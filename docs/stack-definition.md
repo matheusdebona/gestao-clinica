@@ -192,14 +192,54 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 
 ---
 
-## 7. API conventions (locked for Phase 1)
+## 7. API conventions (locked for all phases)
 
-- Prefix: `/api/v1`
-- JSON only; `Accept: application/json`
-- Auth header: `Authorization: Bearer {token}`
-- Form request validation for all writes
-- Consistent error shape (Laravel defaults + optional API Resources)
-- Authorization failures: `403` with clear message; unauthenticated: `401`
+| Concern | Standard |
+| --- | --- |
+| Prefix | `/api/v1` |
+| Format | JSON only (`Accept: application/json`) |
+| Auth | `Authorization: Bearer {token}` |
+| **Input / validation** | **Form Request** on every write (and complex reads when needed) |
+| **Output** | **API Resource** (or Resource collection) for every successful payload |
+| Auth errors | `401` unauthenticated · `403` forbidden (permission) |
+| Validation errors | `422` with Laravel’s structured `message` + `errors` bag |
+| Not found | `404` |
+
+### Why Form Request + Resource
+
+1. **Form Request** — single place for rules, messages, and authorization hooks; the API always returns the same `422` shape the PWA can map to fields.
+2. **API Resource** — stable JSON contract for the frontend (PWA); controllers do not return raw Eloquent models.
+3. Controllers stay thin: validate → act → `return new XResource(...)`.
+
+### Response shapes (target)
+
+**Success (single):**
+
+```json
+{
+  "data": {
+    "id": 1,
+    "name": "..."
+  }
+}
+```
+
+**Success (list / paginator):** Resource collection (`data` + `links` / `meta` when paginated).
+
+**Validation error (`422`):**
+
+```json
+{
+  "message": "The given data was invalid.",
+  "errors": {
+    "email": ["The email field is required."]
+  }
+}
+```
+
+Do **not** invent a parallel error format unless we later introduce a versioned envelope for all responses; prefer Laravel’s defaults so the PWA can reuse one error mapper.
+
+Phase 1 already follows this for auth and users; Phases 2+ must keep the same pattern.
 
 ---
 
