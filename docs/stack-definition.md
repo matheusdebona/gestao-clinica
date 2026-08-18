@@ -246,5 +246,5 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 | DB | PostgreSQL 18 |
 | Cache/queue | Redis |
 | Files | MinIO (S3 API) → cloud S3 later |
-| Commercial core | Products → Protocols → Sales (+ Clients + Payments + Budgets + Docs) |
+| Commercial core | Products → Protocols → Sales → Contract → Treatment (stock on complete) |
 | Phase 1 deliverable | Stack + login + permissions + clinic tenancy skeleton + Docker |
