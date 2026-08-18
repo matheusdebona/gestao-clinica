@@ -1,6 +1,6 @@
 # gestao-clinica
 
-Multi-tenant clinical + commercial management platform — API-first, **mobile-first** UX for clinic staff.
+Multi-tenant clinical + commercial management platform — API-first, **mobile-first PWA** for clinic staff.
 
 ## Current status
 
