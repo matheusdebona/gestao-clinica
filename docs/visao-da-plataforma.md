@@ -443,6 +443,17 @@ Objetivo: a plataforma também funcionar como **controle de estoque**.
 | Cache / filas | Redis |
 | Arquivos | MinIO (compatível com S3) |
 | Ambiente local | Docker Compose |
+| Frontend | PWA mobile-first |
+
+### Padrão da API (travado)
+
+| Entrada | Saída | Erros |
+| --- | --- | --- |
+| **Form Request** valida o que chega | **API Resource** formata o JSON | `401` / `403` / `422` (bag `errors`) / `404` |
+
+Assim o frontend (PWA) sempre recebe a mesma estrutura de sucesso e a mesma estrutura de erro de validação — sem model Eloquent “cru” e sem validação solta no controller.
+
+Detalhe técnico: [`stack-definition.md`](./stack-definition.md) §7.
 
 Isso é a base. O “negócio” (produtos, vendas, tratamentos, etc.) sobe em fases em cima dessa base.
 
