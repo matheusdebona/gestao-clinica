@@ -37,7 +37,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[-]` deferred
 - [ ] Install `spatie/laravel-permission` (^8)
 - [ ] Publish migrations/config; use Redis for permission cache
 - [ ] Add `HasRoles` to `User` (permissions via roles **and** direct assignment)
-- [ ] Define Phase 1 permission catalog seeder (`users.*`, `roles.manage`, `permissions.view`, `files.*`)
+- [ ] Define Phase 1 permission catalog seeder (`users.*`, `roles.manage`, `permissions.view`, `files.*`, `clinics.*`)
 - [ ] Seed optional roles `super-admin` and `admin` as **permission groups only**
 - [ ] Gate every protected route with `permission:...` middleware (never role-only checks)
 - [ ] Bootstrap first super-admin from env (Artisan command or seeder)
@@ -48,6 +48,18 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[-]` deferred
   - [ ] Assign/revoke direct permissions
   - [ ] List permissions / roles
 - [ ] Feature tests: user without permission → 403; with permission → 200
+
+---
+
+## C2. Clinic tenancy skeleton
+
+- [ ] Create `clinics` migration/model (name, contact, settings JSON, `is_active`)
+- [ ] Add `users.clinic_id` (nullable only for platform super-admin)
+- [ ] Resolve current clinic from authenticated user on API requests
+- [ ] Enforce clinic scope helper/trait for upcoming domain models
+- [ ] Seed demo clinic + bind clinic admin user
+- [ ] Permissions: `clinics.view`, `clinics.manage`
+- [ ] Tests: user A cannot resolve clinic B as “current”
 
 ---
 
@@ -77,15 +89,22 @@ Phase 1 is complete when all of the following are true:
 1. `docker compose up` brings API + Postgres 18 + Redis + MinIO to a healthy state.
 2. A seeded admin can **login**, call **me**, and **logout** via Sanctum tokens.
 3. A second user **without** a given permission receives **403** on that endpoint.
-4. File put/get works through the S3 disk against MinIO.
-5. README documents how to run and how to create the first admin.
-6. Automated tests cover auth + at least one permission denial/allowance path.
+4. Authenticated clinic user resolves a **current clinic**; tenancy helpers are ready for domain models.
+5. File put/get works through the S3 disk against MinIO.
+6. README documents how to run and how to create the first admin.
+7. Automated tests cover auth + at least one permission denial/allowance path + clinic binding.
 
 ---
 
-## Next phases (placeholders only)
+## Next phases
 
-- [ ] Phase 2 — Clinical core (patients, appointments) with new permissions
-- [ ] Phase 3 — Documents/attachments on MinIO + audit trail
-- [ ] Phase 4 — Cloud S3 cutover + production hardening
-- [ ] Phase 5 — Frontend client (tech TBD)
+Full checklists: [`domain-roadmap.md`](./domain-roadmap.md).
+
+- [ ] Phase 2 — Products, catalogs, stock + low-stock
+- [ ] Phase 3 — Protocols (product bundles)
+- [ ] Phase 4 — Clients
+- [ ] Phase 5 — Payment methods + card operators/fees
+- [ ] Phase 6 — Sales + stock decrement
+- [ ] Phase 7 — Budgets → convert to sale
+- [ ] Phase 8 — Documents/contracts (MinIO)
+- [ ] Phase 9 — Alerts, audit, dashboards, cloud S3

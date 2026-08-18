@@ -1,25 +1,33 @@
 # gestao-clinica
 
-Clinical management platform — API-first.
+Multi-tenant clinical + commercial management platform — API-first.
 
 ## Current status
 
-**Phase 1 — definition.** Stack, auth, and permission model are documented; implementation has not started yet.
+**Definition phase.** Stack, tenancy, and commercial domain are documented; application scaffolding has not started yet.
 
 | Document | Purpose |
 | --- | --- |
-| [docs/stack-definition.md](./docs/stack-definition.md) | Construction stack, Sanctum auth, permission-first authorization, infra |
-| [docs/phase-1-todo.md](./docs/phase-1-todo.md) | Actionable checklist for scaffolding, login, and RBAC-by-permission |
+| [docs/stack-definition.md](./docs/stack-definition.md) | Laravel 13 / PHP 8.5, Sanctum, Redis, Postgres 18, MinIO, permissions |
+| [docs/phase-1-todo.md](./docs/phase-1-todo.md) | Foundation checklist: Docker, login, permissions, clinic skeleton |
+| [docs/domain-model.md](./docs/domain-model.md) | Products, stock, protocols, clients, payments, sales, budgets, docs, multi-tenant clinic |
+| [docs/domain-roadmap.md](./docs/domain-roadmap.md) | Phased TODOs for the commercial core |
 
 ## Target stack (locked)
 
 - **API:** Laravel 13 · PHP 8.5
 - **Auth:** Laravel Sanctum (Bearer tokens)
-- **Authz:** `spatie/laravel-permission` — permission checks on routes; roles only as optional groups
-- **DB:** PostgreSQL 18
-- **Cache / queue:** Redis
-- **Files:** MinIO (S3-compatible) → cloud S3 later
+- **Authz:** Permission-first (`spatie/laravel-permission`); roles only as optional groups
+- **Tenant:** Clinic — all commercial data clinic-scoped
+- **DB:** PostgreSQL 18 · **Cache/queue:** Redis · **Files:** MinIO (S3)
+
+## Domain (locked direction)
+
+```text
+Clinic → Products/stock → Protocols → Clients → Payments
+       → Sales (stock out) → Budgets → Documents/contracts
+```
 
 ## Next step
 
-Implement Phase 1 from `docs/phase-1-todo.md` after open questions in the stack definition are answered (clients, tenancy, locale, etc.).
+Answer open questions in the stack/domain docs, then implement Phase 1 (`docs/phase-1-todo.md`).
