@@ -134,12 +134,26 @@ Add when implementing tenancy scaffolding:
 
 ---
 
+## Phase 11 — Frontend (mobile-first)
+
+- [ ] Choose stack (e.g. React/Vue/Next) with **mobile-first** responsive layouts
+- [ ] Prioritize phone flows: login, client search, sale, contract, treatment complete, low-stock
+- [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI
+- [ ] Optional PWA (“Add to Home Screen”) for clinic staff
+- [ ] Desktop layouts as progressive enhancement of the mobile design
+- [ ] Native iOS/Android only if web/PWA proves insufficient
+
+**DoD:** doctor and secretary can complete core daily tasks comfortably on a phone-sized viewport.
+
+---
+
 ## Suggested build order (why)
 
 ```text
 Clinic/tenant → Products/stock master → Protocols → Clients → Payments
     → Sales (no stock out) → Budgets → Documents/contracts
     → Treatments (actual usage → stock out + real cost)
+    → Mobile-first UI
 ```
 
-Sales and contracts are commercial. Treatments are clinical consumption. Stock only moves when treatment is completed.
+Sales and contracts are commercial. Treatments are clinical consumption. Stock only moves when treatment is completed. UI must be usable on mobile from day one of the frontend phase.

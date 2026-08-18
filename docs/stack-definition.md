@@ -1,10 +1,10 @@
 # Clinical Management — Stack Definition
 
-Initial architecture decisions for **gestao-clinica**: an API-first clinical management platform.
+Initial architecture decisions for **gestao-clinica**: an API-first clinical management platform with a **mobile-first** product constraint for clinic day-to-day use.
 
 This document freezes the construction stack for Phase 1. Implementation follows the checklist in [`phase-1-todo.md`](./phase-1-todo.md).
 
-Business domain (products, protocols, sales, clients, payments, multi-tenant clinics) is defined in [`domain-model.md`](./domain-model.md) and phased in [`domain-roadmap.md`](./domain-roadmap.md).
+Business domain (products, protocols, sales, treatments, clients, payments, multi-tenant clinics) is defined in [`domain-model.md`](./domain-model.md) and phased in [`domain-roadmap.md`](./domain-roadmap.md). Portuguese overview: [`visao-da-plataforma.md`](./visao-da-plataforma.md).
 
 ---
 
@@ -15,6 +15,17 @@ Business domain (products, protocols, sales, clients, payments, multi-tenant cli
 - Authorize access by **permission** (fine-grained), not by role name alone.
 - Introduce **Clinic** as the multi-tenant holder (users bound to a clinic).
 - Run locally with Docker: API + PostgreSQL + Redis + MinIO.
+- Keep the API shaped for a **mobile-first** client (doctor, secretary, clinic staff on phone/tablet).
+
+### Mobile-first (product constraint)
+
+| Topic | Decision |
+| --- | --- |
+| Priority | **Mobile-first** UX for daily clinic use (doctor, secretary, others) |
+| Desktop | Supported as an expansion of mobile layouts, not the primary design target |
+| API | Token-based Sanctum API suitable for responsive web, PWA, or native apps |
+| First UI (later phase) | Prefer responsive mobile-first web (+ optional PWA); native apps optional later |
+| Critical phone flows | Client search, sale, contract access, start/complete treatment, low-stock |
 
 ---
 
@@ -216,10 +227,10 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 
 ## 10. Open questions (need your input)
 
-### Platform / auth
+### Platform / auth / UX
 
-1. **App clients** — Web SPA only, or also mobile? (Cookie SPA auth vs token-only.)
-2. **Frontend** — Same repo or separate SPA (React/Vue/Next)?
+1. **Frontend delivery** — Mobile-first responsive web (+ optional PWA) first, or native iOS/Android in the first UI release?
+2. **Frontend repo** — Same monorepo or separate SPA repo?
 3. **Locale / i18n** — Portuguese (BR) primary for API messages and seeds?
 4. **User identity** — Email-only login, or also CPF / employee code?
 5. **Soft delete** — Prefer deactivate users over hard delete?
@@ -230,8 +241,9 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 7. **User ↔ clinic** — One clinic per user for now, or many?
 8. **Protocol `min_price`** — Hard block or warning only?
 9. **Partial payments** — Allow outstanding balance on a sale?
-10. **Stock on budgets** — Reserve on accept, or only decrement on sale confirm?
-11. **Currency** — BRL only?
+10. **Treatment extras with charge** — Adjust original sale payment, or only annotate on treatment?
+11. **Sessions** — One sale → one treatment, or multiple sessions?
+12. **Currency** — BRL only?
 
 ---
 
@@ -247,4 +259,5 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 | Cache/queue | Redis |
 | Files | MinIO (S3 API) → cloud S3 later |
 | Commercial core | Products → Protocols → Sales → Contract → Treatment (stock on complete) |
+| UX | **Mobile-first** (doctor, secretary, clinic staff); desktop secondary |
 | Phase 1 deliverable | Stack + login + permissions + clinic tenancy skeleton + Docker |

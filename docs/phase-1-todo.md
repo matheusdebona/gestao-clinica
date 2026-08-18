@@ -109,3 +109,4 @@ Full checklists: [`domain-roadmap.md`](./domain-roadmap.md).
 - [ ] Phase 8 — Documents/contracts (MinIO)
 - [ ] Phase 9 — Treatments → actual usage → stock + real cost
 - [ ] Phase 10 — Alerts, audit, dashboards, cloud S3
+- [ ] Phase 11 — Frontend mobile-first (web/PWA; native later if needed)

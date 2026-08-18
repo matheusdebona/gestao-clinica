@@ -24,6 +24,8 @@ A **gestão-clinica** é um sistema para clínicas controlarem:
 - as **vendas**, os **contratos** e o **tratamento** (aplicação real no paciente);
 - tudo isso separado por **clínica** (multi-tenant): cada clínica só vê e gerencia os próprios dados.
 
+**Uso no celular é prioridade:** a interface será **mobile-first**, pensada para o dia a dia do **médico**, da **secretária** e dos demais papéis da clínica (não um sistema “só de desktop” adaptado depois).
+
 A ideia central do fluxo comercial + clínico é:
 
 ```text
@@ -93,6 +95,35 @@ Você pediu controle por **permissão de acesso a pontos específicos**, não ap
 - Também dá para dar permissão **direta** a um usuário, sem depender do cargo.
 
 Isso permite cenários do tipo: dois usuários com o mesmo “rótulo”, mas um pode cancelar venda e o outro não.
+
+---
+
+## 3.1. Mobile-first (uso no celular)
+
+A plataforma **nasce mobile-first**. O uso diário na clínica acontece no bolso / no balcão com telefone ou tablet — não só no computador.
+
+### Para quem
+
+| Perfil | Exemplos de uso no celular |
+| --- | --- |
+| Secretária | Buscar cliente, fechar venda, gerar contrato, ver agenda de tratamentos |
+| Médico / profissional | Abrir tratamento do paciente, marcar produtos usados, incluir complemento, finalizar e baixar estoque |
+| Estoque / admin | Ver alerta de falta, ajustar cadastros rápidos |
+
+### Princípios de UX
+
+1. **Desenhar primeiro para tela pequena** (depois expandir para tablet/desktop).
+2. Fluxos críticos com **poucos toques**: venda, tratamento (consumo real), busca de cliente, alerta de estoque.
+3. Botões e listas **fáceis de tocar**; evitar tabelas densas como tela principal no mobile.
+4. Formulários curtos, com campos essenciais em destaque.
+5. Funcionar bem com **conexão variável** da clínica (API enxuta; depois cache/offline se precisar).
+6. Desktop continua suportado, mas **não é o desenho-mestre**.
+
+### O que isso implica na construção
+
+- A **API** (Laravel) já serve bem app web responsivo, PWA ou app nativo depois — Sanctum com token Bearer combina com mobile.
+- O **frontend** (quando for implementado) deve ser responsivo com abordagem mobile-first desde o primeiro layout.
+- Caminho recomendado inicial: **web responsiva mobile-first** (e, se fizer sentido, **PWA** para “adicionar à tela inicial”). App nativo (iOS/Android) fica como evolução, não bloqueio da Fase 1 da API.
 
 ---
 
@@ -430,6 +461,7 @@ Isso é a base. O “negócio” (produtos, vendas, tratamentos, etc.) sobe em f
 | **8** | Documentos / contratos (MinIO) |
 | **9** | Tratamentos: início, consumo real, fim → **baixa de estoque + custo** |
 | **10** | Notificações, auditoria, painéis (margem real), S3 na nuvem |
+| **11** | Frontend **mobile-first** (médico, secretária; web/PWA; nativo depois se precisar) |
 
 ---
 
@@ -445,7 +477,7 @@ Marque mentalmente o que está certo ou diga o que mudar:
 6. **Moeda:** só Real (BRL)?
 7. **Login:** só e-mail/senha, ou também CPF / código de funcionário?
 8. **Idioma das mensagens da API:** português (BR) desde o início?
-9. **App:** só web no começo, ou também mobile?
+9. **Frontend mobile-first:** web responsiva (+ PWA) no início está ok, ou você já quer app nativo (iOS/Android) na primeira entrega de interface?
 10. **Contrato:** PDF gerado pelo próprio sistema no início está ok?
 11. **WhatsApp:** só guardar o número por enquanto?
 
@@ -453,7 +485,7 @@ Marque mentalmente o que está certo ou diga o que mudar:
 
 ## 17. Resumo em uma frase
 
-> Cada **clínica** cadastra **produtos** e **protocolos**, registra **clientes** e **pagamentos**, faz a **venda** e o **contrato** (sem mexer no estoque), depois **inicia o tratamento** do paciente e, ao **finalizar**, informa o que foi realmente usado — inclusive complementos sem cobrança — para **baixar o estoque** e **contabilizar o custo real**, com usuários limitados por **permissões** e sem ver dados de outra clínica.
+> Cada **clínica** cadastra **produtos** e **protocolos**, registra **clientes** e **pagamentos**, faz a **venda** e o **contrato** (sem mexer no estoque), depois **inicia o tratamento** do paciente e, ao **finalizar**, informa o que foi realmente usado — inclusive complementos sem cobrança — para **baixar o estoque** e **contabilizar o custo real**, com usuários limitados por **permissões**, dados isolados por clínica, e interface **mobile-first** para o dia a dia do médico e da secretária.
 
 ---
 
