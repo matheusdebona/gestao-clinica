@@ -21,14 +21,14 @@ Multi-tenant clinical + commercial management platform — API-first, **mobile-f
 - **Authz:** Permission-first (`spatie/laravel-permission`); roles only as optional groups
 - **Tenant:** Clinic — all commercial data clinic-scoped
 - **DB:** PostgreSQL 18 · **Cache/queue:** Redis · **Files:** MinIO (S3)
-- **UX:** Mobile-first (doctor, secretary, clinic staff)
+- **UX:** Mobile-first **PWA** (doctor, secretary, clinic staff); native later if needed
 
 ## Domain (locked direction)
 
 ```text
 Clinic → Products → Protocols → Clients → Payments
        → Sales (no stock) → Contract → Treatment (stock + real cost)
-       → Mobile-first UI
+       → Mobile-first PWA
 ```
 
 ## Next step

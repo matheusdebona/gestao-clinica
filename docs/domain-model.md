@@ -420,4 +420,4 @@ All checks remain **permission-first**; roles only group these permissions per c
 | Cards | Separate operators / fee rules module |
 | Budgets & docs | Same commercial lineage; docs on MinIO; no stock effect |
 | Authz | Permission-first model, clinic-scoped queries |
-| UX | Mobile-first for doctor, secretary, and clinic staff daily use |
+| UX | Mobile-first **PWA** for doctor, secretary, and clinic staff; native optional later |

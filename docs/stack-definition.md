@@ -23,8 +23,8 @@ Business domain (products, protocols, sales, treatments, clients, payments, mult
 | --- | --- |
 | Priority | **Mobile-first** UX for daily clinic use (doctor, secretary, others) |
 | Desktop | Supported as an expansion of mobile layouts, not the primary design target |
-| API | Token-based Sanctum API suitable for responsive web, PWA, or native apps |
-| First UI (later phase) | Prefer responsive mobile-first web (+ optional PWA); native apps optional later |
+| API | Token-based Sanctum API suitable for PWA (and native later if needed) |
+| First UI | **PWA** mobile-first (installable / “Add to Home Screen”); native apps only if PWA is not enough later |
 | Critical phone flows | Client search, sale, contract access, start/complete treatment, low-stock |
 
 ---
@@ -229,8 +229,8 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 
 ### Platform / auth / UX
 
-1. **Frontend delivery** — Mobile-first responsive web (+ optional PWA) first, or native iOS/Android in the first UI release?
-2. **Frontend repo** — Same monorepo or separate SPA repo?
+1. **Frontend repo** — Same monorepo or separate SPA/PWA repo?
+2. **PWA stack** — React, Vue, or Next (or other) for the first PWA?
 3. **Locale / i18n** — Portuguese (BR) primary for API messages and seeds?
 4. **User identity** — Email-only login, or also CPF / employee code?
 5. **Soft delete** — Prefer deactivate users over hard delete?
@@ -259,5 +259,5 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 | Cache/queue | Redis |
 | Files | MinIO (S3 API) → cloud S3 later |
 | Commercial core | Products → Protocols → Sales → Contract → Treatment (stock on complete) |
-| UX | **Mobile-first** (doctor, secretary, clinic staff); desktop secondary |
+| UX | **Mobile-first PWA** (doctor, secretary, clinic staff); desktop secondary; native later if needed |
 | Phase 1 deliverable | Stack + login + permissions + clinic tenancy skeleton + Docker |

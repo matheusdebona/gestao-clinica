@@ -121,9 +121,10 @@ A plataforma **nasce mobile-first**. O uso diário na clínica acontece no bolso
 
 ### O que isso implica na construção
 
-- A **API** (Laravel) já serve bem app web responsivo, PWA ou app nativo depois — Sanctum com token Bearer combina com mobile.
-- O **frontend** (quando for implementado) deve ser responsivo com abordagem mobile-first desde o primeiro layout.
-- Caminho recomendado inicial: **web responsiva mobile-first** (e, se fizer sentido, **PWA** para “adicionar à tela inicial”). App nativo (iOS/Android) fica como evolução, não bloqueio da Fase 1 da API.
+- A **API** (Laravel) já serve bem a PWA — Sanctum com token Bearer combina com mobile.
+- O **frontend inicial será uma PWA mobile-first** (instalável / “Adicionar à tela inicial”), para médico e secretária usarem no celular no dia a dia.
+- Desktop continua suportado na mesma PWA, como tela maior — não como desenho principal.
+- App nativo (iOS/Android) fica como evolução **só se** a PWA não atender; não bloqueia as fases da API.
 
 ---
 
@@ -461,7 +462,7 @@ Isso é a base. O “negócio” (produtos, vendas, tratamentos, etc.) sobe em f
 | **8** | Documentos / contratos (MinIO) |
 | **9** | Tratamentos: início, consumo real, fim → **baixa de estoque + custo** |
 | **10** | Notificações, auditoria, painéis (margem real), S3 na nuvem |
-| **11** | Frontend **mobile-first** (médico, secretária; web/PWA; nativo depois se precisar) |
+| **11** | Frontend **PWA mobile-first** (médico, secretária; nativo depois só se precisar) |
 
 ---
 
@@ -477,7 +478,7 @@ Marque mentalmente o que está certo ou diga o que mudar:
 6. **Moeda:** só Real (BRL)?
 7. **Login:** só e-mail/senha, ou também CPF / código de funcionário?
 8. **Idioma das mensagens da API:** português (BR) desde o início?
-9. **Frontend mobile-first:** web responsiva (+ PWA) no início está ok, ou você já quer app nativo (iOS/Android) na primeira entrega de interface?
+9. **Stack da PWA:** React, Vue, Next ou outra?
 10. **Contrato:** PDF gerado pelo próprio sistema no início está ok?
 11. **WhatsApp:** só guardar o número por enquanto?
 
@@ -485,7 +486,7 @@ Marque mentalmente o que está certo ou diga o que mudar:
 
 ## 17. Resumo em uma frase
 
-> Cada **clínica** cadastra **produtos** e **protocolos**, registra **clientes** e **pagamentos**, faz a **venda** e o **contrato** (sem mexer no estoque), depois **inicia o tratamento** do paciente e, ao **finalizar**, informa o que foi realmente usado — inclusive complementos sem cobrança — para **baixar o estoque** e **contabilizar o custo real**, com usuários limitados por **permissões**, dados isolados por clínica, e interface **mobile-first** para o dia a dia do médico e da secretária.
+> Cada **clínica** cadastra **produtos** e **protocolos**, registra **clientes** e **pagamentos**, faz a **venda** e o **contrato** (sem mexer no estoque), depois **inicia o tratamento** do paciente e, ao **finalizar**, informa o que foi realmente usado — inclusive complementos sem cobrança — para **baixar o estoque** e **contabilizar o custo real**, com usuários limitados por **permissões**, dados isolados por clínica, e interface **PWA mobile-first** para o dia a dia do médico e da secretária.
 
 ---
 
