@@ -25,10 +25,10 @@ Multi-tenant clinical + commercial management platform — API-first.
 ## Domain (locked direction)
 
 ```text
-Clinic → Products/stock → Protocols → Clients → Payments
-       → Sales (stock out) → Budgets → Documents/contracts
+Clinic → Products → Protocols → Clients → Payments
+       → Sales (no stock) → Contract → Treatment (stock + real cost)
 ```
 
 ## Next step
 
-Answer open questions in the stack/domain docs, then implement Phase 1 (`docs/phase-1-todo.md`).
+Read [docs/visao-da-plataforma.md](./docs/visao-da-plataforma.md), answer open questions, then implement Phase 1 (`docs/phase-1-todo.md`).

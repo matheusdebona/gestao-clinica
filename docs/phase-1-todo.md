@@ -104,7 +104,8 @@ Full checklists: [`domain-roadmap.md`](./domain-roadmap.md).
 - [ ] Phase 3 — Protocols (product bundles)
 - [ ] Phase 4 — Clients
 - [ ] Phase 5 — Payment methods + card operators/fees
-- [ ] Phase 6 — Sales + stock decrement
+- [ ] Phase 6 — Sales (commercial; **no** stock decrement)
 - [ ] Phase 7 — Budgets → convert to sale
 - [ ] Phase 8 — Documents/contracts (MinIO)
-- [ ] Phase 9 — Alerts, audit, dashboards, cloud S3
+- [ ] Phase 9 — Treatments → actual usage → stock + real cost
+- [ ] Phase 10 — Alerts, audit, dashboards, cloud S3

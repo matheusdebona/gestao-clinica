@@ -21,10 +21,10 @@ A **gestão-clinica** é um sistema para clínicas controlarem:
 - os **protocolos** (procedimentos montados com combinação de produtos);
 - os **clientes** (pacientes);
 - as **formas de pagamento** (incluindo taxas de cartão);
-- as **vendas** (e depois orçamentos e contratos);
+- as **vendas**, os **contratos** e o **tratamento** (aplicação real no paciente);
 - tudo isso separado por **clínica** (multi-tenant): cada clínica só vê e gerencia os próprios dados.
 
-A ideia central do fluxo comercial é:
+A ideia central do fluxo comercial + clínico é:
 
 ```text
 Cadastrar produtos e estoque
@@ -33,11 +33,16 @@ Montar protocolos (agrupando produtos)
         ↓
 Cadastrar clientes e formas de pagamento
         ↓
-Fazer venda (protocolo e/ou produtos avulsos)
+Fazer a venda (protocolo e/ou produtos sugeridos)  ← NÃO baixa estoque
         ↓
-Baixar estoque automaticamente
+Gerar o contrato
         ↓
-(depois) Orçamento → Contrato / documentação
+Iniciar o tratamento do paciente
+        ↓
+Ao final do tratamento: informar o que foi REALMENTE usado
+  (sugestão inicial + complementos do médico, mesmo sem cobrança)
+        ↓
+Aí sim: baixar estoque e contabilizar o custo real
 ```
 
 ---
@@ -80,7 +85,8 @@ Você pediu controle por **permissão de acesso a pontos específicos**, não ap
 - Cada ação importante tem uma permissão, por exemplo:
   - `products.view` — ver produtos
   - `products.create` — cadastrar produto
-  - `sales.confirm` — confirmar venda (e baixar estoque)
+  - `sales.confirm` — confirmar venda (comercial; **não** baixa estoque)
+  - `treatments.complete` — finalizar tratamento e baixar estoque
   - `clients.update` — editar cliente
 - O sistema **sempre verifica a permissão**, nunca só “é recepcionista?”.
 - **Cargos (roles)** existem só como atalho: um pacote de permissões (ex.: “Admin da clínica”, “Estoque”, “Vendas”).
@@ -116,9 +122,10 @@ São **cadastros separados** (por clínica), para você ir incluindo o que usar 
 ### Estoque
 
 - Você **abastece** o estoque (entrada / ajuste).
-- Quando uma **venda é confirmada**, o estoque **desce** automaticamente.
+- A **venda** e o **contrato** **não** baixam estoque — o produto ainda não foi aplicado.
+- A baixa acontece só ao **finalizar o tratamento**, com base no que foi **realmente usado** (incluindo complementos sem cobrança).
 - Se o estoque atual ≤ estoque mínimo → o produto entra na lista de **alerta de falta**.
-- Orçamento **não** baixa estoque (a não ser que depois você peça reserva — ver perguntas no final).
+- Orçamento também **não** baixa estoque.
 
 ---
 
@@ -201,16 +208,18 @@ Assim, na venda você registra **como** pagou e, no futuro, consegue calcular o 
 
 ## 8. Vendas
 
-A venda é o momento em que junta:
+A venda é o momento **comercial**: o que foi combinado/cobrado com o cliente.
+
+Ela junta:
 
 - clínica
 - cliente
-- data / horário do atendimento
-- tempo de atendimento
-- itens (protocolos e/ou produtos)
-- valor esperado × valor efetivo
+- data da venda
+- itens sugeridos (protocolos e/ou produtos)
+- valor esperado × valor efetivo cobrado
 - forma(s) de pagamento
-- e, ao confirmar, **baixa de estoque**
+
+**Importante:** confirmar a venda **não baixa estoque**. O produto só sai do estoque quando o tratamento é finalizado e o consumo real é informado.
 
 ### Itens da venda
 
@@ -220,74 +229,144 @@ Você pode:
 2. Adicionar **produtos individuais**
 3. Misturar os dois na mesma venda
 
+Esses itens viram a **sugestão inicial** do que deve ser usado no tratamento (checklist de partida).
+
 ### Valores
 
 | Conceito | Significado |
 | --- | --- |
 | Valor esperado | Calculado automaticamente com base nos preços já cadastrados (protocolos + produtos) |
-| Valor efetivo | Quanto realmente foi cobrado (pode diferir do esperado, respeitando ou não o valor mínimo do protocolo) |
+| Valor efetivo | Quanto realmente foi cobrado na venda |
 
 ### Pagamento na venda
 
 - Uma ou mais formas de pagamento
 - Se cartão: operadora, parcelas, etc.
-- Data da venda / do atendimento
+- Data da venda
 - Quem vendeu (usuário logado)
 
-### Status (ideia)
+### Status da venda (ideia)
 
-- **Rascunho** — ainda editando, estoque intacto
-- **Confirmada** — fecha a venda e **diminui estoque**
-- **Cancelada** — (depois) devolve estoque
+- **Rascunho** — ainda editando
+- **Confirmada** — venda fechada comercialmente (estoque **intacto**)
+- **Cancelada** — venda anulada (sem efeito de estoque, pois nunca baixou)
 
-### Baixa de estoque (regra)
-
-Ao confirmar:
-
-- Para linha de **produto**: desce a quantidade vendida
-- Para linha de **protocolo**: “explode” os produtos do protocolo e desce cada um × quantidade do protocolo
-
-Os preços/custos do momento da venda ficam **registrados na venda** (snapshot), para o histórico não mudar se você alterar o cadastro depois.
+Os preços do momento da venda ficam **registrados na venda** (snapshot), para o histórico comercial não mudar se o cadastro mudar depois.
 
 ---
 
 ## 9. Orçamentos
 
-Orçamento é quase uma venda, mas:
+Orçamento é quase uma venda, mas ainda em fase de proposta:
 
-- **não baixa estoque** ao salvar;
+- **não** baixa estoque;
 - tem status (rascunho, enviado, aceito, recusado, expirado, convertido);
 - pode **virar venda** quando o cliente aceitar, reaproveitando itens, cliente e valores.
-
-Serve para negociar antes de consumir produto.
 
 ---
 
 ## 10. Documentação / contratos
 
-Na hora de gerar contrato (ou termo / recibo), o sistema reaproveita o que já existe:
+Depois da venda (ou a partir do orçamento convertido), gera-se o **contrato** reaproveitando:
 
 - dados da **clínica**
 - dados do **cliente**
-- **protocolos / produtos** e valores da venda ou do orçamento
+- **protocolos / produtos** e valores da venda
 
-O arquivo (PDF, etc.) fica guardado no **MinIO** (armazenamento estilo S3), preparado para depois migrar para um S3 na nuvem (AWS, R2, etc.) sem mudar a lógica do sistema.
+O arquivo (PDF, etc.) fica no **MinIO** (estilo S3), pronto para migrar depois para S3 na nuvem.
 
-No início: gerar e armazenar o documento. Assinatura eletrônica e templates avançados vêm depois.
+Fluxo esperado:
+
+```text
+Venda confirmada → Gerar contrato → (depois) iniciar tratamento
+```
+
+Assinatura eletrônica e templates avançados vêm depois; no início: gerar e armazenar.
 
 ---
 
-## 11. Alertas de estoque
+## 11. Tratamento (aplicação no paciente) — onde o estoque desce
+
+O **tratamento** é o passo clínico: ir até o paciente, aplicar o procedimento e, no fim, registrar o consumo real.
+
+### Por que existe separado da venda
+
+Na venda o produto ainda **não foi aplicado**. O médico pode:
+
+- usar exatamente o que foi sugerido na venda/protocolo;
+- usar **menos** ou **mais** do que o previsto;
+- **adicionar produtos complementares sem cobrar** o paciente;
+- em alguns casos, cobrar um valor extra por algo acrescentado (regra a detalhar).
+
+O estoque e o **custo real** precisam refletir o que **saiu do frasco**, não só o que foi vendido no papel.
+
+### Fluxo do tratamento
+
+```text
+1. Abrir tratamento a partir da venda (+ contrato já gerado)
+2. Iniciar atendimento do paciente
+3. Sistema sugere os produtos previstos na venda
+   (protocolos “explodidos” em produtos + produtos avulsos)
+4. No fim do tratamento, informar o que foi usado de fato:
+   - marcar / ajustar quantidades dos itens sugeridos
+   - incluir produtos extras (complemento)
+   - dizer se o extra foi cobrado ou cortesia (sem cobrança)
+   - se cobrado: qual valor
+5. Finalizar tratamento
+   → baixa o estoque pelo consumo real
+   → registra o custo total do que foi usado (mesmo o que foi cortesia)
+```
+
+### Dados do tratamento
+
+| Informação | Finalidade |
+| --- | --- |
+| Clínica, cliente, venda | Vínculo |
+| Profissional responsável | Quem aplicou |
+| Início / fim | Horários do atendimento |
+| Tempo de atendimento | Duração real |
+| Status | `agendado`, `em_andamento`, `finalizado`, `cancelado` |
+| Observações clínicas | Anotações do atendimento |
+
+### Itens de consumo (o que realmente saiu)
+
+Cada linha de consumo no tratamento:
+
+| Campo | Significado |
+| --- | --- |
+| Produto | O que foi usado |
+| Quantidade | Quanto foi usado (na unidade do produto) |
+| Origem | `sugerido` (veio da venda) ou `complemento` (adicionado no atendimento) |
+| Cobrado? | Sim / não (cortesia do médico) |
+| Valor cobrado | Se cobrado; senão zero |
+| Custo unitário (snapshot) | Custo do produto no momento do uso |
+| Custo total da linha | `quantidade × custo` — entra na conta da clínica mesmo se for cortesia |
+
+### Regras de ouro
+
+1. **Venda / contrato = comercial** (o que foi combinado e cobrado na venda).
+2. **Tratamento finalizado = operacional + estoque + custo real**.
+3. Produto de **cortesia** (sem cobrança ao paciente) **ainda baixa estoque** e **ainda conta como custo** da clínica.
+4. Só se finaliza o tratamento (e baixa estoque) uma vez; cancelar tratamento finalizado exigiria estorno de estoque (fase posterior).
+
+### Permissões (exemplos)
+
+`treatments.view`, `treatments.start`, `treatments.update`, `treatments.complete`, `treatments.cancel`
+
+---
+
+## 12. Alertas de estoque
 
 Objetivo: a plataforma também funcionar como **controle de estoque**.
 
 - Cada produto tem **estoque mínimo**
 - Lista / filtro de produtos em falta ou perto da falta
-- No futuro: aviso por e-mail ou WhatsApp (por enquanto, foco em ter a informação no sistema)
+- A baixa que alimenta esses alertas vem do **fim do tratamento**, não da venda
+- No futuro: aviso por e-mail ou WhatsApp
 
 ---
 
-## 12. Como as peças se ligam
+## 13. Como as peças se ligam
 
 ```text
                     ┌─────────────┐
@@ -304,21 +383,23 @@ Objetivo: a plataforma também funcionar como **controle de estoque**.
            ┌───────────────┼───────────────┐
            ▼               ▼               ▼
      Formas de         Orçamento         Venda
-     pagamento              │               │
-           │                └───────┬───────┘
-           └────────────────────────┤
-                                    ▼
-                            Documentos /
-                             contratos
-                                    │
-                                    ▼
-                          Estoque atualizado
-                         (+ alerta de falta)
+     pagamento              │          (comercial)
+           │                └──────┬──────┘
+           └───────────────────────┤
+                                   ▼
+                           Contrato / docs
+                                   │
+                                   ▼
+                             Tratamento
+                    (início → uso real → fim)
+                                   │
+                                   ▼
+                    Baixa de estoque + custo real
+                      (+ alerta de falta)
 ```
-
 ---
 
-## 13. Stack técnica (resumo)
+## 14. Stack técnica (resumo)
 
 | Camada | Escolha |
 | --- | --- |
@@ -331,11 +412,11 @@ Objetivo: a plataforma também funcionar como **controle de estoque**.
 | Arquivos | MinIO (compatível com S3) |
 | Ambiente local | Docker Compose |
 
-Isso é a base. O “negócio” (produtos, vendas, etc.) sobe em fases em cima dessa base.
+Isso é a base. O “negócio” (produtos, vendas, tratamentos, etc.) sobe em fases em cima dessa base.
 
 ---
 
-## 14. Ordem de construção (fases)
+## 15. Ordem de construção (fases)
 
 | Fase | O que entrega |
 | --- | --- |
@@ -344,34 +425,36 @@ Isso é a base. O “negócio” (produtos, vendas, etc.) sobe em fases em cima 
 | **3** | Protocolos (pacotes de produtos) |
 | **4** | Clientes |
 | **5** | Formas de pagamento, operadoras e taxas de cartão |
-| **6** | Vendas + baixa de estoque |
+| **6** | Vendas (comercial; **sem** baixa de estoque) |
 | **7** | Orçamentos → converter em venda |
 | **8** | Documentos / contratos (MinIO) |
-| **9** | Notificações, auditoria, painéis, S3 na nuvem |
+| **9** | Tratamentos: início, consumo real, fim → **baixa de estoque + custo** |
+| **10** | Notificações, auditoria, painéis (margem real), S3 na nuvem |
 
 ---
 
-## 15. O que ainda precisa da sua confirmação
+## 16. O que ainda precisa da sua confirmação
 
 Marque mentalmente o que está certo ou diga o que mudar:
 
 1. **Usuário em várias clínicas?** Hoje: 1 usuário = 1 clínica.
 2. **Vender abaixo do valor mínimo do protocolo:** bloquear ou só avisar?
 3. **Pagamento parcial:** pode ficar saldo em aberto na venda, ou o total pago tem que fechar com o valor efetivo?
-4. **Orçamento aceito:** reserva estoque, ou só baixa na venda confirmada?
-5. **Moeda:** só Real (BRL)?
-6. **Login:** só e-mail/senha, ou também CPF / código de funcionário?
-7. **Idioma das mensagens da API:** português (BR) desde o início?
-8. **App:** só web no começo, ou também mobile?
-9. **Contrato:** PDF gerado pelo próprio sistema no início está ok?
-10. **WhatsApp:** só guardar o número por enquanto, sem integração com API da Meta ainda?
+4. **Complemento no tratamento com cobrança:** gera uma cobrança/ajuste ligado à venda original, ou só anota o valor no tratamento?
+5. **Uma venda → um tratamento**, ou pode haver várias sessões de tratamento para a mesma venda?
+6. **Moeda:** só Real (BRL)?
+7. **Login:** só e-mail/senha, ou também CPF / código de funcionário?
+8. **Idioma das mensagens da API:** português (BR) desde o início?
+9. **App:** só web no começo, ou também mobile?
+10. **Contrato:** PDF gerado pelo próprio sistema no início está ok?
+11. **WhatsApp:** só guardar o número por enquanto?
 
 ---
 
-## 16. Resumo em uma frase
+## 17. Resumo em uma frase
 
-> Cada **clínica** cadastra **produtos** (com custo, preço e estoque), monta **protocolos**, registra **clientes** e **pagamentos**, faz **vendas** (protocolo e/ou avulso) com valor esperado e efetivo, **baixa estoque**, recebe **alerta de falta**, e depois usa os mesmos dados para **orçamento** e **contrato** — com usuários limitados por **permissões** e sem ver dados de outra clínica.
+> Cada **clínica** cadastra **produtos** e **protocolos**, registra **clientes** e **pagamentos**, faz a **venda** e o **contrato** (sem mexer no estoque), depois **inicia o tratamento** do paciente e, ao **finalizar**, informa o que foi realmente usado — inclusive complementos sem cobrança — para **baixar o estoque** e **contabilizar o custo real**, com usuários limitados por **permissões** e sem ver dados de outra clínica.
 
 ---
 
-Se algo neste documento **não** bate com o que você imaginou (nome de campo, regra de estoque, fluxo de venda, multi-clínica, etc.), diga o ponto que ajustamos antes de começar a implementar a Fase 1.
+Se algo neste documento **não** bate com o que você imaginou (especialmente a separação venda → contrato → tratamento → estoque), diga o ponto que ajustamos antes de começar a implementar a Fase 1.

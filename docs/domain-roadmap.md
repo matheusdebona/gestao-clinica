@@ -69,18 +69,18 @@ Add when implementing tenancy scaffolding:
 
 ---
 
-## Phase 6 — Sales + stock movement
+## Phase 6 — Sales (commercial only)
 
-- [ ] Create/update sale draft (client, date/service_at, notes)
+- [ ] Create/update sale draft (client, sold_at, notes)
 - [ ] Add lines: protocol and/or product with qty; snapshot prices
 - [ ] Compute `expected_amount` automatically
 - [ ] Set `effective_amount` (+ min_price policy)
 - [ ] Attach one or more `SalePayment`s
-- [ ] Confirm sale → explode protocols → decrement stock (transactional)
-- [ ] Cancel sale → restore stock (if enabled)
-- [ ] Permissions + tests (stock math, isolation, 403s)
+- [ ] Confirm sale **without** stock movement
+- [ ] Cancel sale (still no stock side effects)
+- [ ] Permissions + tests (isolation, 403s; assert stock unchanged on confirm)
 
-**DoD:** selling a protocol reduces component product stock; payments and amounts persisted.
+**DoD:** sale + payments persisted; confirming a sale does **not** change product stock.
 
 ---
 
@@ -91,7 +91,7 @@ Add when implementing tenancy scaffolding:
 - [ ] Convert accepted budget → sale draft
 - [ ] Permissions + tests
 
-**DoD:** quote → convert → confirm sale path works.
+**DoD:** quote → convert → confirm sale path works (still no stock change).
 
 ---
 
@@ -103,15 +103,33 @@ Add when implementing tenancy scaffolding:
 - [ ] List/download by permission
 - [ ] Permissions + tests
 
-**DoD:** contract/receipt file produced from existing sale data.
+**DoD:** contract/receipt file produced from existing sale data; stock unchanged.
 
 ---
 
-## Phase 9 — Alerts & hardening (later)
+## Phase 9 — Treatments + stock movement + real cost
+
+- [ ] Create/start treatment from confirmed sale
+- [ ] Prefill suggested consumption by exploding sale protocols + product lines
+- [ ] Allow quantity adjustments on suggested lines
+- [ ] Allow **extra** products (complimentary or charged)
+- [ ] Complete treatment transactionally:
+  - [ ] Snapshot unit costs / line costs
+  - [ ] Decrement stock by actual quantities
+  - [ ] Persist `total_cost` (includes complimentary)
+  - [ ] Persist any `charged_amount` on extras
+- [ ] Cancel in-progress treatment (no stock change)
+- [ ] Permissions + tests (stock math, complimentary cost counted, isolation)
+
+**DoD:** finishing a treatment lowers stock by what was really used; complimentary extras still cost the clinic and hit stock.
+
+---
+
+## Phase 10 — Alerts & hardening (later)
 
 - [ ] Low-stock notification channel (email / WhatsApp — TBD)
-- [ ] Audit log for stock and price overrides
-- [ ] Dashboard aggregates (sales, margin, stock risk)
+- [ ] Audit log for stock and treatment overrides
+- [ ] Dashboard: revenue (sale) vs real cost (treatment) / margin
 - [ ] Cloud S3 cutover for documents and uploads
 
 ---
@@ -119,8 +137,9 @@ Add when implementing tenancy scaffolding:
 ## Suggested build order (why)
 
 ```text
-Clinic/tenant → Products/stock → Protocols → Clients → Payments
-    → Sales (stock out) → Budgets → Documents
+Clinic/tenant → Products/stock master → Protocols → Clients → Payments
+    → Sales (no stock out) → Budgets → Documents/contracts
+    → Treatments (actual usage → stock out + real cost)
 ```
 
-Sales need products, protocols, clients, and payment methods. Budgets reuse the same line model. Documents consume confirmed commercial data and MinIO.
+Sales and contracts are commercial. Treatments are clinical consumption. Stock only moves when treatment is completed.

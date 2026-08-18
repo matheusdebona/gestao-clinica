@@ -16,10 +16,13 @@ The platform is a **multi-tenant clinic system** that:
 2. Groups products into **protocols** (procedures) with quantities, sale price, minimum price, and total cost.
 3. Registers **clients** (patients) with contact and clinical notes.
 4. Registers **payment methods** (and card operators / rates when credit card).
-5. Creates **sales** (and later **budgets** / **contracts**) that consume protocols and/or individual products, link to a client and clinic, and **decrement stock**.
-6. Warns when stock is low.
+5. Creates **sales** and **contracts** (commercial agreement — **does not** decrement stock).
+6. Runs a **treatment** for the patient: start → record **actual** product usage (planned + complimentary extras) → complete → **then** decrement stock and account real cost.
+7. Warns when stock is low.
 
 All commercial and clinical data belongs to a **clinic** (tenant). Users belong to a clinic and only see that clinic’s data (except platform super-admins).
+
+**Portuguese product vision:** [`visao-da-plataforma.md`](./visao-da-plataforma.md)
 
 ---
 
@@ -54,7 +57,7 @@ Clinic
 ├── Users
 ├── Product catalogs
 │   ├── ProductType          (botox, filler, toxin, acid, …)
-│   ├── Brand                (optional entity; not free-text only)
+│   ├── Brand
 │   ├── UnitOfMeasure        (mg, ml, unit, kg, …)
 │   └── Product
 │         ├── cost, sale_price
@@ -64,16 +67,18 @@ Clinic
 │   └── ProtocolItem  → Product + quantity_used
 ├── Client (patient)
 ├── Payment catalog
-│   ├── PaymentMethod        (cash, PIX, check, credit_card, …)
-│   ├── CardOperator         (Cielo, Stone, …)
-│   ├── CardBrand            (Visa, Mastercard, …)  [optional]
-│   └── CardFee / rate rules (operator + brand + installments → %)
+│   ├── PaymentMethod
+│   ├── CardOperator
+│   ├── CardBrand            (optional)
+│   └── CardFeeRule
 ├── Budget (optional pre-sale)
 │   └── BudgetItem
-├── Sale
-│   ├── SaleItem             (protocol and/or product lines)
+├── Sale                     (commercial — NO stock movement)
+│   ├── SaleItem             (suggested protocols and/or products)
 │   └── SalePayment
-└── Document / Contract      (generated from sale/budget + clinic + client)
+├── Document / Contract      (from sale/budget)
+└── Treatment                (clinical application — stock moves on complete)
+    └── TreatmentConsumption (actual usage: suggested + complimentary extras)
 ```
 
 ---
@@ -101,14 +106,17 @@ Clinic
 | Event | Effect |
 | --- | --- |
 | Manual adjustment / restock | Increase or set stock (audited later) |
-| Confirmed **sale** | Decrease by quantities on sale lines (product lines + protocol exploded products) |
-| Budget | **Does not** decrease stock (unless later we add reservation — open question) |
-| Sale cancel / void | Restore stock (when cancellation is implemented) |
+| **Sale** confirm / cancel | **No stock change** |
+| Budget | **No stock change** |
+| Contract generation | **No stock change** |
+| **Treatment complete** | Decrease by **actual consumption** lines (suggested + extras, including complimentary) |
+| Treatment cancel after complete | Restore stock (later phase) |
 
 ### Low-stock warning
 
 - Product is “low” when `stock_quantity <= min_stock`.
-- API: list/filter low-stock products; optional notification channel later (WhatsApp/email — out of Phase 1).
+- Stock levels only move when treatments are completed (or manual adjustments).
+- API: list/filter low-stock products; optional notification channel later.
 
 ### Permissions (examples)
 
@@ -201,35 +209,34 @@ Sales that pay by card reference method + operator (+ brand/installments) so net
 
 ## 8. Sales
 
-A **sale** is the commercial event that ties clinic + client + lines + payments + date, and **moves stock**.
+A **sale** is the **commercial** event: what was agreed and charged. It does **not** move stock.
 
 | Field | Purpose |
 | --- | --- |
 | `clinic_id` | Tenant |
 | `client_id` | Buyer / patient |
 | `sold_by_user_id` | Authenticated seller |
-| `sold_at` / `service_at` | Sale date and service datetime |
-| `service_duration_minutes` | Time of this attendance |
+| `sold_at` | Sale datetime |
 | `expected_amount` | Auto-calculated from lines (protocols + products at registered prices) |
-| `effective_amount` | Actual charged amount (may differ; respect protocol `min_price` policy) |
+| `effective_amount` | Actual charged amount |
 | `status` | `draft`, `confirmed`, `cancelled` |
 | `notes` | Free text |
 
 ### SaleItem
 
-Each line is either a **protocol** or a **standalone product** (or both kinds on the same sale).
+Each line is either a **protocol** or a **standalone product**. These lines become the **suggested consumption checklist** when a treatment starts.
 
 | Field | Purpose |
 | --- | --- |
 | `sale_id` | Parent |
 | `line_type` | `protocol` \| `product` |
 | `protocol_id` | If protocol line |
-| `product_id` | If product line (or exploded component for stock — see below) |
+| `product_id` | If product line |
 | `quantity` | How many of that protocol/product |
 | `unit_price` | Snapshot at sale time |
 | `line_total` | Snapshot |
 
-**Stock on confirm:** for each protocol line, explode `ProtocolItem`s and decrement product stock by `protocol_qty × item.quantity`; for product lines, decrement by line quantity. Snapshots of prices/costs stored on the sale so catalog changes do not rewrite history.
+Price snapshots stay on the sale for commercial history. Stock is **not** touched here.
 
 ### SalePayment
 
@@ -253,11 +260,9 @@ Each line is either a **protocol** or a **standalone product** (or both kinds on
 
 Same shape as a sale, but:
 
-- Does **not** decrement stock on save.
+- Does **not** decrement stock (nothing does until treatment complete).
 - Status: `draft`, `sent`, `accepted`, `rejected`, `expired`, `converted`.
 - Can **convert to sale** (copy lines + client + expected amounts).
-
-Feeds later **contracts/documents** with the same client/protocol/product data.
 
 ### Permissions
 
@@ -267,7 +272,7 @@ Feeds later **contracts/documents** with the same client/protocol/product data.
 
 ## 10. Documents / contracts
 
-Generated from budget or sale + clinic + client data (and protocol/product lines).
+Generated from budget or sale + clinic + client data (and protocol/product lines). **No stock effect.**
 
 | Field | Purpose |
 | --- | --- |
@@ -279,7 +284,7 @@ Generated from budget or sale + clinic + client data (and protocol/product lines
 | `storage_path` | PDF/file on MinIO (S3) |
 | `payload` (JSON) | Snapshot of values used to render the document |
 
-Templates and e-sign are later; Phase definition only reserves the model and MinIO storage.
+Typical order: **confirm sale → issue contract → start treatment**.
 
 ### Permissions
 
@@ -287,7 +292,66 @@ Templates and e-sign are later; Phase definition only reserves the model and Min
 
 ---
 
-## 11. Domain flow (happy path)
+## 11. Treatments (clinical application — stock + real cost)
+
+A **treatment** is opened for a patient (from a confirmed sale). Suggested products come from exploding sale protocols + product lines. At the end, the professional records **what was actually used**.
+
+### Why separate from sale
+
+- At sale time the product has **not** been applied yet.
+- The doctor may use the suggested set, change quantities, and **add complementary products without charging** the patient.
+- Stock and **clinic cost** must follow **real consumption**, including complimentary extras.
+
+### Treatment
+
+| Field | Purpose |
+| --- | --- |
+| `clinic_id` | Tenant |
+| `sale_id` | Commercial source |
+| `client_id` | Patient (denormalized for queries) |
+| `professional_user_id` | Who performed the application |
+| `started_at` / `finished_at` | Session window |
+| `duration_minutes` | Actual service time |
+| `status` | `scheduled`, `in_progress`, `completed`, `cancelled` |
+| `notes` | Clinical notes |
+| `total_cost` | Σ consumption line costs (includes complimentary) |
+| `total_charged_on_treatment` | Σ amounts charged on consumption lines (extras billed at session, if any) |
+
+### TreatmentConsumption
+
+| Field | Purpose |
+| --- | --- |
+| `treatment_id` | Parent |
+| `product_id` | Product used |
+| `quantity` | Actual quantity used |
+| `source` | `suggested` (from sale) \| `extra` (added during treatment) |
+| `sale_item_id` | Optional link back to originating sale line |
+| `is_charged` | Whether patient was billed for this line |
+| `charged_amount` | Amount charged (0 if complimentary) |
+| `unit_cost` | Product cost snapshot at completion |
+| `line_cost` | `quantity × unit_cost` — always counted for clinic cost |
+
+### Completion behavior (transactional)
+
+1. Validate treatment is `in_progress` with at least the required consumption lines.
+2. Persist consumption snapshots (`unit_cost`, `line_cost`).
+3. Decrement `product.stock_quantity` by each consumption `quantity`.
+4. Set `total_cost` / status `completed` / `finished_at`.
+5. Emit low-stock evaluation for touched products.
+
+### Cost accounting note
+
+- **Revenue** primarily lives on the **sale** (`effective_amount` + payments).
+- **Real product cost** lives on the **treatment** (`total_cost`), including complimentary extras.
+- Margin analysis later: sale revenue − treatment real cost (− card fees, etc.).
+
+### Permissions
+
+`treatments.view`, `treatments.start`, `treatments.update`, `treatments.complete`, `treatments.cancel`
+
+---
+
+## 12. Domain flow (happy path)
 
 ```text
 Clinic exists
@@ -296,17 +360,18 @@ Clinic exists
   → Build protocols (products + qty → total_cost, sale_price, min_price)
   → Register clients
   → (Optional) Create budget → convert
-  → Create sale (protocol and/or products)
-       → expected_amount calculated
-       → effective_amount + payment(s)
-       → confirm → stock down
+  → Create & confirm sale (protocol and/or products)     ← no stock change
+  → Generate contract
+  → Start treatment (suggested products from sale)
+  → Complete treatment with actual usage
+       (+ extras, possibly complimentary / charged)
+       → stock down
+       → real cost recorded
   → Low-stock list / alerts
-  → Generate contract/doc from sale data
 ```
-
 ---
 
-## 12. Permission catalog (domain, additive to Phase 1)
+## 13. Permission catalog (domain, additive to Phase 1)
 
 | Area | Permissions |
 | --- | --- |
@@ -319,36 +384,39 @@ Clinic exists
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
+| Treatments | `treatments.view`, `treatments.start`, `treatments.update`, `treatments.complete`, `treatments.cancel` |
 
-All checks remain **permission-first**; roles only group these permissions per clinic job (receptionist, seller, stock manager, clinic admin).
+All checks remain **permission-first**; roles only group these permissions per clinic job (receptionist, seller, stock manager, professional, clinic admin).
 
 ---
 
-## 13. Open questions
+## 14. Open questions
 
-1. **User ↔ clinic** — Confirm: one clinic per user for now, or membership in many clinics?
+1. **User ↔ clinic** — One clinic per user for now, or membership in many clinics?
 2. **`min_price` on protocol** — Hard block below minimum, or warning only?
 3. **Partial payments** — Must payments sum exactly to `effective_amount`, or allow outstanding balance?
 4. **Installments** — Store installment plan on the sale payment, or only fee lookup?
-5. **Stock reservation** — Reserve stock when budget is accepted, or only on sale confirm?
-6. **Product types / brands / units** — Clinic-scoped catalogs only, or platform defaults cloned into each clinic?
-7. **Currency** — BRL only?
-8. **Sale performer** — Only the logged-in user, or selectable professional?
-9. **Contracts** — HTML/PDF templates first, or integrate a third-party doc tool later?
-10. **WhatsApp** — Store number only for now, or plan Meta API integration soon?
+5. **Treatment extras with charge** — Create a payment adjustment on the original sale, or only record `charged_amount` on the treatment line?
+6. **Sessions** — One sale → one treatment, or multiple treatment sessions per sale?
+7. **Product types / brands / units** — Clinic-scoped catalogs only, or platform defaults cloned into each clinic?
+8. **Currency** — BRL only?
+9. **Contracts** — HTML/PDF templates first, or third-party doc tool later?
+10. **WhatsApp** — Store number only for now?
 
 ---
 
-## 14. Decision summary
+## 15. Decision summary
 
 | Topic | Decision |
 | --- | --- |
 | Tenant | Clinic; all domain data clinic-scoped |
-| Commercial core | Products → Protocols → Sales (+ Clients + Payments) |
-| Stock | Decrements on confirmed sale; low-stock via `min_stock` |
+| Commercial core | Products → Protocols → Sales → Contract → Treatment |
+| Stock | Decrements only on **treatment complete** (actual usage); low-stock via `min_stock` |
+| Sale | Commercial only; suggested products; **no stock movement** |
+| Treatment | Records real usage (suggested + complimentary extras); drives stock + real cost |
 | Protocol | Bundle of products with qty, sale_price, min_price, total_cost |
 | Sale lines | Protocol and/or individual products |
-| Money | expected_amount (auto) + effective_amount (actual) + payment method(s) |
+| Money | Sale: expected + effective + payments; Treatment: real cost (+ optional extra charges) |
 | Cards | Separate operators / fee rules module |
-| Budgets & docs | Same data lineage; docs stored on MinIO |
-| Authz | Same permission-first model, clinic-scoped queries |
+| Budgets & docs | Same commercial lineage; docs on MinIO; no stock effect |
+| Authz | Permission-first model, clinic-scoped queries |
