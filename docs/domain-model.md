@@ -85,38 +85,60 @@ Clinic
 
 ## 4. Products & stock
 
+Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./produto-financeiro.md).
+
 ### Product
 
 | Field | Purpose |
 | --- | --- |
 | `clinic_id` | Tenant |
 | `name` | Product name |
-| `product_type_id` | Category (botox, filling, botulinum toxin, acid, …) — **registered catalog**, not hard-coded enum forever |
+| `sku` | Optional internal/supplier code |
+| `product_type_id` | Category (botox, filling, toxin, acid, …) |
 | `brand_id` | Brand |
-| `unit_of_measure_id` | kg, mg, ml, unit, … |
-| `purpose` / `description` | What it is for |
-| `cost` | Acquisition / unit cost |
+| `unit_of_measure_id` | kg, mg, ml, unit, … — qty and cost share this UoM |
+| `purpose` | What it is for |
+| `cost` | **Weighted average unit cost** (CMV / inventory valuation base) |
 | `sale_price` | Default selling price |
-| `stock_quantity` | Current stock (decimal-friendly for mg/ml) |
-| `min_stock` | Threshold for low-stock warning |
+| `min_sale_price` | Optional floor for standalone product sales |
+| `stock_quantity` | Current stock in product UoM |
+| `min_stock` | Low-stock threshold |
 | `is_active` | Soft disable |
+
+**Derived (Resource):** `unit_margin`, `unit_margin_percent`, `inventory_value`, `is_low_stock`.
+
+### Stock movement
+
+Every stock change is recorded (Phase 2+):
+
+| Field | Purpose |
+| --- | --- |
+| `type` | `in`, `out`, `adjustment` |
+| `quantity` | Positive amount |
+| `unit_cost` | Required on `in` — purchase cost for weighted average |
+| `cost_before` / `cost_after` | Average cost trail |
+| `stock_before` / `stock_after` | Quantity trail |
+| `reason`, `user_id` | Audit |
+| `reference_*` | Later: treatment / purchase link |
+
+**Inbound weighted average:**  
+`(stock × cost + qty_in × unit_cost_in) / (stock + qty_in)`.
 
 ### Stock behavior
 
 | Event | Effect |
 | --- | --- |
-| Manual adjustment / restock | Increase or set stock (audited later) |
+| Stock `in` (restock) | Increase qty; update weighted average `cost` |
+| Manual `out` / adjustment | Change qty; average cost unchanged unless policy says otherwise |
 | **Sale** confirm / cancel | **No stock change** |
-| Budget | **No stock change** |
-| Contract generation | **No stock change** |
-| **Treatment complete** | Decrease by **actual consumption** lines (suggested + extras, including complimentary) |
+| Budget / contract | **No stock change** |
+| **Treatment complete** | Decrease by actual consumption; CMV snapshots `unit_cost` |
 | Treatment cancel after complete | Restore stock (later phase) |
 
 ### Low-stock warning
 
 - Product is “low” when `stock_quantity <= min_stock`.
-- Stock levels only move when treatments are completed (or manual adjustments).
-- API: list/filter low-stock products; optional notification channel later.
+- API: list/filter low-stock products.
 
 ### Permissions (examples)
 
