@@ -10,6 +10,7 @@ Multi-tenant clinical + commercial management platform — API-first, **mobile-f
 | --- | --- |
 | [docs/visao-da-plataforma.md](./docs/visao-da-plataforma.md) | Visão completa em português |
 | [docs/produto-financeiro.md](./docs/produto-financeiro.md) | Dados do produto para custo, receita e margem |
+| [docs/protocolo.md](./docs/protocolo.md) | Protocolo = serviço completo + preços (custo/sugerido/mínimo/especial) |
 | [docs/stack-definition.md](./docs/stack-definition.md) | Stack técnica |
 | [docs/phase-1-todo.md](./docs/phase-1-todo.md) | Checklist Fase 1 |
 | [docs/domain-model.md](./docs/domain-model.md) | Domínio comercial |

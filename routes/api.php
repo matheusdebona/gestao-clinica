@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\Catalog\UnitOfMeasureController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\PermissionCatalogController;
 use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\ProtocolController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -95,5 +96,20 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:products.delete');
         Route::post('products/{product}/stock-movements', [ProductController::class, 'adjustStock'])
             ->middleware('permission:products.adjust_stock');
+
+        Route::get('protocols', [ProtocolController::class, 'index'])
+            ->middleware('permission:protocols.view');
+        Route::post('protocols', [ProtocolController::class, 'store'])
+            ->middleware('permission:protocols.create');
+        Route::get('protocols/{protocol}', [ProtocolController::class, 'show'])
+            ->middleware('permission:protocols.view');
+        Route::put('protocols/{protocol}', [ProtocolController::class, 'update'])
+            ->middleware('permission:protocols.update');
+        Route::delete('protocols/{protocol}', [ProtocolController::class, 'destroy'])
+            ->middleware('permission:protocols.delete');
+        Route::put('protocols/{protocol}/items', [ProtocolController::class, 'syncItems'])
+            ->middleware('permission:protocols.update');
+        Route::post('protocols/{protocol}/recalculate', [ProtocolController::class, 'recalculate'])
+            ->middleware('permission:protocols.update');
     });
 });

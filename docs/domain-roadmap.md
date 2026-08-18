@@ -39,13 +39,15 @@ See financial field evaluation: [`produto-financeiro.md`](./produto-financeiro.m
 
 ## Phase 3 — Protocols
 
-- [ ] CRUD `Protocol` (sale_price, min_price, total_cost)
-- [ ] Manage `ProtocolItem` (product + quantity)
-- [ ] Recalculate `total_cost` when items or product costs change
-- [ ] Optional validation helper: proposed price vs `min_price`
-- [ ] Permissions + tests
+See pricing model: [`protocolo.md`](./protocolo.md).
 
-**DoD:** define a procedure as a product bundle with cost and prices.
+- [x] CRUD `Protocol` (total_cost, products_sale_total, suggested_price, min_price, special_price)
+- [x] Manage `ProtocolItem` (product + quantity) via sync endpoint
+- [x] Recalculate costs/suggested/min from products (respect manual flags)
+- [x] `special_price` for special-condition suggested sell price
+- [x] Permissions + tests (margins, manual preserve, clinic isolation)
+
+**DoD:** define a complete service as a product bundle with cost, suggested, minimum, and optional special price.
 
 ---
 
