@@ -22,16 +22,18 @@ Add when implementing tenancy scaffolding:
 
 ## Phase 2 — Catalogs & products + stock
 
-- [ ] CRUD `ProductType` (clinic-scoped)
-- [ ] CRUD `Brand`
-- [ ] CRUD `UnitOfMeasure`
-- [ ] CRUD `Product` (cost, sale_price, stock_quantity, min_stock, purpose, FKs)
-- [ ] Stock adjustment endpoint (permission `products.adjust_stock`)
-- [ ] Low-stock listing (`stock_quantity <= min_stock`)
-- [ ] Permissions + feature tests (including cross-clinic isolation)
-- [ ] Seed sample types (botox, filling, toxin, acid, …) for demo clinic
+See financial field evaluation: [`produto-financeiro.md`](./produto-financeiro.md).
 
-**DoD:** register products with cost/sale/stock; list low-stock; another clinic cannot see these rows.
+- [x] CRUD `ProductType` (clinic-scoped)
+- [x] CRUD `Brand`
+- [x] CRUD `UnitOfMeasure`
+- [x] CRUD `Product` (cost médio, sale_price, min_sale_price, stock, purpose, FKs + margem no Resource)
+- [x] Stock movement endpoint (`in`/`out`, weighted average on inbound)
+- [x] Low-stock listing (`?low_stock=1`)
+- [x] Permissions + feature tests (including cross-clinic isolation)
+- [x] Seed sample types (botox, filling, toxin, acid, …) for demo clinic
+
+**DoD:** register products with cost/sale/stock; list low-stock; another clinic cannot see these rows; inbound recalculates average cost.
 
 ---
 
