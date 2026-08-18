@@ -148,16 +148,20 @@ Every stock change is recorded (Phase 2+):
 
 ## 5. Protocols (procedure = product bundle)
 
-A **protocol** is a reusable grouping of products for a procedure.
+A **protocol** is a reusable **set of products that forms a complete service**. Pricing details: [`protocolo.md`](./protocolo.md).
 
 | Field | Purpose |
 | --- | --- |
 | `clinic_id` | Tenant |
 | `name` | e.g. “Full face filling” |
 | `description` | Optional |
-| `sale_price` | Default protocol price |
-| `min_price` | Floor the seller should not go below (warning or hard block — open question) |
-| `total_cost` | Sum of (product.cost × quantity) — **stored and/or recalculated** when items change |
+| `total_cost` | **Calculated** `Σ (product.cost × qty)` |
+| `products_sale_total` | **Calculated** `Σ (product.sale_price × qty)` — reference |
+| `suggested_price` | Main suggested sell price (defaults from products’ sale prices; editable) |
+| `suggested_price_is_manual` | When true, recalculation does not overwrite `suggested_price` |
+| `min_price` | Commercial floor (defaults from products’ min/cost; editable) |
+| `min_price_is_manual` | When true, recalculation does not overwrite `min_price` |
+| `special_price` | Optional second suggested price (special condition / easier close) |
 | `is_active` | Soft disable |
 
 ### ProtocolItem
@@ -166,10 +170,9 @@ A **protocol** is a reusable grouping of products for a procedure.
 | --- | --- |
 | `protocol_id` | Parent |
 | `product_id` | Component product |
-| `quantity` | Amount of that product consumed by the protocol (in product’s UoM) |
+| `quantity` | Amount used in the service (product UoM) |
 
-**Cost formula:** `total_cost = Σ (product.cost × protocol_item.quantity)`  
-**Margin (derived):** `sale_price - total_cost` (not necessarily stored).
+**Derived margins:** suggested/special/min minus `total_cost`.
 
 ### Permissions
 

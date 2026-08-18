@@ -32,6 +32,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'products.update',
             'products.delete',
             'products.adjust_stock',
+            'protocols.view',
+            'protocols.create',
+            'protocols.update',
+            'protocols.delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -60,6 +64,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'products.update',
             'products.delete',
             'products.adjust_stock',
+            'protocols.view',
+            'protocols.create',
+            'protocols.update',
+            'protocols.delete',
         ]);
     }
 }

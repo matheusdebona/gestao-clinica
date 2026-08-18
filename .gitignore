@@ -27,3 +27,7 @@ Homestead.yaml
 Thumbs.db
 database/*.sqlite
 database/*.sqlite
+
+# accidental local sqlite db files
+gestao_clinica
+*.sqlite

@@ -163,31 +163,36 @@ São **cadastros separados** (por clínica), para você ir incluindo o que usar 
 
 ## 5. Protocolos
 
-Protocolo = **agrupamento de produtos** que forma um procedimento.
+Protocolo = **conjunto de produtos que forma um serviço completo**.
+
+Detalhe: [`protocolo.md`](./protocolo.md).
 
 Exemplo mental:
 
 > Protocolo “Preenchimento labial”  
 > - Produto A: 1 unidade  
 > - Produto B: 0,5 ml  
-> - Valor de venda do protocolo: R$ X  
-> - Valor mínimo: R$ Y  
-> - Custo total: soma (custo de cada produto × quantidade)
+> - **Custo:** soma (custo × qtd) dos produtos  
+> - **Sugerido:** baseado nos preços de venda dos produtos  
+> - **Mínimo:** piso comercial do pacote  
+> - **Condição especial:** outro valor sugerido para facilitar a venda do médico
 
 ### O que o protocolo guarda
 
 | Informação | Finalidade |
 | --- | --- |
-| Nome e descrição | Identificar o procedimento |
-| Lista de produtos + quantidades | O que será consumido |
-| Valor de venda | Preço padrão do protocolo |
-| Valor mínimo | Piso comercial (bloquear ou só avisar — a decidir) |
-| Custo total | Calculado a partir dos custos dos produtos |
+| Nome e descrição | Identificar o serviço |
+| Lista de produtos + quantidades | Composição do serviço |
+| Custo total | Calculado pelos custos dos produtos |
+| Total a preço de tabela dos produtos | Referência (`products_sale_total`) |
+| Valor sugerido | Preço principal sugerido na venda (editável) |
+| Valor mínimo | Piso comercial (editável) |
+| Valor condição especial | Segundo sugerido opcional (promo / fechamento) |
 | Ativo / inativo | Desliga sem apagar |
 
 ### Por que isso importa
 
-Na venda, em vez de montar produto por produto toda vez, você escolhe o **protocolo**. O sistema já sabe composição, custo e preço esperado. Ainda assim, na mesma venda você pode **somar produtos avulsos**.
+Na venda, escolhe-se o **protocolo** (serviço completo). O sistema já traz custo e opções de preço (sugerido / especial), respeitando o mínimo. Ainda assim, na mesma venda dá para somar produtos avulsos. Estoque só desce no fim do tratamento.
 
 ---
 
