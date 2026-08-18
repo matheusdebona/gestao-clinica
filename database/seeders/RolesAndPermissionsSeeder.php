@@ -1,0 +1,49 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
+
+class RolesAndPermissionsSeeder extends Seeder
+{
+    public function run(): void
+    {
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $permissions = [
+            'users.view',
+            'users.create',
+            'users.update',
+            'users.delete',
+            'roles.manage',
+            'permissions.view',
+            'files.upload',
+            'files.delete',
+            'clinics.view',
+            'clinics.manage',
+        ];
+
+        foreach ($permissions as $permission) {
+            Permission::findOrCreate($permission, 'web');
+        }
+
+        $superAdmin = Role::findOrCreate('super-admin', 'web');
+        $superAdmin->syncPermissions(Permission::all());
+
+        $admin = Role::findOrCreate('admin', 'web');
+        $admin->syncPermissions([
+            'users.view',
+            'users.create',
+            'users.update',
+            'users.delete',
+            'roles.manage',
+            'permissions.view',
+            'files.upload',
+            'files.delete',
+            'clinics.view',
+        ]);
+    }
+}

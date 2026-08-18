@@ -1,17 +1,31 @@
 # Clinical Management — Stack Definition
 
-Initial architecture decisions for **gestao-clinica**: an API-first clinical management platform.
+Initial architecture decisions for **gestao-clinica**: an API-first clinical management platform with a **mobile-first** product constraint for clinic day-to-day use.
 
 This document freezes the construction stack for Phase 1. Implementation follows the checklist in [`phase-1-todo.md`](./phase-1-todo.md).
+
+Business domain (products, protocols, sales, treatments, clients, payments, multi-tenant clinics) is defined in [`domain-model.md`](./domain-model.md) and phased in [`domain-roadmap.md`](./domain-roadmap.md). Portuguese overview: [`visao-da-plataforma.md`](./visao-da-plataforma.md).
 
 ---
 
 ## 1. Goals (Phase 1)
 
-- Define and stand up the API foundation (not clinical domain modules yet).
+- Define and stand up the API foundation.
 - Authenticate users (login / logout / me / token lifecycle).
 - Authorize access by **permission** (fine-grained), not by role name alone.
+- Introduce **Clinic** as the multi-tenant holder (users bound to a clinic).
 - Run locally with Docker: API + PostgreSQL + Redis + MinIO.
+- Keep the API shaped for a **mobile-first** client (doctor, secretary, clinic staff on phone/tablet).
+
+### Mobile-first (product constraint)
+
+| Topic | Decision |
+| --- | --- |
+| Priority | **Mobile-first** UX for daily clinic use (doctor, secretary, others) |
+| Desktop | Supported as an expansion of mobile layouts, not the primary design target |
+| API | Token-based Sanctum API suitable for PWA (and native later if needed) |
+| First UI | **PWA** mobile-first (installable / “Add to Home Screen”); native apps only if PWA is not enough later |
+| Critical phone flows | Client search, sale, contract access, start/complete treatment, low-stock |
 
 ---
 
@@ -189,39 +203,61 @@ When moving to cloud S3: change `AWS_*` / endpoint; keep `FILESYSTEM_DISK=s3`.
 
 ---
 
-## 8. Explicitly out of scope (later phases)
+## 8. Multi-tenancy (locked)
 
-- Clinical domain (patients, appointments, EHR, billing)
-- Multi-clinic / multi-tenant tenancy model (decision still open — see below)
+| Topic | Decision |
+| --- | --- |
+| Tenant | **Clinic** — holder of products, protocols, clients, sales, payments, documents |
+| Users | Belong to a clinic (`users.clinic_id`); data access always clinic-scoped |
+| Platform admin | Optional super-admin without clinic scope for managing clinics only |
+| Domain details | See [`domain-model.md`](./domain-model.md) |
+
+---
+
+## 9. Explicitly out of scope (for Phase 1 code)
+
+- Product / protocol / sale / budget modules (Phases 2–8 — see [`domain-roadmap.md`](./domain-roadmap.md))
 - Frontend application
 - OAuth2 / social login / SSO
-- Audit log / LGPD compliance suite (should be planned early, built after auth skeleton)
+- Full audit log / LGPD suite (plan early; implement after commercial core)
 - Cloud S3 cutover
+- WhatsApp API messaging (store numbers first)
 
 ---
 
-## 9. Open questions (need your input)
+## 10. Open questions (need your input)
 
-These do not block the stack definition above, but should be answered before or during Phase 1 implementation:
+### Platform / auth / UX
 
-1. **Clients** — Web SPA only, or also mobile? (Affects cookie SPA auth vs token-only.)
-2. **Frontend** — Same repo (Inertia/Blade) or separate SPA (React/Vue/Next)?
-3. **Tenancy** — Single clinic install, or multi-clinic (tenant) from day one?
-4. **Locale / i18n** — Portuguese (BR) primary for API messages and seeds?
-5. **User identity** — Email-only login, or also CPF / employee code?
-6. **Soft delete / deactivate** — Prefer deactivate users over hard delete?
-7. **Admin bootstrap** — Env-based seeder acceptable, or invite-only first user?
+1. **Frontend repo** — Same monorepo or separate SPA/PWA repo?
+2. **PWA stack** — React, Vue, or Next (or other) for the first PWA?
+3. **Locale / i18n** — Portuguese (BR) primary for API messages and seeds?
+4. **User identity** — Email-only login, or also CPF / employee code?
+5. **Soft delete** — Prefer deactivate users over hard delete?
+6. **Admin bootstrap** — Env-based seeder acceptable?
+
+### Domain (also listed in domain-model)
+
+7. **User ↔ clinic** — One clinic per user for now, or many?
+8. **Protocol `min_price`** — Hard block or warning only?
+9. **Partial payments** — Allow outstanding balance on a sale?
+10. **Treatment extras with charge** — Adjust original sale payment, or only annotate on treatment?
+11. **Sessions** — One sale → one treatment, or multiple sessions?
+12. **Currency** — BRL only?
 
 ---
 
-## 10. Decision summary
+## 11. Decision summary
 
 | Topic | Decision |
 | --- | --- |
 | API | Laravel 13, PHP 8.5 |
 | Auth | Sanctum (Bearer tokens first) |
 | Authz | Permission-first via Spatie; roles as optional groups |
+| Tenant | Clinic; clinic-scoped domain data |
 | DB | PostgreSQL 18 |
 | Cache/queue | Redis |
 | Files | MinIO (S3 API) → cloud S3 later |
-| Phase 1 deliverable | Stack + login + permission gates + Docker local env |
+| Commercial core | Products → Protocols → Sales → Contract → Treatment (stock on complete) |
+| UX | **Mobile-first PWA** (doctor, secretary, clinic staff); desktop secondary; native later if needed |
+| Phase 1 deliverable | Stack + login + permissions + clinic tenancy skeleton + Docker |
