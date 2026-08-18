@@ -4,33 +4,69 @@ Multi-tenant clinical + commercial management platform — API-first, **mobile-f
 
 ## Current status
 
-**Definition phase.** Stack, tenancy, commercial domain, treatment-driven stock, and mobile-first constraint are documented; application scaffolding has not started yet.
+**Phase 1 in progress / foundation landed:** Laravel 13 API scaffold with Sanctum auth, permission-first RBAC, clinic tenancy skeleton, and Docker Compose stack.
 
 | Document | Purpose |
 | --- | --- |
-| [docs/visao-da-plataforma.md](./docs/visao-da-plataforma.md) | **Visão completa em português** (para validar alinhamento) |
-| [docs/stack-definition.md](./docs/stack-definition.md) | Laravel 13 / PHP 8.5, Sanctum, Redis, Postgres 18, MinIO, permissions, mobile-first |
-| [docs/phase-1-todo.md](./docs/phase-1-todo.md) | Foundation checklist: Docker, login, permissions, clinic skeleton |
-| [docs/domain-model.md](./docs/domain-model.md) | Products, protocols, clients, payments, sales, treatments, multi-tenant clinic |
-| [docs/domain-roadmap.md](./docs/domain-roadmap.md) | Phased TODOs including mobile-first frontend |
+| [docs/visao-da-plataforma.md](./docs/visao-da-plataforma.md) | Visão completa em português |
+| [docs/stack-definition.md](./docs/stack-definition.md) | Stack técnica |
+| [docs/phase-1-todo.md](./docs/phase-1-todo.md) | Checklist Fase 1 |
+| [docs/domain-model.md](./docs/domain-model.md) | Domínio comercial |
+| [docs/domain-roadmap.md](./docs/domain-roadmap.md) | Fases 2–11 |
 
-## Target stack (locked)
+## Stack
 
-- **API:** Laravel 13 · PHP 8.5
-- **Auth:** Laravel Sanctum (Bearer tokens)
-- **Authz:** Permission-first (`spatie/laravel-permission`); roles only as optional groups
-- **Tenant:** Clinic — all commercial data clinic-scoped
-- **DB:** PostgreSQL 18 · **Cache/queue:** Redis · **Files:** MinIO (S3)
-- **UX:** Mobile-first **PWA** (doctor, secretary, clinic staff); native later if needed
+- Laravel 13 · PHP 8.5
+- Sanctum (Bearer) · Spatie Permission
+- PostgreSQL 18 · Redis · MinIO (S3)
+- Clinic multi-tenant · PWA (frontend later)
 
-## Domain (locked direction)
+## Quick start (Docker)
 
-```text
-Clinic → Products → Protocols → Clients → Payments
-       → Sales (no stock) → Contract → Treatment (stock + real cost)
-       → Mobile-first PWA
+```bash
+cp .env.example .env
+# APP_KEY will be generated on first artisan run inside the container if empty
+docker compose up -d --build
+docker compose exec app php artisan key:generate
+docker compose exec app php artisan migrate --seed
 ```
 
-## Next step
+API: `http://localhost:8000`  
+MinIO console: `http://localhost:9001` (minio / minioSecret)
 
-Read [docs/visao-da-plataforma.md](./docs/visao-da-plataforma.md), answer open questions, then implement Phase 1 (`docs/phase-1-todo.md`).
+Demo admin (from seed):
+
+- Email: `admin@clinica-demo.test`
+- Password: `ChangeMe!123`
+
+### Useful Make targets
+
+```bash
+make up
+make test
+make artisan CMD="route:list"
+```
+
+## Auth API (Phase 1)
+
+| Method | Path | Notes |
+| --- | --- | --- |
+| `POST` | `/api/v1/auth/login` | `{ "email", "password" }` → token |
+| `GET` | `/api/v1/auth/me` | Bearer token |
+| `POST` | `/api/v1/auth/logout` | Revoke current token |
+| `POST` | `/api/v1/auth/logout-all` | Revoke all tokens |
+
+Permission-gated examples: `/api/v1/users`, `/api/v1/clinics/current`, `/api/v1/permissions`.
+
+## Local tests (without Docker)
+
+```bash
+cp .env.example .env
+php artisan key:generate
+# use sqlite/array drivers for quick tests, or point at local Postgres/Redis
+php artisan test
+```
+
+## Build order
+
+Follow `docs/domain-roadmap.md` in sequence. Do not start Phase 2 until Phase 1 DoD in `docs/phase-1-todo.md` is complete.
