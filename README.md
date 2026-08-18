@@ -8,6 +8,7 @@ Multi-tenant clinical + commercial management platform — API-first.
 
 | Document | Purpose |
 | --- | --- |
+| [docs/visao-da-plataforma.md](./docs/visao-da-plataforma.md) | **Visão completa em português** (para validar alinhamento) |
 | [docs/stack-definition.md](./docs/stack-definition.md) | Laravel 13 / PHP 8.5, Sanctum, Redis, Postgres 18, MinIO, permissions |
 | [docs/phase-1-todo.md](./docs/phase-1-todo.md) | Foundation checklist: Docker, login, permissions, clinic skeleton |
 | [docs/domain-model.md](./docs/domain-model.md) | Products, stock, protocols, clients, payments, sales, budgets, docs, multi-tenant clinic |
