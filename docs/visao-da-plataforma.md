@@ -9,6 +9,8 @@ Os detalhes técnicos (Laravel, Docker, permissões em inglês de código) conti
 - [`domain-roadmap.md`](./domain-roadmap.md)
 - [`phase-1-todo.md`](./phase-1-todo.md)
 
+> **Comece por este arquivo** se quiser validar o negócio em português. Os outros são a especificação técnica.
+
 ---
 
 ## 1. O que é a plataforma

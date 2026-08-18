@@ -2,6 +2,8 @@
 
 Business domain aligned for **gestao-clinica**. Complements the technical stack in [`stack-definition.md`](./stack-definition.md).
 
+**Visão em português (para validação):** [`visao-da-plataforma.md`](./visao-da-plataforma.md)
+
 Implementation order lives in [`domain-roadmap.md`](./domain-roadmap.md).
 
 ---
