@@ -160,7 +160,7 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 
 - [x] Spec MD — Vue 3 + Vite + TS; Tailwind + Reka UI; web responsiva primeiro; componentes antes das features
 - [ ] Scaffold `apps/web` (Fase 1 do spec)
-- [ ] Design system + `/dev/ui` kitchen sink (Fase 3)
+- [ ] Design system **Modern Soft Violet** + `/dev/ui` kitchen sink (Fase 3)
 - [ ] Features clínicas: auth, clients, products, sales, treatments, notifications, metrics (Fase 4)
 - [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)
 - [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI
