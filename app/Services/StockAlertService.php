@@ -2,14 +2,17 @@
 
 namespace App\Services;
 
+use App\Enums\StockMovementType;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Product;
+use App\Models\StockMovement;
 use App\Models\Treatment;
 use App\Models\User;
 use App\Notifications\AppointmentStockWarningNotification;
 use App\Notifications\LowStockProductNotification;
 use App\Notifications\ProjectedLowStockNotification;
+use App\Notifications\ReorderPointStockNotification;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -18,6 +21,8 @@ use Illuminate\Support\Facades\Notification;
 
 class StockAlertService
 {
+    public const CONSUMPTION_WINDOW_DAYS = 30;
+
     public function __construct(private readonly TreatmentService $treatments) {}
 
     /**
@@ -107,6 +112,8 @@ class StockAlertService
                 );
             }
 
+            $this->notifyReorderPoints($clinic->id, $recipients, $day);
+
             $plannedByProduct = $this->plannedUsageForDay($clinic->id, $day);
             if ($plannedByProduct === []) {
                 return;
@@ -190,6 +197,83 @@ class StockAlertService
             });
 
         return $planned;
+    }
+
+    /**
+     * @param  Collection<int, User>  $recipients
+     */
+    private function notifyReorderPoints(int $clinicId, Collection $recipients, CarbonImmutable $day): void
+    {
+        $avgByProduct = $this->averageDailyConsumptionByProduct($clinicId, $day);
+        if ($avgByProduct === []) {
+            return;
+        }
+
+        $products = Product::query()
+            ->where('clinic_id', $clinicId)
+            ->where('is_active', true)
+            ->where('lead_time_days', '>', 0)
+            ->whereIn('id', array_keys($avgByProduct))
+            ->orderBy('name')
+            ->get();
+
+        foreach ($products as $product) {
+            if ($product->isLowStock()) {
+                continue;
+            }
+
+            $avgDaily = $avgByProduct[(int) $product->id] ?? 0.0;
+            if ($avgDaily <= 0) {
+                continue;
+            }
+
+            $reorderPoint = ($avgDaily * (int) $product->lead_time_days) + (float) $product->min_stock;
+            if ((float) $product->stock_quantity > $reorderPoint) {
+                continue;
+            }
+
+            $this->notifyOncePerDay(
+                $recipients,
+                'reorder_point',
+                (int) $product->id,
+                new ReorderPointStockNotification(
+                    product: $product,
+                    avgDailyConsumption: number_format($avgDaily, 4, '.', ''),
+                    reorderPoint: number_format($reorderPoint, 4, '.', ''),
+                ),
+            );
+        }
+    }
+
+    /**
+     * Average daily appointment consumption over the last CONSUMPTION_WINDOW_DAYS ending on $day.
+     *
+     * @return array<int, float> product_id => avg daily qty
+     */
+    public function averageDailyConsumptionByProduct(int $clinicId, CarbonImmutable $day): array
+    {
+        $to = $day->endOfDay();
+        $from = $day->subDays(self::CONSUMPTION_WINDOW_DAYS - 1)->startOfDay();
+        $windowDays = self::CONSUMPTION_WINDOW_DAYS;
+
+        $totals = StockMovement::query()
+            ->where('clinic_id', $clinicId)
+            ->where('type', StockMovementType::Out->value)
+            ->where('reason', 'appointment_complete')
+            ->whereBetween('created_at', [$from, $to])
+            ->selectRaw('product_id, COALESCE(SUM(quantity), 0) as total_qty')
+            ->groupBy('product_id')
+            ->pluck('total_qty', 'product_id');
+
+        $averages = [];
+        foreach ($totals as $productId => $totalQty) {
+            $avg = (float) $totalQty / $windowDays;
+            if ($avg > 0) {
+                $averages[(int) $productId] = $avg;
+            }
+        }
+
+        return $averages;
     }
 
     /**

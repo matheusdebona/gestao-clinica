@@ -252,7 +252,7 @@ Response shape sugerida:
 - [x] Agregação fulfillment
 - [x] Tests stock / cancel rate
 - [ ] (UI) low-stock + saldo a aplicar
-- [x] Job de alerta low-stock (já entregue na Phase 10; lead-time-aware reorder depois)
+- [x] Job de alerta low-stock (já entregue na Phase 10; inclui ponto de reposição por `lead_time_days`)
 
 ---
 
@@ -281,4 +281,4 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 
 **Status Onda D:** implementado — `GET /api/v1/metrics/inventory` (snapshot + `from`/`to` opcionais, default 30d) e `GET /api/v1/metrics/operations` (período obrigatório, saldo a aplicar + lista).
 
-Próximo: PWA / charts consumindo A–D; alerta de reposição por `lead_time_days`.
+Próximo: PWA / charts consumindo A–D.
