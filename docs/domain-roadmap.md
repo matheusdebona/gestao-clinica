@@ -138,9 +138,15 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 
 ## Phase 10 — Alerts & hardening (later)
 
+See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap.md) (waves A–D).
+
+- [x] Metrics API wave A — commercial KPIs (`GET /metrics/commercial`, `metrics.view`)
+- [ ] Metrics API wave B — acquisition (origin/campaign/consultation)
+- [ ] Metrics API wave C — real margin (sale vs treatment/appointment)
+- [ ] Metrics API wave D — inventory + clinical operations
 - [ ] Low-stock notification channel (email / WhatsApp — TBD)
 - [ ] Audit log for stock and treatment overrides
-- [ ] Dashboard: revenue (sale) vs real cost (treatment) / margin
+- [ ] Dashboard UI (PWA) consuming metrics endpoints
 - [ ] Cloud S3 cutover for documents and uploads
 
 ---

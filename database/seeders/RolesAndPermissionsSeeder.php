@@ -64,6 +64,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'treatments.start',
             'treatments.complete',
             'treatments.cancel',
+            'metrics.view',
         ];
 
         foreach ($permissions as $permission) {
@@ -124,6 +125,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'treatments.start',
             'treatments.complete',
             'treatments.cancel',
+            'metrics.view',
         ]);
     }
 }

@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\ClientOriginController;
 use App\Http\Controllers\Api\V1\ClinicBrandingController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\MetricsController;
 use App\Http\Controllers\Api\V1\Payments\CardBrandController;
 use App\Http\Controllers\Api\V1\Payments\CardFeeRuleController;
 use App\Http\Controllers\Api\V1\Payments\CardOperatorController;
@@ -259,6 +260,9 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:documents.view');
         Route::delete('documents/{document}', [DocumentController::class, 'destroy'])
             ->middleware('permission:documents.delete');
+
+        Route::get('metrics/commercial', [MetricsController::class, 'commercial'])
+            ->middleware('permission:metrics.view');
 
         Route::get('treatments', [TreatmentController::class, 'index'])
             ->middleware('permission:treatments.view');
