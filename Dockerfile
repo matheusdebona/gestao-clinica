@@ -1,4 +1,4 @@
-# PHP 8.5 + extensions for Laravel 13 API (+ Chromium for Browsershot PDFs)
+# PHP 8.5 + extensions for Laravel 13 API (+ Node/Chromium for Browsershot PDFs)
 FROM php:8.5-cli-bookworm
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -6,12 +6,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
     fonts-liberation \
     fonts-dejavu-core \
+    nodejs \
+    npm \
     && docker-php-ext-install pdo_pgsql bcmath intl zip \
     && pecl install redis \
     && docker-php-ext-enable redis \
+    && npm install -g puppeteer \
     && rm -rf /var/lib/apt/lists/*
 
 ENV BROWSERSHOT_CHROME_PATH=/usr/bin/chromium
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
