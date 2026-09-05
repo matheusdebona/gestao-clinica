@@ -142,7 +142,7 @@ See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap
 
 - [x] Metrics API wave A — commercial KPIs (`GET /metrics/commercial`, `metrics.view`)
 - [x] Metrics API wave B — acquisition (`GET /metrics/acquisition`, lifetime conversion)
-- [ ] Metrics API wave C — real margin (sale vs treatment/appointment)
+- [x] Metrics API wave C — real margin (`GET /metrics/margin`, period + cohort_sale)
 - [ ] Metrics API wave D — inventory + clinical operations
 - [ ] Low-stock notification channel (email / WhatsApp — TBD)
 - [ ] Audit log for stock and treatment overrides
