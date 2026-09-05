@@ -9,7 +9,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class AppointmentResource extends JsonResource
 {
     /**
-     * @param  array{suggested_consumptions?: list<array<string, mixed>>, stock_warnings?: list<array<string, mixed>>}|null  $extras
+     * @param  array{suggested_consumptions?: list<array<string, mixed>>, stock_warnings?: list<array<string, mixed>>, warnings?: list<string>}|null  $extras
      */
     public function __construct($resource, private readonly ?array $extras = null)
     {
@@ -37,6 +37,7 @@ class AppointmentResource extends JsonResource
             'client' => ClientResource::make($this->whenLoaded('client')),
             'suggested_consumptions' => $this->extras['suggested_consumptions'] ?? null,
             'stock_warnings' => $this->extras['stock_warnings'] ?? null,
+            'warnings' => $this->extras['warnings'] ?? null,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

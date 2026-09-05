@@ -167,7 +167,7 @@ Receita de setembro vs custo de sessões de setembro **não** é a mesma coisa q
 1. `GET /api/v1/metrics/inventory`
 2. `GET /api/v1/metrics/operations?from=&to=`
 3. Reusar lógica de fulfillment em agregado (`FulfillmentMetricsService`).
-4. Alertas (Phase 10): job diário low-stock → email/WhatsApp (canal TBD) — **depois** dos endpoints.
+4. Alertas (Phase 10): job diário low-stock (atual + projeção do dia) → **in-app + push stub** já entregue; email/WhatsApp/FCM depois dos endpoints de métricas onda D.
 5. Testes de isolamento + stock math.
 6. UI: lista low-stock; cards de sessões; tabela “pacotes com saldo pendente”.
 

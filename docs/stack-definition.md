@@ -298,6 +298,7 @@ Phase 1 already follows this for auth and users; Phases 2+ must keep the same pa
 | DB | PostgreSQL 18 |
 | Cache/queue | Redis |
 | Files | MinIO (S3 API) → cloud S3 later |
+| Alerts | Database inbox + `PushChannel` stub; `CheckLowStockProductsJob` daily at 01:00 (requires `schedule:run` + `queue:work`) |
 | Commercial core | Products → Protocols → Sales → Contract → Treatment (stock on complete) |
 | UX | **Mobile-first PWA** (doctor, secretary, clinic staff); desktop secondary; native later if needed |
 | Phase 1 deliverable | Stack + login + permissions + clinic tenancy skeleton + Docker |
