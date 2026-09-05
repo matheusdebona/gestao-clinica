@@ -109,4 +109,4 @@ Full checklists: [`domain-roadmap.md`](./domain-roadmap.md).
 - [x] Phase 8 — Budget PDF + clinic branding (MinIO); sale contract/receipt deferred
 - [x] Phase 9 — Treatments + appointments → actual usage → stock + real cost
 - [ ] Phase 10 — Alerts, audit, dashboards, cloud S3
-- [ ] Phase 11 — Frontend **PWA** mobile-first (native later if needed)
+- [ ] Phase 11 — Frontend Vue mobile-first web (spec: `docs/frontend-vue-spec.md`); PWA later; native only if needed

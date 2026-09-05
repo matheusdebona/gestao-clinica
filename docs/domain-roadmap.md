@@ -147,23 +147,28 @@ See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap
 - [x] Low-stock alerts (in-app inbox + PushChannel stub): daily job (atual + projeção pelos agendamentos do dia); warnings não-bloqueantes no `schedule`; destinatários com `products.view`
 - [ ] Real push / email / WhatsApp channels (FCM/Web Push later)
 - [ ] Audit log for stock and treatment overrides
-- [ ] Dashboard UI (PWA) consuming metrics endpoints
+- [ ] Dashboard UI (Vue web / later PWA) consuming metrics endpoints
 - [ ] Cloud S3 cutover for documents and uploads
 
 **Ops:** keep `php artisan schedule:run` (cron) and `php artisan queue:work` running so `CheckLowStockProductsJob` (01:00) and queued notifications are delivered.
 
 ---
 
-## Phase 11 — Frontend PWA (mobile-first)
+## Phase 11 — Frontend (mobile-first web → PWA)
 
-- [ ] Choose PWA stack (e.g. React/Vue/Next) with **mobile-first** layouts
-- [ ] Ship as installable **PWA** (manifest + service worker; “Add to Home Screen”)
-- [ ] Prioritize phone flows: login, client search, sale, contract, treatment complete, low-stock
+See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, design-system order, and implementation phases.
+
+- [x] Spec MD — Vue 3 + Vite + TS; Tailwind + Reka UI; web responsiva primeiro; componentes antes das features
+- [ ] Scaffold `apps/web` (Fase 1 do spec)
+- [ ] Design system + `/dev/ui` kitchen sink (Fase 3)
+- [ ] Features clínicas: auth, clients, products, sales, treatments, notifications, metrics (Fase 4)
+- [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)
 - [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI
 - [ ] Desktop layouts as progressive enhancement of the mobile design
 - [ ] Native iOS/Android only if PWA proves insufficient later
 
-**DoD:** doctor and secretary can install the PWA and complete core daily tasks comfortably on a phone-sized viewport.
+**DoD (web):** doctor and secretary complete core daily tasks comfortably on a phone-sized viewport.  
+**DoD (PWA later):** installable “Add to Home Screen” on top of the same app.
 
 ---
 
@@ -173,7 +178,7 @@ See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap
 Clinic/tenant → Products/stock master → Protocols → Clients → Payments
     → Sales (no stock out) → Budgets → Documents/contracts
     → Treatments (actual usage → stock out + real cost)
-    → Mobile-first PWA UI
+    → Mobile-first Vue web UI (PWA after)
 ```
 
-Sales and contracts are commercial. Treatments are clinical consumption. Stock only moves when treatment is completed. First UI is an installable **PWA**.
+Sales and contracts are commercial. Treatments are clinical consumption. Stock only moves when treatment is completed. First UI is a **mobile-first Vue web app**; PWA comes after the web flows are stable.
