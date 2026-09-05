@@ -2,29 +2,28 @@
 
 namespace Database\Factories;
 
-use App\Models\Client;
+use App\Models\ClientOrigin;
 use App\Models\Clinic;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Client>
+ * @extends Factory<ClientOrigin>
  */
-class ClientFactory extends Factory
+class ClientOriginFactory extends Factory
 {
-    protected $model = Client::class;
+    protected $model = ClientOrigin::class;
 
     public function definition(): array
     {
         return [
             'clinic_id' => Clinic::factory(),
-            'name' => fake()->name(),
-            'whatsapp' => fake()->numerify('119########'),
-            'notes' => fake()->optional()->sentence(),
-            'main_pains' => fake()->optional()->sentence(),
-            'service_duration_minutes' => fake()->optional()->numberBetween(15, 120),
-            'client_origin_id' => null,
-            'campaign_id' => null,
-            'initial_consultation_amount' => null,
+            'name' => fake()->unique()->randomElement([
+                'Instagram',
+                'Facebook',
+                'Indicação',
+                'Google',
+                'Outros',
+            ]).' '.fake()->unique()->numerify('##'),
             'is_active' => true,
         ];
     }

@@ -2,11 +2,13 @@
 
 use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\AppointmentController;
+use App\Http\Controllers\Api\V1\CampaignController;
 use App\Http\Controllers\Api\V1\Catalog\BrandController;
 use App\Http\Controllers\Api\V1\Catalog\ProductTypeController;
 use App\Http\Controllers\Api\V1\Catalog\UnitOfMeasureController;
 use App\Http\Controllers\Api\V1\BudgetController;
 use App\Http\Controllers\Api\V1\ClientController;
+use App\Http\Controllers\Api\V1\ClientOriginController;
 use App\Http\Controllers\Api\V1\ClinicBrandingController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\DocumentController;
@@ -142,6 +144,28 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:clients.update');
         Route::delete('clients/{client}', [ClientController::class, 'destroy'])
             ->middleware('permission:clients.delete');
+
+        Route::get('client-origins', [ClientOriginController::class, 'index'])
+            ->middleware('permission:client_origins.manage');
+        Route::post('client-origins', [ClientOriginController::class, 'store'])
+            ->middleware('permission:client_origins.manage');
+        Route::get('client-origins/{client_origin}', [ClientOriginController::class, 'show'])
+            ->middleware('permission:client_origins.manage');
+        Route::put('client-origins/{client_origin}', [ClientOriginController::class, 'update'])
+            ->middleware('permission:client_origins.manage');
+        Route::delete('client-origins/{client_origin}', [ClientOriginController::class, 'destroy'])
+            ->middleware('permission:client_origins.manage');
+
+        Route::get('campaigns', [CampaignController::class, 'index'])
+            ->middleware('permission:campaigns.manage');
+        Route::post('campaigns', [CampaignController::class, 'store'])
+            ->middleware('permission:campaigns.manage');
+        Route::get('campaigns/{campaign}', [CampaignController::class, 'show'])
+            ->middleware('permission:campaigns.manage');
+        Route::put('campaigns/{campaign}', [CampaignController::class, 'update'])
+            ->middleware('permission:campaigns.manage');
+        Route::delete('campaigns/{campaign}', [CampaignController::class, 'destroy'])
+            ->middleware('permission:campaigns.manage');
 
         Route::get('payment-methods', [PaymentMethodController::class, 'index'])
             ->middleware('permission:payment_methods.manage');

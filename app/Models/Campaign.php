@@ -6,22 +6,17 @@ use App\Models\Concerns\BelongsToClinic;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Client extends Model
+class Campaign extends Model
 {
-    /** @use HasFactory<\Database\Factories\ClientFactory> */
+    /** @use HasFactory<\Database\Factories\CampaignFactory> */
     use BelongsToClinic, HasFactory;
 
     protected $fillable = [
         'clinic_id',
-        'name',
-        'whatsapp',
-        'notes',
-        'main_pains',
-        'service_duration_minutes',
         'client_origin_id',
-        'campaign_id',
-        'initial_consultation_amount',
+        'name',
         'is_active',
     ];
 
@@ -35,8 +30,6 @@ class Client extends Model
     protected function casts(): array
     {
         return [
-            'service_duration_minutes' => 'integer',
-            'initial_consultation_amount' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }
@@ -46,8 +39,8 @@ class Client extends Model
         return $this->belongsTo(ClientOrigin::class);
     }
 
-    public function campaign(): BelongsTo
+    public function clients(): HasMany
     {
-        return $this->belongsTo(Campaign::class);
+        return $this->hasMany(Client::class);
     }
 }
