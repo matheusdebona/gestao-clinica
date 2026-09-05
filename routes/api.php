@@ -268,6 +268,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:metrics.view');
         Route::get('metrics/margin', [MetricsController::class, 'margin'])
             ->middleware('permission:metrics.view');
+        Route::get('metrics/inventory', [MetricsController::class, 'inventory'])
+            ->middleware('permission:metrics.view');
+        Route::get('metrics/operations', [MetricsController::class, 'operations'])
+            ->middleware('permission:metrics.view');
 
         Route::get('notifications', [NotificationController::class, 'index']);
         Route::post('notifications/{id}/read', [NotificationController::class, 'markRead']);

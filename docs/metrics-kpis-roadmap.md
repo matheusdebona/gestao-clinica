@@ -171,7 +171,7 @@ Receita de setembro vs custo de sessões de setembro **não** é a mesma coisa q
 5. Testes de isolamento + stock math.
 6. UI: lista low-stock; cards de sessões; tabela “pacotes com saldo pendente”.
 
-**DoD onda D:** low-stock e saldo pendente acionáveis no dia a dia.
+**DoD onda D:** low-stock e saldo pendente acionáveis no dia a dia. **API entregue** (`/metrics/inventory`, `/metrics/operations`); UI na PWA.
 
 ---
 
@@ -248,11 +248,11 @@ Response shape sugerida:
 - [ ] (Futuro) impostos, taxas, custos fixos
 
 ### D — Estoque / operação
-- [ ] inventory + operations endpoints
-- [ ] Agregação fulfillment
-- [ ] Tests stock / cancel rate
+- [x] inventory + operations endpoints
+- [x] Agregação fulfillment
+- [x] Tests stock / cancel rate
 - [ ] (UI) low-stock + saldo a aplicar
-- [ ] (Depois) job de alerta
+- [x] Job de alerta low-stock (já entregue na Phase 10; lead-time-aware reorder depois)
 
 ---
 
@@ -279,4 +279,6 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 6. Gasto de campanha (`spend_amount`) adiado para B+.  
 7. Margem (Onda C): receita = `effective_amount` + extras cobrados; custo = `appointment.total_cost` completed; `period` usa `finished_at` para custo; impostos/taxas/fixos fora do escopo.
 
-Próximo: **Onda D** (estoque + operação).
+**Status Onda D:** implementado — `GET /api/v1/metrics/inventory` (snapshot + `from`/`to` opcionais, default 30d) e `GET /api/v1/metrics/operations` (período obrigatório, saldo a aplicar + lista).
+
+Próximo: PWA / charts consumindo A–D; alerta de reposição por `lead_time_days`.
