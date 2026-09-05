@@ -27,6 +27,7 @@ class ProductFactory extends Factory
             'min_sale_price' => '80.00',
             'stock_quantity' => '0.0000',
             'min_stock' => '5.0000',
+            'lead_time_days' => 0,
             'is_active' => true,
         ];
     }

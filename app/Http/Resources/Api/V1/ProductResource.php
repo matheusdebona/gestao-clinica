@@ -27,6 +27,7 @@ class ProductResource extends JsonResource
             'min_sale_price' => $this->min_sale_price,
             'stock_quantity' => $this->stock_quantity,
             'min_stock' => $this->min_stock,
+            'lead_time_days' => $this->lead_time_days,
             'unit_margin' => $this->unitMargin(),
             'unit_margin_percent' => $this->unitMarginPercent(),
             'inventory_value' => $this->inventoryValue(),

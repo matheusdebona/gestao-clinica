@@ -26,6 +26,7 @@ class Product extends Model
         'min_sale_price',
         'stock_quantity',
         'min_stock',
+        'lead_time_days',
         'is_active',
     ];
 
@@ -37,6 +38,7 @@ class Product extends Model
             'min_sale_price' => 'decimal:2',
             'stock_quantity' => 'decimal:4',
             'min_stock' => 'decimal:4',
+            'lead_time_days' => 'integer',
             'is_active' => 'boolean',
         ];
     }

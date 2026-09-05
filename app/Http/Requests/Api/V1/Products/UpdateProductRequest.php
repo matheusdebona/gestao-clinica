@@ -46,6 +46,7 @@ class UpdateProductRequest extends FormRequest
             'sale_price' => ['sometimes', 'numeric', 'min:0'],
             'min_sale_price' => ['nullable', 'numeric', 'min:0'],
             'min_stock' => ['sometimes', 'numeric', 'min:0'],
+            'lead_time_days' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:365'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

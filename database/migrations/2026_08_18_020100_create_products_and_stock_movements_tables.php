@@ -22,6 +22,7 @@ return new class extends Migration
             $table->decimal('min_sale_price', 15, 2)->nullable();
             $table->decimal('stock_quantity', 15, 4)->default(0);
             $table->decimal('min_stock', 15, 4)->default(0);
+            $table->unsignedInteger('lead_time_days')->default(0);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 

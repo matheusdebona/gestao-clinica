@@ -45,6 +45,7 @@ class StoreProductRequest extends FormRequest
             'min_sale_price' => ['nullable', 'numeric', 'min:0'],
             'stock_quantity' => ['nullable', 'numeric', 'min:0'],
             'min_stock' => ['nullable', 'numeric', 'min:0'],
+            'lead_time_days' => ['nullable', 'integer', 'min:0', 'max:365'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }
