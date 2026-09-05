@@ -91,12 +91,13 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 
 ## Phase 7 — Budgets
 
-- [ ] Budget CRUD mirroring sale lines (no stock decrement)
-- [ ] Status workflow (`draft` → `sent` → `accepted` / `rejected` / `expired`)
-- [ ] Convert accepted budget → sale draft
-- [ ] Permissions + tests
+- [x] Versioned budgets created from draft sales (immutable item snapshots)
+- [x] Sale item KPI snapshots: `product_name`, `list_unit_price`, `list_line_total`
+- [x] Status workflow (`draft` → `sent` → `accepted` / `rejected` / `expired`; prior drafts/sent → `superseded`)
+- [x] Accept on same sale (no new sale); then payments/confirm as today
+- [x] Permissions + tests (isolation, versioning, stock unchanged)
 
-**DoD:** quote → convert → confirm sale path works (still no stock change).
+**DoD:** quote versions preserved; accept → confirm sale path works (still no stock change).
 
 ---
 

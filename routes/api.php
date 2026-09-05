@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Catalog\BrandController;
 use App\Http\Controllers\Api\V1\Catalog\ProductTypeController;
 use App\Http\Controllers\Api\V1\Catalog\UnitOfMeasureController;
+use App\Http\Controllers\Api\V1\BudgetController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\Payments\CardBrandController;
@@ -191,5 +192,24 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:sales.confirm');
         Route::post('sales/{sale}/cancel', [SaleController::class, 'cancel'])
             ->middleware('permission:sales.cancel');
+
+        Route::get('budgets', [BudgetController::class, 'index'])
+            ->middleware('permission:budgets.view');
+        Route::get('budgets/{budget}', [BudgetController::class, 'show'])
+            ->middleware('permission:budgets.view');
+        Route::get('sales/{sale}/budgets', [BudgetController::class, 'indexForSale'])
+            ->middleware('permission:budgets.view');
+        Route::post('sales/{sale}/budgets', [BudgetController::class, 'store'])
+            ->middleware('permission:budgets.create');
+        Route::patch('budgets/{budget}', [BudgetController::class, 'update'])
+            ->middleware('permission:budgets.update');
+        Route::post('budgets/{budget}/send', [BudgetController::class, 'send'])
+            ->middleware('permission:budgets.update');
+        Route::post('budgets/{budget}/accept', [BudgetController::class, 'accept'])
+            ->middleware('permission:budgets.convert');
+        Route::post('budgets/{budget}/reject', [BudgetController::class, 'reject'])
+            ->middleware('permission:budgets.update');
+        Route::post('budgets/{budget}/expire', [BudgetController::class, 'expire'])
+            ->middleware('permission:budgets.update');
     });
 });

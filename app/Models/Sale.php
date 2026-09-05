@@ -78,6 +78,11 @@ class Sale extends Model
         return $this->hasMany(SalePayment::class);
     }
 
+    public function budgets(): HasMany
+    {
+        return $this->hasMany(Budget::class);
+    }
+
     public function isDraft(): bool
     {
         return $this->status === self::STATUS_DRAFT;

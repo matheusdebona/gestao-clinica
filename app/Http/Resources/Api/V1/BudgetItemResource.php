@@ -5,8 +5,8 @@ namespace App\Http\Resources\Api\V1;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\SaleItem */
-class SaleItemResource extends JsonResource
+/** @mixin \App\Models\BudgetItem */
+class BudgetItemResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
@@ -19,12 +19,9 @@ class SaleItemResource extends JsonResource
             'list_unit_price' => $this->list_unit_price,
             'list_line_total' => $this->list_line_total,
             'unit_price' => $this->unit_price,
+            'line_total' => $this->line_total,
             'unit_cost' => $this->unit_cost,
             'min_unit_price' => $this->min_unit_price,
-            'line_total' => $this->line_total,
-            'line_min_total' => number_format((float) $this->min_unit_price * (float) $this->quantity, 2, '.', ''),
-            'is_below_minimum' => (float) $this->unit_price < (float) $this->min_unit_price,
-            'product' => ProductResource::make($this->whenLoaded('product')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
