@@ -478,7 +478,7 @@ Isso é a base. O “negócio” (produtos, vendas, tratamentos, etc.) sobe em f
 | **8** | Documentos / contratos (MinIO) |
 | **9** | Tratamentos: início, consumo real, fim → **baixa de estoque + custo** |
 | **10** | Notificações, auditoria, painéis (margem real), S3 na nuvem |
-| **11** | Frontend **PWA mobile-first** (médico, secretária; nativo depois só se precisar) |
+| **11** | Frontend **Vue** mobile-first web (spec em `docs/frontend-vue-spec.md`); PWA depois; nativo só se precisar |
 
 ---
 
@@ -494,7 +494,7 @@ Marque mentalmente o que está certo ou diga o que mudar:
 6. **Moeda:** só Real (BRL)?
 7. **Login:** só e-mail/senha, ou também CPF / código de funcionário?
 8. **Idioma das mensagens da API:** português (BR) desde o início?
-9. **Stack da PWA:** React, Vue, Next ou outra?
+9. **Frontend:** Vue 3 — ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) (web primeiro; PWA depois).
 10. **Contrato:** PDF gerado pelo próprio sistema no início está ok?
 11. **WhatsApp:** só guardar o número por enquanto?
 

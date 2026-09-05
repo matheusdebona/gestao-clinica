@@ -281,4 +281,4 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 
 **Status Onda D:** implementado — `GET /api/v1/metrics/inventory` (snapshot + `from`/`to` opcionais, default 30d) e `GET /api/v1/metrics/operations` (período obrigatório, saldo a aplicar + lista).
 
-Próximo: PWA / charts consumindo A–D; alerta de reposição por `lead_time_days`.
+Próximo: frontend Vue conforme [`frontend-vue-spec.md`](./frontend-vue-spec.md) (design system → features → PWA).

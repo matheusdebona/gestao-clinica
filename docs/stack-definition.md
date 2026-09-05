@@ -269,8 +269,8 @@ Phase 1 already follows this for auth and users; Phases 2+ must keep the same pa
 
 ### Platform / auth / UX
 
-1. **Frontend repo** — Same monorepo or separate SPA/PWA repo?
-2. **PWA stack** — React, Vue, or Next (or other) for the first PWA?
+1. **Frontend repo** — Spec em [`frontend-vue-spec.md`](./frontend-vue-spec.md); código futuro default `apps/web/` neste monorepo (repo separado ainda ok).
+2. **Frontend stack** — **Vue 3 + Vite + TypeScript**, web responsiva mobile-first primeiro; PWA numa fase posterior (ver spec).
 3. **Locale / i18n** — Portuguese (BR) primary for API messages and seeds?
 4. **User identity** — Email-only login, or also CPF / employee code?
 5. **Soft delete** — Prefer deactivate users over hard delete?
@@ -300,5 +300,5 @@ Phase 1 already follows this for auth and users; Phases 2+ must keep the same pa
 | Files | MinIO (S3 API) → cloud S3 later |
 | Alerts | Database inbox + `PushChannel` stub; `CheckLowStockProductsJob` daily at 01:00 (requires `schedule:run` + `queue:work`) |
 | Commercial core | Products → Protocols → Sales → Contract → Treatment (stock on complete) |
-| UX | **Mobile-first PWA** (doctor, secretary, clinic staff); desktop secondary; native later if needed |
+| UX | **Mobile-first web** (Vue SPA); design system **Modern Soft Violet**; PWA after web is stable |
 | Phase 1 deliverable | Stack + login + permissions + clinic tenancy skeleton + Docker |
