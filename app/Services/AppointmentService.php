@@ -19,12 +19,14 @@ class AppointmentService
     public function __construct(
         private readonly TreatmentService $treatments,
         private readonly StockService $stock,
+        private readonly StockAlertService $stockAlerts,
     ) {}
 
     /**
      * @param  array{scheduled_at?: string|null, professional_user_id?: int|null, notes?: string|null}  $data
+     * @return array{appointment: Appointment, warnings: list<string>}
      */
-    public function schedule(Treatment $treatment, array $data): Appointment
+    public function schedule(Treatment $treatment, array $data): array
     {
         if (! $treatment->isOpen()) {
             throw ValidationException::withMessages([
@@ -32,7 +34,7 @@ class AppointmentService
             ]);
         }
 
-        return Appointment::query()->create([
+        $appointment = Appointment::query()->create([
             'clinic_id' => $treatment->clinic_id,
             'treatment_id' => $treatment->id,
             'client_id' => $treatment->client_id,
@@ -41,6 +43,15 @@ class AppointmentService
             'scheduled_at' => $data['scheduled_at'] ?? null,
             'notes' => $data['notes'] ?? null,
         ]);
+
+        $suggested = $this->treatments->suggestedConsumptions($treatment);
+        $warnings = $this->stockAlerts->warningMessagesForSuggested($suggested);
+        $this->stockAlerts->notifyAppointmentWarnings($appointment, $warnings);
+
+        return [
+            'appointment' => $appointment->fresh(['consumptions', 'treatment', 'client']),
+            'warnings' => $warnings,
+        ];
     }
 
     /**

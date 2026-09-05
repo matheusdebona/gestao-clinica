@@ -29,9 +29,11 @@ class AppointmentController extends Controller
 
     public function store(StoreAppointmentRequest $request, Treatment $treatment): JsonResponse
     {
-        $appointment = $this->appointments->schedule($treatment, $request->validated());
+        $result = $this->appointments->schedule($treatment, $request->validated());
 
-        return (new AppointmentResource($appointment->load(['client', 'consumptions'])))
+        return (new AppointmentResource($result['appointment']->load(['client', 'consumptions']), [
+            'warnings' => $result['warnings'],
+        ]))
             ->response()
             ->setStatusCode(201);
     }
