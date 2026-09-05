@@ -51,6 +51,7 @@ return new class extends Migration
             $table->index(['clinic_id', 'is_active']);
             $table->index(['clinic_id', 'client_origin_id']);
             $table->index(['clinic_id', 'campaign_id']);
+            $table->index(['clinic_id', 'created_at']);
         });
     }
 

@@ -141,7 +141,7 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap.md) (waves A–D).
 
 - [x] Metrics API wave A — commercial KPIs (`GET /metrics/commercial`, `metrics.view`)
-- [ ] Metrics API wave B — acquisition (origin/campaign/consultation)
+- [x] Metrics API wave B — acquisition (`GET /metrics/acquisition`, lifetime conversion)
 - [ ] Metrics API wave C — real margin (sale vs treatment/appointment)
 - [ ] Metrics API wave D — inventory + clinical operations
 - [ ] Low-stock notification channel (email / WhatsApp — TBD)

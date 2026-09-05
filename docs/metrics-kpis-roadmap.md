@@ -88,22 +88,16 @@ Regra de ouro: **toda métrica é clinic-scoped** e aceita filtro de período (`
 
 1. Garantir índices: `(clinic_id, created_at)`, `(clinic_id, client_origin_id)`, `(clinic_id, campaign_id)` em `clients`.
 2. `GET /api/v1/metrics/acquisition?from=&to=&group_by=origin|campaign`
-3. Definir conversão com clareza no docs:
-   - **Recomendação:** cliente criado no período que possui sale `confirmed` com `sold_at/confirmed_at` ≥ `client.created_at` (primeira venda após cadastro).
-4. Service `AcquisitionMetricsService` — left join clients → sales agregadas.
-5. Testes: cliente Instagram com sale; cliente Facebook sem sale; isolamento.
-6. UI: ranking de canais (clientes | receita consulta | receita vendas | conversão %).
+3. Conversão **lifetime** (decidido): cliente criado no período com ≥1 sale `confirmed` onde `sold_at` ≥ `client.created_at`. A venda pode cair **depois** do período (orçamento no mês N, pagamento no N+1).
+4. Service `AcquisitionMetricsService` — cohort de clients + subquery de sales pós-cadastro.
+5. Testes: Instagram com sale no mês seguinte; Facebook sem sale; draft não converte; isolamento; `group_by=campaign`.
+6. UI (depois): ranking de canais (clientes | receita consulta | receita vendas | conversão %).
 
-### Extensão opcional (ainda na onda B ou B+)
+**Sem `campaigns.spend_amount` nesta onda** — CAC/ROI de ads fica para B+ quando houver gasto de mídia. Enquanto isso: `avg_consultation_amount` e `sales_to_consultation_ratio` (receita vendas ÷ receita consultas).
 
-Campo em `campaigns`:
+**Status:** implementado (`GET /api/v1/metrics/acquisition?from=&to=&group_by=origin|campaign`).
 
-- `spend_amount` (investimento em mídia)
-- `starts_on` / `ends_on` (opcional)
-
-Aí CAC/ROI passam a usar **gasto real da campanha**, não só valor da consulta.
-
-**DoD onda B:** ranking por origem/campanha confiável; conversão testada.
+**DoD onda B:** ranking por origem/campanha confiável; conversão lifetime testada.
 
 ---
 
@@ -238,10 +232,10 @@ Response shape sugerida:
 - [ ] (UI) 4 cards + mix pagamento
 
 ### B — Aquisição
-- [ ] `AcquisitionMetricsService` + endpoint
-- [ ] Definição de conversão documentada
-- [ ] Tests por origin/campaign
-- [ ] (Opcional) `campaigns.spend_amount`
+- [x] `AcquisitionMetricsService` + endpoint
+- [x] Definição de conversão documentada (**lifetime**)
+- [x] Tests por origin/campaign
+- [ ] (Opcional / B+) `campaigns.spend_amount`
 - [ ] (UI) ranking canais
 
 ### C — Margem
@@ -276,8 +270,9 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 
 1. Data canônica da sale para métricas: **`sold_at`** (Onda A).  
 2. Períodos longos: `from`/`to` + agregação `day|week|month` (auto ou explícita) — evita séries diárias de 365+ pontos sem necessidade.  
-3. Conversão (Onda B): lifetime vs só vendas no mesmo período do cadastro — ainda pendente.  
+3. Conversão (Onda B): **lifetime** — sale `confirmed` com `sold_at` ≥ `client.created_at` (pode ser após o período de cadastro).  
 4. Incluir `initial_consultation_amount` na “receita total” do dashboard ou card separado (recomendação: **card separado**, não somar com Sale).  
-5. Canal de alerta low-stock: email vs WhatsApp — pendente.
+5. Canal de alerta low-stock: email vs WhatsApp — pendente.  
+6. Gasto de campanha (`spend_amount`) adiado para B+.
 
-Próximo: **Onda B** (aquisição).
+Próximo: **Onda C** (margem real).
