@@ -64,13 +64,13 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 
 ## Phase 5 — Payment methods & card fees
 
-- [ ] CRUD `PaymentMethod` (cash, PIX, check, credit_card, …)
-- [ ] CRUD `CardOperator`
-- [ ] Optional CRUD `CardBrand`
-- [ ] CRUD `CardFeeRule` (operator, brand?, installments → fee)
-- [ ] Permissions + tests
+- [x] CRUD `PaymentMethod` (cash, PIX, check, credit_card, debit_card, boleto, other) + optional method fees
+- [x] CRUD `CardOperator` (multi-machine; `auto_anticipate`)
+- [x] CRUD `CardBrand` + seed principais bandeiras
+- [x] CRUD `CardFeeRule` (method + operator + brand + installments → fee % and/or fixed)
+- [x] Permissions `*.manage` + feature tests + default catalog seed
 
-**DoD:** sales can reference methods; card sales can attach operator/fee metadata.
+**DoD:** sales can reference methods; card sales can attach operator/fee metadata and compute net received.
 
 ---
 

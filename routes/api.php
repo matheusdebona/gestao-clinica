@@ -6,6 +6,10 @@ use App\Http\Controllers\Api\V1\Catalog\ProductTypeController;
 use App\Http\Controllers\Api\V1\Catalog\UnitOfMeasureController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\ClinicController;
+use App\Http\Controllers\Api\V1\Payments\CardBrandController;
+use App\Http\Controllers\Api\V1\Payments\CardFeeRuleController;
+use App\Http\Controllers\Api\V1\Payments\CardOperatorController;
+use App\Http\Controllers\Api\V1\Payments\PaymentMethodController;
 use App\Http\Controllers\Api\V1\PermissionCatalogController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProtocolController;
@@ -123,5 +127,49 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:clients.update');
         Route::delete('clients/{client}', [ClientController::class, 'destroy'])
             ->middleware('permission:clients.delete');
+
+        Route::get('payment-methods', [PaymentMethodController::class, 'index'])
+            ->middleware('permission:payment_methods.manage');
+        Route::post('payment-methods', [PaymentMethodController::class, 'store'])
+            ->middleware('permission:payment_methods.manage');
+        Route::get('payment-methods/{payment_method}', [PaymentMethodController::class, 'show'])
+            ->middleware('permission:payment_methods.manage');
+        Route::put('payment-methods/{payment_method}', [PaymentMethodController::class, 'update'])
+            ->middleware('permission:payment_methods.manage');
+        Route::delete('payment-methods/{payment_method}', [PaymentMethodController::class, 'destroy'])
+            ->middleware('permission:payment_methods.manage');
+
+        Route::get('card-operators', [CardOperatorController::class, 'index'])
+            ->middleware('permission:card_operators.manage');
+        Route::post('card-operators', [CardOperatorController::class, 'store'])
+            ->middleware('permission:card_operators.manage');
+        Route::get('card-operators/{card_operator}', [CardOperatorController::class, 'show'])
+            ->middleware('permission:card_operators.manage');
+        Route::put('card-operators/{card_operator}', [CardOperatorController::class, 'update'])
+            ->middleware('permission:card_operators.manage');
+        Route::delete('card-operators/{card_operator}', [CardOperatorController::class, 'destroy'])
+            ->middleware('permission:card_operators.manage');
+
+        Route::get('card-brands', [CardBrandController::class, 'index'])
+            ->middleware('permission:card_brands.manage');
+        Route::post('card-brands', [CardBrandController::class, 'store'])
+            ->middleware('permission:card_brands.manage');
+        Route::get('card-brands/{card_brand}', [CardBrandController::class, 'show'])
+            ->middleware('permission:card_brands.manage');
+        Route::put('card-brands/{card_brand}', [CardBrandController::class, 'update'])
+            ->middleware('permission:card_brands.manage');
+        Route::delete('card-brands/{card_brand}', [CardBrandController::class, 'destroy'])
+            ->middleware('permission:card_brands.manage');
+
+        Route::get('card-fee-rules', [CardFeeRuleController::class, 'index'])
+            ->middleware('permission:card_fees.manage');
+        Route::post('card-fee-rules', [CardFeeRuleController::class, 'store'])
+            ->middleware('permission:card_fees.manage');
+        Route::get('card-fee-rules/{card_fee_rule}', [CardFeeRuleController::class, 'show'])
+            ->middleware('permission:card_fees.manage');
+        Route::put('card-fee-rules/{card_fee_rule}', [CardFeeRuleController::class, 'update'])
+            ->middleware('permission:card_fees.manage');
+        Route::delete('card-fee-rules/{card_fee_rule}', [CardFeeRuleController::class, 'destroy'])
+            ->middleware('permission:card_fees.manage');
     });
 });

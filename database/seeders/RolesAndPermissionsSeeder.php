@@ -40,6 +40,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'clients.create',
             'clients.update',
             'clients.delete',
+            'payment_methods.manage',
+            'card_operators.manage',
+            'card_brands.manage',
+            'card_fees.manage',
         ];
 
         foreach ($permissions as $permission) {
@@ -76,6 +80,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'clients.create',
             'clients.update',
             'clients.delete',
+            'payment_methods.manage',
+            'card_operators.manage',
+            'card_brands.manage',
+            'card_fees.manage',
         ]);
     }
 }
