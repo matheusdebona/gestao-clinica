@@ -350,62 +350,74 @@ Typical later order: **confirm sale → issue contract → start treatment**.
 
 ---
 
-## 11. Treatments (clinical application — stock + real cost)
+## 11. Treatments + Appointments (clinical application — stock + real cost)
 
-A **treatment** is opened for a patient (from a confirmed sale). Suggested products come from exploding sale protocols + product lines. At the end, the professional records **what was actually used**.
+A **treatment** is the clinical case opened from a **confirmed sale** (1:1).  
+**Appointments** are calendar sessions under that treatment (application, return with products, evaluation with zero consumption). Stock moves only when an **appointment is completed**.
 
 ### Why separate from sale
 
 - At sale time the product has **not** been applied yet.
-- The doctor may use the suggested set, change quantities, and **add complementary products without charging** the patient.
-- Stock and **clinic cost** must follow **real consumption**, including complimentary extras.
+- A sold package (e.g. 3 applications) is fulfilled across **multiple return visits**.
+- The doctor may change quantities and **add complementary products** (courtesy or charged).
+- Stock and **clinic cost** follow **real consumption per session**, including complimentary extras.
 
 ### Treatment
 
 | Field | Purpose |
 | --- | --- |
 | `clinic_id` | Tenant |
-| `sale_id` | Commercial source |
-| `client_id` | Patient (denormalized for queries) |
-| `professional_user_id` | Who performed the application |
-| `started_at` / `finished_at` | Session window |
-| `duration_minutes` | Actual service time |
-| `status` | `scheduled`, `in_progress`, `completed`, `cancelled` |
+| `sale_id` | Commercial source (unique) |
+| `client_id` | Patient (denormalized) |
+| `opened_by_user_id` | Who opened the case |
+| `status` | `open`, `completed`, `cancelled` |
 | `notes` | Clinical notes |
-| `total_cost` | Σ consumption line costs (includes complimentary) |
-| `total_charged_on_treatment` | Σ amounts charged on consumption lines (extras billed at session, if any) |
+| `total_cost` | Rollup of completed appointment costs |
 
-### TreatmentConsumption
+### Appointment
 
 | Field | Purpose |
 | --- | --- |
-| `treatment_id` | Parent |
+| `treatment_id` | Parent clinical case |
+| `scheduled_at` | Planned visit (nullable for immediate start) |
+| `status` | `scheduled`, `in_progress`, `completed`, `cancelled` |
+| `professional_user_id` | Who performed the session |
+| `started_at` / `finished_at` / `duration_minutes` | Session window |
+| `stock_warning` | JSON warnings captured on start (stock < suggested) |
+| `total_cost` / `total_charged_on_appointment` | Session cost + extra charges |
+
+### AppointmentConsumption
+
+| Field | Purpose |
+| --- | --- |
+| `appointment_id` | Parent session |
 | `product_id` | Product used |
 | `quantity` | Actual quantity used |
-| `source` | `suggested` (from sale) \| `extra` (added during treatment) |
-| `sale_item_id` | Optional link back to originating sale line |
-| `is_charged` | Whether patient was billed for this line |
-| `charged_amount` | Amount charged (0 if complimentary) |
-| `unit_cost` | Product cost snapshot at completion |
-| `line_cost` | `quantity × unit_cost` — always counted for clinic cost |
+| `source` | `suggested` (from sale) \| `extra` |
+| `sale_item_id` | Optional link to sale line |
+| `is_complimentary` | Courtesy extra (no patient charge) |
+| `charged_amount` | Amount charged for paid extras (0 otherwise) |
+| `sale_payment_id` | New `SalePayment` when extra is charged |
+| `unit_cost` / `line_cost` | Cost snapshot at appointment complete |
 
-### Completion behavior (transactional)
+### Session flow
 
-1. Validate treatment is `in_progress` with at least the required consumption lines.
-2. Persist consumption snapshots (`unit_cost`, `line_cost`).
-3. Decrement `product.stock_quantity` by each consumption `quantity`.
-4. Set `total_cost` / status `completed` / `finished_at`.
-5. Emit low-stock evaluation for touched products.
+1. Open treatment from confirmed sale.
+2. Create one or more appointments (schedule returns).
+3. Start appointment → suggested remaining qty + optional stock warnings (non-blocking).
+4. Sync consumptions (suggested / complimentary extra / charged extra + payment).
+5. Complete appointment → snapshot costs → stock out (`allowNegative`) → reference movement on appointment.
+6. Fulfillment report: sold vs consumed vs remaining + current stock.
 
 ### Cost accounting note
 
-- **Revenue** primarily lives on the **sale** (`effective_amount` + payments).
-- **Real product cost** lives on the **treatment** (`total_cost`), including complimentary extras.
+- **Revenue** primarily lives on the **sale** (`effective_amount` + payments, including extra session payments).
+- **Real product cost** lives on appointments rolled into **treatment.total_cost**, including complimentary extras.
 - Margin analysis later: sale revenue − treatment real cost (− card fees, etc.).
 
 ### Permissions
 
-`treatments.view`, `treatments.start`, `treatments.update`, `treatments.complete`, `treatments.cancel`
+`treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel`
 
 ---
 
@@ -442,7 +454,7 @@ Clinic exists
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
-| Treatments | `treatments.view`, `treatments.start`, `treatments.update`, `treatments.complete`, `treatments.cancel` |
+| Treatments | `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel` |
 
 All checks remain **permission-first**; roles only group these permissions per clinic job (receptionist, seller, stock manager, professional, clinic admin).
 

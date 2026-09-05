@@ -107,6 +107,6 @@ Full checklists: [`domain-roadmap.md`](./domain-roadmap.md).
 - [ ] Phase 6 — Sales (commercial; **no** stock decrement)
 - [ ] Phase 7 — Budgets → convert to sale
 - [x] Phase 8 — Budget PDF + clinic branding (MinIO); sale contract/receipt deferred
-- [ ] Phase 9 — Treatments → actual usage → stock + real cost
+- [x] Phase 9 — Treatments + appointments → actual usage → stock + real cost
 - [ ] Phase 10 — Alerts, audit, dashboards, cloud S3
 - [ ] Phase 11 — Frontend **PWA** mobile-first (native later if needed)

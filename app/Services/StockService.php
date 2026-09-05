@@ -6,6 +6,7 @@ use App\Enums\StockMovementType;
 use App\Models\Product;
 use App\Models\StockMovement;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -19,8 +20,10 @@ class StockService
         ?string $reason = null,
         ?string $notes = null,
         ?User $user = null,
+        bool $allowNegative = false,
+        ?Model $reference = null,
     ): StockMovement {
-        return DB::transaction(function () use ($product, $type, $quantity, $unitCost, $reason, $notes, $user) {
+        return DB::transaction(function () use ($product, $type, $quantity, $unitCost, $reason, $notes, $user, $allowNegative, $reference) {
             /** @var Product $locked */
             $locked = Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
 
@@ -48,7 +51,7 @@ class StockService
                     : (($stockBefore * $costBefore) + ($qty * $inboundCost)) / ($stockBefore + $qty);
             } else {
                 $stockAfter = $stockBefore - $qty;
-                if ($stockAfter < 0) {
+                if ($stockAfter < 0 && ! $allowNegative) {
                     throw new InvalidArgumentException('Insufficient stock for this movement.');
                 }
                 $costAfter = $costBefore;
@@ -71,6 +74,8 @@ class StockService
                 'stock_after' => $this->format($stockAfter),
                 'reason' => $reason,
                 'notes' => $notes,
+                'reference_type' => $reference?->getMorphClass(),
+                'reference_id' => $reference?->getKey(),
             ]);
         });
     }

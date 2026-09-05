@@ -115,21 +115,24 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 
 ---
 
-## Phase 9 — Treatments + stock movement + real cost
+## Phase 9 — Treatments + appointments + real stock
 
-- [ ] Create/start treatment from confirmed sale
-- [ ] Prefill suggested consumption by exploding sale protocols + product lines
-- [ ] Allow quantity adjustments on suggested lines
-- [ ] Allow **extra** products (complimentary or charged)
-- [ ] Complete treatment transactionally:
-  - [ ] Snapshot unit costs / line costs
-  - [ ] Decrement stock by actual quantities
-  - [ ] Persist `total_cost` (includes complimentary)
-  - [ ] Persist any `charged_amount` on extras
-- [ ] Cancel in-progress treatment (no stock change)
-- [ ] Permissions + tests (stock math, complimentary cost counted, isolation)
+- [x] Treatment model opened from confirmed sale (1:1)
+- [x] Appointment entity (N per treatment) for scheduling / sessions / calendar later
+- [x] Prefill suggested consumption from remaining sale balance
+- [x] Allow quantity adjustments + extra products (complimentary or charged)
+- [x] Charged extras append a new `SalePayment` on the sale
+- [x] Complete appointment transactionally:
+  - [x] Snapshot unit costs / line costs
+  - [x] Decrement stock by actual quantities (negative stock allowed)
+  - [x] Persist `total_cost` (includes complimentary)
+  - [x] Persist charged amounts on extras
+- [x] Warn on start when stock < suggested remaining
+- [x] Fulfillment endpoint (sold / consumed / remaining + current stock)
+- [x] Cancel scheduled/in-progress appointment (no stock change)
+- [x] Permissions + tests
 
-**DoD:** finishing a treatment lowers stock by what was really used; complimentary extras still cost the clinic and hit stock.
+**DoD:** each completed appointment session lowers stock by what was really used; complimentary extras still cost the clinic and hit stock; multiple sessions per sale supported.
 
 ---
 

@@ -57,6 +57,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'documents.view',
             'documents.generate',
             'documents.delete',
+            'treatments.view',
+            'treatments.manage',
+            'treatments.start',
+            'treatments.complete',
+            'treatments.cancel',
         ];
 
         foreach ($permissions as $permission) {
@@ -110,6 +115,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'documents.view',
             'documents.generate',
             'documents.delete',
+            'treatments.view',
+            'treatments.manage',
+            'treatments.start',
+            'treatments.complete',
+            'treatments.cancel',
         ]);
     }
 }
