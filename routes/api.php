@@ -265,6 +265,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:metrics.view');
         Route::get('metrics/acquisition', [MetricsController::class, 'acquisition'])
             ->middleware('permission:metrics.view');
+        Route::get('metrics/margin', [MetricsController::class, 'margin'])
+            ->middleware('permission:metrics.view');
 
         Route::get('treatments', [TreatmentController::class, 'index'])
             ->middleware('permission:treatments.view');
