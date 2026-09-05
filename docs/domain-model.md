@@ -260,13 +260,15 @@ Selecting a **protocol** on a sale **explodes** its products into lines (qty edi
 | `sale_id` | Parent |
 | `product_id` | Product line |
 | `source_protocol_id` | Nullable origin when exploded from a protocol |
+| `product_name` | Name snapshot at line write (KPI / history) |
 | `quantity` | Editable qty |
-| `unit_price` | Snapshot (defaults to product `sale_price`; editable) |
+| `list_unit_price` / `list_line_total` | Catalog/list price snapshot at line write |
+| `unit_price` | Offered price snapshot (defaults to product `sale_price`; editable) |
 | `unit_cost` | Cost snapshot for later margin |
 | `min_unit_price` | Snapshot `coalesce(min_sale_price, cost)` |
 | `line_total` | `quantity × unit_price` |
 
-API returns `min_amount`, `is_below_minimum`, and per-line below-min flags. Confirming below `min_amount` requires `confirm_below_minimum: true` (soft gate with explicit confirmation).
+API returns `min_amount`, `is_below_minimum`, and per-line below-min flags. Confirming below `min_amount` requires `confirm_below_minimum: true` (soft gate with explicit confirmation). Catalog changes after the line is written do **not** rewrite these snapshots.
 
 ### SalePayment
 
@@ -434,6 +436,7 @@ Clinic exists
 | Payments | `payment_methods.manage`, `card_operators.manage`, `card_brands.manage`, `card_fees.manage` |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
+| Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
 | Treatments | `treatments.view`, `treatments.start`, `treatments.update`, `treatments.complete`, `treatments.cancel` |
 
