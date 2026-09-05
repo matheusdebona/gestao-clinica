@@ -204,31 +204,34 @@ Payment setup is **its own module**, not buried inside sales.
 
 ### PaymentMethod
 
-Examples: cash (`dinheiro`), PIX, check (`cheque`), credit card (`cartao_credito`), debit card.
+Examples: cash (`dinheiro`), PIX, check (`cheque`), credit card (`cartao_credito`), debit card, boleto, other.
 
 | Field | Notes |
 | --- | --- |
-| `clinic_id` | Tenant (or global + clinic overrides — default: clinic-scoped) |
-| `name`, `code` | Display + stable code |
-| `kind` | `cash`, `pix`, `check`, `credit_card`, `debit_card`, `other` |
-| `requires_card_meta` | True for card kinds |
+| `clinic_id` | Tenant-scoped |
+| `name`, `code` | Display + stable code (unique per clinic) |
+| `kind` | `cash`, `pix`, `check`, `credit_card`, `debit_card`, `boleto`, `other` |
+| `requires_card_meta` | True for card kinds (auto-set) |
+| `fee_percent`, `fee_fixed` | Optional method-level fees for **non-card** kinds (e.g. boleto generation fee). Null for card kinds — use `CardFeeRule` |
 | `is_active` | Soft disable |
 
-### Card operator & rates
+### Card operator, brand & rates
 
-When `kind = credit_card` (and optionally debit):
+When `kind` is `credit_card` or `debit_card`:
 
 | Entity | Purpose |
 | --- | --- |
-| `CardOperator` | Cielo, Rede, Stone, PagSeguro, … |
-| `CardBrand` | Visa, Mastercard, Elo, Amex, … (optional) |
-| `CardFeeRule` | Operator (+ brand) + installment count → fee % and/or fixed fee |
+| `CardOperator` | Maquininha / acquirer (Cielo, Stone, Rede…). `auto_anticipate` marks machines that settle/anticipate installments automatically vs D+N |
+| `CardBrand` | Visa, Mastercard, Elo, Amex, … (required on fee rules; seeded defaults) |
+| `CardFeeRule` | `payment_method` + operator + **required** brand + exact installment count → `fee_percent` and/or `fee_fixed` |
 
-Sales that pay by card reference method + operator (+ brand/installments) so net received can be calculated later.
+Debit rules use `installments = 1`. Multiple operators per clinic allow different MDR tables (e.g. one anticipating machine vs one without).
+
+Net received for a gross amount: use `PaymentFeeCalculator` / model helpers (`netAmountFor` / `feeAmountFor`). Per-installment manual anticipation UI is deferred (receivables). Monthly machine rent is deferred to fixed costs.
 
 ### Permissions
 
-`payment_methods.manage`, `card_operators.manage`, `card_fees.manage`
+`payment_methods.manage`, `card_operators.manage`, `card_brands.manage`, `card_fees.manage`
 
 ---
 
@@ -405,7 +408,7 @@ Clinic exists
 | Products | `products.view`, `products.create`, `products.update`, `products.delete`, `products.adjust_stock` |
 | Protocols | `protocols.view`, `protocols.create`, `protocols.update`, `protocols.delete` |
 | Clients | `clients.view`, `clients.create`, `clients.update`, `clients.delete` |
-| Payments | `payment_methods.manage`, `card_operators.manage`, `card_fees.manage` |
+| Payments | `payment_methods.manage`, `card_operators.manage`, `card_brands.manage`, `card_fees.manage` |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
