@@ -342,15 +342,16 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 - [x] `docs/frontend-vue-spec.md`
 - [x] Links em stack-definition + domain-roadmap
 
-### Fase 1 — Scaffold (PR futuro de código)
+### Fase 1 — Scaffold
 
-1. Criar `apps/web` com `npm create vite@latest` (Vue + TS).
-2. Configurar Tailwind, ESLint, Prettier, Vue Router, Pinia, Vue Query, VeeValidate, Zod, ofetch, Reka UI, Lucide.
-3. `.env.example` com `VITE_API_URL`.
-4. Proxy Vite → API local (Docker) se útil.
-5. README: como subir API + front.
+- [x] `apps/web` (Vite + Vue 3 + TS)
+- [x] Tailwind 4, Vue Router, Pinia, Reka UI, Lucide
+- [x] `.env.example` com `VITE_API_URL`
+- [x] README em `apps/web/README.md`
+- [ ] Vue Query, VeeValidate, Zod, ofetch (Fase 2 — auth/API)
+- [ ] ESLint / Prettier (quando o fluxo de auth entrar)
 
-**DoD Fase 1:** `npm run dev` abre shell vazio apontando para a API.
+**DoD Fase 1:** `npm run dev` abre o kitchen sink em `/dev/ui`.
 
 ### Fase 2 — Fundação app
 
@@ -364,13 +365,13 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
 ### Fase 3 — Design system (“Modern Soft Violet”)
 
-1. Tokens Soft Violet em CSS vars → Tailwind theme (§5.1).
-2. Shell: `AppShell` / sidebar brand / `PageHeader` / `SearchField` (§5.2).
-3. Cards + forms + feedback + overlays + data (§5.3–5.7).
-4. Página `/dev/ui` com swatches + todos os estados.
-5. Patterns iniciais: `PermissionGate`, `MoneyDisplay`, `StockStatusBadge`, `ClinicShell`.
+- [x] Tokens Soft Violet em CSS vars → Tailwind theme (§5.1)
+- [x] `PageHeader` / `SearchField` + primitives de form/feedback/overlay no `/dev/ui`
+- [x] Página `/dev/ui` com swatches + estados (default / erro / snack)
+- [ ] Shell completo: `AppShell` / sidebar brand / `ClinicShell` (próximo PR, com auth)
+- [ ] Patterns: `PermissionGate`, `MoneyDisplay`, `StockStatusBadge`
 
-**DoD Fase 3:** kitchen sink revisável no visual Soft Violet; nenhuma feature de negócio ainda (exceto auth já feita).
+**DoD Fase 3 (parcial):** kitchen sink revisável no visual Soft Violet; features de negócio ainda não.
 
 ### Fase 4 — Features (ordem de valor clínico)
 
@@ -432,7 +433,7 @@ Nav do `ClinicShell` só mostra itens permitidos.
 
 ## 10. Fora de escopo deste documento / v1 web
 
-- Implementação do código Vue (Fases 1+)
+- Features clínicas e auth (Fases 2 e 4)
 - PWA / service worker
 - Storybook (opcional)
 - Temas dark mode como prioridade

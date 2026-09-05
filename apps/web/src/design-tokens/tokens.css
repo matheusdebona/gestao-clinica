@@ -1,0 +1,130 @@
+/**
+ * Modern Soft Violet — design tokens
+ * Source of truth for the clinical UI visual language.
+ */
+
+:root {
+  /* Brand */
+  --sv-brand-primary: #5956a6;
+  --sv-brand-primary-dark: #4a4791;
+  --sv-brand-primary-light: #ecebfa;
+  --sv-brand-primary-hover: #6865b8;
+
+  /* Backgrounds */
+  --sv-bg-canvas: #ebf1f8;
+  --sv-bg-sidebar: #5956a6;
+  --sv-bg-surface: #ffffff;
+  --sv-bg-surface-muted: #f5f7fb;
+  --sv-bg-input: #f0f4f8;
+
+  /* Text */
+  --sv-text-title: #1f2430;
+  --sv-text-body: #3a3f4d;
+  --sv-text-muted: #7e8597;
+  --sv-text-inverse: #ffffff;
+
+  /* Accents / feedback */
+  --sv-success: #10b981;
+  --sv-success-light: #d1fae5;
+  --sv-danger: #ef4444;
+  --sv-danger-light: #fee2e2;
+  --sv-warning: #f59e0b;
+  --sv-warning-light: #fef3c7;
+  --sv-card-pink: #fdf2f4;
+  --sv-card-purple: #f8f5fe;
+  --sv-card-blue: #eff6ff;
+  --sv-badge-purple: #a855f7;
+  --sv-gradient-cta-start: #ec4899;
+  --sv-gradient-cta-end: #c084fc;
+
+  /* Borders */
+  --sv-border-subtle: #e5e9f2;
+  --sv-border-divider: #e2e8f0;
+
+  /* Radius */
+  --sv-radius-sm: 8px;
+  --sv-radius-md: 12px;
+  --sv-radius-lg: 20px;
+  --sv-radius-xl: 28px;
+  --sv-radius-card: 24px;
+  --sv-radius-full: 9999px;
+
+  /* Shadows */
+  --sv-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --sv-shadow-floating: 0 10px 30px rgba(89, 86, 166, 0.12);
+  --sv-shadow-input: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+
+  /* Layout */
+  --sv-sidebar-width: 240px;
+  --sv-page-gap: 20px;
+  --sv-page-padding: 24px;
+
+  /* Typography */
+  --sv-font-sans: "Inter Variable", "Plus Jakarta Sans Variable", system-ui, sans-serif;
+  --sv-text-h1: 24px;
+  --sv-leading-h1: 32px;
+  --sv-text-h2: 20px;
+  --sv-leading-h2: 28px;
+  --sv-text-h3: 16px;
+  --sv-leading-h3: 24px;
+  --sv-text-body: 14px;
+  --sv-leading-body: 20px;
+  --sv-text-caption: 12px;
+  --sv-leading-caption: 16px;
+  --sv-text-badge: 11px;
+}
+
+@theme inline {
+  --font-sans: var(--sv-font-sans);
+
+  --color-brand: var(--sv-brand-primary);
+  --color-brand-dark: var(--sv-brand-primary-dark);
+  --color-brand-light: var(--sv-brand-primary-light);
+  --color-brand-hover: var(--sv-brand-primary-hover);
+
+  --color-canvas: var(--sv-bg-canvas);
+  --color-sidebar: var(--sv-bg-sidebar);
+  --color-surface: var(--sv-bg-surface);
+  --color-surface-muted: var(--sv-bg-surface-muted);
+  --color-input: var(--sv-bg-input);
+
+  --color-title: var(--sv-text-title);
+  --color-body: var(--sv-text-body);
+  --color-muted: var(--sv-text-muted);
+  --color-inverse: var(--sv-text-inverse);
+
+  --color-success: var(--sv-success);
+  --color-success-light: var(--sv-success-light);
+  --color-danger: var(--sv-danger);
+  --color-danger-light: var(--sv-danger-light);
+  --color-warning: var(--sv-warning);
+  --color-warning-light: var(--sv-warning-light);
+  --color-card-pink: var(--sv-card-pink);
+  --color-card-purple: var(--sv-card-purple);
+  --color-card-blue: var(--sv-card-blue);
+  --color-badge-purple: var(--sv-badge-purple);
+
+  --color-border-subtle: var(--sv-border-subtle);
+  --color-border-divider: var(--sv-border-divider);
+
+  --radius-sm: var(--sv-radius-sm);
+  --radius-md: var(--sv-radius-md);
+  --radius-lg: var(--sv-radius-lg);
+  --radius-xl: var(--sv-radius-xl);
+  --radius-card: var(--sv-radius-card);
+  --radius-full: var(--sv-radius-full);
+
+  --shadow-card: var(--sv-shadow-card);
+  --shadow-floating: var(--sv-shadow-floating);
+  --shadow-input: var(--sv-shadow-input);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

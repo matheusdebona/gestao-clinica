@@ -1,0 +1,61 @@
+@import "@fontsource-variable/inter";
+@import "@fontsource-variable/plus-jakarta-sans";
+@import "tailwindcss";
+@import "./design-tokens/tokens.css";
+
+@layer base {
+  html {
+    font-family: var(--sv-font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--sv-bg-canvas);
+    color: var(--sv-text-body);
+    font-size: var(--sv-text-body);
+    line-height: var(--sv-leading-body);
+  }
+
+  #app {
+    min-height: 100vh;
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--sv-text-title);
+    font-size: var(--sv-text-h1);
+    font-weight: 700;
+    line-height: var(--sv-leading-h1);
+  }
+
+  h2 {
+    margin: 0;
+    color: var(--sv-text-title);
+    font-size: var(--sv-text-h2);
+    font-weight: 600;
+    line-height: var(--sv-leading-h2);
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--sv-text-title);
+    font-size: var(--sv-text-h3);
+    font-weight: 600;
+    line-height: var(--sv-leading-h3);
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font: inherit;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--sv-brand-primary);
+    outline-offset: 2px;
+  }
+}

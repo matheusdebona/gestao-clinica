@@ -15,13 +15,14 @@ Multi-tenant clinical + commercial management platform — API-first, **mobile-f
 | [docs/phase-1-todo.md](./docs/phase-1-todo.md) | Checklist Fase 1 |
 | [docs/domain-model.md](./docs/domain-model.md) | Domínio comercial |
 | [docs/domain-roadmap.md](./docs/domain-roadmap.md) | Fases 2–11 |
+| [docs/frontend-vue-spec.md](./docs/frontend-vue-spec.md) | Spec do frontend Vue + Soft Violet |
 
 ## Stack
 
 - Laravel 13 · PHP 8.5
 - Sanctum (Bearer) · Spatie Permission
 - PostgreSQL 18 · Redis · MinIO (S3)
-- Clinic multi-tenant · PWA (frontend later)
+- Clinic multi-tenant · Vue SPA em [`apps/web`](./apps/web) (PWA later)
 
 ## Quick start (Docker)
 
@@ -48,6 +49,19 @@ make up
 make test
 make artisan CMD="route:list"
 ```
+
+## Frontend Vue (design system)
+
+Kitchen sink Soft Violet em `/dev/ui` — validar cores, inputs e feedback antes das features.
+
+```bash
+cd apps/web
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Detalhes: [`apps/web/README.md`](./apps/web/README.md).
 
 ## Auth API (Phase 1)
 
