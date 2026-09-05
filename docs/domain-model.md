@@ -68,6 +68,8 @@ Clinic
 ├── Protocol
 │   └── ProtocolItem  → Product + quantity_used
 ├── Client (patient)
+│   ├── ClientOrigin         (Instagram, Facebook, Indicação, …)
+│   └── Campaign             (belongs to origin; e.g. Reels Setembro)
 ├── Payment catalog
 │   ├── PaymentMethod
 │   ├── CardOperator
@@ -192,11 +194,34 @@ A **protocol** is a reusable **set of products that forms a complete service**. 
 | `notes` | Free observations |
 | `main_pains` | Main pains / complaints (text or structured later) |
 | `service_duration_minutes` | Typical or last service time (also capturable per sale) |
+| `client_origin_id` | Acquisition channel (Instagram, Facebook, referral, …) |
+| `campaign_id` | Specific campaign under that origin (optional) |
+| `initial_consultation_amount` | Amount paid for the first evaluation/consultation (CAC metrics) |
 | Extra later | Document (CPF), email, birth date, address — optional |
+
+### ClientOrigin (clinic catalog)
+
+| Field | Notes |
+| --- | --- |
+| `clinic_id` | Tenant-scoped |
+| `name` | Unique per clinic (e.g. Instagram) |
+| `is_active` | Soft deactivate; historical client links kept |
+
+### Campaign (clinic catalog)
+
+| Field | Notes |
+| --- | --- |
+| `clinic_id` | Tenant-scoped |
+| `client_origin_id` | Parent origin |
+| `name` | Unique per clinic + origin |
+| `is_active` | Soft deactivate; historical client links kept |
+
+Attribution fields on the client are optional. When `campaign_id` is set, `client_origin_id` is required and must match the campaign’s origin.
 
 ### Permissions
 
-`clients.view`, `clients.create`, `clients.update`, `clients.delete`
+`clients.view`, `clients.create`, `clients.update`, `clients.delete`  
+`client_origins.manage`, `campaigns.manage`
 
 ---
 
@@ -449,7 +474,7 @@ Clinic exists
 | Catalogs | `product_types.manage`, `brands.manage`, `units.manage` |
 | Products | `products.view`, `products.create`, `products.update`, `products.delete`, `products.adjust_stock` |
 | Protocols | `protocols.view`, `protocols.create`, `protocols.update`, `protocols.delete` |
-| Clients | `clients.view`, `clients.create`, `clients.update`, `clients.delete` |
+| Clients | `clients.view`, `clients.create`, `clients.update`, `clients.delete`, `client_origins.manage`, `campaigns.manage` |
 | Payments | `payment_methods.manage`, `card_operators.manage`, `card_brands.manage`, `card_fees.manage` |
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |

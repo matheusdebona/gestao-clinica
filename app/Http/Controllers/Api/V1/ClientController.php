@@ -29,28 +29,30 @@ class ClientController extends Controller
             $query->where('is_active', $request->boolean('is_active'));
         }
 
-        return ClientResource::collection($query->paginate(20));
+        return ClientResource::collection(
+            $query->with(['clientOrigin', 'campaign'])->paginate(20)
+        );
     }
 
     public function store(StoreClientRequest $request): JsonResponse
     {
         $client = Client::query()->create($request->validated());
 
-        return (new ClientResource($client))
+        return (new ClientResource($client->load(['clientOrigin', 'campaign'])))
             ->response()
             ->setStatusCode(201);
     }
 
     public function show(Client $client): ClientResource
     {
-        return new ClientResource($client);
+        return new ClientResource($client->load(['clientOrigin', 'campaign']));
     }
 
     public function update(UpdateClientRequest $request, Client $client): ClientResource
     {
         $client->update($request->validated());
 
-        return new ClientResource($client->fresh());
+        return new ClientResource($client->fresh()->load(['clientOrigin', 'campaign']));
     }
 
     public function destroy(Client $client): JsonResponse

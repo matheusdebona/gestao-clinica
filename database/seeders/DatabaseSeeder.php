@@ -13,6 +13,7 @@ class DatabaseSeeder extends Seeder
             DemoClinicSeeder::class,
             ProductCatalogSeeder::class,
             PaymentCatalogSeeder::class,
+            ClientAttributionSeeder::class,
         ]);
     }
 }
