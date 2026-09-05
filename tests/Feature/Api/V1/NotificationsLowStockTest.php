@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Enums\StockMovementType;
 use App\Jobs\CheckLowStockProductsJob;
 use App\Models\Brand;
 use App\Models\Client;
@@ -10,12 +11,14 @@ use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
 use App\Models\Sale;
+use App\Models\StockMovement;
 use App\Models\Treatment;
 use App\Models\UnitOfMeasure;
 use App\Models\User;
 use App\Notifications\AppointmentStockWarningNotification;
 use App\Notifications\LowStockProductNotification;
 use App\Notifications\ProjectedLowStockNotification;
+use App\Notifications\ReorderPointStockNotification;
 use App\Services\StockAlertService;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
@@ -57,6 +60,7 @@ class NotificationsLowStockTest extends TestCase
         string $stock,
         string $minStock = '5.0000',
         ?Clinic $clinic = null,
+        int $leadTimeDays = 0,
     ): Product {
         $clinic ??= $this->clinic;
         CurrentClinic::setId($clinic->id);
@@ -71,8 +75,28 @@ class NotificationsLowStockTest extends TestCase
             'min_sale_price' => '100.00',
             'stock_quantity' => $stock,
             'min_stock' => $minStock,
+            'lead_time_days' => $leadTimeDays,
             'is_active' => true,
             'sku' => fake()->unique()->bothify('N-####'),
+        ]);
+    }
+
+    protected function recordAppointmentConsumption(Product $product, string $quantity, string $createdAt): void
+    {
+        StockMovement::query()->create([
+            'clinic_id' => $product->clinic_id,
+            'product_id' => $product->id,
+            'user_id' => $this->admin->id,
+            'type' => StockMovementType::Out->value,
+            'quantity' => $quantity,
+            'unit_cost' => $product->cost,
+            'cost_before' => $product->cost,
+            'cost_after' => $product->cost,
+            'stock_before' => $product->stock_quantity,
+            'stock_after' => $product->stock_quantity,
+            'reason' => 'appointment_complete',
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
         ]);
     }
 
@@ -240,6 +264,61 @@ class NotificationsLowStockTest extends TestCase
             ->assertOk();
 
         $this->assertSame(0, $this->admin->fresh()->unreadNotifications()->count());
+    }
+
+    public function test_daily_job_notifies_reorder_point_from_lead_time(): void
+    {
+        Notification::fake();
+        $day = CarbonImmutable::parse('2026-09-30 12:00:00');
+        $this->travelTo($day);
+
+        // avg daily = 30/30 = 1; lead=10; min=5 → reorder=15; stock=12 → alert
+        $product = $this->makeProduct('Toxina', '12.0000', '5.0000', leadTimeDays: 10);
+        $this->recordAppointmentConsumption($product, '30.0000', '2026-09-15 10:00:00');
+
+        // Above reorder: stock 20 > 15 → no reorder alert
+        $ok = $this->makeProduct('Peeling', '20.0000', '5.0000', leadTimeDays: 10);
+        $this->recordAppointmentConsumption($ok, '30.0000', '2026-09-15 10:00:00');
+
+        // lead_time_days=0 never fires reorder
+        $noLead = $this->makeProduct('Sem lead', '12.0000', '5.0000', leadTimeDays: 0);
+        $this->recordAppointmentConsumption($noLead, '30.0000', '2026-09-15 10:00:00');
+
+        (new CheckLowStockProductsJob($day->toDateString()))
+            ->handle(app(StockAlertService::class));
+
+        Notification::assertSentTo($this->admin, ReorderPointStockNotification::class, function ($n) use ($product) {
+            return $n->product->is($product)
+                && $n->avgDailyConsumption === '1.0000'
+                && $n->reorderPoint === '15.0000';
+        });
+        Notification::assertNotSentTo($this->admin, ReorderPointStockNotification::class, function ($n) use ($ok) {
+            return $n->product->is($ok);
+        });
+        Notification::assertNotSentTo($this->admin, ReorderPointStockNotification::class, function ($n) use ($noLead) {
+            return $n->product->is($noLead);
+        });
+        Notification::assertNotSentTo($this->admin, LowStockProductNotification::class, function ($n) use ($product) {
+            return $n->product->is($product);
+        });
+    }
+
+    public function test_already_low_stock_skips_reorder_point_notification(): void
+    {
+        Notification::fake();
+        $day = CarbonImmutable::parse('2026-09-30 12:00:00');
+        $this->travelTo($day);
+
+        $product = $this->makeProduct('Baixo', '3.0000', '5.0000', leadTimeDays: 10);
+        $this->recordAppointmentConsumption($product, '30.0000', '2026-09-15 10:00:00');
+
+        (new CheckLowStockProductsJob($day->toDateString()))
+            ->handle(app(StockAlertService::class));
+
+        Notification::assertSentTo($this->admin, LowStockProductNotification::class, function ($n) use ($product) {
+            return $n->product->is($product);
+        });
+        Notification::assertNotSentTo($this->admin, ReorderPointStockNotification::class);
     }
 
     public function test_inbox_does_not_expose_other_users_notifications(): void

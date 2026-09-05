@@ -144,7 +144,7 @@ See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap
 - [x] Metrics API wave B — acquisition (`GET /metrics/acquisition`, lifetime conversion)
 - [x] Metrics API wave C — real margin (`GET /metrics/margin`, period + cohort_sale)
 - [x] Metrics API wave D — inventory + clinical operations (`GET /metrics/inventory`, `GET /metrics/operations`)
-- [x] Low-stock alerts (in-app inbox + PushChannel stub): daily job (atual + projeção pelos agendamentos do dia); warnings não-bloqueantes no `schedule`; destinatários com `products.view`
+- [x] Low-stock alerts (in-app inbox + PushChannel stub): daily job (atual + projeção pelos agendamentos do dia + ponto de reposição por `lead_time_days`); warnings não-bloqueantes no `schedule`; destinatários com `products.view`
 - [ ] Real push / email / WhatsApp channels (FCM/Web Push later)
 - [ ] Audit log for stock and treatment overrides
 - [ ] Dashboard UI (PWA) consuming metrics endpoints
