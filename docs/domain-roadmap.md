@@ -103,13 +103,15 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 
 ## Phase 8 — Documents / contracts
 
-- [ ] Document model linked to sale/budget + client + clinic
-- [ ] Generate PDF (or HTML→PDF) from snapshot payload
-- [ ] Store file on MinIO (`documents` prefix)
-- [ ] List/download by permission
-- [ ] Permissions + tests
+- [x] Clinic branding in `settings.branding` + logo on MinIO
+- [x] Document model linked to budget (+ nullable sale) + client + clinic
+- [x] Generate **budget PDF** via Blade + Browsershot/Chromium from snapshot payload (list vs offered + discount)
+- [x] Store file on MinIO (`documents/` prefix)
+- [x] List / show / download / delete by permission
+- [x] Permissions + tests (PDF renderer mocked in CI)
+- [ ] Sale contract / receipt PDF (deferred)
 
-**DoD:** contract/receipt file produced from existing sale data; stock unchanged.
+**DoD (partial):** budget orçamento PDF produced with clinic branding; stock unchanged. Contract/receipt from confirmed sale remains future work.
 
 ---
 

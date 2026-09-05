@@ -33,4 +33,38 @@ class Clinic extends Model
     {
         return $this->hasMany(User::class);
     }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
+    /**
+     * @return array{display_name: string|null, primary_color: string, secondary_color: string, logo_path: string|null}
+     */
+    public function branding(): array
+    {
+        $branding = is_array($this->settings['branding'] ?? null)
+            ? $this->settings['branding']
+            : [];
+
+        return [
+            'display_name' => $branding['display_name'] ?? $this->name,
+            'primary_color' => $branding['primary_color'] ?? '#0F766E',
+            'secondary_color' => $branding['secondary_color'] ?? '#134E4A',
+            'logo_path' => $branding['logo_path'] ?? null,
+        ];
+    }
+
+    /**
+     * @param  array{display_name?: string|null, primary_color?: string, secondary_color?: string, logo_path?: string|null}  $branding
+     */
+    public function updateBranding(array $branding): void
+    {
+        $settings = $this->settings ?? [];
+        $current = is_array($settings['branding'] ?? null) ? $settings['branding'] : [];
+        $settings['branding'] = array_merge($current, $branding);
+        $this->settings = $settings;
+        $this->save();
+    }
 }

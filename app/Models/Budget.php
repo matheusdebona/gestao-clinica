@@ -96,6 +96,11 @@ class Budget extends Model
         return $this->hasMany(BudgetItem::class);
     }
 
+    public function documents(): HasMany
+    {
+        return $this->hasMany(Document::class);
+    }
+
     public function isDraft(): bool
     {
         return $this->status === self::STATUS_DRAFT;

@@ -43,8 +43,10 @@ All commercial and clinical data belongs to a **clinic** (tenant). Users belong 
 | `name` | Legal / display name |
 | `document` | CNPJ / tax id (optional initially) |
 | `phone`, `email`, `address` | Contact |
-| `settings` (JSON) | Low-stock defaults, locale, currency |
+| `settings` (JSON) | Low-stock defaults, locale, currency, **`branding`** (display name, primary/secondary hex colors, `logo_path` on MinIO) |
 | `is_active` | Soft disable tenant |
+
+**Clinic branding (API):** `GET/PUT /api/v1/clinic/branding`, `POST/DELETE /api/v1/clinic/branding/logo` — permission `clinics.branding` (clinic admin) or `clinics.manage` (platform). Logo: jpeg/png/webp, max 2MB, stored under `clinics/{id}/logo.*` on the `s3` disk.
 
 **Rule:** products, protocols, clients, payment catalogs, sales, budgets, and documents are **clinic-scoped**. No cross-clinic reads in normal user flows.
 
@@ -325,23 +327,26 @@ Budgets are **versioned commercial proposals** generated from a **draft sale**. 
 
 ## 10. Documents / contracts
 
-Generated from budget or sale + clinic + client data (and protocol/product lines). **No stock effect.**
+Generated from **budget** (Phase 8) or sale (future) + clinic branding + client data. **No stock effect.**
 
 | Field | Purpose |
 | --- | --- |
 | `clinic_id` | Tenant |
 | `client_id` | Patient |
-| `sale_id` / `budget_id` | Source |
-| `type` | `contract`, `consent`, `receipt`, … |
-| `status` | `draft`, `issued`, … |
-| `storage_path` | PDF/file on MinIO (S3) |
-| `payload` (JSON) | Snapshot of values used to render the document |
+| `sale_id` / `budget_id` | Source (`budget_id` for orçamento PDF; `sale_id` reserved) |
+| `type` | `budget_pdf` (Phase 8); later `contract`, `consent`, `receipt`, … |
+| `status` | `issued` (Phase 8); later `draft`, … |
+| `storage_path` / `filename` / `mime_type` | PDF on MinIO under `documents/{clinic_id}/budgets/...` |
+| `payload` (JSON) | Snapshot: branding + client + budget lines with **list vs offered** + discount |
+| `generated_by_user_id` | Who generated |
 
-Typical order: **confirm sale → issue contract → start treatment**.
+**Phase 8 delivery:** `POST /budgets/{budget}/pdf` renders Blade → Browsershot/Chromium → MinIO → `Document` row. Regenerating creates a **new** document (history). Sale contract/receipt PDFs are out of scope until a later phase.
+
+Typical later order: **confirm sale → issue contract → start treatment**.
 
 ### Permissions
 
-`documents.view`, `documents.generate`, `documents.delete`
+`documents.view`, `documents.generate`, `documents.delete` (+ `clinics.branding` for logo/colors)
 
 ---
 
@@ -428,13 +433,12 @@ Clinic exists
 
 | Area | Permissions |
 | --- | --- |
-| Clinics | `clinics.view`, `clinics.manage` (platform / admin) |
+| Clinics | `clinics.view`, `clinics.manage` (platform), `clinics.branding` (clinic logo/colors) |
 | Catalogs | `product_types.manage`, `brands.manage`, `units.manage` |
 | Products | `products.view`, `products.create`, `products.update`, `products.delete`, `products.adjust_stock` |
 | Protocols | `protocols.view`, `protocols.create`, `protocols.update`, `protocols.delete` |
 | Clients | `clients.view`, `clients.create`, `clients.update`, `clients.delete` |
 | Payments | `payment_methods.manage`, `card_operators.manage`, `card_brands.manage`, `card_fees.manage` |
-| Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
