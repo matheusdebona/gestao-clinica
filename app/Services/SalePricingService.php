@@ -73,12 +73,11 @@ class SalePricingService
                 $existing = $locked->items()->where('product_id', $product->id)->first();
 
                 if ($existing !== null) {
+                    $newQty = (float) $existing->quantity + (float) $protocolItem->quantity;
                     $existing->update([
-                        'quantity' => (float) $existing->quantity + (float) $protocolItem->quantity,
-                        'line_total' => $this->money2(
-                            ((float) $existing->quantity + (float) $protocolItem->quantity)
-                            * (float) $existing->unit_price
-                        ),
+                        'quantity' => $this->qty($newQty),
+                        'list_line_total' => $this->money2($newQty * (float) $existing->list_unit_price),
+                        'line_total' => $this->money2($newQty * (float) $existing->unit_price),
                         'source_protocol_id' => $existing->source_protocol_id ?? $protocol->id,
                     ]);
                 } else {
@@ -216,7 +215,8 @@ class SalePricingService
         float|string|null $unitPrice,
         ?int $sourceProtocolId,
     ): SaleItem {
-        $price = $unitPrice !== null ? (float) $unitPrice : (float) $product->sale_price;
+        $listPrice = (float) $product->sale_price;
+        $price = $unitPrice !== null ? (float) $unitPrice : $listPrice;
         $cost = (float) $product->cost;
         $min = $product->min_sale_price !== null
             ? (float) $product->min_sale_price
@@ -225,7 +225,10 @@ class SalePricingService
         return $sale->items()->create([
             'product_id' => $product->id,
             'source_protocol_id' => $sourceProtocolId,
+            'product_name' => $product->name,
             'quantity' => $this->qty($quantity),
+            'list_unit_price' => $this->money2($listPrice),
+            'list_line_total' => $this->money2($listPrice * $quantity),
             'unit_price' => $this->money2($price),
             'unit_cost' => $this->money4($cost),
             'min_unit_price' => $this->money2($min),

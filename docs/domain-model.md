@@ -260,13 +260,15 @@ Selecting a **protocol** on a sale **explodes** its products into lines (qty edi
 | `sale_id` | Parent |
 | `product_id` | Product line |
 | `source_protocol_id` | Nullable origin when exploded from a protocol |
+| `product_name` | Name snapshot at line write (KPI / history) |
 | `quantity` | Editable qty |
-| `unit_price` | Snapshot (defaults to product `sale_price`; editable) |
+| `list_unit_price` / `list_line_total` | Catalog/list price snapshot at line write |
+| `unit_price` | Offered price snapshot (defaults to product `sale_price`; editable) |
 | `unit_cost` | Cost snapshot for later margin |
 | `min_unit_price` | Snapshot `coalesce(min_sale_price, cost)` |
 | `line_total` | `quantity × unit_price` |
 
-API returns `min_amount`, `is_below_minimum`, and per-line below-min flags. Confirming below `min_amount` requires `confirm_below_minimum: true` (soft gate with explicit confirmation).
+API returns `min_amount`, `is_below_minimum`, and per-line below-min flags. Confirming below `min_amount` requires `confirm_below_minimum: true` (soft gate with explicit confirmation). Catalog changes after the line is written do **not** rewrite these snapshots.
 
 ### SalePayment
 
@@ -290,11 +292,30 @@ No hard delete — cancel only (`draft` or `confirmed` → `cancelled`). Confirm
 
 ## 9. Budgets (quotes)
 
-Same shape as a sale, but:
+Budgets are **versioned commercial proposals** generated from a **draft sale**. They do **not** move stock.
 
-- Does **not** decrement stock (nothing does until treatment complete).
-- Status: `draft`, `sent`, `accepted`, `rejected`, `expired`, `converted`.
-- Can **convert to sale** (copy lines + client + expected amounts).
+| Field | Purpose |
+| --- | --- |
+| `clinic_id` / `sale_id` / `client_id` | Tenant + source sale + patient |
+| `created_by_user_id` | Who generated the proposal |
+| `version` | Incremental per sale (`v1`, `v2`, …) |
+| `status` | `draft`, `sent`, `accepted`, `rejected`, `expired`, `superseded` |
+| `expected_amount` / `effective_amount` / `min_amount` | Copied from sale at snapshot time |
+| `notes` / `valid_until` | Optional proposal metadata |
+| `sent_at` / `accepted_at` / `rejected_at` | Transition timestamps |
+
+### BudgetItem (immutable snapshot)
+
+| Field | Purpose |
+| --- | --- |
+| `product_id` / `product_name` | Product + name at proposal time |
+| `source_protocol_id` | Optional protocol origin |
+| `quantity` | Qty at proposal time |
+| `list_unit_price` / `list_line_total` | Catalog/list price at proposal time |
+| `unit_price` / `line_total` | Offered price from the sale |
+| `unit_cost` / `min_unit_price` | Cost and floor snapshots |
+
+**Flow:** edit draft sale → `POST /sales/{sale}/budgets` (supersedes prior `draft`/`sent`) → `send` → `accept` → same sale stays `draft` for payments/confirm. Catalog price changes never rewrite existing budget or confirmed sale lines.
 
 ### Permissions
 
@@ -415,6 +436,7 @@ Clinic exists
 | Payments | `payment_methods.manage`, `card_operators.manage`, `card_brands.manage`, `card_fees.manage` |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
+| Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
 | Treatments | `treatments.view`, `treatments.start`, `treatments.update`, `treatments.complete`, `treatments.cancel` |
 

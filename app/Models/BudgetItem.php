@@ -6,13 +6,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class SaleItem extends Model
+class BudgetItem extends Model
 {
-    /** @use HasFactory<\Database\Factories\SaleItemFactory> */
+    /** @use HasFactory<\Database\Factories\BudgetItemFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'sale_id',
+        'budget_id',
         'product_id',
         'source_protocol_id',
         'product_name',
@@ -20,9 +20,9 @@ class SaleItem extends Model
         'list_unit_price',
         'list_line_total',
         'unit_price',
+        'line_total',
         'unit_cost',
         'min_unit_price',
-        'line_total',
     ];
 
     protected function casts(): array
@@ -32,15 +32,15 @@ class SaleItem extends Model
             'list_unit_price' => 'decimal:2',
             'list_line_total' => 'decimal:2',
             'unit_price' => 'decimal:2',
+            'line_total' => 'decimal:2',
             'unit_cost' => 'decimal:4',
             'min_unit_price' => 'decimal:2',
-            'line_total' => 'decimal:2',
         ];
     }
 
-    public function sale(): BelongsTo
+    public function budget(): BelongsTo
     {
-        return $this->belongsTo(Sale::class);
+        return $this->belongsTo(Budget::class);
     }
 
     public function product(): BelongsTo

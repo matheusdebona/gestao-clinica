@@ -17,13 +17,17 @@ class SaleItemFactory extends Factory
     public function definition(): array
     {
         $qty = 1;
+        $listPrice = '120.00';
         $unitPrice = '100.00';
 
         return [
             'sale_id' => Sale::factory(),
             'product_id' => Product::factory(),
             'source_protocol_id' => null,
+            'product_name' => fake()->words(3, true),
             'quantity' => $qty,
+            'list_unit_price' => $listPrice,
+            'list_line_total' => number_format($qty * (float) $listPrice, 2, '.', ''),
             'unit_price' => $unitPrice,
             'unit_cost' => '10.0000',
             'min_unit_price' => '80.00',

@@ -49,6 +49,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'sales.update',
             'sales.confirm',
             'sales.cancel',
+            'budgets.view',
+            'budgets.create',
+            'budgets.update',
+            'budgets.convert',
         ];
 
         foreach ($permissions as $permission) {
@@ -94,6 +98,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'sales.update',
             'sales.confirm',
             'sales.cancel',
+            'budgets.view',
+            'budgets.create',
+            'budgets.update',
+            'budgets.convert',
         ]);
     }
 }
