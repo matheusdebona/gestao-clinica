@@ -300,5 +300,5 @@ Phase 1 already follows this for auth and users; Phases 2+ must keep the same pa
 | Files | MinIO (S3 API) → cloud S3 later |
 | Alerts | Database inbox + `PushChannel` stub; `CheckLowStockProductsJob` daily at 01:00 (requires `schedule:run` + `queue:work`) |
 | Commercial core | Products → Protocols → Sales → Contract → Treatment (stock on complete) |
-| UX | **Mobile-first web** (Vue SPA); PWA after web is stable; native later if needed |
+| UX | **Mobile-first web** (Vue SPA); design system **Modern Soft Violet**; PWA after web is stable |
 | Phase 1 deliverable | Stack + login + permissions + clinic tenancy skeleton + Docker |
