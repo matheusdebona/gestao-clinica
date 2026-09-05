@@ -124,17 +124,18 @@ Receita de setembro vs custo de sessões de setembro **não** é a mesma coisa q
 
 ### Passo a passo técnico
 
-1. Documentar os dois modos em `docs/metrics-kpis-roadmap.md` (este arquivo) e no OpenAPI/resource.
-2. `GET /api/v1/metrics/margin?from=&to=&mode=period|cohort_sale`
+1. Documentar os dois modos (este arquivo).
+2. `GET /api/v1/metrics/margin?from=&to=&mode=period|cohort_sale` (default `period`)
 3. `MarginMetricsService` com queries separadas por modo.
-4. Breakdown opcional: `GET .../margin/by-product` e `.../by-protocol`.
-5. Testes:
-   - Sale confirmada + 2 appointments (parcial + final).
-   - Extra complimentary entra no custo, não na receita da sale (salvo charged).
-   - mode cohort vs period com datas diferentes.
-6. UI: card Margem | % | Custo cortesia; drill-down por produto.
+4. Receita = `sale.effective_amount` + extras cobrados (`appointment.total_charged_on_appointment`); custo = `appointment.total_cost` (completed); cortesia = Σ `line_cost` onde `is_complimentary`.
+5. Data do custo em `period`: `finished_at`. Data da receita: `sold_at`.
+6. Fora de escopo: impostos, taxas de cartão, custos fixos.
+7. Testes: period vs cohort com datas cruzadas; cortesia/extras; isolamento; draft/não-completed fora.
+8. UI (depois): card Margem | % | Custo cortesia; aviso saldo a aplicar (`pending_fulfillment_count` em cohort).
 
-**DoD onda C:** margem period e cohort testadas; UI mostra aviso quando há “saldo a aplicar” pendente.
+**Status:** implementado (`GET /api/v1/metrics/margin`).
+
+**DoD onda C (API):** margem period e cohort testadas; `pending_fulfillment_count` em cohort. UI pendente.
 
 ---
 
@@ -239,10 +240,12 @@ Response shape sugerida:
 - [ ] (UI) ranking canais
 
 ### C — Margem
-- [ ] modes `period` e `cohort_sale`
-- [ ] Cortesia e extras charged
-- [ ] Tests com appointments parciais
+- [x] modes `period` e `cohort_sale`
+- [x] Cortesia e extras charged
+- [x] Tests period vs cohort / isolamento
 - [ ] (UI) margem + aviso saldo pendente
+- [ ] (C+) breakdown por produto/protocolo
+- [ ] (Futuro) impostos, taxas, custos fixos
 
 ### D — Estoque / operação
 - [ ] inventory + operations endpoints
@@ -273,6 +276,7 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 3. Conversão (Onda B): **lifetime** — sale `confirmed` com `sold_at` ≥ `client.created_at` (pode ser após o período de cadastro).  
 4. Incluir `initial_consultation_amount` na “receita total” do dashboard ou card separado (recomendação: **card separado**, não somar com Sale).  
 5. Canal de alerta low-stock: email vs WhatsApp — pendente.  
-6. Gasto de campanha (`spend_amount`) adiado para B+.
+6. Gasto de campanha (`spend_amount`) adiado para B+.  
+7. Margem (Onda C): receita = `effective_amount` + extras cobrados; custo = `appointment.total_cost` completed; `period` usa `finished_at` para custo; impostos/taxas/fixos fora do escopo.
 
-Próximo: **Onda C** (margem real).
+Próximo: **Onda D** (estoque + operação).
