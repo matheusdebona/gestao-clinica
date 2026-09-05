@@ -53,9 +53,10 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 
 ## Phase 4 — Clients
 
-- [ ] CRUD `Client` (name, whatsapp, notes, main_pains, service_duration_minutes)
-- [ ] Search by name / WhatsApp within clinic
-- [ ] Permissions + tests
+- [x] CRUD `Client` (name, whatsapp, notes, main_pains, service_duration_minutes)
+- [x] Search by name / WhatsApp within clinic (`?q=`)
+- [x] Soft deactivate via DELETE (`is_active=false`)
+- [x] Permissions + tests (isolation, 403, validation)
 
 **DoD:** clients usable as sale/budget counterparts.
 
