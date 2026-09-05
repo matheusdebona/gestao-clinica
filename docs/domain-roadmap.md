@@ -76,14 +76,14 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 
 ## Phase 6 — Sales (commercial only)
 
-- [ ] Create/update sale draft (client, sold_at, notes)
-- [ ] Add lines: protocol and/or product with qty; snapshot prices
-- [ ] Compute `expected_amount` automatically
-- [ ] Set `effective_amount` (+ min_price policy)
-- [ ] Attach one or more `SalePayment`s
-- [ ] Confirm sale **without** stock movement
-- [ ] Cancel sale (still no stock side effects)
-- [ ] Permissions + tests (isolation, 403s; assert stock unchanged on confirm)
+- [x] Create/update sale draft (client, sold_at, notes)
+- [x] Add lines via protocol explode and/or product sync; snapshot prices/costs/mins
+- [x] Compute `expected_amount` automatically; malleable `effective_amount`
+- [x] Soft min-price warnings + `confirm_below_minimum` on confirm
+- [x] Attach one or more `SalePayment`s (sum must equal effective; card meta, no fee snapshot)
+- [x] Confirm sale **without** stock movement
+- [x] Cancel sale (history preserved; no delete)
+- [x] Permissions + tests (isolation, 403s; assert stock unchanged on confirm)
 
 **DoD:** sale + payments persisted; confirming a sale does **not** change product stock.
 

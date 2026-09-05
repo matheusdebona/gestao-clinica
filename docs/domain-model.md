@@ -245,26 +245,28 @@ A **sale** is the **commercial** event: what was agreed and charged. It does **n
 | `client_id` | Buyer / patient |
 | `sold_by_user_id` | Authenticated seller |
 | `sold_at` | Sale datetime |
-| `expected_amount` | Auto-calculated from lines (protocols + products at registered prices) |
-| `effective_amount` | Actual charged amount |
+| `expected_amount` | Auto-calculated from product lines (`Σ line_total`) |
+| `effective_amount` | Actual charged amount (malleable; tracks expected until manually set) |
+| `effective_amount_is_manual` | When true, item sync does not overwrite `effective_amount` |
 | `status` | `draft`, `confirmed`, `cancelled` |
 | `notes` | Free text |
 
-### SaleItem
+### SaleItem (always product — model B)
 
-Each line is either a **protocol** or a **standalone product**. These lines become the **suggested consumption checklist** when a treatment starts.
+Selecting a **protocol** on a sale **explodes** its products into lines (qty editable). Extra standalone products can be added. Protocol suggested/min/special remain **UI references** (`protocol_references` on the resource), not priced sale lines.
 
 | Field | Purpose |
 | --- | --- |
 | `sale_id` | Parent |
-| `line_type` | `protocol` \| `product` |
-| `protocol_id` | If protocol line |
-| `product_id` | If product line |
-| `quantity` | How many of that protocol/product |
-| `unit_price` | Snapshot at sale time |
-| `line_total` | Snapshot |
+| `product_id` | Product line |
+| `source_protocol_id` | Nullable origin when exploded from a protocol |
+| `quantity` | Editable qty |
+| `unit_price` | Snapshot (defaults to product `sale_price`; editable) |
+| `unit_cost` | Cost snapshot for later margin |
+| `min_unit_price` | Snapshot `coalesce(min_sale_price, cost)` |
+| `line_total` | `quantity × unit_price` |
 
-Price snapshots stay on the sale for commercial history. Stock is **not** touched here.
+API returns `min_amount`, `is_below_minimum`, and per-line below-min flags. Confirming below `min_amount` requires `confirm_below_minimum: true` (soft gate with explicit confirmation).
 
 ### SalePayment
 
@@ -273,10 +275,12 @@ Price snapshots stay on the sale for commercial history. Stock is **not** touche
 | `sale_id` | Parent |
 | `payment_method_id` | Method used |
 | `amount` | Portion paid with this method |
-| `card_operator_id` / brand / installments | When card |
+| `card_operator_id` / `card_brand_id` / `installments` | Required when method `requires_card_meta` |
 | `paid_at` | Optional |
 
-`Σ payment.amount` should equal `effective_amount` (configurable: allow partial — open question).
+`Σ payment.amount` **must equal** `effective_amount` on confirm. Card **fees are not** snapshotted here (deferred to receivables / installment anticipation).
+
+No hard delete — cancel only (`draft` or `confirmed` → `cancelled`). Confirmed sales only allow `notes` updates.
 
 ### Permissions
 

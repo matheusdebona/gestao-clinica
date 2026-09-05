@@ -44,6 +44,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'card_operators.manage',
             'card_brands.manage',
             'card_fees.manage',
+            'sales.view',
+            'sales.create',
+            'sales.update',
+            'sales.confirm',
+            'sales.cancel',
         ];
 
         foreach ($permissions as $permission) {
@@ -84,6 +89,11 @@ class RolesAndPermissionsSeeder extends Seeder
             'card_operators.manage',
             'card_brands.manage',
             'card_fees.manage',
+            'sales.view',
+            'sales.create',
+            'sales.update',
+            'sales.confirm',
+            'sales.cancel',
         ]);
     }
 }
