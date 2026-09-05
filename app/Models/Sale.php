@@ -83,6 +83,11 @@ class Sale extends Model
         return $this->hasMany(Budget::class);
     }
 
+    public function treatment(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(Treatment::class);
+    }
+
     public function isDraft(): bool
     {
         return $this->status === self::STATUS_DRAFT;
