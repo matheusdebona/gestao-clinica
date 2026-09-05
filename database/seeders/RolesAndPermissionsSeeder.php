@@ -24,6 +24,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'files.delete',
             'clinics.view',
             'clinics.manage',
+            'clinics.branding',
             'product_types.manage',
             'brands.manage',
             'units.manage',
@@ -53,6 +54,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'budgets.create',
             'budgets.update',
             'budgets.convert',
+            'documents.view',
+            'documents.generate',
+            'documents.delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -73,6 +77,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'files.upload',
             'files.delete',
             'clinics.view',
+            'clinics.branding',
             'product_types.manage',
             'brands.manage',
             'units.manage',
@@ -102,6 +107,9 @@ class RolesAndPermissionsSeeder extends Seeder
             'budgets.create',
             'budgets.update',
             'budgets.convert',
+            'documents.view',
+            'documents.generate',
+            'documents.delete',
         ]);
     }
 }

@@ -6,7 +6,9 @@ use App\Http\Controllers\Api\V1\Catalog\ProductTypeController;
 use App\Http\Controllers\Api\V1\Catalog\UnitOfMeasureController;
 use App\Http\Controllers\Api\V1\BudgetController;
 use App\Http\Controllers\Api\V1\ClientController;
+use App\Http\Controllers\Api\V1\ClinicBrandingController;
 use App\Http\Controllers\Api\V1\ClinicController;
+use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\Payments\CardBrandController;
 use App\Http\Controllers\Api\V1\Payments\CardFeeRuleController;
 use App\Http\Controllers\Api\V1\Payments\CardOperatorController;
@@ -32,6 +34,15 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware(['auth:sanctum', 'clinic.resolve'])->group(function (): void {
         Route::get('clinics/current', [ClinicController::class, 'current'])
             ->middleware('permission:clinics.view');
+
+        Route::get('clinic/branding', [ClinicBrandingController::class, 'show'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::put('clinic/branding', [ClinicBrandingController::class, 'update'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::post('clinic/branding/logo', [ClinicBrandingController::class, 'uploadLogo'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::delete('clinic/branding/logo', [ClinicBrandingController::class, 'deleteLogo'])
+            ->middleware('permission:clinics.branding|clinics.manage');
 
         Route::get('clinics', [ClinicController::class, 'index'])
             ->middleware('permission:clinics.manage');
@@ -211,5 +222,16 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:budgets.update');
         Route::post('budgets/{budget}/expire', [BudgetController::class, 'expire'])
             ->middleware('permission:budgets.update');
+
+        Route::post('budgets/{budget}/pdf', [DocumentController::class, 'generateBudgetPdf'])
+            ->middleware('permission:documents.generate');
+        Route::get('documents', [DocumentController::class, 'index'])
+            ->middleware('permission:documents.view');
+        Route::get('documents/{document}', [DocumentController::class, 'show'])
+            ->middleware('permission:documents.view');
+        Route::get('documents/{document}/download', [DocumentController::class, 'download'])
+            ->middleware('permission:documents.view');
+        Route::delete('documents/{document}', [DocumentController::class, 'destroy'])
+            ->middleware('permission:documents.delete');
     });
 });
