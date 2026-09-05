@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\Payments\PaymentMethodController;
 use App\Http\Controllers\Api\V1\PermissionCatalogController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProtocolController;
+use App\Http\Controllers\Api\V1\SaleController;
 use App\Http\Controllers\Api\V1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -171,5 +172,24 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:card_fees.manage');
         Route::delete('card-fee-rules/{card_fee_rule}', [CardFeeRuleController::class, 'destroy'])
             ->middleware('permission:card_fees.manage');
+
+        Route::get('sales', [SaleController::class, 'index'])
+            ->middleware('permission:sales.view');
+        Route::post('sales', [SaleController::class, 'store'])
+            ->middleware('permission:sales.create');
+        Route::get('sales/{sale}', [SaleController::class, 'show'])
+            ->middleware('permission:sales.view');
+        Route::patch('sales/{sale}', [SaleController::class, 'update'])
+            ->middleware('permission:sales.update');
+        Route::put('sales/{sale}/items', [SaleController::class, 'syncItems'])
+            ->middleware('permission:sales.update');
+        Route::post('sales/{sale}/apply-protocol', [SaleController::class, 'applyProtocol'])
+            ->middleware('permission:sales.update');
+        Route::put('sales/{sale}/payments', [SaleController::class, 'syncPayments'])
+            ->middleware('permission:sales.update');
+        Route::post('sales/{sale}/confirm', [SaleController::class, 'confirm'])
+            ->middleware('permission:sales.confirm');
+        Route::post('sales/{sale}/cancel', [SaleController::class, 'cancel'])
+            ->middleware('permission:sales.cancel');
     });
 });
