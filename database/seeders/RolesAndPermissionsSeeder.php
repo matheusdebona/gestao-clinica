@@ -36,6 +36,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'protocols.create',
             'protocols.update',
             'protocols.delete',
+            'clients.view',
+            'clients.create',
+            'clients.update',
+            'clients.delete',
         ];
 
         foreach ($permissions as $permission) {
@@ -68,6 +72,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'protocols.create',
             'protocols.update',
             'protocols.delete',
+            'clients.view',
+            'clients.create',
+            'clients.update',
+            'clients.delete',
         ]);
     }
 }

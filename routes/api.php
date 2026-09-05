@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\Catalog\BrandController;
 use App\Http\Controllers\Api\V1\Catalog\ProductTypeController;
 use App\Http\Controllers\Api\V1\Catalog\UnitOfMeasureController;
+use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\PermissionCatalogController;
 use App\Http\Controllers\Api\V1\ProductController;
@@ -111,5 +112,16 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:protocols.update');
         Route::post('protocols/{protocol}/recalculate', [ProtocolController::class, 'recalculate'])
             ->middleware('permission:protocols.update');
+
+        Route::get('clients', [ClientController::class, 'index'])
+            ->middleware('permission:clients.view');
+        Route::post('clients', [ClientController::class, 'store'])
+            ->middleware('permission:clients.create');
+        Route::get('clients/{client}', [ClientController::class, 'show'])
+            ->middleware('permission:clients.view');
+        Route::put('clients/{client}', [ClientController::class, 'update'])
+            ->middleware('permission:clients.update');
+        Route::delete('clients/{client}', [ClientController::class, 'destroy'])
+            ->middleware('permission:clients.delete');
     });
 });
