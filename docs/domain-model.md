@@ -477,7 +477,7 @@ Clinic exists
 | Clients | `clients.view`, `clients.create`, `clients.update`, `clients.delete`, `client_origins.manage`, `campaigns.manage` |
 | Payments | `payment_methods.manage`, `card_operators.manage`, `card_brands.manage`, `card_fees.manage` |
 | Sales | `sales.view`, `sales.create`, `sales.update`, `sales.confirm`, `sales.cancel` |
-| Metrics | `metrics.view` (`GET /metrics/commercial` — revenue by `sold_at`, payment mix, budget funnel, series) |
+| Metrics | `metrics.view` (`GET /metrics/commercial`, `GET /metrics/acquisition` — lifetime conversion by origin/campaign) |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
 | Treatments | `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel` |
