@@ -63,7 +63,7 @@ Clinic
 │   ├── UnitOfMeasure        (mg, ml, unit, kg, …)
 │   └── Product
 │         ├── cost, sale_price
-│         ├── stock_quantity, min_stock
+│         ├── stock_quantity, min_stock, lead_time_days
 │         └── purpose / description
 ├── Protocol
 │   └── ProtocolItem  → Product + quantity_used
@@ -107,6 +107,7 @@ Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./p
 | `min_sale_price` | Optional floor for standalone product sales |
 | `stock_quantity` | Current stock in product UoM |
 | `min_stock` | Low-stock threshold |
+| `lead_time_days` | Purchase lead time in days (`0` = not configured). Used later for reorder-point alerts before stock hits `min_stock`. |
 | `is_active` | Soft disable |
 
 **Derived (Resource):** `unit_margin`, `unit_margin_percent`, `inventory_value`, `is_low_stock`.
@@ -143,6 +144,7 @@ Every stock change is recorded (Phase 2+):
 
 - Product is “low” when `stock_quantity <= min_stock`.
 - API: list/filter low-stock products.
+- `lead_time_days` is stored on the product now; lead-time-aware reorder alerts (consumption × lead time + `min_stock`) come later.
 
 ### Permissions (examples)
 
@@ -451,7 +453,7 @@ A **treatment** is the clinical case opened from a **confirmed sale** (1:1).
 ```text
 Clinic exists
   → Register catalogs (types, brands, units, payment methods, card fees)
-  → Register products (cost, sale price, stock, min_stock)
+  → Register products (cost, sale price, stock, min_stock, lead_time_days)
   → Build protocols (products + qty → total_cost, sale_price, min_price)
   → Register clients
   → (Optional) Create budget → convert
@@ -507,7 +509,7 @@ All checks remain **permission-first**; roles only group these permissions per c
 | --- | --- |
 | Tenant | Clinic; all domain data clinic-scoped |
 | Commercial core | Products → Protocols → Sales → Contract → Treatment |
-| Stock | Decrements only on **treatment complete** (actual usage); low-stock via `min_stock` |
+| Stock | Decrements only on **treatment complete** (actual usage); low-stock via `min_stock`; `lead_time_days` reserved for future reorder alerts |
 | Sale | Commercial only; suggested products; **no stock movement** |
 | Treatment | Records real usage (suggested + complimentary extras); drives stock + real cost |
 | Protocol | Bundle of products with qty, sale_price, min_price, total_cost |

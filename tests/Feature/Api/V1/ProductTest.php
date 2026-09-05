@@ -187,4 +187,75 @@ class ProductTest extends TestCase
             'sale_price' => 10,
         ])->assertForbidden();
     }
+
+    public function test_can_create_and_update_lead_time_days(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $catalog = $this->catalog();
+
+        $created = $this->postJson('/api/v1/products', [
+            'name' => 'Filler 1ml',
+            'sku' => 'FIL-1',
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'sale_price' => 200,
+            'stock_quantity' => 5,
+            'min_stock' => 2,
+            'lead_time_days' => 60,
+        ])->assertCreated()
+            ->assertJsonPath('data.lead_time_days', 60);
+
+        $productId = $created->json('data.id');
+
+        $this->assertDatabaseHas('products', [
+            'id' => $productId,
+            'lead_time_days' => 60,
+        ]);
+
+        $this->putJson("/api/v1/products/{$productId}", [
+            'lead_time_days' => 45,
+        ])->assertOk()
+            ->assertJsonPath('data.lead_time_days', 45);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $productId,
+            'lead_time_days' => 45,
+        ]);
+    }
+
+    public function test_lead_time_days_defaults_to_zero_when_omitted(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $catalog = $this->catalog();
+
+        $this->postJson('/api/v1/products', [
+            'name' => 'Toxin',
+            'sku' => 'TOX-1',
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'sale_price' => 150,
+            'stock_quantity' => 3,
+            'min_stock' => 1,
+        ])->assertCreated()
+            ->assertJsonPath('data.lead_time_days', 0);
+    }
+
+    public function test_lead_time_days_rejects_negative_values(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $catalog = $this->catalog();
+
+        $this->postJson('/api/v1/products', [
+            'name' => 'Acid',
+            'sku' => 'ACD-1',
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'sale_price' => 80,
+            'lead_time_days' => -1,
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['lead_time_days']);
+    }
 }
