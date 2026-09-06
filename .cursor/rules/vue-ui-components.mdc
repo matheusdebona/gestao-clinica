@@ -37,6 +37,8 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `ClinicShell` — `components/patterns` (sidebar + bottom nav)
 - `PermissionGate` — `components/patterns`; slot só com a permission
 - `ClientSearchBar` — `components/patterns`; busca com debounce (`search`)
+- `MoneyDisplay` — `components/patterns`; BRL (`formatBRL`)
+- `StockStatusBadge` — `components/patterns`; Normal / estoque baixo / reposição / negativo
 
 ## Tokens
 Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows.

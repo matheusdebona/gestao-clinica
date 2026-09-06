@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Brand;
 use App\Models\Clinic;
 use App\Models\ProductType;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -20,6 +21,9 @@ class ProductTypeFactory extends Factory
 
         return [
             'clinic_id' => Clinic::factory(),
+            'brand_id' => fn (array $attributes) => Brand::factory()->create([
+                'clinic_id' => $attributes['clinic_id'],
+            ])->id,
             'name' => $name,
             'slug' => Str::slug($name).'-'.fake()->unique()->numerify('##'),
             'is_active' => true,

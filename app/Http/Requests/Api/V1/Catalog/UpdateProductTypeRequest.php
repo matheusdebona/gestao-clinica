@@ -15,16 +15,30 @@ class UpdateProductTypeRequest extends FormRequest
     public function rules(): array
     {
         $clinicId = $this->user()?->clinic_id;
-        $typeId = $this->route('product_type')?->id;
+        $type = $this->route('product_type');
+        $typeId = $type?->id;
+        $brandId = $this->integer('brand_id') ?: $type?->brand_id;
 
         return [
-            'name' => ['sometimes', 'string', 'max:255'],
+            'brand_id' => [
+                'sometimes',
+                'integer',
+                Rule::exists('brands', 'id')->where(fn ($q) => $q->where('clinic_id', $clinicId)),
+            ],
+            'name' => [
+                'sometimes',
+                'string',
+                'max:255',
+                Rule::unique('product_types', 'name')
+                    ->where(fn ($q) => $q->where('clinic_id', $clinicId)->where('brand_id', $brandId))
+                    ->ignore($typeId),
+            ],
             'slug' => [
                 'sometimes',
                 'string',
                 'max:255',
                 Rule::unique('product_types', 'slug')
-                    ->where(fn ($q) => $q->where('clinic_id', $clinicId))
+                    ->where(fn ($q) => $q->where('clinic_id', $clinicId)->where('brand_id', $brandId))
                     ->ignore($typeId),
             ],
             'is_active' => ['sometimes', 'boolean'],

@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests\Api\V1\Products;
 
+use App\Support\ProductTypeBrandValidator;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -49,5 +51,20 @@ class UpdateProductRequest extends FormRequest
             'lead_time_days' => ['sometimes', 'nullable', 'integer', 'min:0', 'max:365'],
             'is_active' => ['sometimes', 'boolean'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            $product = $this->route('product');
+            $brandId = $this->has('brand_id') ? $this->integer('brand_id') : $product?->brand_id;
+            $typeId = $this->has('product_type_id') ? $this->integer('product_type_id') : $product?->product_type_id;
+
+            ProductTypeBrandValidator::assert(
+                $validator,
+                $brandId ? (int) $brandId : null,
+                $typeId ? (int) $typeId : null,
+            );
+        });
     }
 }

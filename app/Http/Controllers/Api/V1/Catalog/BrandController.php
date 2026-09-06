@@ -8,15 +8,20 @@ use App\Http\Requests\Api\V1\Catalog\UpdateBrandRequest;
 use App\Http\Resources\Api\V1\BrandResource;
 use App\Models\Brand;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class BrandController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return BrandResource::collection(
-            Brand::query()->orderBy('name')->paginate(50)
-        );
+        $query = Brand::query()->orderBy('name');
+
+        if ($request->boolean('active_only')) {
+            $query->where('is_active', true);
+        }
+
+        return BrandResource::collection($query->paginate(50));
     }
 
     public function store(StoreBrandRequest $request): JsonResponse

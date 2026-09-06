@@ -36,3 +36,14 @@ export function emptyToMoney(value: string): string | null {
   }
   return trimmed
 }
+
+export function formatQty(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '') {
+    return '—'
+  }
+  const amount = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(amount)) {
+    return '—'
+  }
+  return new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 4 }).format(amount)
+}

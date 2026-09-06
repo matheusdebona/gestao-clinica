@@ -33,6 +33,7 @@ const emit = defineEmits<{
       <div class="flex flex-wrap items-center gap-2">
         <p class="truncate text-[15px] font-medium text-title">{{ title }}</p>
         <Badge v-if="badge" :variant="badgeVariant">{{ badge }}</Badge>
+        <slot name="status" />
       </div>
       <p v-if="meta" class="mt-0.5 truncate text-[13px] text-muted">{{ meta }}</p>
     </div>

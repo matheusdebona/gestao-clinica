@@ -26,12 +26,24 @@ class ProductController extends Controller
             ->with(['productType', 'brand', 'unitOfMeasure'])
             ->orderBy('name');
 
+        if ($request->filled('q')) {
+            $term = '%'.$request->string('q')->toString().'%';
+            $query->where(function ($builder) use ($term): void {
+                $builder->where('name', 'like', $term)
+                    ->orWhere('sku', 'like', $term);
+            });
+        }
+
         if ($request->boolean('low_stock')) {
             $query->whereColumn('stock_quantity', '<=', 'min_stock');
         }
 
         if ($request->filled('product_type_id')) {
             $query->where('product_type_id', $request->integer('product_type_id'));
+        }
+
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->boolean('is_active'));
         }
 
         return ProductResource::collection($query->paginate(20));

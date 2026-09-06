@@ -8,15 +8,20 @@ use App\Http\Requests\Api\V1\Catalog\UpdateUnitOfMeasureRequest;
 use App\Http\Resources\Api\V1\UnitOfMeasureResource;
 use App\Models\UnitOfMeasure;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class UnitOfMeasureController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return UnitOfMeasureResource::collection(
-            UnitOfMeasure::query()->orderBy('name')->paginate(50)
-        );
+        $query = UnitOfMeasure::query()->orderBy('name');
+
+        if ($request->boolean('active_only')) {
+            $query->where('is_active', true);
+        }
+
+        return UnitOfMeasureResource::collection($query->paginate(50));
     }
 
     public function store(StoreUnitOfMeasureRequest $request): JsonResponse

@@ -3,18 +3,21 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
+use Database\Factories\ProductTypeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 class ProductType extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProductTypeFactory> */
+    /** @use HasFactory<ProductTypeFactory> */
     use BelongsToClinic, HasFactory;
 
     protected $fillable = [
         'clinic_id',
+        'brand_id',
         'name',
         'slug',
         'is_active',
@@ -34,6 +37,11 @@ class ProductType extends Model
                 $type->slug = Str::slug($type->name);
             }
         });
+    }
+
+    public function brand(): BelongsTo
+    {
+        return $this->belongsTo(Brand::class);
     }
 
     public function products(): HasMany

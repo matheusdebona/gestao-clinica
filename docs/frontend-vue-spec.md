@@ -370,7 +370,7 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 - [x] Página `/dev/ui` com swatches + estados (default / erro / snack)
 - [x] `ClinicShell` + `SidebarNavItem` (sidebar neutra; brand só como acento)
 - [x] Patterns: `PermissionGate`, `ClientSearchBar`
-- [ ] Patterns: `MoneyDisplay`, `StockStatusBadge`
+- [x] Patterns: `MoneyDisplay`, `StockStatusBadge`
 
 **DoD Fase 3 (parcial):** kitchen sink revisável no visual Soft Violet; features de negócio ainda não.
 
@@ -383,7 +383,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | 4.1 | Auth polish | feito |
 | 4.2 | Clientes | feito |
 | 4.2b | Equipe (RBAC) | feito |
-| **4.3** | **Produtos** (+ marcas, tipos, unidades) | próximo — detalhe abaixo |
+| **4.3** | **Produtos** (+ marcas, tipos, unidades) | feito |
 | **4.4** | **Protocolos** (pacote de produtos) | detalhe abaixo |
 | **4.5** | **Vendas / orçamentos** | detalhe abaixo |
 | **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
@@ -415,11 +415,11 @@ Objetivo: cadastro operacional do catálogo e estoque. API Phase 2 já existe; e
 
 Hoje `product_type_id` e `brand_id` são FKs **independentes** em `products`. Para a cascata “tipos da marca”:
 
-- [ ] `product_types.brand_id` (obrigatório, clinic-scoped) — tipo pertence a uma marca
-- [ ] Migration + backfill dos tipos seedados (atribuir marca ou recriar seeds)
-- [ ] `GET /product-types?brand_id=` para popular o select
-- [ ] Validar no store/update de produto: `product_type.brand_id === product.brand_id`
-- [ ] `GET /products?q=` busca por `name` / `sku` (além de `low_stock`, `product_type_id`, e opcional `is_active`)
+- [x] `product_types.brand_id` (obrigatório, clinic-scoped) — tipo pertence a uma marca
+- [x] Migration + backfill dos tipos seedados (atribuir marca ou recriar seeds)
+- [x] `GET /product-types?brand_id=` para popular o select
+- [x] Validar no store/update de produto: `product_type.brand_id === product.brand_id`
+- [x] `GET /products?q=` busca por `name` / `sku` (além de `low_stock`, `product_type_id`, e opcional `is_active`)
 
 Unidades de medida **continuam independentes** da marca (escolha no form do produto).
 
@@ -448,17 +448,17 @@ Nav: manter **Produtos**; catálogos podem ficar como subtela/atalhos no detalhe
 ##### Patterns de UI a reutilizar / acrescentar
 
 - `ListCard`, `SearchField` / pattern de busca, `Switch` “somente ativos” / “estoque baixo”, `FormField`, `Select`, `Pagination`, `EmptyState`, `ConfirmDialog` (desativar).
-- [ ] `MoneyDisplay` — preços e custo
-- [ ] `StockStatusBadge` — baixo / ok (token success/warning)
+- [x] `MoneyDisplay` — preços e custo
+- [x] `StockStatusBadge` — baixo / ok (token success/warning)
 
 ##### DoD 4.3
 
-- [ ] Secretária cadastra marca → tipo da marca → produto com unidade e preços
-- [ ] Lista filtra por texto, tipo, estoque baixo e ativos
-- [ ] Ajuste de estoque (entrada com custo recalcula média; saída sem mudar custo médio)
-- [ ] Desativar produto e ocultar com “somente ativos”
-- [ ] Outra clínica não vê o catálogo (já garantido na API; cobrir na UI só por escopo de sessão)
-- [ ] Testes API da cascata marca/tipo + `?q=`; smoke manual das telas Vue
+- [x] Secretária cadastra marca → tipo da marca → produto com unidade e preços
+- [x] Lista filtra por texto, tipo, estoque baixo e ativos
+- [x] Ajuste de estoque (entrada com custo recalcula média; saída sem mudar custo médio)
+- [x] Desativar produto e ocultar com “somente ativos”
+- [x] Outra clínica não vê o catálogo (já garantido na API; cobrir na UI só por escopo de sessão)
+- [x] Testes API da cascata marca/tipo + `?q=`; smoke manual das telas Vue
 
 #### 4.4 — Protocolos (especificação de UI)
 
