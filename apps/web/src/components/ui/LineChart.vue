@@ -89,7 +89,7 @@ function render() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: readToken('--sv-bg-sidebar', '#1c1c1e'),
+          backgroundColor: readToken('--sv-bg-sidebar', '#0a101c'),
           titleColor: readToken('--sv-text-inverse', 'white'),
           bodyColor: readToken('--sv-text-inverse', 'white'),
           displayColors: false,

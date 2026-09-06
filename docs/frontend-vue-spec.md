@@ -169,8 +169,8 @@ Tema **explícito** via classe `dark` em `html` (não só `prefers-color-scheme`
 | Default | **sistema** (`prefers-color-scheme`) |
 | Toggle | `ThemeToggle` no `ClinicShell` (sidebar + header mobile), login e `/dev/ui` (segmentado no kitchen sink) |
 | Brand no escuro | `#7A77C9` (ligeiramente mais claro que `#5956A6`); pressed `#5956A6` |
-| Glass no escuro | fills cinza translúcidos (`rgba(44,44,46,…)`), hairline branco 10–14%, highlight inset fraco — **sem vidro leitoso branco** |
-| Canvas | claro `#F2F2F7`; escuro `#000000` + mesh brand calmo |
+| Glass no escuro | painéis azul-cinza translúcidos (`rgba(26,36,56,…)`), hairline azul-frio — **sem vidro leitoso branco** nem cinza iOS |
+| Canvas | claro `#F2F2F7`; escuro **midnight navy** `#0B1220` + mesh brand/azul calmo (não preto puro) |
 | `color-scheme` | `light` / `dark` no `html` (date/scroll nativos) |
 | Reduced transparency | sólidos `--sv-bg-surface` / `--sv-bg-input` / `--sv-bg-sidebar` **do tema ativo** |
 
@@ -183,7 +183,7 @@ Script inline em `index.html` aplica a classe antes do Vue para evitar flash.
 | `prefers-reduced-transparency` | Superfícies sólidas (`--sv-bg-surface` / `--sv-bg-input` / `--sv-bg-sidebar` do tema ativo); sem `backdrop-filter`; mesh do canvas desligado; bordas `--sv-border-subtle` |
 | `prefers-reduced-motion` | Transições/animações ≈ 0 (já global em `tokens.css`) |
 
-Contraste de texto: `--sv-text-title` / `--sv-text-body` sobre o vidro; no claro não usar texto branco em `glass-regular`; no escuro o título é claro (`#F5F5F7`).
+Contraste de texto: `--sv-text-title` / `--sv-text-body` sobre o vidro; no claro não usar texto branco em `glass-regular`; no escuro o título é slate claro (`#F1F5F9`) sobre canvas midnight.
 
 ### 5.1 Tokens (CSS variables → Tailwind theme)
 

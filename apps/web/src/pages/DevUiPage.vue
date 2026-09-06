@@ -145,7 +145,7 @@ function simulateLoading() {
         <div class="grid gap-3 sm:grid-cols-3">
           <GlassSurface material="regular" padding>
             <p class="text-[13px] font-medium text-title">glass-regular</p>
-            <p class="mt-1 text-[13px] text-muted">Cards, dialogs, menus, shell clara.</p>
+            <p class="mt-1 text-[13px] text-muted">Cards, dialogs, menus. No escuro: painel midnight.</p>
           </GlassSurface>
           <GlassSurface material="clear" padding>
             <p class="text-[13px] font-medium text-title">glass-clear</p>
@@ -170,7 +170,7 @@ function simulateLoading() {
             <ColorSwatch name="Dark" swatch-class="glass-dark" />
           </div>
           <p class="mt-4 text-[13px] text-muted">
-            Com prefers-reduced-transparency as superfícies ficam sólidas (canvas, surface, input) nos dois temas.
+            Com prefers-reduced-transparency as superfícies ficam sólidas (canvas, surface, input) nos dois temas. No escuro o canvas é midnight navy, não preto.
           </p>
         </SurfaceCard>
       </section>
