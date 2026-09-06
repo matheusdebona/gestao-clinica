@@ -55,9 +55,11 @@ const cancelMutation = useMutation({
 
 const treatmentMutation = useMutation({
   mutationFn: () => startTreatment(props.saleId),
-  onSuccess: async () => {
+  onSuccess: async (treatment) => {
     toast.success('Tratamento aberto')
     await queryClient.invalidateQueries({ queryKey: ['sales'] })
+    await queryClient.invalidateQueries({ queryKey: ['treatments'] })
+    await router.push({ name: 'treatments-show', params: { id: String(treatment.id) } })
   },
   onError: (error) => {
     toast.error(error instanceof ApiError ? error.message : 'Não foi possível abrir o tratamento.')
@@ -198,8 +200,16 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
           O caso clínico já foi iniciado a partir desta venda.
         </Banner>
         <div class="flex flex-wrap gap-2">
+          <PermissionGate permission="treatments.view">
+            <Button
+              @click="router.push({ name: 'treatments-show', params: { id: String(sale.treatment_id) } })"
+            >
+              Ver tratamento
+            </Button>
+          </PermissionGate>
           <PermissionGate permission="appointments.manage">
             <Button
+              variant="secondary"
               @click="
                 router.push({
                   name: 'appointments-new',

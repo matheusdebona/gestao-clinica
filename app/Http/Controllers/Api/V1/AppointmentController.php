@@ -13,6 +13,7 @@ use App\Models\Treatment;
 use App\Services\AppointmentService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Carbon;
 
 class AppointmentController extends Controller
 {
@@ -90,7 +91,13 @@ class AppointmentController extends Controller
     public function show(Appointment $appointment): AppointmentResource
     {
         return new AppointmentResource(
-            $appointment->load(['consumptions.product', 'client', 'treatment', 'professionalUser'])
+            $appointment->load([
+                'consumptions.product',
+                'consumptions.salePayment.paymentMethod',
+                'client',
+                'treatment',
+                'professionalUser',
+            ])
         );
     }
 
@@ -135,9 +142,9 @@ class AppointmentController extends Controller
         return new AppointmentResource($this->appointments->cancel($appointment));
     }
 
-    private function boundDate(mixed $value, bool $startOfDay): \Illuminate\Support\Carbon
+    private function boundDate(mixed $value, bool $startOfDay): Carbon
     {
-        $parsed = \Illuminate\Support\Carbon::parse($value);
+        $parsed = Carbon::parse($value);
         $raw = is_string($value) ? $value : $parsed->toIso8601String();
         $hasTime = str_contains($raw, 'T') || preg_match('/\d{2}:\d{2}/', $raw) === 1;
 

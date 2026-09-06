@@ -207,20 +207,26 @@ const router = createRouter({
           component: () => import('@/pages/AppointmentFormPage.vue'),
         },
         {
+          path: 'appointments/:id/consume',
+          name: 'appointments-consume',
+          component: () => import('@/pages/AppointmentConsumePage.vue'),
+        },
+        {
           path: 'appointments/:id',
           name: 'appointments-show',
           component: () => import('@/pages/AppointmentDetailPage.vue'),
         },
         {
           path: 'treatments',
+          name: 'treatments',
           meta: { title: 'Tratamentos' },
-          component: () => import('@/pages/ComingSoonPage.vue'),
+          component: () => import('@/pages/TreatmentsPage.vue'),
         },
         {
           path: 'treatments/:id',
           name: 'treatments-show',
           meta: { title: 'Tratamentos' },
-          component: () => import('@/pages/ComingSoonPage.vue'),
+          component: () => import('@/pages/TreatmentDetailPage.vue'),
         },
         {
           path: 'notifications',

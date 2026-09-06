@@ -3,24 +3,39 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Treatments\IndexTreatmentRequest;
 use App\Http\Requests\Api\V1\Treatments\StoreTreatmentRequest;
 use App\Http\Resources\Api\V1\TreatmentResource;
 use App\Models\Sale;
 use App\Models\Treatment;
 use App\Services\TreatmentService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class TreatmentController extends Controller
 {
     public function __construct(private readonly TreatmentService $treatments) {}
 
-    public function index(Request $request): AnonymousResourceCollection
+    /**
+     * List treatments in the current clinic.
+     *
+     * Query: `q` (client name or WhatsApp), `status`, `client_id`, `sale_id`.
+     */
+    public function index(IndexTreatmentRequest $request): AnonymousResourceCollection
     {
         $query = Treatment::query()
             ->with(['client', 'sale'])
             ->orderByDesc('id');
+
+        if ($request->filled('q')) {
+            $term = '%'.$request->string('q')->toString().'%';
+            $query->whereHas('client', function ($builder) use ($term): void {
+                $builder->where(function ($inner) use ($term): void {
+                    $inner->where('name', 'like', $term)
+                        ->orWhere('whatsapp', 'like', $term);
+                });
+            });
+        }
 
         if ($request->filled('sale_id')) {
             $query->where('sale_id', $request->integer('sale_id'));
@@ -55,7 +70,13 @@ class TreatmentController extends Controller
     public function show(Treatment $treatment): TreatmentResource
     {
         return new TreatmentResource(
-            $treatment->load(['client', 'sale.items', 'appointments.consumptions', 'openedByUser'])
+            $treatment->load([
+                'client',
+                'sale.items',
+                'appointments.consumptions',
+                'appointments.professionalUser',
+                'openedByUser',
+            ])
         );
     }
 

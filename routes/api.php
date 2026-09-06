@@ -171,7 +171,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:campaigns.manage');
 
         Route::get('payment-methods', [PaymentMethodController::class, 'index'])
-            ->middleware('permission:payment_methods.manage|sales.view');
+            ->middleware('permission:payment_methods.manage|sales.view|treatments.consume');
         Route::post('payment-methods', [PaymentMethodController::class, 'store'])
             ->middleware('permission:payment_methods.manage');
         Route::get('payment-methods/{payment_method}', [PaymentMethodController::class, 'show'])
@@ -182,7 +182,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:payment_methods.manage');
 
         Route::get('card-operators', [CardOperatorController::class, 'index'])
-            ->middleware('permission:card_operators.manage|sales.view');
+            ->middleware('permission:card_operators.manage|sales.view|treatments.consume');
         Route::post('card-operators', [CardOperatorController::class, 'store'])
             ->middleware('permission:card_operators.manage');
         Route::get('card-operators/{card_operator}', [CardOperatorController::class, 'show'])
@@ -193,7 +193,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:card_operators.manage');
 
         Route::get('card-brands', [CardBrandController::class, 'index'])
-            ->middleware('permission:card_brands.manage|sales.view');
+            ->middleware('permission:card_brands.manage|sales.view|treatments.consume');
         Route::post('card-brands', [CardBrandController::class, 'store'])
             ->middleware('permission:card_brands.manage');
         Route::get('card-brands/{card_brand}', [CardBrandController::class, 'show'])
@@ -291,8 +291,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('treatments/{treatment}/cancel', [TreatmentController::class, 'cancel'])
             ->middleware('permission:treatments.cancel');
 
-        // Agenda uses appointments.*; nested treatment routes keep treatments.* dual-check
-        // so existing clinical clients still work until 4.7 consume/complete.
+        // Agenda uses appointments.*; clinical consume/complete stay on treatments.*.
         Route::get('professionals', [UserController::class, 'professionals'])
             ->middleware('permission:appointments.view|appointments.manage|users.view');
         Route::get('appointments', [AppointmentController::class, 'index'])
@@ -308,7 +307,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('appointments/{appointment}/start', [AppointmentController::class, 'start'])
             ->middleware('permission:appointments.start|treatments.start');
         Route::put('appointments/{appointment}/consumptions', [AppointmentController::class, 'syncConsumptions'])
-            ->middleware('permission:treatments.manage');
+            ->middleware('permission:treatments.consume');
         Route::post('appointments/{appointment}/complete', [AppointmentController::class, 'complete'])
             ->middleware('permission:treatments.complete');
         Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
