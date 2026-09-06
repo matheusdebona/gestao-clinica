@@ -89,9 +89,9 @@ async function submitRegister() {
 </script>
 
 <template>
-  <div class="flex min-h-screen items-center justify-center bg-canvas px-4 py-8">
+  <div class="flex min-h-dvh items-center justify-center bg-canvas px-4 py-[5dvh]">
     <div
-      class="auth-card w-full max-w-[920px] overflow-hidden rounded-[14px] border border-border-subtle bg-surface"
+      class="auth-card h-[90dvh] w-full max-w-[920px] overflow-hidden rounded-[14px] border border-border-subtle bg-surface"
       :class="{ register: mode === 'register' }"
     >
       <div class="auth-image">
@@ -106,7 +106,7 @@ async function submitRegister() {
         </p>
       </div>
 
-      <section class="auth-login flex flex-col justify-center px-6 py-8 md:px-10">
+      <section class="auth-login flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-8 md:px-10">
         <h1 class="text-[28px] font-semibold tracking-[-0.03em] text-title">Entrar</h1>
         <p class="mt-1 text-[15px] text-muted">Use o e-mail da clínica.</p>
         <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitLogin">
@@ -144,7 +144,7 @@ async function submitRegister() {
         </p>
       </section>
 
-      <section class="auth-register flex flex-col justify-center px-6 py-8 md:px-10">
+      <section class="auth-register flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-8 md:px-10">
         <h1 class="text-[28px] font-semibold tracking-[-0.03em] text-title">Cadastrar</h1>
         <p class="mt-1 text-[15px] text-muted">Abre a clínica e o primeiro acesso.</p>
         <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitRegister">
@@ -218,12 +218,20 @@ async function submitRegister() {
 <style scoped>
 .auth-card {
   display: grid;
+  grid-template-rows: minmax(0, 1fr);
   grid-template-columns: 1fr;
 }
 
 .auth-image {
-  position: relative;
-  height: 168px;
+  display: none;
+}
+
+.auth-login,
+.auth-register {
+  grid-row: 1;
+  grid-column: 1;
+  min-height: 0;
+  align-self: stretch;
 }
 
 .auth-card:not(.register) .auth-register,
@@ -234,22 +242,33 @@ async function submitRegister() {
 @media (min-width: 768px) {
   .auth-card {
     position: relative;
+    grid-template-rows: minmax(0, 1fr);
     grid-template-columns: 1fr 1fr;
-    min-height: 580px;
   }
 
   .auth-image {
+    display: block;
     position: absolute;
     inset-block: 0;
     left: 0;
     z-index: 2;
     width: 50%;
     height: auto;
+    grid-row: 1;
+    grid-column: 1;
     transition: transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .auth-card.register .auth-image {
     transform: translateX(100%);
+  }
+
+  .auth-login,
+  .auth-register {
+    grid-row: 1;
+    min-height: 0;
+    height: 100%;
+    align-self: stretch;
   }
 
   .auth-login {
