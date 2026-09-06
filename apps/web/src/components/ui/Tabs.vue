@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { cn } from '@/lib/cn'
+
 interface TabItem {
   value: string
   label: string
@@ -6,21 +8,36 @@ interface TabItem {
 
 const model = defineModel<string>({ required: true })
 
-defineProps<{
-  items: TabItem[]
-  disabled?: boolean
-}>()
+withDefaults(
+  defineProps<{
+    items: TabItem[]
+    disabled?: boolean
+    block?: boolean
+  }>(),
+  {
+    disabled: false,
+    block: false,
+  },
+)
 </script>
 
 <template>
-  <div class="inline-flex rounded-[10px] bg-input p-1" role="tablist">
+  <div
+    :class="cn('rounded-[10px] bg-input p-1', block ? 'flex w-full' : 'inline-flex')"
+    role="tablist"
+  >
     <button
       v-for="item in items"
       :key="item.value"
       type="button"
       role="tab"
-      class="h-9 rounded-[8px] px-3.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40"
-      :class="model === item.value ? 'bg-surface text-title' : 'text-muted'"
+      :class="
+        cn(
+          'h-9 rounded-[8px] px-3.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40',
+          block && 'min-w-0 flex-1 px-2',
+          model === item.value ? 'bg-surface text-title' : 'text-muted',
+        )
+      "
       :aria-selected="model === item.value"
       :disabled="disabled"
       @click="model = item.value"

@@ -148,7 +148,7 @@ See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap
 - [ ] **UI inbox** (Fase 4.9 Vue) — list/read/read-all + badge; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.9
 - [ ] Real push / email / WhatsApp channels (FCM/Web Push later)
 - [ ] Audit log for stock and treatment overrides
-- [ ] Dashboard UI (Vue web / later PWA) consuming metrics endpoints
+- [x] Dashboard UI (Vue web / later PWA) consuming metrics endpoints
 - [ ] Cloud S3 cutover for documents and uploads
 
 **Ops:** keep `php artisan schedule:run` (cron) and `php artisan queue:work` running so `CheckLowStockProductsJob` (01:00) and queued notifications are delivered.
@@ -170,7 +170,7 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] **Vendas / orçamentos** (wizard, protocolo+itens, soft min, pagamentos fechados, orçamento+PDF, nav inbox) — Fase 4.5; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.5
 - [x] **Agendamentos** (agenda dia/semana, `appointments.*`, overlap por profissional, start sem estoque) — Fase 4.6; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.6
 - [x] **Tratamento — consumo clínico** (`treatments.consume`, checklist sessão, extras, stock no complete) — Fase 4.7; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.7
-- [ ] **Métricas** (página única A–D, hero faturamento/ticket/conversão/margem, charts) — Fase 4.8; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8
+- [x] **Métricas** (página única A–D, hero faturamento/ticket/conversão/margem, charts) — Fase 4.8; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8
 - [ ] **Notificações** (inbox Alertas, badge unread, chips, deep links; só `products.view`) — Fase 4.9; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.9
 - [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)
 - [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI

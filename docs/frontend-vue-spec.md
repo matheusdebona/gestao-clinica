@@ -389,7 +389,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | **4.5** | **Vendas / orçamentos** | feito |
 | **4.6** | **Agendamentos** (agenda completa) | feito |
 | **4.7** | **Tratamento — consumo clínico** (baixa estoque) | feito |
-| **4.8** | **Métricas** | detalhe abaixo |
+| **4.8** | **Métricas** | feito |
 | **4.9** | **Notificações** | detalhe abaixo |
 
 Cada feature: páginas mobile-first + `PermissionGate` nas ações.
@@ -801,19 +801,19 @@ Não obrigatório criar sub-rotas nesta fase (decisão 2A).
 
 ##### Patterns
 
-- [ ] `MetricCard` (ou pattern) — valor + label + opcional delta
-- [ ] Chart simples (série receita) — lib leve alinhada ao design system; tokens Soft Violet
+- [x] `MetricCard` (ou pattern) — valor + label + opcional delta
+- [x] Chart simples (série receita) — lib leve alinhada ao design system; tokens Soft Violet
 - `PageHeader`, filtros de período, `Badge`/`ListCard` para listas D, `PermissionGate` / route meta
 - `MoneyDisplay` para valores
 
 ##### DoD 4.8
 
-- [ ] `/metrics` com período mês corrente e 4 cards do hero
-- [ ] Seções A–D consumindo os 5 endpoints; toggles aquisição e margem
-- [ ] Chart(s) conforme decisão C (no mínimo receita no tempo)
-- [ ] Estoque/ops com listas na página + links
-- [ ] Nav Métricas; só `metrics.view` (admin)
-- [ ] Smoke: números batem com fixture conhecida do período
+- [x] `/metrics` com período mês corrente e 4 cards do hero
+- [x] Seções A–D consumindo os 5 endpoints; toggles aquisição e margem
+- [x] Chart(s) conforme decisão C (no mínimo receita no tempo)
+- [x] Estoque/ops com listas na página + links
+- [x] Nav Métricas; só `metrics.view` (admin)
+- [x] Smoke: números batem com fixture conhecida do período
 
 #### 4.9 — Notificações / Alertas (especificação de UI)
 

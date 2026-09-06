@@ -3,7 +3,9 @@ import { ref } from 'vue'
 import AgendaEventCard from '@/components/patterns/AgendaEventCard.vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
+import MetricCard from '@/components/patterns/MetricCard.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
+import RankBar from '@/components/patterns/RankBar.vue'
 import StockStatusBadge from '@/components/patterns/StockStatusBadge.vue'
 import WizardStepper from '@/components/patterns/WizardStepper.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
@@ -18,6 +20,7 @@ import EmptyState from '@/components/ui/EmptyState.vue'
 import FormField from '@/components/ui/FormField.vue'
 import InlineAlert from '@/components/ui/InlineAlert.vue'
 import Input from '@/components/ui/Input.vue'
+import LineChart from '@/components/ui/LineChart.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -33,6 +36,7 @@ import Switch from '@/components/ui/Switch.vue'
 import Tabs from '@/components/ui/Tabs.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import { useToastStore } from '@/stores/toast'
+import { formatBRL } from '@/lib/formatters'
 
 const toast = useToastStore()
 
@@ -53,6 +57,14 @@ const itemQty = ref('1')
 const itemPrice = ref('80')
 const wizardStep = ref(1)
 const agendaTab = ref('day')
+const periodTab = ref('month')
+
+const chartLabels = ['01/09', '08/09', '15/09', '22/09', '30/09']
+const chartValues = [1200, 800, 1600, 400, 2100]
+
+function formatChartValue(value: number): string {
+  return formatBRL(value)
+}
 
 const dialogOpen = ref(false)
 const confirmOpen = ref(false)
@@ -126,6 +138,7 @@ function simulateLoading() {
             </div>
             <div class="mt-4 flex flex-wrap items-center gap-3">
               <MoneyDisplay value="120.5" />
+              <MoneyDisplay size="lg" value="1280.00" />
               <StockStatusBadge level="ok" />
               <StockStatusBadge level="low" />
               <StockStatusBadge level="reorder" />
@@ -362,6 +375,42 @@ function simulateLoading() {
                 { value: 'week', label: 'Semana' },
               ]"
             />
+            <Tabs
+              v-model="periodTab"
+              block
+              :items="[
+                { value: '7d', label: '7d' },
+                { value: '30d', label: '30d' },
+                { value: 'month', label: 'Mês' },
+                { value: 'custom', label: 'Datas' },
+              ]"
+            />
+          </div>
+        </SurfaceCard>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <p class="section-label">Métricas</p>
+        <div class="grid grid-cols-2 gap-3">
+          <MetricCard label="Faturamento" hint="vendas confirmadas">
+            <MoneyDisplay size="lg" value="12800.00" />
+          </MetricCard>
+          <MetricCard label="Conversão" hint="consulta → venda">33,33%</MetricCard>
+        </div>
+        <SurfaceCard>
+          <p class="text-[13px] font-medium text-muted">Receita por dia</p>
+          <div class="mt-3">
+            <LineChart
+              :labels="chartLabels"
+              :values="chartValues"
+              label="Receita de exemplo"
+              :format-value="formatChartValue"
+            />
+          </div>
+          <div class="mt-4 divide-y divide-border-divider">
+            <RankBar label="PIX" :value="formatBRL('8000')" :ratio="1" meta="pix" />
+            <RankBar label="Dinheiro" :value="formatBRL('4000')" :ratio="0.5" meta="cash" />
+            <RankBar label="Crédito" :value="formatBRL('2000')" :ratio="0.25" meta="credit_card" />
           </div>
         </SurfaceCard>
       </section>

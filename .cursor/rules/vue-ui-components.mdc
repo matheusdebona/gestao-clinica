@@ -29,7 +29,8 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `AppDialog`, `ConfirmDialog`
 - `EmptyState` — título + descrição + slot `action`
 - `Pagination` — `page` / `lastPage` (`update:page`)
-- `Tabs` — segmento Dia/Semana (`v-model` + `items`)
+- `Tabs` — segmento (`v-model` + `items`; `block` para largura total)
+- `LineChart` — série (Chart.js; cores via tokens Soft Violet)
 
 ## Layout
 - `PageHeader`, `SurfaceCard`
@@ -38,11 +39,13 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `ClinicShell` — `components/patterns` (sidebar + bottom nav)
 - `PermissionGate` — `components/patterns`; slot só com a permission
 - `ClientSearchBar` — `components/patterns`; busca com debounce (`search`)
-- `MoneyDisplay` — `components/patterns`; BRL (`formatBRL`)
+- `MoneyDisplay` — `components/patterns`; BRL (`formatBRL`); `size` `md` | `lg`
 - `StockStatusBadge` — `components/patterns`; Normal / estoque baixo / reposição / negativo
 - `ItemLineRow` — `components/patterns`; produto + quantidade + preço opcional + remover (protocolos / vendas)
 - `WizardStepper` — `components/patterns`; passos mobile (venda)
 - `AgendaEventCard` — `components/patterns`; evento da agenda (cliente, horário, status, profissional, tratamento)
+- `MetricCard` — `components/patterns`; label + valor (slot) + hint
+- `RankBar` — `components/patterns`; ranking com barra proporcional (tokens)
 
 ## Tokens
 Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows.
