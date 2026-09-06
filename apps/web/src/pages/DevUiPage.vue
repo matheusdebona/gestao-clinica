@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
@@ -8,12 +9,14 @@ import ButtonAccent from '@/components/ui/ButtonAccent.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
 import ColorSwatch from '@/components/ui/ColorSwatch.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
+import EmptyState from '@/components/ui/EmptyState.vue'
 import FormField from '@/components/ui/FormField.vue'
 import InlineAlert from '@/components/ui/InlineAlert.vue'
 import Input from '@/components/ui/Input.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import Pagination from '@/components/ui/Pagination.vue'
 import SearchField from '@/components/ui/SearchField.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
@@ -40,6 +43,7 @@ const loadingPrimary = ref(false)
 
 const dialogOpen = ref(false)
 const confirmOpen = ref(false)
+const page = ref(2)
 
 const selectOptions = [
   { value: 'protocolo-a', label: 'Protocolo A' },
@@ -142,6 +146,12 @@ function simulateLoading() {
             placeholder="Pacientes, produtos"
             @search="toast.info(searchValue || 'Nada para buscar')"
           />
+          <div class="mt-4">
+            <ClientSearchBar
+              v-model="searchValue"
+              @search="toast.info(searchValue || 'Nada para buscar')"
+            />
+          </div>
         </SurfaceCard>
       </section>
 
@@ -294,6 +304,26 @@ function simulateLoading() {
             <SidebarNavItem label="Início" active />
             <SidebarNavItem label="Clientes" />
             <SidebarNavItem label="Sair" disabled />
+          </div>
+        </SurfaceCard>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <p class="section-label">Vazio e páginas</p>
+        <SurfaceCard :padding="false">
+          <EmptyState
+            title="Nenhum cliente ainda"
+            description="Cadastre o primeiro paciente da clínica."
+          >
+            <template #action>
+              <Button @click="toast.info('Novo')">Novo cliente</Button>
+            </template>
+          </EmptyState>
+        </SurfaceCard>
+        <SurfaceCard>
+          <Pagination :page="page" :last-page="3" @update:page="page = $event" />
+          <div class="mt-4 border-t border-border-divider pt-4">
+            <Pagination :page="1" :last-page="1" disabled />
           </div>
         </SurfaceCard>
       </section>

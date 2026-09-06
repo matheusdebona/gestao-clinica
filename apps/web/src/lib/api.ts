@@ -21,6 +21,11 @@ export const api = ofetch.create({
   async onResponseError({ response }) {
     if (response.status === 401) {
       clearToken()
+      const path = window.location.pathname
+      if (path !== '/login' && path !== '/dev/ui') {
+        const redirect = encodeURIComponent(`${path}${window.location.search}`)
+        window.location.assign(`/login?redirect=${redirect}`)
+      }
     }
 
     const payload = (await response._data) as {

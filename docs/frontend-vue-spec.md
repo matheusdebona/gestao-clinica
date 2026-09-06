@@ -348,8 +348,8 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 - [x] Tailwind 4, Vue Router, Pinia, Reka UI, Lucide
 - [x] `.env.example` com `VITE_API_URL`
 - [x] README em `apps/web/README.md`
-- [ ] Vue Query, VeeValidate, Zod, ofetch (Fase 2 — auth/API)
-- [ ] ESLint / Prettier (quando o fluxo de auth entrar)
+- [x] Vue Query, VeeValidate, Zod, ofetch
+- [ ] ESLint / Prettier (quando o fluxo de lint entrar)
 
 **DoD Fase 1:** `npm run dev` abre o kitchen sink em `/dev/ui`.
 
@@ -369,21 +369,22 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 - [x] `PageHeader` / `SearchField` + primitives de form/feedback/overlay no `/dev/ui`
 - [x] Página `/dev/ui` com swatches + estados (default / erro / snack)
 - [x] `ClinicShell` + `SidebarNavItem` (sidebar neutra; brand só como acento)
-- [ ] Patterns: `PermissionGate`, `MoneyDisplay`, `StockStatusBadge`
+- [x] Patterns: `PermissionGate`, `ClientSearchBar`
+- [ ] Patterns: `MoneyDisplay`, `StockStatusBadge`
 
 **DoD Fase 3 (parcial):** kitchen sink revisável no visual Soft Violet; features de negócio ainda não.
 
 ### Fase 4 — Features (ordem de valor clínico)
 
-| Ordem | Feature | API / notas |
-| --- | --- | --- |
-| 4.1 | Auth polish | Lembrar clinic name, erros de login |
-| 4.2 | Clientes | CRUD + busca `?q=` |
-| 4.3 | Produtos | Lista, filtro low-stock, `lead_time_days` no form |
-| 4.4 | Vendas / orçamentos | Fluxos principais confirm/cancel; sem baixar estoque na confirmação |
-| 4.5 | Tratamentos / appointments | Start/complete, warnings de estoque, fulfillment |
-| 4.6 | Notificações | Inbox list/read/read-all |
-| 4.7 | Métricas | Cards A–D (`/metrics/commercial`, `acquisition`, `margin`, `inventory`, `operations`) |
+| Ordem | Feature | API / notas | Status |
+| --- | --- | --- | --- |
+| 4.1 | Auth polish | Lembrar clinic name, erros de login | feito |
+| 4.2 | Clientes | CRUD + busca `?q=` | feito |
+| 4.3 | Produtos | Lista, filtro low-stock, `lead_time_days` no form | |
+| 4.4 | Vendas / orçamentos | Fluxos principais confirm/cancel; sem baixar estoque na confirmação | |
+| 4.5 | Tratamentos / appointments | Start/complete, warnings de estoque, fulfillment | |
+| 4.6 | Notificações | Inbox list/read/read-all | |
+| 4.7 | Métricas | Cards A–D (`/metrics/commercial`, `acquisition`, `margin`, `inventory`, `operations`) | |
 
 Cada feature: páginas mobile-first + `PermissionGate` nas ações.
 
