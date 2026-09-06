@@ -13,16 +13,6 @@ const props = withDefaults(
   },
 )
 
-const classes = computed(() =>
-  cn(
-    'flex gap-3 rounded-[10px] px-3.5 py-3 text-[15px]',
-    props.variant === 'info' && 'bg-brand-light text-title',
-    props.variant === 'success' && 'bg-success-light text-title',
-    props.variant === 'warning' && 'bg-warning-light text-title',
-    props.variant === 'danger' && 'bg-danger-light text-title',
-  ),
-)
-
 const labelClass = computed(() => {
   if (props.variant === 'success') return 'text-success'
   if (props.variant === 'warning') return 'text-warning'
@@ -32,10 +22,13 @@ const labelClass = computed(() => {
 </script>
 
 <template>
-  <div :class="classes" role="status">
+  <div
+    :class="cn('flex gap-3 border-b border-border-divider py-3 last:border-b-0 last:pb-0 first:pt-0')"
+    role="status"
+  >
     <div class="min-w-0">
-      <p v-if="title" :class="['font-medium', labelClass]">{{ title }}</p>
-      <p :class="title ? 'mt-0.5 text-body' : 'text-body'">
+      <p v-if="title" :class="['text-[15px] font-medium', labelClass]">{{ title }}</p>
+      <p class="text-[15px] text-muted">
         <slot />
       </p>
     </div>
