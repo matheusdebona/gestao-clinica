@@ -1,0 +1,43 @@
+<script setup lang="ts">
+import { cn } from '@/lib/cn'
+import { SwitchRoot, SwitchThumb } from 'reka-ui'
+
+withDefaults(
+  defineProps<{
+    modelValue?: boolean
+    disabled?: boolean
+    id?: string
+    label?: string
+  }>(),
+  {
+    modelValue: false,
+    disabled: false,
+    label: '',
+  },
+)
+
+const emit = defineEmits<{
+  'update:modelValue': [value: boolean]
+}>()
+</script>
+
+<template>
+  <label
+    :class="cn('inline-flex cursor-pointer items-center justify-between gap-3 text-[15px] text-title', disabled && 'cursor-not-allowed opacity-40')"
+  >
+    <span v-if="label || $slots.default">
+      <slot>{{ label }}</slot>
+    </span>
+    <SwitchRoot
+      :id="id"
+      :checked="modelValue"
+      :disabled="disabled"
+      class="relative h-[31px] w-[51px] shrink-0 rounded-full bg-[#e9e9ea] outline-none transition-colors data-[state=checked]:bg-success"
+      @update:checked="(v: boolean) => emit('update:modelValue', v === true)"
+    >
+      <SwitchThumb
+        class="block size-[27px] translate-x-[2px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.2)] transition-transform data-[state=checked]:translate-x-[22px]"
+      />
+    </SwitchRoot>
+  </label>
+</template>

@@ -159,8 +159,8 @@ See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap
 See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, design-system order, and implementation phases.
 
 - [x] Spec MD — Vue 3 + Vite + TS; Tailwind + Reka UI; web responsiva primeiro; componentes antes das features
-- [ ] Scaffold `apps/web` (Fase 1 do spec)
-- [ ] Design system **Modern Soft Violet** + `/dev/ui` kitchen sink (Fase 3)
+- [x] Scaffold `apps/web` (Fase 1 do spec)
+- [x] Design system **Modern Soft Violet** + `/dev/ui` kitchen sink (Fase 3 — tokens + primitives; shell/auth no próximo PR)
 - [ ] Features clínicas: auth, clients, products, sales, treatments, notifications, metrics (Fase 4)
 - [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)
 - [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI

@@ -1,0 +1,121 @@
+/**
+ * Soft Violet, Apple-minimal.
+ * Brand stays violet; chrome is quiet — hairlines, grouped fills, little shadow.
+ */
+
+:root {
+  --sv-brand-primary: #5956a6;
+  --sv-brand-primary-dark: #4a4791;
+  --sv-brand-primary-light: #eef0f7;
+  --sv-brand-primary-hover: #4f4c96;
+
+  --sv-bg-canvas: #f2f2f7;
+  --sv-bg-sidebar: #1c1c1e;
+  --sv-bg-surface: #ffffff;
+  --sv-bg-surface-muted: #f2f2f7;
+  --sv-bg-input: #f2f2f7;
+
+  --sv-text-title: #1c1c1e;
+  --sv-text-body: #3a3a3c;
+  --sv-text-muted: #8e8e93;
+  --sv-text-inverse: #ffffff;
+
+  --sv-success: #34c759;
+  --sv-success-light: #e8f8ed;
+  --sv-danger: #ff3b30;
+  --sv-danger-light: #ffecea;
+  --sv-warning: #ff9f0a;
+  --sv-warning-light: #fff4e5;
+  --sv-card-pink: #f7f7f8;
+  --sv-card-purple: #f7f7f8;
+  --sv-card-blue: #f7f7f8;
+  --sv-badge-purple: #5956a6;
+  --sv-gradient-cta-start: #5956a6;
+  --sv-gradient-cta-end: #5956a6;
+
+  --sv-border-subtle: rgba(60, 60, 67, 0.12);
+  --sv-border-divider: rgba(60, 60, 67, 0.08);
+
+  --sv-radius-sm: 8px;
+  --sv-radius-md: 10px;
+  --sv-radius-lg: 14px;
+  --sv-radius-xl: 18px;
+  --sv-radius-card: 12px;
+  --sv-radius-full: 9999px;
+
+  --sv-shadow-card: none;
+  --sv-shadow-floating: 0 8px 28px rgba(0, 0, 0, 0.12);
+  --sv-shadow-input: none;
+
+  --sv-sidebar-width: 240px;
+  --sv-page-gap: 24px;
+  --sv-page-padding: 20px;
+
+  --sv-font-sans: "Inter Variable", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --sv-text-h1: 28px;
+  --sv-leading-h1: 34px;
+  --sv-text-h2: 17px;
+  --sv-leading-h2: 22px;
+  --sv-text-h3: 15px;
+  --sv-leading-h3: 20px;
+  --sv-text-body: 15px;
+  --sv-leading-body: 20px;
+  --sv-text-caption: 13px;
+  --sv-leading-caption: 18px;
+  --sv-text-badge: 12px;
+}
+
+@theme inline {
+  --font-sans: var(--sv-font-sans);
+
+  --color-brand: var(--sv-brand-primary);
+  --color-brand-dark: var(--sv-brand-primary-dark);
+  --color-brand-light: var(--sv-brand-primary-light);
+  --color-brand-hover: var(--sv-brand-primary-hover);
+
+  --color-canvas: var(--sv-bg-canvas);
+  --color-sidebar: var(--sv-bg-sidebar);
+  --color-surface: var(--sv-bg-surface);
+  --color-surface-muted: var(--sv-bg-surface-muted);
+  --color-input: var(--sv-bg-input);
+
+  --color-title: var(--sv-text-title);
+  --color-body: var(--sv-text-body);
+  --color-muted: var(--sv-text-muted);
+  --color-inverse: var(--sv-text-inverse);
+
+  --color-success: var(--sv-success);
+  --color-success-light: var(--sv-success-light);
+  --color-danger: var(--sv-danger);
+  --color-danger-light: var(--sv-danger-light);
+  --color-warning: var(--sv-warning);
+  --color-warning-light: var(--sv-warning-light);
+  --color-card-pink: var(--sv-card-pink);
+  --color-card-purple: var(--sv-card-purple);
+  --color-card-blue: var(--sv-card-blue);
+  --color-badge-purple: var(--sv-badge-purple);
+
+  --color-border-subtle: var(--sv-border-subtle);
+  --color-border-divider: var(--sv-border-divider);
+
+  --radius-sm: var(--sv-radius-sm);
+  --radius-md: var(--sv-radius-md);
+  --radius-lg: var(--sv-radius-lg);
+  --radius-xl: var(--sv-radius-xl);
+  --radius-card: var(--sv-radius-card);
+  --radius-full: var(--sv-radius-full);
+
+  --shadow-card: var(--sv-shadow-card);
+  --shadow-floating: var(--sv-shadow-floating);
+  --shadow-input: var(--sv-shadow-input);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
