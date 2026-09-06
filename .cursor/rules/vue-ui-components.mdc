@@ -18,7 +18,7 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 
 ## Forms
 - `FormField` — label + hint + **error 422**; slot gets `{ invalid }`
-- `Input` — `text` | `number` | `password` | `email` | `date` | `search` | `tel`
+- `Input` — `text` | `number` | `password` | `email` | `date` | `datetime-local` | `search` | `tel`
 - `PasswordInput` — senha com mostrar/ocultar (olho)
 - `Textarea`, `Select`, `Checkbox`, `Switch`
 - `SearchField`, `MaskedBox`
@@ -29,6 +29,7 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `AppDialog`, `ConfirmDialog`
 - `EmptyState` — título + descrição + slot `action`
 - `Pagination` — `page` / `lastPage` (`update:page`)
+- `Tabs` — segmento Dia/Semana (`v-model` + `items`)
 
 ## Layout
 - `PageHeader`, `SurfaceCard`
@@ -41,6 +42,7 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `StockStatusBadge` — `components/patterns`; Normal / estoque baixo / reposição / negativo
 - `ItemLineRow` — `components/patterns`; produto + quantidade + preço opcional + remover (protocolos / vendas)
 - `WizardStepper` — `components/patterns`; passos mobile (venda)
+- `AgendaEventCard` — `components/patterns`; evento da agenda (cliente, horário, status, profissional, tratamento)
 
 ## Tokens
 Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows.

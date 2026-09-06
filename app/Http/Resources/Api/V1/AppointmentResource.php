@@ -35,6 +35,13 @@ class AppointmentResource extends JsonResource
             'notes' => $this->notes,
             'consumptions' => AppointmentConsumptionResource::collection($this->whenLoaded('consumptions')),
             'client' => ClientResource::make($this->whenLoaded('client')),
+            'professional' => UserResource::make($this->whenLoaded('professionalUser')),
+            'treatment' => $this->whenLoaded('treatment', fn () => [
+                'id' => $this->treatment->id,
+                'status' => $this->treatment->status,
+                'sale_id' => $this->treatment->sale_id,
+                'client_id' => $this->treatment->client_id,
+            ]),
             'suggested_consumptions' => $this->extras['suggested_consumptions'] ?? null,
             'stock_warnings' => $this->extras['stock_warnings'] ?? null,
             'warnings' => $this->extras['warnings'] ?? null,

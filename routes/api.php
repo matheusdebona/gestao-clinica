@@ -279,11 +279,11 @@ Route::prefix('v1')->group(function (): void {
         Route::post('notifications/read-all', [NotificationController::class, 'markAllRead']);
 
         Route::get('treatments', [TreatmentController::class, 'index'])
-            ->middleware('permission:treatments.view');
+            ->middleware('permission:treatments.view|appointments.manage');
         Route::post('sales/{sale}/treatments', [TreatmentController::class, 'store'])
             ->middleware('permission:treatments.start');
         Route::get('treatments/{treatment}', [TreatmentController::class, 'show'])
-            ->middleware('permission:treatments.view');
+            ->middleware('permission:treatments.view|appointments.view');
         Route::get('treatments/{treatment}/fulfillment', [TreatmentController::class, 'fulfillment'])
             ->middleware('permission:treatments.view');
         Route::post('treatments/{treatment}/complete', [TreatmentController::class, 'complete'])
@@ -291,21 +291,27 @@ Route::prefix('v1')->group(function (): void {
         Route::post('treatments/{treatment}/cancel', [TreatmentController::class, 'cancel'])
             ->middleware('permission:treatments.cancel');
 
+        // Agenda uses appointments.*; nested treatment routes keep treatments.* dual-check
+        // so existing clinical clients still work until 4.7 consume/complete.
+        Route::get('professionals', [UserController::class, 'professionals'])
+            ->middleware('permission:appointments.view|appointments.manage|users.view');
+        Route::get('appointments', [AppointmentController::class, 'index'])
+            ->middleware('permission:appointments.view');
         Route::get('treatments/{treatment}/appointments', [AppointmentController::class, 'indexForTreatment'])
-            ->middleware('permission:treatments.view');
+            ->middleware('permission:treatments.view|appointments.view');
         Route::post('treatments/{treatment}/appointments', [AppointmentController::class, 'store'])
-            ->middleware('permission:treatments.manage');
+            ->middleware('permission:treatments.manage|appointments.manage');
         Route::get('appointments/{appointment}', [AppointmentController::class, 'show'])
-            ->middleware('permission:treatments.view');
+            ->middleware('permission:treatments.view|appointments.view');
         Route::patch('appointments/{appointment}', [AppointmentController::class, 'update'])
-            ->middleware('permission:treatments.manage');
+            ->middleware('permission:treatments.manage|appointments.manage');
         Route::post('appointments/{appointment}/start', [AppointmentController::class, 'start'])
-            ->middleware('permission:treatments.start');
+            ->middleware('permission:appointments.start|treatments.start');
         Route::put('appointments/{appointment}/consumptions', [AppointmentController::class, 'syncConsumptions'])
             ->middleware('permission:treatments.manage');
         Route::post('appointments/{appointment}/complete', [AppointmentController::class, 'complete'])
             ->middleware('permission:treatments.complete');
         Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
-            ->middleware('permission:treatments.cancel');
+            ->middleware('permission:appointments.cancel|treatments.cancel');
     });
 });

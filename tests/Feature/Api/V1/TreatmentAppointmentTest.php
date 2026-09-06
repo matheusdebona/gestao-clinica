@@ -99,6 +99,13 @@ class TreatmentAppointmentTest extends TestCase
         return Sale::query()->findOrFail($saleId);
     }
 
+    protected function createAppointment(int $treatmentId, array $payload = []): int
+    {
+        return $this->postJson("/api/v1/treatments/{$treatmentId}/appointments", array_merge([
+            'professional_user_id' => $this->admin->id,
+        ], $payload))->assertCreated()->json('data.id');
+    }
+
     public function test_open_treatment_from_confirmed_sale_only_once(): void
     {
         $product = $this->makeProduct('Botox', '10.0000', '100.00');
@@ -134,10 +141,10 @@ class TreatmentAppointmentTest extends TestCase
             ->assertCreated()
             ->json('data.id');
 
-        $appointmentId = $this->postJson("/api/v1/treatments/{$treatmentId}/appointments", [
+        $appointmentId = $this->createAppointment($treatmentId, [
             'scheduled_at' => now()->addDay()->toIso8601String(),
             'notes' => '1a aplicacao',
-        ])->assertCreated()->json('data.id');
+        ]);
 
         $start = $this->postJson("/api/v1/appointments/{$appointmentId}/start")
             ->assertOk();
@@ -174,9 +181,9 @@ class TreatmentAppointmentTest extends TestCase
             ->assertJsonPath('data.items.0.remaining_quantity', '2.0000');
 
         // Second session
-        $appt2 = $this->postJson("/api/v1/treatments/{$treatmentId}/appointments", [
+        $appt2 = $this->createAppointment($treatmentId, [
             'scheduled_at' => now()->addDays(30)->toIso8601String(),
-        ])->assertCreated()->json('data.id');
+        ]);
 
         $this->postJson("/api/v1/appointments/{$appt2}/start")
             ->assertOk()
@@ -191,9 +198,9 @@ class TreatmentAppointmentTest extends TestCase
         $treatmentId = $this->postJson("/api/v1/sales/{$sale->id}/treatments")
             ->assertCreated()->json('data.id');
 
-        $appointmentId = $this->postJson("/api/v1/treatments/{$treatmentId}/appointments", [
+        $appointmentId = $this->createAppointment($treatmentId, [
             'notes' => 'Avaliacao',
-        ])->assertCreated()->json('data.id');
+        ]);
 
         $this->postJson("/api/v1/appointments/{$appointmentId}/start")->assertOk();
         $this->putJson("/api/v1/appointments/{$appointmentId}/consumptions", [
@@ -222,8 +229,7 @@ class TreatmentAppointmentTest extends TestCase
 
         $treatmentId = $this->postJson("/api/v1/sales/{$sale->id}/treatments")
             ->assertCreated()->json('data.id');
-        $appointmentId = $this->postJson("/api/v1/treatments/{$treatmentId}/appointments")
-            ->assertCreated()->json('data.id');
+        $appointmentId = $this->createAppointment($treatmentId);
 
         $this->postJson("/api/v1/appointments/{$appointmentId}/start")->assertOk();
 
@@ -273,8 +279,7 @@ class TreatmentAppointmentTest extends TestCase
 
         $treatmentId = $this->postJson("/api/v1/sales/{$sale->id}/treatments")
             ->assertCreated()->json('data.id');
-        $appointmentId = $this->postJson("/api/v1/treatments/{$treatmentId}/appointments")
-            ->assertCreated()->json('data.id');
+        $appointmentId = $this->createAppointment($treatmentId);
         $this->postJson("/api/v1/appointments/{$appointmentId}/start")->assertOk();
         $this->putJson("/api/v1/appointments/{$appointmentId}/consumptions", [
             'consumptions' => [[
@@ -296,8 +301,7 @@ class TreatmentAppointmentTest extends TestCase
 
         $treatmentId = $this->postJson("/api/v1/sales/{$sale->id}/treatments")
             ->assertCreated()->json('data.id');
-        $appointmentId = $this->postJson("/api/v1/treatments/{$treatmentId}/appointments")
-            ->assertCreated()->json('data.id');
+        $appointmentId = $this->createAppointment($treatmentId);
         $this->postJson("/api/v1/appointments/{$appointmentId}/start")->assertOk();
 
         $this->postJson("/api/v1/appointments/{$appointmentId}/cancel")

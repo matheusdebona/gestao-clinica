@@ -23,11 +23,25 @@ class UpdateAppointmentRequest extends FormRequest
             'scheduled_at' => ['sometimes', 'nullable', 'date'],
             'professional_user_id' => [
                 'sometimes',
-                'nullable',
+                'required',
                 'integer',
                 Rule::exists('users', 'id')->where(fn ($q) => $q->where('clinic_id', $clinicId)),
             ],
+            'duration_minutes' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:1440'],
             'notes' => ['sometimes', 'nullable', 'string'],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'professional_user_id.required' => 'Selecione o profissional.',
+            'professional_user_id.exists' => 'Profissional inválido para esta clínica.',
+            'duration_minutes.min' => 'Informe a duração em minutos (1 a 1440).',
+            'duration_minutes.max' => 'Informe a duração em minutos (1 a 1440).',
         ];
     }
 }

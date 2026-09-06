@@ -68,6 +68,10 @@ class EnsureRolesAndPermissions
         'treatments.start',
         'treatments.complete',
         'treatments.cancel',
+        'appointments.view',
+        'appointments.manage',
+        'appointments.start',
+        'appointments.cancel',
         'metrics.view',
     ];
 
@@ -133,6 +137,10 @@ class EnsureRolesAndPermissions
             'treatments.start',
             'treatments.complete',
             'treatments.cancel',
+            'appointments.view',
+            'appointments.manage',
+            'appointments.start',
+            'appointments.cancel',
             'metrics.view',
         ]);
 
@@ -148,6 +156,10 @@ class EnsureRolesAndPermissions
             'sales.view',
             'sales.create',
             'documents.view',
+            'appointments.view',
+            'appointments.manage',
+            'appointments.start',
+            'appointments.cancel',
         ]);
 
         Role::findOrCreate('seller', self::GUARD)->syncPermissions([
@@ -194,6 +206,10 @@ class EnsureRolesAndPermissions
             'treatments.start',
             'treatments.complete',
             'treatments.cancel',
+            'appointments.view',
+            'appointments.manage',
+            'appointments.start',
+            'appointments.cancel',
             'documents.view',
             'documents.generate',
             'documents.delete',

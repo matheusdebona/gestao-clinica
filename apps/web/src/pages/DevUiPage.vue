@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import AgendaEventCard from '@/components/patterns/AgendaEventCard.vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
@@ -29,6 +30,7 @@ import Spinner from '@/components/ui/Spinner.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
+import Tabs from '@/components/ui/Tabs.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import { useToastStore } from '@/stores/toast'
 
@@ -40,6 +42,7 @@ const passwordValue = ref('senha123')
 const passwordConfirmValue = ref('senha123')
 const emailValue = ref('maria@clinica.test')
 const dateValue = ref('2026-09-05')
+const datetimeValue = ref('2026-09-08T14:30')
 const notesValue = ref('Observações da consulta')
 const selectValue = ref('protocolo-a')
 const searchValue = ref('')
@@ -49,6 +52,7 @@ const loadingPrimary = ref(false)
 const itemQty = ref('1')
 const itemPrice = ref('80')
 const wizardStep = ref(1)
+const agendaTab = ref('day')
 
 const dialogOpen = ref(false)
 const confirmOpen = ref(false)
@@ -222,6 +226,9 @@ function simulateLoading() {
               <FormField label="Data" html-for="ok-date">
                 <Input id="ok-date" v-model="dateValue" type="date" />
               </FormField>
+              <FormField label="Data e hora" html-for="ok-datetime">
+                <Input id="ok-datetime" v-model="datetimeValue" type="datetime-local" />
+              </FormField>
               <FormField label="Notas" html-for="ok-notes">
                 <Textarea id="ok-notes" v-model="notesValue" />
               </FormField>
@@ -268,6 +275,11 @@ function simulateLoading() {
               <FormField label="Data" error="Escolha uma data." html-for="err-date">
                 <template #default="{ invalid }">
                   <Input id="err-date" v-model="dateValue" type="date" :invalid="invalid" />
+                </template>
+              </FormField>
+              <FormField label="Data e hora" error="Informe data e hora." html-for="err-datetime">
+                <template #default="{ invalid }">
+                  <Input id="err-datetime" v-model="datetimeValue" type="datetime-local" :invalid="invalid" />
                 </template>
               </FormField>
               <FormField label="Notas" error="Mínimo de 10 caracteres." html-for="err-notes">
@@ -334,6 +346,23 @@ function simulateLoading() {
             :current="wizardStep"
             @select="wizardStep = $event"
           />
+          <div class="mt-5 flex flex-col gap-3">
+            <Tabs
+              v-model="agendaTab"
+              :items="[
+                { value: 'day', label: 'Dia' },
+                { value: 'week', label: 'Semana' },
+              ]"
+            />
+            <Tabs
+              v-model="agendaTab"
+              disabled
+              :items="[
+                { value: 'day', label: 'Dia' },
+                { value: 'week', label: 'Semana' },
+              ]"
+            />
+          </div>
         </SurfaceCard>
       </section>
 
@@ -361,6 +390,13 @@ function simulateLoading() {
               badge="Concluído"
               badge-variant="success"
               @action="toast.info('Avaliação')"
+            />
+            <AgendaEventCard
+              title="Maria Silva"
+              meta="14:30 · Dra. Ana · Tratamento #12"
+              badge="Agendada"
+              badge-variant="purple"
+              @action="toast.info('Sessão')"
             />
           </div>
         </SurfaceCard>

@@ -7,7 +7,7 @@ defineOptions({ inheritAttrs: false })
 const props = withDefaults(
   defineProps<{
     modelValue?: string | number
-    type?: 'text' | 'number' | 'password' | 'email' | 'date' | 'search' | 'tel'
+    type?: 'text' | 'number' | 'password' | 'email' | 'date' | 'datetime-local' | 'search' | 'tel'
     invalid?: boolean
     disabled?: boolean
     placeholder?: string

@@ -62,6 +62,20 @@ export function formatDateTime(value: string | null | undefined): string {
   }).format(parsed)
 }
 
+export function formatTime(value: string | null | undefined): string {
+  if (!value) {
+    return '—'
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return '—'
+  }
+  return new Intl.DateTimeFormat('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(parsed)
+}
+
 export function formatDate(value: string | null | undefined): string {
   if (!value) {
     return '—'

@@ -34,7 +34,9 @@ class TreatmentController extends Controller
             $query->where('status', $request->string('status')->toString());
         }
 
-        return TreatmentResource::collection($query->paginate(20));
+        $perPage = min(max($request->integer('per_page', 20), 1), 100);
+
+        return TreatmentResource::collection($query->paginate($perPage));
     }
 
     public function store(StoreTreatmentRequest $request, Sale $sale): JsonResponse
