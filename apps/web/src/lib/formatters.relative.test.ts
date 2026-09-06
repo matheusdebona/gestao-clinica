@@ -6,7 +6,7 @@ const now = new Date('2026-09-06T18:00:00.000Z')
 describe('formatRelativeTime', () => {
   it('uses compact Portuguese relative copy', () => {
     expect(formatRelativeTime('2026-09-06T17:59:30.000Z', now)).toBe('agora')
-    expect(formatRelativeTime('2026-09-06T17:50:00.000Z', now)).toMatch(/5 minutos/)
+    expect(formatRelativeTime('2026-09-06T17:55:00.000Z', now)).toMatch(/5 minutos/)
     expect(formatRelativeTime('2026-09-06T16:00:00.000Z', now)).toMatch(/2 horas/)
   })
 

@@ -167,6 +167,7 @@ class NotificationsLowStockTest extends TestCase
 
         $this->postJson("/api/v1/treatments/{$treatmentId}/appointments", [
             'scheduled_at' => $day->setTime(14, 0)->toIso8601String(),
+            'professional_user_id' => $this->admin->id,
         ])->assertCreated();
 
         Notification::fake();
@@ -195,6 +196,7 @@ class NotificationsLowStockTest extends TestCase
 
         $response = $this->postJson("/api/v1/treatments/{$treatmentId}/appointments", [
             'scheduled_at' => now()->addDay()->toIso8601String(),
+            'professional_user_id' => $this->admin->id,
         ])->assertCreated();
 
         $this->assertNotEmpty($response->json('data.warnings'));
