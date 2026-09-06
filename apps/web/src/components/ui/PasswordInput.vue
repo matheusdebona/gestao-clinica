@@ -35,10 +35,8 @@ const inputType = computed(() => (visible.value ? 'text' : 'password'))
 
 const classes = computed(() =>
   cn(
-    'h-11 w-full rounded-[10px] border bg-input py-0 pr-11 pl-3.5 text-[15px] text-title transition-colors placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
-    props.invalid
-      ? 'border-danger/50 bg-danger-light'
-      : 'border-transparent focus-visible:border-brand/40 focus-visible:bg-surface',
+    'glass-field h-11 w-full rounded-[12px] py-0 pr-11 pl-3.5 text-[15px] text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
+    typeof attrs.class === 'string' ? attrs.class : undefined,
   ),
 )
 
@@ -65,7 +63,7 @@ function toggleVisible() {
       :disabled="disabled"
       :autocomplete="autocomplete"
       :aria-invalid="invalid || undefined"
-      v-bind="attrs"
+      v-bind="{ ...attrs, class: undefined }"
       @input="onInput"
     >
     <div class="absolute top-1/2 right-1.5 -translate-y-1/2">

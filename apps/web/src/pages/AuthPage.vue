@@ -90,9 +90,9 @@ async function submitRegister() {
 </script>
 
 <template>
-  <div class="flex min-h-dvh items-center justify-center bg-canvas px-4 py-[5dvh]">
+  <div class="flex min-h-dvh items-center justify-center px-4 py-[5dvh]">
     <div
-      class="auth-card h-[90dvh] w-full max-w-[920px] overflow-hidden rounded-[14px] border border-border-subtle bg-surface"
+      class="glass-regular auth-card h-[90dvh] w-full max-w-[920px] overflow-hidden rounded-[22px]"
       :class="{ register: mode === 'register' }"
     >
       <div class="auth-image">

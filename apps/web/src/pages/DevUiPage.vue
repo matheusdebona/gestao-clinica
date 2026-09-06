@@ -5,11 +5,13 @@ import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import MetricCard from '@/components/patterns/MetricCard.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
+import MoneyInput from '@/components/patterns/MoneyInput.vue'
 import NotificationInboxItem from '@/components/patterns/NotificationInboxItem.vue'
 import RankBar from '@/components/patterns/RankBar.vue'
 import StockStatusBadge from '@/components/patterns/StockStatusBadge.vue'
 import WizardStepper from '@/components/patterns/WizardStepper.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
+import AppSheet from '@/components/ui/AppSheet.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
@@ -19,6 +21,7 @@ import ColorSwatch from '@/components/ui/ColorSwatch.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormField from '@/components/ui/FormField.vue'
+import GlassSurface from '@/components/ui/GlassSurface.vue'
 import InlineAlert from '@/components/ui/InlineAlert.vue'
 import Input from '@/components/ui/Input.vue'
 import LineChart from '@/components/ui/LineChart.vue'
@@ -28,6 +31,7 @@ import NavBadge from '@/components/ui/NavBadge.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
+import Radio from '@/components/ui/Radio.vue'
 import SearchField from '@/components/ui/SearchField.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
@@ -47,11 +51,14 @@ const numberValue = ref('12')
 const passwordValue = ref('senha123')
 const passwordConfirmValue = ref('senha123')
 const emailValue = ref('maria@clinica.test')
+const telValue = ref('11999990000')
 const dateValue = ref('2026-09-05')
 const datetimeValue = ref('2026-09-08T14:30')
 const notesValue = ref('Observações da consulta')
 const selectValue = ref('protocolo-a')
 const searchValue = ref('')
+const moneyValue = ref('1280,00')
+const radioValue = ref('presencial')
 const checked = ref(true)
 const enabled = ref(false)
 const loadingPrimary = ref(false)
@@ -69,6 +76,7 @@ function formatChartValue(value: number): string {
 }
 
 const dialogOpen = ref(false)
+const sheetOpen = ref(false)
 const confirmOpen = ref(false)
 const confirmPrimaryOpen = ref(false)
 const page = ref(2)
@@ -77,6 +85,11 @@ const selectOptions = [
   { value: 'protocolo-a', label: 'Protocolo A' },
   { value: 'protocolo-b', label: 'Protocolo B' },
   { value: 'protocolo-c', label: 'Protocolo C' },
+]
+
+const radioOptions = [
+  { value: 'presencial', label: 'Presencial' },
+  { value: 'remoto', label: 'Remoto' },
 ]
 
 const palette = [
@@ -100,15 +113,30 @@ function simulateLoading() {
 </script>
 
 <template>
-  <div class="min-h-screen bg-canvas">
+  <div class="min-h-screen">
     <div class="mx-auto flex w-full max-w-[720px] flex-col gap-8 px-5 py-10 md:px-8">
       <PageHeader
+        sticky
         title="Componentes"
-        description="Violeta como acento. O resto é silêncio — para validar antes das telas da clínica."
+        description="Soft Violet Liquid Glass (heavy). Violeta só como acento — o resto é material translúcido."
       />
 
       <section class="flex flex-col gap-2">
-        <p class="section-label">Aparência</p>
+        <p class="section-label">Materiais</p>
+        <div class="grid gap-3 sm:grid-cols-3">
+          <GlassSurface material="regular" padding>
+            <p class="text-[13px] font-medium text-title">glass-regular</p>
+            <p class="mt-1 text-[13px] text-muted">Cards, dialogs, menus, shell clara.</p>
+          </GlassSurface>
+          <GlassSurface material="clear" padding>
+            <p class="text-[13px] font-medium text-title">glass-clear</p>
+            <p class="mt-1 text-[13px] text-muted">Search, chips, sticky, botões secundários.</p>
+          </GlassSurface>
+          <GlassSurface material="dark" padding>
+            <p class="text-[13px] font-medium text-inverse">glass-dark</p>
+            <p class="mt-1 text-[13px] text-inverse/60">Sidebar, toast.</p>
+          </GlassSurface>
+        </div>
         <SurfaceCard>
           <div class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
             <ColorSwatch
@@ -117,7 +145,13 @@ function simulateLoading() {
               :name="s.name"
               :hex="s.hex"
             />
+            <ColorSwatch name="Regular" swatch-class="glass-regular" />
+            <ColorSwatch name="Clear" swatch-class="glass-clear" />
+            <ColorSwatch name="Dark" swatch-class="glass-dark" />
           </div>
+          <p class="mt-4 text-[13px] text-muted">
+            Com prefers-reduced-transparency as superfícies ficam sólidas (canvas, surface, input).
+          </p>
         </SurfaceCard>
       </section>
 
@@ -203,6 +237,11 @@ function simulateLoading() {
             @search="toast.info(searchValue || 'Nada para buscar')"
           />
           <div class="mt-4">
+            <FormField label="Busca (input)" html-for="ok-search">
+              <Input id="ok-search" v-model="searchValue" type="search" placeholder="SKU ou nome" />
+            </FormField>
+          </div>
+          <div class="mt-4">
             <ClientSearchBar
               v-model="searchValue"
               @search="toast.info(searchValue || 'Nada para buscar')"
@@ -238,6 +277,12 @@ function simulateLoading() {
               <FormField label="E-mail" html-for="ok-email">
                 <Input id="ok-email" v-model="emailValue" type="email" />
               </FormField>
+              <FormField label="WhatsApp" html-for="ok-tel">
+                <Input id="ok-tel" v-model="telValue" type="tel" />
+              </FormField>
+              <FormField label="Valor" html-for="ok-money">
+                <MoneyInput id="ok-money" v-model="moneyValue" />
+              </FormField>
               <FormField label="Data" html-for="ok-date">
                 <Input id="ok-date" v-model="dateValue" type="date" />
               </FormField>
@@ -250,11 +295,28 @@ function simulateLoading() {
               <FormField label="Protocolo" html-for="ok-select">
                 <Select id="ok-select" v-model="selectValue" :options="selectOptions" />
               </FormField>
+              <FormField label="Atendimento" html-for="ok-radio">
+                <Radio id="ok-radio" v-model="radioValue" name="dev-radio" :options="radioOptions" />
+              </FormField>
+              <FormField label="Atendimento (desabilitado)">
+                <Radio
+                  v-model="radioValue"
+                  name="dev-radio-disabled"
+                  disabled
+                  :options="radioOptions"
+                />
+              </FormField>
               <div class="border-t border-border-divider pt-3">
                 <Checkbox v-model="checked" label="Lembrar neste dispositivo" />
               </div>
               <div class="border-t border-border-divider pt-3">
+                <Checkbox :model-value="false" disabled label="Desabilitado" />
+              </div>
+              <div class="border-t border-border-divider pt-3">
                 <Switch v-model="enabled" label="Notificações" />
+              </div>
+              <div class="border-t border-border-divider pt-3">
+                <Switch :model-value="true" disabled label="Switch desabilitado" />
               </div>
               <FormField label="Cartão">
                 <MaskedBox value="•••• 4242" />
@@ -287,6 +349,11 @@ function simulateLoading() {
                   <Input id="err-email" v-model="emailValue" type="email" :invalid="invalid" />
                 </template>
               </FormField>
+              <FormField label="Valor" error="Informe um valor." html-for="err-money">
+                <template #default="{ invalid }">
+                  <MoneyInput id="err-money" v-model="moneyValue" :invalid="invalid" />
+                </template>
+              </FormField>
               <FormField label="Data" error="Escolha uma data." html-for="err-date">
                 <template #default="{ invalid }">
                   <Input id="err-date" v-model="dateValue" type="date" :invalid="invalid" />
@@ -311,6 +378,14 @@ function simulateLoading() {
                     :invalid="invalid"
                   />
                 </template>
+              </FormField>
+              <FormField label="Atendimento" error="Escolha uma opção.">
+                <Radio
+                  v-model="radioValue"
+                  name="dev-radio-err"
+                  invalid
+                  :options="radioOptions"
+                />
               </FormField>
               <InlineAlert>Corrija os campos acima para continuar.</InlineAlert>
             </div>
@@ -476,7 +551,7 @@ function simulateLoading() {
 
       <section class="flex flex-col gap-2">
         <p class="section-label">Navegação</p>
-        <SurfaceCard class="!bg-sidebar">
+        <GlassSurface material="dark" padding>
           <div class="flex flex-col gap-0.5">
             <SidebarNavItem label="Início" active />
             <SidebarNavItem label="Alertas">
@@ -487,7 +562,7 @@ function simulateLoading() {
             <SidebarNavItem label="Clientes" />
             <SidebarNavItem label="Sair" disabled />
           </div>
-        </SurfaceCard>
+        </GlassSurface>
       </section>
 
       <section class="flex flex-col gap-2">
@@ -515,6 +590,7 @@ function simulateLoading() {
         <SurfaceCard>
           <div class="flex flex-wrap gap-2">
             <Button variant="secondary" @click="dialogOpen = true">Detalhe</Button>
+            <Button variant="secondary" @click="sheetOpen = true">Painel</Button>
             <Button variant="destructive" @click="confirmOpen = true">Excluir</Button>
             <Button variant="secondary" @click="confirmPrimaryOpen = true">Confirmar valor</Button>
           </div>
@@ -525,10 +601,23 @@ function simulateLoading() {
     <AppDialog
       v-model:open="dialogOpen"
       title="Detalhe"
-      description="Painel curto. No telefone, preferir sheet."
+      description="Painel flutuante em glass-regular. No telefone, preferir sheet."
     >
       <p>Conteúdo secundário fica aqui, sem decoração extra.</p>
     </AppDialog>
+
+    <AppSheet
+      v-model:open="sheetOpen"
+      title="Filtros"
+      description="Sheet flutuante em glass-regular — embaixo no telefone, à direita no desktop."
+    >
+      <FormField label="Busca">
+        <SearchField v-model="searchValue" placeholder="Filtrar" />
+      </FormField>
+      <div class="mt-4">
+        <Select v-model="selectValue" :options="selectOptions" />
+      </div>
+    </AppSheet>
 
     <ConfirmDialog
       v-model:open="confirmOpen"

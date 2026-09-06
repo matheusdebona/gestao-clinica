@@ -19,16 +19,23 @@ const labelClass = computed(() => {
   if (props.variant === 'danger') return 'text-danger'
   return 'text-brand'
 })
+
+const surfaceClass = computed(() => {
+  if (props.variant === 'success') return 'glass-chip-success'
+  if (props.variant === 'warning') return 'glass-chip-warning'
+  if (props.variant === 'danger') return 'glass-chip-danger'
+  return 'glass-chip-brand'
+})
 </script>
 
 <template>
   <div
-    :class="cn('flex gap-3 border-b border-border-divider py-3 last:border-b-0 last:pb-0 first:pt-0')"
+    :class="cn('glass-chip flex gap-3 rounded-[14px] px-3.5 py-3', surfaceClass)"
     role="status"
   >
     <div class="min-w-0">
       <p v-if="title" :class="['text-[15px] font-medium', labelClass]">{{ title }}</p>
-      <p class="text-[15px] text-muted">
+      <p class="text-[15px] text-body">
         <slot />
       </p>
     </div>

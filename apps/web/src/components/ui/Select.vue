@@ -46,10 +46,7 @@ const selectedLabel = computed(
 
 const triggerClass = computed(() =>
   cn(
-    'inline-flex h-11 w-full items-center justify-between gap-2 rounded-[10px] border bg-input px-3.5 text-[15px] text-title outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-    props.invalid
-      ? 'border-danger/50 bg-danger-light'
-      : 'border-transparent data-[state=open]:border-brand/40 data-[state=open]:bg-surface',
+    'glass-field inline-flex h-11 w-full items-center justify-between gap-2 rounded-[12px] px-3.5 text-[15px] text-title outline-none disabled:cursor-not-allowed disabled:opacity-50',
   ),
 )
 </script>
@@ -68,8 +65,8 @@ const triggerClass = computed(() =>
     </SelectTrigger>
     <SelectPortal>
       <SelectContent
-        class="z-50 min-w-[var(--reka-select-trigger-width)] overflow-hidden rounded-[12px] border border-border-subtle bg-surface shadow-floating"
-        :side-offset="6"
+        class="glass-menu z-50 min-w-[var(--reka-select-trigger-width)] overflow-hidden rounded-[14px]"
+        :side-offset="8"
         position="popper"
       >
         <SelectViewport class="p-1">
@@ -77,7 +74,7 @@ const triggerClass = computed(() =>
             v-for="option in options"
             :key="option.value"
             :value="option.value"
-            class="relative flex cursor-pointer select-none items-center rounded-[8px] py-2.5 pr-8 pl-3 text-[15px] text-body outline-none data-[highlighted]:bg-surface-muted data-[state=checked]:text-title"
+            class="relative flex cursor-pointer select-none items-center rounded-[10px] py-2.5 pr-8 pl-3 text-[15px] text-body outline-none data-[highlighted]:bg-brand-light/60 data-[state=checked]:text-title"
           >
             <SelectItemText>{{ option.label }}</SelectItemText>
             <SelectItemIndicator class="absolute right-2 inline-flex items-center">

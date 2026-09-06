@@ -33,7 +33,7 @@ const emit = defineEmits<{
 <template>
   <button
     type="button"
-    class="flex w-full items-center gap-3 bg-transparent px-1 py-3 text-left first:pt-0 last:pb-0"
+    class="flex w-full items-center gap-3 rounded-[12px] bg-transparent px-2 py-3 text-left transition-colors first:mt-0 hover:bg-surface/35"
     @click="emit('action')"
   >
     <div class="min-w-0 flex-1">
