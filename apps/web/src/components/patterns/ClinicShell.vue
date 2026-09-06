@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import {
   Bell,
   ClipboardList,
+  FileText,
   LayoutDashboard,
   LogOut,
   Package,
@@ -23,18 +24,25 @@ const auth = useAuthStore()
 
 const items = computed(() => {
   const all = [
-    { to: '/', label: 'Início', icon: LayoutDashboard },
-    { to: '/clients', label: 'Clientes', icon: Users, permission: 'clients.view' },
+    { to: '/', label: 'Início', icon: LayoutDashboard, pinMobile: true },
+    { to: '/clients', label: 'Clientes', icon: Users, permission: 'clients.view', pinMobile: true },
     { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view' },
-    { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view' },
+    { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', pinMobile: true },
     { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view' },
-    { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view' },
+    { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', pinMobile: true },
+    { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view', pinMobile: true },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
     { to: '/notifications', label: 'Alertas', icon: Bell },
     { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view' },
   ]
 
   return all.filter((item) => !item.permission || auth.can(item.permission) || auth.permissions.length === 0)
+})
+
+const mobileItems = computed(() => {
+  const pinned = items.value.filter((item) => item.pinMobile)
+  const rest = items.value.filter((item) => !item.pinMobile)
+  return [...pinned, ...rest].slice(0, 5)
 })
 
 function isNavActive(to: string) {
@@ -94,7 +102,7 @@ async function onLogout() {
         class="fixed inset-x-0 bottom-0 z-30 flex justify-around border-t border-border-subtle bg-surface px-2 py-2 md:hidden"
       >
         <RouterLink
-          v-for="item in items.slice(0, 5)"
+          v-for="item in mobileItems"
           :key="item.to"
           :to="item.to"
           class="flex flex-col items-center gap-1 px-2 py-1 text-[11px]"

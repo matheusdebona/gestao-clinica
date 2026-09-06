@@ -4,6 +4,7 @@ import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import StockStatusBadge from '@/components/patterns/StockStatusBadge.vue'
+import WizardStepper from '@/components/patterns/WizardStepper.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
@@ -46,9 +47,12 @@ const checked = ref(true)
 const enabled = ref(false)
 const loadingPrimary = ref(false)
 const itemQty = ref('1')
+const itemPrice = ref('80')
+const wizardStep = ref(1)
 
 const dialogOpen = ref(false)
 const confirmOpen = ref(false)
+const confirmPrimaryOpen = ref(false)
 const page = ref(2)
 
 const selectOptions = [
@@ -129,6 +133,17 @@ function simulateLoading() {
                 title="Toxina 100U"
                 unit="Frasco (un)"
                 line-sale="80.00"
+                @remove="toast.info('Item removido')"
+              />
+            </div>
+            <div class="mt-4">
+              <ItemLineRow
+                v-model:quantity="itemQty"
+                v-model:unit-price="itemPrice"
+                title="Ácido hialurônico"
+                unit="Seringa (un)"
+                line-sale="160.00"
+                show-unit-price
                 @remove="toast.info('Item removido')"
               />
             </div>
@@ -306,6 +321,23 @@ function simulateLoading() {
       </section>
 
       <section class="flex flex-col gap-2">
+        <p class="section-label">Assistente</p>
+        <SurfaceCard>
+          <WizardStepper
+            :steps="[
+              { id: 'cliente', label: 'Cliente' },
+              { id: 'itens', label: 'Itens' },
+              { id: 'valores', label: 'Valores' },
+              { id: 'pagamentos', label: 'Pagamentos' },
+              { id: 'revisar', label: 'Revisar' },
+            ]"
+            :current="wizardStep"
+            @select="wizardStep = $event"
+          />
+        </SurfaceCard>
+      </section>
+
+      <section class="flex flex-col gap-2">
         <p class="section-label">Lista</p>
         <SurfaceCard>
           <div class="divide-y divide-border-divider">
@@ -371,6 +403,7 @@ function simulateLoading() {
           <div class="flex flex-wrap gap-2">
             <Button variant="secondary" @click="dialogOpen = true">Detalhe</Button>
             <Button variant="destructive" @click="confirmOpen = true">Excluir</Button>
+            <Button variant="secondary" @click="confirmPrimaryOpen = true">Confirmar valor</Button>
           </div>
         </SurfaceCard>
       </section>
@@ -390,6 +423,14 @@ function simulateLoading() {
       description="Não dá para desfazer."
       confirm-label="Excluir"
       @confirm="toast.success('Excluído')"
+    />
+    <ConfirmDialog
+      v-model:open="confirmPrimaryOpen"
+      title="Confirmar abaixo do mínimo?"
+      description="O valor efetivo ficou abaixo do piso. Continuar mesmo assim?"
+      confirm-label="Confirmar mesmo assim"
+      confirm-variant="primary"
+      @confirm="toast.success('Confirmado')"
     />
   </div>
 </template>

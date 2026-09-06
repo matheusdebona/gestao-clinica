@@ -22,11 +22,24 @@ class SaleController extends Controller
 {
     public function __construct(private readonly SalePricingService $pricing) {}
 
+    /**
+     * List sales in the current clinic.
+     *
+     * Query: `q` (client name or WhatsApp), `status` (draft|confirmed|cancelled), `client_id`.
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Sale::query()
-            ->with(['client', 'items.product', 'payments.paymentMethod'])
+            ->with(['client', 'items.product.unitOfMeasure', 'payments.paymentMethod', 'treatment'])
             ->orderByDesc('id');
+
+        if ($request->filled('q')) {
+            $term = '%'.$request->string('q')->toString().'%';
+            $query->whereHas('client', function ($builder) use ($term): void {
+                $builder->where('name', 'like', $term)
+                    ->orWhere('whatsapp', 'like', $term);
+            });
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->string('status')->toString());
@@ -55,7 +68,7 @@ class SaleController extends Controller
 
     public function show(Sale $sale): SaleResource
     {
-        return new SaleResource($sale);
+        return new SaleResource($sale->load(['treatment']));
     }
 
     public function update(UpdateSaleRequest $request, Sale $sale): SaleResource

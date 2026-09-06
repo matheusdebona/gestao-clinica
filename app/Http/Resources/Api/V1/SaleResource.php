@@ -12,7 +12,7 @@ class SaleResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $this->resource->loadMissing(['items.product', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser']);
+        $this->resource->loadMissing(['items.product.unitOfMeasure', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser', 'treatment']);
 
         $minAmount = $this->minAmount();
         $costTotal = $this->costTotal();
@@ -35,6 +35,7 @@ class SaleResource extends JsonResource
             'payments_balance' => number_format((float) $this->effective_amount - (float) $paymentsTotal, 2, '.', ''),
             'status' => $this->status,
             'notes' => $this->notes,
+            'treatment_id' => $this->treatment?->id,
             'client' => ClientResource::make($this->whenLoaded('client')),
             'items' => SaleItemResource::collection($this->whenLoaded('items')),
             'payments' => SalePaymentResource::collection($this->whenLoaded('payments')),

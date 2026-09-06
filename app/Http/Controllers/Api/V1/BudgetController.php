@@ -17,18 +17,30 @@ class BudgetController extends Controller
 {
     public function __construct(private readonly BudgetService $budgets) {}
 
+    /**
+     * Inbox of budgets in the current clinic.
+     *
+     * Query: `sale_id`, `client_id`, `status`. Superseded rows are hidden unless
+     * `status` is set or `include_superseded=1`.
+     */
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = Budget::query()
-            ->with(['items', 'client'])
+            ->with(['items', 'client', 'sale'])
             ->orderByDesc('id');
 
         if ($request->filled('sale_id')) {
             $query->where('sale_id', $request->integer('sale_id'));
         }
 
+        if ($request->filled('client_id')) {
+            $query->where('client_id', $request->integer('client_id'));
+        }
+
         if ($request->filled('status')) {
             $query->where('status', $request->string('status')->toString());
+        } elseif (! $request->boolean('include_superseded')) {
+            $query->where('status', '!=', Budget::STATUS_SUPERSEDED);
         }
 
         return BudgetResource::collection($query->paginate(20));

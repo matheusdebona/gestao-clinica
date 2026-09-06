@@ -12,18 +12,20 @@ import Button from './Button.vue'
 
 const open = defineModel<boolean>('open', { default: false })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title?: string
     description?: string
     confirmLabel?: string
     cancelLabel?: string
+    confirmVariant?: 'destructive' | 'primary'
   }>(),
   {
     title: 'Confirmar',
     description: 'Esta ação não pode ser desfeita.',
     confirmLabel: 'Confirmar',
     cancelLabel: 'Cancelar',
+    confirmVariant: 'destructive',
   },
 )
 
@@ -50,7 +52,7 @@ const emit = defineEmits<{
             <Button variant="ghost">{{ cancelLabel }}</Button>
           </DialogClose>
           <Button
-            variant="destructive"
+            :variant="props.confirmVariant"
             @click="
               () => {
                 emit('confirm')
