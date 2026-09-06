@@ -86,7 +86,7 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
           <dd class="mt-0.5 text-[15px] text-title">{{ unit.symbol }}</dd>
         </div>
         <div>
-          <dt class="text-[13px] text-muted">Status</dt>
+          <dt class="text-[13px] text-muted">Situação</dt>
           <dd class="mt-0.5 text-[15px] text-title">{{ unit.is_active ? 'Ativa' : 'Inativa' }}</dd>
         </div>
       </dl>

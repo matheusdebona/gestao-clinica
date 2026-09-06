@@ -29,7 +29,7 @@ const page = ref(1)
 const status = ref('')
 
 const statusOptions = [
-  { value: '', label: 'Todos os status' },
+  { value: '', label: 'Todas as situações' },
   { value: 'draft', label: SALE_STATUS_LABELS.draft },
   { value: 'confirmed', label: SALE_STATUS_LABELS.confirmed },
   { value: 'cancelled', label: SALE_STATUS_LABELS.cancelled },
@@ -101,7 +101,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhuma venda encontrada' : 'Nenhu
         @search="onSearch"
       />
 
-      <FormField label="Status">
+      <FormField label="Situação">
         <Select v-model="status" :options="statusOptions" />
       </FormField>
 
@@ -120,7 +120,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhuma venda encontrada' : 'Nenhu
       <SurfaceCard v-else-if="sales.length === 0" :padding="false">
         <EmptyState
           :title="emptyTitle"
-          :description="q || status ? 'Tente outro cliente ou status.' : 'Monte a primeira venda da clínica.'"
+          :description="q || status ? 'Tente outro cliente ou situação.' : 'Monte a primeira venda da clínica.'"
         >
           <template v-if="!q && !status" #action>
             <PermissionGate permission="sales.create">

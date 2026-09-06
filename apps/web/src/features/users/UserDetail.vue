@@ -145,7 +145,7 @@ const permissionList = computed(() =>
             <dd class="mt-0.5 text-title">{{ displayRoles(user.roles) || '—' }}</dd>
           </div>
           <div>
-            <dt class="text-[13px] text-muted">Status</dt>
+            <dt class="text-[13px] text-muted">Situação</dt>
             <dd class="mt-0.5 text-title">{{ user.is_active ? 'Ativo' : 'Inativo' }}</dd>
           </div>
           <div v-if="permissionList.length">

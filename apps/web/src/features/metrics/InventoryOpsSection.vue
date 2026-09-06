@@ -134,7 +134,7 @@ function pendingMeta(row: (typeof pending.value)[number]) {
       </div>
 
       <SurfaceCard v-if="operations">
-        <p class="text-[13px] font-medium text-muted">Sessões por status</p>
+        <p class="text-[13px] font-medium text-muted">Sessões por situação</p>
         <div class="mt-2 divide-y divide-border-divider">
           <RankBar
             v-for="row in sessionRows"

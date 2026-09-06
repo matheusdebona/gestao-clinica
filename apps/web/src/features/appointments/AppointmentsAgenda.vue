@@ -51,7 +51,7 @@ const viewItems = [
 ]
 
 const statusOptions = [
-  { value: '', label: 'Todos os status' },
+  { value: '', label: 'Todas as situações' },
   { value: 'scheduled', label: APPOINTMENT_STATUS_LABELS.scheduled },
   { value: 'in_progress', label: APPOINTMENT_STATUS_LABELS.in_progress },
   { value: 'completed', label: APPOINTMENT_STATUS_LABELS.completed },
@@ -188,7 +188,7 @@ function onClientSearch(value: string) {
         </div>
       </div>
 
-      <FormField label="Status">
+      <FormField label="Situação">
         <Select v-model="status" :options="statusOptions" />
       </FormField>
 

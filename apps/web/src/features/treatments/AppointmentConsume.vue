@@ -263,7 +263,7 @@ const completePending = computed(() => completeMutation.isPending.value)
 
     <template v-else-if="appointment">
       <Banner v-if="!isInProgress" variant="warning" title="Sessão não está em atendimento">
-        Só dá para registrar consumo com a sessão em andamento. Status atual:
+        Só dá para registrar consumo com a sessão em andamento. Situação atual:
         {{ APPOINTMENT_STATUS_LABELS[appointment.status] }}.
       </Banner>
       <Banner
