@@ -19,6 +19,7 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 ## Forms
 - `FormField` — label + hint + **error 422**; slot gets `{ invalid }`
 - `Input` — `text` | `number` | `password` | `email` | `date` | `search` | `tel`
+- `PasswordInput` — senha com mostrar/ocultar (olho)
 - `Textarea`, `Select`, `Checkbox`, `Switch`
 - `SearchField`, `MaskedBox`
 

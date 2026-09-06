@@ -28,10 +28,11 @@ const emit = defineEmits<{
   >
     <CheckboxRoot
       :id="id"
-      :checked="modelValue"
+      :model-value="modelValue"
       :disabled="disabled"
       class="flex size-[22px] shrink-0 items-center justify-center rounded-[6px] border border-border-subtle bg-surface outline-none data-[state=checked]:border-brand data-[state=checked]:bg-brand"
-      @update:checked="(v: boolean | 'indeterminate') => emit('update:modelValue', v === true)"
+      @update:model-value="(v: boolean | 'indeterminate') => emit('update:modelValue', v === true)"
+      @click.stop
     >
       <CheckboxIndicator>
         <Check class="size-3.5 text-inverse" :stroke-width="3" />

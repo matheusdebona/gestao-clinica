@@ -5,6 +5,7 @@ import authClinic from '@/assets/auth-clinic.jpg'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
+import PasswordInput from '@/components/ui/PasswordInput.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
@@ -123,10 +124,9 @@ async function submitRegister() {
           </FormField>
           <FormField label="Senha" :error="loginErrors.password" html-for="login-password">
             <template #default="{ invalid }">
-              <Input
+              <PasswordInput
                 id="login-password"
                 v-model="loginForm.password"
-                type="password"
                 autocomplete="current-password"
                 :invalid="invalid"
               />
@@ -176,10 +176,9 @@ async function submitRegister() {
             html-for="reg-password"
           >
             <template #default="{ invalid }">
-              <Input
+              <PasswordInput
                 id="reg-password"
                 v-model="registerForm.password"
-                type="password"
                 autocomplete="new-password"
                 :invalid="invalid"
               />
@@ -191,10 +190,9 @@ async function submitRegister() {
             html-for="reg-password-2"
           >
             <template #default="{ invalid }">
-              <Input
+              <PasswordInput
                 id="reg-password-2"
                 v-model="registerForm.password_confirmation"
-                type="password"
                 autocomplete="new-password"
                 :invalid="invalid"
               />

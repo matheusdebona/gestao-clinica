@@ -8,6 +8,7 @@ import {
   Package,
   Receipt,
   Stethoscope,
+  UserCog,
   Users,
   ChartNoAxesCombined,
 } from '@lucide/vue'
@@ -23,6 +24,7 @@ const items = computed(() => {
   const all = [
     { to: '/', label: 'Início', icon: LayoutDashboard },
     { to: '/clients', label: 'Clientes', icon: Users, permission: 'clients.view' },
+    { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view' },
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view' },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
