@@ -5,6 +5,7 @@ import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import MetricCard from '@/components/patterns/MetricCard.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
+import NotificationInboxItem from '@/components/patterns/NotificationInboxItem.vue'
 import RankBar from '@/components/patterns/RankBar.vue'
 import StockStatusBadge from '@/components/patterns/StockStatusBadge.vue'
 import WizardStepper from '@/components/patterns/WizardStepper.vue'
@@ -23,6 +24,7 @@ import Input from '@/components/ui/Input.vue'
 import LineChart from '@/components/ui/LineChart.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
+import NavBadge from '@/components/ui/NavBadge.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
@@ -447,6 +449,27 @@ function simulateLoading() {
               badge-variant="purple"
               @action="toast.info('Sessão')"
             />
+            <NotificationInboxItem
+              title="Estoque baixo"
+              message="O produto Ácido está no/abaixo do estoque mínimo."
+              relative-time="há 5 minutos"
+              unread
+              @action="toast.info('Alerta não lido')"
+            />
+            <NotificationInboxItem
+              title="Estoque no agendamento"
+              message="Alerta de estoque no agendamento #12."
+              relative-time="ontem"
+              @action="toast.info('Alerta lido')"
+            />
+            <NotificationInboxItem
+              title="Alerta"
+              message="Tipo ainda não mapeado."
+              relative-time="há 3 dias"
+              unread
+              :navigable="false"
+              @action="toast.info('Só marcar lida')"
+            />
           </div>
         </SurfaceCard>
       </section>
@@ -456,6 +479,11 @@ function simulateLoading() {
         <SurfaceCard class="!bg-sidebar">
           <div class="flex flex-col gap-0.5">
             <SidebarNavItem label="Início" active />
+            <SidebarNavItem label="Alertas">
+              <template #badge>
+                <NavBadge :count="3" />
+              </template>
+            </SidebarNavItem>
             <SidebarNavItem label="Clientes" />
             <SidebarNavItem label="Sair" disabled />
           </div>

@@ -10,12 +10,18 @@ class NotificationResource extends JsonResource
 {
     public static bool $forceWrapping = true;
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(Request $request): array
     {
+        $data = $this->data;
+
         return [
             'id' => $this->id,
             'type' => $this->type,
-            'data' => $this->data,
+            'type_key' => is_array($data) ? ($data['type'] ?? null) : null,
+            'data' => $data,
             'read_at' => $this->read_at,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

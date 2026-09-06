@@ -274,9 +274,10 @@ Route::prefix('v1')->group(function (): void {
         Route::get('metrics/operations', [MetricsController::class, 'operations'])
             ->middleware('permission:metrics.view');
 
+        Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
         Route::get('notifications', [NotificationController::class, 'index']);
-        Route::post('notifications/{id}/read', [NotificationController::class, 'markRead']);
         Route::post('notifications/read-all', [NotificationController::class, 'markAllRead']);
+        Route::post('notifications/{id}/read', [NotificationController::class, 'markRead']);
 
         Route::get('treatments', [TreatmentController::class, 'index'])
             ->middleware('permission:treatments.view|appointments.manage');

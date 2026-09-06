@@ -294,7 +294,8 @@ Validação: Zod no client + exibir `errors.field` do Laravel `422`.
 | `PermissionGate` | Renderiza slot só se `/auth/me` tiver a permission Spatie |
 | `ClientSearchBar` | Busca clientes (`?q=`) — usa `SearchField` |
 | `StockStatusBadge` | Normal / low / reorder / negativo (success / warning / danger / purple) |
-| `NotificationInboxItem` | Linha do inbox (`low_stock`, `projected_low_stock`, `reorder_point`, …) |
+| `NotificationInboxItem` | Linha do inbox (`low_stock`, `projected_low_stock`, `appointment_stock_warning`, …) |
+| `NavBadge` | Contador numérico de não lidas no item Alertas |
 | `ClinicShell` | AppShell Soft Violet + nav filtrada por permissions |
 
 ### 5.9 Kitchen sink
@@ -390,7 +391,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | **4.6** | **Agendamentos** (agenda completa) | feito |
 | **4.7** | **Tratamento — consumo clínico** (baixa estoque) | feito |
 | **4.8** | **Métricas** | feito |
-| **4.9** | **Notificações** | detalhe abaixo |
+| **4.9** | **Notificações** | feito |
 
 Cada feature: páginas mobile-first + `PermissionGate` nas ações.
 
@@ -847,9 +848,9 @@ Usar **`data.type`** na UI (o campo `type` do Resource é FQCN da classe Laravel
 
 Já existem: `GET /notifications`, `POST …/{id}/read`, `POST …/read-all` (auth + clinic; **sem** permission Spatie na rota).
 
-- [ ] Filtros: `?unread=1`, `?category=stock|agenda` (ou mapear por `data.type`) — **necessário para chips**
-- [ ] Contador: `GET /notifications/unread-count` **ou** listagem unread com total — **necessário para badge**
-- [ ] Resource pode expor `data.type` no topo (`type_key`) para facilitar o client (opcional)
+- [x] Filtros: `?unread=1`, `?category=stock|agenda` (ou mapear por `data.type`) — **necessário para chips**
+- [x] Contador: `GET /notifications/unread-count` **ou** listagem unread com total — **necessário para badge**
+- [x] Resource pode expor `data.type` no topo (`type_key`) para facilitar o client (opcional)
 
 Destinatários dos jobs: usuários ativos da clínica com `products.view` (já no `StockAlertService`).
 
@@ -872,19 +873,19 @@ Nav label: **Alertas** (já no shell) — ocultar sem `products.view`.
 
 ##### Patterns
 
-- [ ] `NotificationInboxItem` (título, message, tempo relativo, unread)
-- [ ] `NavBadge` no item Alertas
+- [x] `NotificationInboxItem` (título, message, tempo relativo, unread)
+- [x] `NavBadge` no item Alertas
 - Reutilizar `ListCard`/`EmptyState`/`PageHeader`/`Button`
 
 ##### DoD 4.9
 
-- [ ] Inbox com chips Todas/Não lidas/Estoque/Agenda
-- [ ] Tap marca lida e navega; mark-all funciona
-- [ ] Badge numérico na nav; item só com `products.view`
-- [ ] Empty state com a copy acordada
-- [ ] Tipos desconhecidos não quebram a lista
-- [ ] Gaps de API (filtros + unread count) cobertos por testes
-- [ ] Push real **não** bloqueia o DoD
+- [x] Inbox com chips Todas/Não lidas/Estoque/Agenda
+- [x] Tap marca lida e navega; mark-all funciona
+- [x] Badge numérico na nav; item só com `products.view`
+- [x] Empty state com a copy acordada
+- [x] Tipos desconhecidos não quebram a lista
+- [x] Gaps de API (filtros + unread count) cobertos por testes
+- [x] Push real **não** bloqueia o DoD
 
 ### Fase 5 — PWA (depois da web estável)
 

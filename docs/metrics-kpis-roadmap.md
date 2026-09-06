@@ -283,4 +283,4 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 
 **Status Onda D:** implementado — `GET /api/v1/metrics/inventory` (snapshot + `from`/`to` opcionais, default 30d) e `GET /api/v1/metrics/operations` (período obrigatório, saldo a aplicar + lista).
 
-UI Fase 4.8: página `/metrics` (hero + seções A–D). Próximo no front: alertas in-app (Fase 4.9) e PWA (Fase 5).
+UI Fase 4.8: página `/metrics` (hero + seções A–D). UI Fase 4.9: inbox in-app de alertas. Próximo no front: PWA (Fase 5).

@@ -230,8 +230,9 @@ const router = createRouter({
         },
         {
           path: 'notifications',
-          meta: { title: 'Alertas' },
-          component: () => import('@/pages/ComingSoonPage.vue'),
+          name: 'notifications',
+          meta: { title: 'Alertas', permission: 'products.view' },
+          component: () => import('@/pages/NotificationsPage.vue'),
         },
         {
           path: 'metrics',

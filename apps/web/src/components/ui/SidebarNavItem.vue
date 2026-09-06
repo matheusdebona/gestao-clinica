@@ -29,6 +29,9 @@ const classes = computed(() =>
 <template>
   <span :class="classes" :aria-current="active ? 'page' : undefined">
     <component :is="icon" v-if="icon" class="size-4 shrink-0" :stroke-width="1.75" />
-    <span class="truncate">{{ label }}</span>
+    <span class="min-w-0 truncate">{{ label }}</span>
+    <span v-if="$slots.badge" class="ml-auto shrink-0">
+      <slot name="badge" />
+    </span>
   </span>
 </template>

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api\V1;
 
 use App\Jobs\CheckLowStockProductsJob;
+use App\Models\Appointment;
 use App\Models\Brand;
 use App\Models\Client;
 use App\Models\Clinic;
@@ -21,7 +22,9 @@ use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
@@ -258,5 +261,142 @@ class NotificationsLowStockTest extends TestCase
         $foreignId = $other->notifications()->firstOrFail()->id;
         $this->postJson("/api/v1/notifications/{$foreignId}/read")
             ->assertNotFound();
+    }
+
+    public function test_inbox_filters_unread_and_category(): void
+    {
+        $product = $this->makeProduct('Baixo', '1.0000', '5.0000');
+        $this->admin->notify(new LowStockProductNotification($product));
+        $this->admin->notify(new ProjectedLowStockNotification(
+            $product,
+            '2.0000',
+            '3.0000',
+            CarbonImmutable::parse('2026-09-06'),
+        ));
+
+        $appointment = Appointment::factory()->forClinic($this->clinic)->create();
+        $this->admin->notify(new AppointmentStockWarningNotification($appointment, ['Estoque insuficiente.']));
+
+        $this->insertInboxNotification($this->admin, [
+            'type' => 'future_channel',
+            'title' => 'Canal novo',
+            'message' => 'Ainda sem deep link.',
+        ]);
+
+        $lowStock = $this->admin->notifications->first(
+            fn ($notification) => ($notification->data['type'] ?? null) === 'low_stock',
+        );
+        $this->assertNotNull($lowStock);
+        $lowStock->markAsRead();
+
+        Sanctum::actingAs($this->admin);
+
+        $all = $this->getJson('/api/v1/notifications')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 4);
+
+        $this->assertContains('future_channel', $all->json('data.*.type_key'));
+        $this->assertContains('low_stock', $all->json('data.*.type_key'));
+
+        $unread = $this->getJson('/api/v1/notifications?unread=1')
+            ->assertOk();
+        $this->assertSame(3, $unread->json('meta.total'));
+        $this->assertTrue(collect($unread->json('data'))->every(fn ($row) => $row['read_at'] === null));
+
+        $stock = $this->getJson('/api/v1/notifications?category=stock')
+            ->assertOk();
+        $this->assertSame(2, $stock->json('meta.total'));
+        $this->assertEqualsCanonicalizing(
+            ['low_stock', 'projected_low_stock'],
+            $stock->json('data.*.type_key'),
+        );
+
+        $agenda = $this->getJson('/api/v1/notifications?category=agenda')
+            ->assertOk();
+        $this->assertSame(1, $agenda->json('meta.total'));
+        $this->assertSame('appointment_stock_warning', $agenda->json('data.0.type_key'));
+
+        $unreadStock = $this->getJson('/api/v1/notifications?unread=1&category=stock')
+            ->assertOk();
+        $this->assertSame(1, $unreadStock->json('meta.total'));
+        $this->assertSame('projected_low_stock', $unreadStock->json('data.0.type_key'));
+        $this->assertNull($unreadStock->json('data.0.read_at'));
+
+        $this->getJson('/api/v1/notifications?category=email')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['category']);
+    }
+
+    public function test_unread_count_decreases_after_read_and_read_all(): void
+    {
+        $product = $this->makeProduct('Baixo', '1.0000', '5.0000');
+        $this->admin->notify(new LowStockProductNotification($product));
+        $this->admin->notify(new ProjectedLowStockNotification(
+            $product,
+            '1.0000',
+            '2.0000',
+            CarbonImmutable::parse('2026-09-06'),
+        ));
+
+        Sanctum::actingAs($this->admin);
+
+        $this->getJson('/api/v1/notifications/unread-count')
+            ->assertOk()
+            ->assertJsonPath('data.unread_count', 2);
+
+        $id = $this->getJson('/api/v1/notifications?unread=1')->json('data.0.id');
+        $this->postJson("/api/v1/notifications/{$id}/read")->assertOk();
+
+        $this->getJson('/api/v1/notifications/unread-count')
+            ->assertOk()
+            ->assertJsonPath('data.unread_count', 1);
+
+        $this->postJson('/api/v1/notifications/read-all')->assertOk();
+
+        $this->getJson('/api/v1/notifications/unread-count')
+            ->assertOk()
+            ->assertJsonPath('data.unread_count', 0);
+
+        $this->getJson('/api/v1/notifications?unread=1')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 0);
+    }
+
+    public function test_unknown_type_exposes_type_key_without_breaking_list(): void
+    {
+        $this->insertInboxNotification($this->admin, [
+            'type' => 'mystery_alert',
+            'title' => 'Alerta genérico',
+            'message' => 'Sem destino.',
+        ]);
+
+        Sanctum::actingAs($this->admin);
+
+        $this->getJson('/api/v1/notifications')
+            ->assertOk()
+            ->assertJsonPath('data.0.type_key', 'mystery_alert')
+            ->assertJsonPath('data.0.data.title', 'Alerta genérico')
+            ->assertJsonPath('data.0.data.message', 'Sem destino.');
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    protected function insertInboxNotification(User $user, array $data): string
+    {
+        $id = (string) Str::uuid();
+
+        DB::table('notifications')->insert([
+            'id' => $id,
+            'type' => 'App\\Notifications\\UnknownTypeNotification',
+            'notifiable_type' => $user->getMorphClass(),
+            'notifiable_id' => $user->id,
+            'data' => json_encode($data, JSON_THROW_ON_ERROR),
+            'read_at' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return $id;
     }
 }
