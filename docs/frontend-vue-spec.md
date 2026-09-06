@@ -73,7 +73,7 @@ flowchart TD
 ```
 
 1. **Tokens** — cores, tipografia, spacing, radii, z-index (CSS variables + Tailwind theme).
-2. **Primitives** — Button, Input, Select, Textarea, Checkbox, Switch, Badge, Avatar, Spinner, Icon.
+2. **Primitives** — Button, Input, DatePicker, Select, Textarea, Checkbox, Switch, Badge, Avatar, Spinner, Icon.
 3. **Compostos** — FormField, Dialog/Sheet, Toast, Tabs, ListRow/Table, EmptyState, PageHeader, Skeleton, Banner.
 4. **Patterns de domínio** — ClientSearchBar, MoneyInput/Display, StockStatusBadge, PermissionGate, ClinicShell.
 5. **Páginas/features** — só depois do kitchen sink `/dev/ui` estar estável.
@@ -150,8 +150,8 @@ Dois materiais claros + um escuro. Implementar como classes em `tokens.css` (`gl
 | `glass-regular` | **Obrigatório** em cards (`SurfaceCard`), dialogs, sheets, menus, sidebar clara / tab bar, toasts escuros via `glass-dark` | bg ~branco 64%, blur 40px, saturate 180%, borda `rgba(255,255,255,0.22)`, sombra flutuante + highlight inset |
 | `glass-clear` | **Obrigatório** em search pill, chips/badges, botões secondary/accent, sticky headers, wells leves | bg ~branco 40%, blur 24px, saturate 160%, borda `rgba(255,255,255,0.14)` |
 | `glass-dark` | **Obrigatório** na sidebar desktop e toasts | bg `#1C1C1E` ~62%, mesmo blur/saturate do regular, borda branca ~16% |
-| `glass-field` | **Obrigatório** em todo controle que aceita input (text, email, password, number, search, tel, date, textarea, select trigger, masked, money) | bg ~branco 50%, blur 20px; foco sobe para regular + hairline brand |
-| `glass-menu` | **Obrigatório** em dropdowns / select / popover | igual regular, radius 14, elevação flutuante |
+| `glass-field` | **Obrigatório** em todo controle que aceita input (text, email, password, number, search, tel, datetime-local, textarea, select/DatePicker trigger, masked, money) | bg ~branco 50%, blur 20px; foco sobe para regular + hairline brand |
+| `glass-menu` | **Obrigatório** em dropdowns / select / DatePicker / popover | igual regular, radius 14, elevação flutuante |
 
 **Opcional:** glass em rows (`ListCard` hover), tracks de tabs, banners (tinted chip).
 
@@ -326,7 +326,8 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 | --- | --- | --- |
 | `Button` | primary / secondary / ghost / destructive | Primary: brand **sólido**; secondary/ghost hover em glass; loading / disabled |
 | `ButtonAccent` | CTA raro (outline glass, sem gradient) | Só destaques explícitos |
-| `Input` | Texto / number / password / email / date / datetime-local / search / tel | `glass-field`, radius ≥10; invalid via `aria-invalid` |
+| `Input` | Texto / number / password / email / datetime-local / search / tel | `glass-field`, radius ≥10; invalid via `aria-invalid`. **Não** usar `type="date"`. |
+| `DatePicker` | Data civil (não nativo) | `v-model` ISO `YYYY-MM-DD`; trigger `glass-field`; calendário `glass-menu`; PT-BR (Seg–Dom); `id` / `invalid` / `disabled`; Limpar / Hoje |
 | `Textarea` | Texto longo | idem |
 | `Select` | Escolha única (headless) | trigger `glass-field`; menu `glass-menu` flutuante |
 | `Radio` | Escolha única (grupo) | unchecked glass; checked brand sólido |

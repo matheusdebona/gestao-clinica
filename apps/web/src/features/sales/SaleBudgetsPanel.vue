@@ -5,8 +5,8 @@ import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
+import DatePicker from '@/components/ui/DatePicker.vue'
 import FormField from '@/components/ui/FormField.vue'
-import Input from '@/components/ui/Input.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Textarea from '@/components/ui/Textarea.vue'
@@ -158,7 +158,7 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
       <SurfaceCard>
         <div class="flex flex-col gap-3">
           <FormField label="Validade" html-for="budget-valid-until">
-            <Input id="budget-valid-until" v-model="validUntil" type="date" />
+            <DatePicker id="budget-valid-until" v-model="validUntil" />
           </FormField>
           <FormField label="Notas do orçamento" html-for="budget-notes">
             <Textarea id="budget-notes" v-model="notes" />

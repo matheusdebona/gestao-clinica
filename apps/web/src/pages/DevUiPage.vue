@@ -19,6 +19,7 @@ import ButtonAccent from '@/components/ui/ButtonAccent.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
 import ColorSwatch from '@/components/ui/ColorSwatch.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
+import DatePicker from '@/components/ui/DatePicker.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormField from '@/components/ui/FormField.vue'
 import GlassSurface from '@/components/ui/GlassSurface.vue'
@@ -56,6 +57,8 @@ const passwordConfirmValue = ref('senha123')
 const emailValue = ref('maria@clinica.test')
 const telValue = ref('11999990000')
 const dateValue = ref('2026-09-05')
+const dateEmpty = ref('')
+const datePickerOpen = ref(true)
 const datetimeValue = ref('2026-09-08T14:30')
 const notesValue = ref('Observações da consulta')
 const selectValue = ref('protocolo-a')
@@ -304,9 +307,13 @@ function simulateLoading() {
                 <MoneyInput id="ok-money" v-model="moneyValue" />
               </FormField>
               <FormField label="Data" html-for="ok-date">
-                <Input id="ok-date" v-model="dateValue" type="date" />
+                <DatePicker id="ok-date" v-model="dateValue" />
               </FormField>
-              <FormField label="Data e hora" html-for="ok-datetime">
+              <FormField
+                label="Data e hora"
+                hint="datetime-local nativo até existir DateTimePicker"
+                html-for="ok-datetime"
+              >
                 <Input id="ok-datetime" v-model="datetimeValue" type="datetime-local" />
               </FormField>
               <FormField label="Notas" html-for="ok-notes">
@@ -376,7 +383,7 @@ function simulateLoading() {
               </FormField>
               <FormField label="Data" error="Escolha uma data." html-for="err-date">
                 <template #default="{ invalid }">
-                  <Input id="err-date" v-model="dateValue" type="date" :invalid="invalid" />
+                  <DatePicker id="err-date" v-model="dateEmpty" :invalid="invalid" />
                 </template>
               </FormField>
               <FormField label="Data e hora" error="Informe data e hora." html-for="err-datetime">
@@ -411,6 +418,43 @@ function simulateLoading() {
             </div>
           </SurfaceCard>
         </div>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <p class="section-label">DatePicker</p>
+        <SurfaceCard>
+          <div class="grid gap-4 md:grid-cols-2">
+            <FormField label="Vazio" html-for="dp-empty">
+              <DatePicker id="dp-empty" v-model="dateEmpty" />
+            </FormField>
+            <FormField label="Preenchido" html-for="dp-filled">
+              <DatePicker id="dp-filled" v-model="dateValue" />
+            </FormField>
+            <FormField
+              class="md:col-span-2"
+              label="Aberto"
+              hint="Calendário visível neste demo (modal desligado para não prender o foco da página)."
+              html-for="dp-open"
+            >
+              <div class="min-h-[22rem]">
+                <DatePicker
+                  id="dp-open"
+                  v-model="dateValue"
+                  v-model:open="datePickerOpen"
+                  :modal="false"
+                />
+              </div>
+            </FormField>
+            <FormField label="Erro" error="Escolha uma data." html-for="dp-error">
+              <template #default="{ invalid }">
+                <DatePicker id="dp-error" v-model="dateEmpty" :invalid="invalid" />
+              </template>
+            </FormField>
+            <FormField label="Desabilitado" html-for="dp-disabled">
+              <DatePicker id="dp-disabled" model-value="2026-09-05" disabled />
+            </FormField>
+          </div>
+        </SurfaceCard>
       </section>
 
       <section class="flex flex-col gap-2">

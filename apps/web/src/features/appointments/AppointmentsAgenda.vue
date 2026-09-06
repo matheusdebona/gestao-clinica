@@ -8,10 +8,10 @@ import AgendaEventCard from '@/components/patterns/AgendaEventCard.vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
+import DatePicker from '@/components/ui/DatePicker.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormField from '@/components/ui/FormField.vue'
 import IconButton from '@/components/ui/IconButton.vue'
-import Input from '@/components/ui/Input.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
@@ -61,6 +61,9 @@ const statusOptions = [
 const dateInput = computed({
   get: () => toDateInput(cursor.value),
   set: (value: string) => {
+    if (!value) {
+      return
+    }
     cursor.value = startOfDay(fromDateInput(value))
   },
 })
@@ -181,7 +184,7 @@ function onClientSearch(value: string) {
           <ChevronRight class="size-4" :stroke-width="1.75" />
         </IconButton>
         <div class="min-w-[11rem] flex-1">
-          <Input v-model="dateInput" type="date" />
+          <DatePicker id="agenda-date" v-model="dateInput" />
         </div>
         <div class="hidden md:block">
           <Tabs v-model="view" :items="viewItems" />
