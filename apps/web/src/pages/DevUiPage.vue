@@ -18,6 +18,7 @@ import SearchField from '@/components/ui/SearchField.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import Spinner from '@/components/ui/Spinner.vue'
+import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
 import Textarea from '@/components/ui/Textarea.vue'
@@ -282,6 +283,17 @@ function simulateLoading() {
               badge-variant="success"
               @action="toast.info('Avaliação')"
             />
+          </div>
+        </SurfaceCard>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <p class="section-label">Navegação</p>
+        <SurfaceCard class="!bg-sidebar">
+          <div class="flex flex-col gap-0.5">
+            <SidebarNavItem label="Início" active />
+            <SidebarNavItem label="Clientes" />
+            <SidebarNavItem label="Sair" disabled />
           </div>
         </SurfaceCard>
       </section>

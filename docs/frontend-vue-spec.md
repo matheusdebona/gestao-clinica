@@ -319,7 +319,7 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
 ### 6.2 Auth (`stores/auth` + `features/auth`)
 
-- Endpoints: `POST /auth/login`, `GET /auth/me`, `POST /auth/logout` (e logout-all se útil).
+- Endpoints: `POST /auth/login`, `POST /auth/register`, `GET /auth/me`, `POST /auth/logout` (e logout-all se útil).
 - Persistir token (preferência: `sessionStorage` ou memória + refresh manual; evitar XSS óbvio com `localStorage` se possível — documentar trade-off no README do app).
 - Guard de rota: sem token → login; com token → carregar `me` (permissions + clinic).
 
@@ -355,20 +355,20 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
 ### Fase 2 — Fundação app
 
-1. `lib/api` + storage de token.
-2. Store Pinia `auth` (login / me / logout).
-3. Rotas `/login` e `/` (shell).
-4. Guards + tratamento 401/403/422.
-5. `AppShell` placeholder (sem nav completa).
+- [x] `lib/api` + token em `sessionStorage`
+- [x] Store Pinia `auth` (login / register / me / logout)
+- [x] Rotas `/login` e `/` (`ClinicShell`)
+- [x] Guards + 401 / 422
+- [x] Tela login/cadastro (painel que desliza no desktop)
 
-**DoD Fase 2:** login real contra Sanctum; `/auth/me` popula permissions.
+**DoD Fase 2:** login e cadastro reais contra Sanctum; `/auth/me` popula permissions.
 
 ### Fase 3 — Design system (“Modern Soft Violet”)
 
 - [x] Tokens Soft Violet em CSS vars → Tailwind theme (§5.1)
 - [x] `PageHeader` / `SearchField` + primitives de form/feedback/overlay no `/dev/ui`
 - [x] Página `/dev/ui` com swatches + estados (default / erro / snack)
-- [ ] Shell completo: `AppShell` / sidebar brand / `ClinicShell` (próximo PR, com auth)
+- [x] `ClinicShell` + `SidebarNavItem` (sidebar neutra; brand só como acento)
 - [ ] Patterns: `PermissionGate`, `MoneyDisplay`, `StockStatusBadge`
 
 **DoD Fase 3 (parcial):** kitchen sink revisável no visual Soft Violet; features de negócio ainda não.

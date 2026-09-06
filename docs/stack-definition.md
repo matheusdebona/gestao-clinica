@@ -82,6 +82,7 @@ Later: swap MinIO endpoint for a cloud S3 (AWS, Cloudflare R2, etc.) without cha
 | Primary API auth | Sanctum **personal access tokens** (`Bearer`) |
 | Optional later | Cookie/session SPA auth (same-site frontend) |
 | Login | `POST /api/v1/auth/login` → issue token |
+| Register | `POST /api/v1/auth/register` → clinic + first admin + token |
 | Logout | `POST /api/v1/auth/logout` → revoke current token |
 | Current user | `GET /api/v1/auth/me` → user + permissions |
 | Password reset | Deferred unless needed in Phase 1 |
@@ -93,6 +94,7 @@ Sanctum **token abilities** are *not* the RBAC system. They may later scope mach
 | Method | Path | Auth | Purpose |
 | --- | --- | --- | --- |
 | `POST` | `/api/v1/auth/login` | Public | Email/password → token |
+| `POST` | `/api/v1/auth/register` | Public | Clinic name + name + email + password → clinic, admin user, token |
 | `POST` | `/api/v1/auth/logout` | Token | Revoke current token |
 | `GET` | `/api/v1/auth/me` | Token | Profile + effective permissions |
 | `POST` | `/api/v1/auth/logout-all` | Token | Revoke all tokens for user (optional) |

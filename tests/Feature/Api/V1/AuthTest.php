@@ -67,6 +67,60 @@ class AuthTest extends TestCase
             ->assertJsonPath('data.email', $user->email);
     }
 
+    public function test_register_creates_clinic_admin_and_returns_token(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', [
+            'clinic_name' => 'Clínica Aurora',
+            'name' => 'Ana Costa',
+            'email' => 'ana@aurora.test',
+            'password' => 'ChangeMe!123',
+            'password_confirmation' => 'ChangeMe!123',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonStructure([
+                'token',
+                'token_type',
+                'user' => ['id', 'email', 'permissions', 'clinic'],
+            ])
+            ->assertJsonPath('user.email', 'ana@aurora.test')
+            ->assertJsonPath('user.clinic.name', 'Clínica Aurora');
+
+        $this->assertDatabaseHas('clinics', ['name' => 'Clínica Aurora']);
+        $this->assertDatabaseHas('users', ['email' => 'ana@aurora.test']);
+
+        $user = User::query()->where('email', 'ana@aurora.test')->first();
+        $this->assertNotNull($user);
+        $this->assertTrue($user->hasRole('admin'));
+    }
+
+    public function test_register_rejects_duplicate_email(): void
+    {
+        $clinic = Clinic::factory()->create();
+        User::factory()->forClinic($clinic)->create(['email' => 'taken@clinica.test']);
+
+        $this->postJson('/api/v1/auth/register', [
+            'clinic_name' => 'Outra Clínica',
+            'name' => 'Outra Pessoa',
+            'email' => 'taken@clinica.test',
+            'password' => 'ChangeMe!123',
+            'password_confirmation' => 'ChangeMe!123',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+    }
+
+    public function test_register_rejects_weak_password(): void
+    {
+        $this->postJson('/api/v1/auth/register', [
+            'clinic_name' => 'Clínica Fraca',
+            'name' => 'Ana',
+            'email' => 'ana@fraca.test',
+            'password' => 'short',
+            'password_confirmation' => 'short',
+        ])->assertStatus(422)
+            ->assertJsonValidationErrors(['password']);
+    }
+
     public function test_logout_revokes_current_token(): void
     {
         $clinic = Clinic::factory()->create();
