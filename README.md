@@ -68,6 +68,7 @@ Detalhes: [`apps/web/README.md`](./apps/web/README.md).
 | Method | Path | Notes |
 | --- | --- | --- |
 | `POST` | `/api/v1/auth/login` | `{ "email", "password" }` → token |
+| `POST` | `/api/v1/auth/register` | Clínica + primeiro admin → token |
 | `GET` | `/api/v1/auth/me` | Bearer token |
 | `POST` | `/api/v1/auth/logout` | Revoke current token |
 | `POST` | `/api/v1/auth/logout-all` | Revoke all tokens |
