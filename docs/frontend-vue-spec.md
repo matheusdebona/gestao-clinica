@@ -388,7 +388,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | **4.5** | **Vendas / orçamentos** | detalhe abaixo |
 | **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
 | **4.7** | **Tratamento — consumo clínico** (baixa estoque) | detalhe abaixo |
-| 4.8 | Métricas | |
+| **4.8** | **Métricas** | detalhe abaixo |
 | 4.9 | Notificações | |
 
 Cada feature: páginas mobile-first + `PermissionGate` nas ações.
@@ -747,6 +747,72 @@ Seed sugerido: **professional** e **admin** com `consume` + `complete`; recepç�
 - [ ] Nav Tratamentos + links Agenda/Venda
 - [ ] `treatments.consume` no seed e nas rotas de sync
 - [ ] Testes API da nova perm + smoke Vue do fluxo start→consume→complete
+
+#### 4.8 — Métricas (especificação de UI)
+
+Objetivo: dashboard mobile-first com as **4 waves** de KPI já expostas na API. Guia: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap.md). Permission: `metrics.view`.
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Waves **A–D** na UI (comercial, aquisição, margem, estoque/ops) |
+| Layout | **Uma página** `/metrics` com seções empilhadas + seletor de período no topo |
+| Período padrão | **Mês corrente** (+ atalhos recomendados: 7d / 30d / mês / custom `from`–`to`) |
+| Gráficos | Charts onde a API tiver série / ranking visual — no mínimo série de receita (A); demais waves com visualização adequada aos dados (não só números soltos) |
+| Acima da dobra | **Faturamento** (receita), **ticket médio**, **taxa de conversão** (aquisição), **margem** |
+| Aquisição | Toggle **origem / campanha** (`group_by`) |
+| Margem | Toggle **período / cohort_sale** (`mode`) |
+| Estoque / ops | **Seção na mesma página** (low-stock + sessões + pendências de fulfillment) — não só deep links |
+| Quem vê | Só quem tem `metrics.view` — **manter admin** (seed atual) |
+| Nav | Item **Métricas** |
+
+##### Conteúdo por seção (mesma rota)
+
+1. **Período** — default mês corrente; envia `from`/`to` a todos os GETs (inventory pode usar o mesmo range).
+2. **Primeiro viewport (cards)** — faturamento · ticket médio · taxa conversão · margem (puxar de `commercial` + `acquisition` + `margin`).
+3. **Comercial (A)** — resto dos KPIs (nº vendas, desconto médio, funil orçamento, mix pagamento) + **série/chart de receita** (`granularity` auto ou escolhida).
+4. **Aquisição (B)** — ranking com toggle origem/campanha; conversão em destaque (já no hero).
+5. **Margem (C)** — KPIs + toggle período/cohort; nota de fulfillment pendente no modo cohort.
+6. **Estoque & operações (D)** — cards low-stock / valor estoque / sessões / cancelamentos; listas curtas (low-stock products, pending fulfillments, by_professional) com link para Produtos / Tratamentos / Agenda quando fizer sentido.
+
+Uma seção = um job; evitar “dashboard denso” no primeiro viewport (só os 4 cards + período).
+
+##### API (já existe — gaps só de UX)
+
+| Endpoint | Uso na página |
+| --- | --- |
+| `GET /metrics/commercial` | Hero receita/ticket; seção A + series |
+| `GET /metrics/acquisition` | Hero conversão; seção B |
+| `GET /metrics/margin` | Hero margem; seção C |
+| `GET /metrics/inventory` | Seção D estoque |
+| `GET /metrics/operations` | Seção D ops |
+
+Clinic scope = sessão atual. Sem multi-clínica no picker.
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/metrics` | Dashboard único (seções A–D) | `metrics.view` |
+
+Não obrigatório criar sub-rotas nesta fase (decisão 2A).
+
+##### Patterns
+
+- [ ] `MetricCard` (ou pattern) — valor + label + opcional delta
+- [ ] Chart simples (série receita) — lib leve alinhada ao design system; tokens Soft Violet
+- `PageHeader`, filtros de período, `Badge`/`ListCard` para listas D, `PermissionGate` / route meta
+- `MoneyDisplay` para valores
+
+##### DoD 4.8
+
+- [ ] `/metrics` com período mês corrente e 4 cards do hero
+- [ ] Seções A–D consumindo os 5 endpoints; toggles aquisição e margem
+- [ ] Chart(s) conforme decisão C (no mínimo receita no tempo)
+- [ ] Estoque/ops com listas na página + links
+- [ ] Nav Métricas; só `metrics.view` (admin)
+- [ ] Smoke: números batem com fixture conhecida do período
 
 ### Fase 5 — PWA (depois da web estável)
 

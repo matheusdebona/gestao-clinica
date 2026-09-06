@@ -6,6 +6,8 @@ Documento de referência para construir o dashboard e os indicadores da clínica
 
 Complementa: [`domain-model.md`](./domain-model.md), [`domain-roadmap.md`](./domain-roadmap.md), [`produto-financeiro.md`](./produto-financeiro.md).
 
+**UI Fase 4.8** (página única, hero + seções A–D): [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8.
+
 ---
 
 ## 1. Fontes de dados (o que já existe)
