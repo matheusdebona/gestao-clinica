@@ -389,7 +389,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
 | **4.7** | **Tratamento — consumo clínico** (baixa estoque) | detalhe abaixo |
 | **4.8** | **Métricas** | detalhe abaixo |
-| 4.9 | Notificações | |
+| **4.9** | **Notificações** | detalhe abaixo |
 
 Cada feature: páginas mobile-first + `PermissionGate` nas ações.
 
@@ -814,6 +814,77 @@ Não obrigatório criar sub-rotas nesta fase (decisão 2A).
 - [ ] Nav Métricas; só `metrics.view` (admin)
 - [ ] Smoke: números batem com fixture conhecida do período
 
+#### 4.9 — Notificações / Alertas (especificação de UI)
+
+Objetivo: **inbox in-app** mobile-first dos alertas já gerados pelo backend (estoque + aviso de agenda). Push/e-mail/WhatsApp ficam **fora** desta fase (stub permanece).
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Lista + marcar lida + marcar todas + deep links + **badge com contador** na nav |
+| Badge | Contador de não lidas (API: `unread_count` ou `GET ?unread=1` + `meta.total`) |
+| Filtros | Chips: **Todas \| Não lidas \| Estoque \| Agenda** |
+| Tap no item | Marca como lida **e** navega (produto / agendamento) |
+| Empty state | “Nenhum alerta” / “Você está em dia” |
+| Nav | Item **Alertas** só para quem tem **`products.view`** (destinatários típicos dos jobs de estoque) |
+| Canais externos | Fora do 4.9 — só inbox database |
+| Tipos | Só os 3 atuais; UI **genérica** se aparecer `data.type` desconhecido |
+
+##### Tipos atuais (`data.type`)
+
+| `data.type` | Deep link sugerido |
+| --- | --- |
+| `low_stock` | `/products/:product_id` |
+| `projected_low_stock` | `/products/:product_id` |
+| `appointment_stock_warning` | `/appointments/:appointment_id` (ou tratamento) |
+| *(desconhecido)* | Só marcar lida; sem navegação ou detalhe mínimo com `title`/`message` |
+
+Usar **`data.type`** na UI (o campo `type` do Resource é FQCN da classe Laravel).
+
+##### API / gaps nesta fase
+
+Já existem: `GET /notifications`, `POST …/{id}/read`, `POST …/read-all` (auth + clinic; **sem** permission Spatie na rota).
+
+- [ ] Filtros: `?unread=1`, `?category=stock|agenda` (ou mapear por `data.type`) — **necessário para chips**
+- [ ] Contador: `GET /notifications/unread-count` **ou** listagem unread com total — **necessário para badge**
+- [ ] Resource pode expor `data.type` no topo (`type_key`) para facilitar o client (opcional)
+
+Destinatários dos jobs: usuários ativos da clínica com `products.view` (já no `StockAlertService`).
+
+##### Telas / rotas
+
+| Rota | Página | Gate |
+| --- | --- | --- |
+| `/notifications` | Inbox (filtros, paginação, mark all) | auth + **`products.view`** (nav e rota) |
+
+Nav label: **Alertas** (já no shell) — ocultar sem `products.view`.
+
+##### UX
+
+1. Abrir Alertas → lista (não lidas em destaque tipográfico/badge).
+2. Chips filtram; pull/pagination 20.
+3. Tap → `POST read` + `router.push` deep link.
+4. “Marcar todas como lidas” no header.
+5. Empty: “Nenhum alerta” / “Você está em dia”.
+6. Badge no `ClinicShell` com contador; zera ao ler.
+
+##### Patterns
+
+- [ ] `NotificationInboxItem` (título, message, tempo relativo, unread)
+- [ ] `NavBadge` no item Alertas
+- Reutilizar `ListCard`/`EmptyState`/`PageHeader`/`Button`
+
+##### DoD 4.9
+
+- [ ] Inbox com chips Todas/Não lidas/Estoque/Agenda
+- [ ] Tap marca lida e navega; mark-all funciona
+- [ ] Badge numérico na nav; item só com `products.view`
+- [ ] Empty state com a copy acordada
+- [ ] Tipos desconhecidos não quebram a lista
+- [ ] Gaps de API (filtros + unread count) cobertos por testes
+- [ ] Push real **não** bloqueia o DoD
+
 ### Fase 5 — PWA (depois da web estável)
 
 1. `vite-plugin-pwa` (manifest, ícones, service worker).
@@ -856,7 +927,7 @@ Não obrigatório criar sub-rotas nesta fase (decisão 2A).
 | `/appointments` | Agenda | `appointments.view` |
 | `/treatments` | Tratamentos (consumo) | `treatments.view` |
 | `/appointments/:id/consume` | Consumo da sessão | `treatments.consume` |
-| `/notifications` | Inbox | auth |
+| `/notifications` | Alertas (inbox) | auth + `products.view` |
 | `/metrics` | Dashboard KPIs | `metrics.view` |
 | `/dev/ui` | Kitchen sink | DEV ou admin |
 
