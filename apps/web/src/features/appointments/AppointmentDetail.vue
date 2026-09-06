@@ -94,6 +94,8 @@ const treatmentsForForm = computed(() => {
   ]
 })
 
+const professionals = computed(() => professionalsQuery.data.value ?? [])
+
 const rescheduleMutation = useMutation({
   mutationFn: (payload: AppointmentPayload) => updateAppointment(props.appointmentId, payload),
   onSuccess: async () => {
@@ -115,6 +117,8 @@ const rescheduleMutation = useMutation({
     toast.error(error instanceof ApiError ? error.message : 'Não foi possível remarcar.')
   },
 })
+
+const reschedulePending = computed(() => rescheduleMutation.isPending.value)
 
 const startMutation = useMutation({
   mutationFn: () => startAppointment(props.appointmentId),
@@ -249,10 +253,10 @@ function goBack() {
               ref="formRef"
               :appointment="appointment"
               :treatments="treatmentsForForm"
-              :professionals="professionalsQuery.data ?? []"
+              :professionals="professionals"
               lock-treatment
               submit-label="Salvar horário"
-              :loading="rescheduleMutation.isPending"
+              :loading="reschedulePending"
               @submit="onReschedule"
               @cancel="goBack"
             />

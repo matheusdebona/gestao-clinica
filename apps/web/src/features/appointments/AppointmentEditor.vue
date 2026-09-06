@@ -45,6 +45,12 @@ const professionalsQuery = useQuery({
   enabled: allowed,
 })
 
+const openTreatments = computed(() => treatmentsQuery.data.value?.data ?? [])
+const professionals = computed(() => professionalsQuery.data.value ?? [])
+const catalogsPending = computed(
+  () => treatmentsQuery.isPending.value || professionalsQuery.isPending.value,
+)
+
 const { mutate: save, isPending: saving } = useMutation({
   mutationFn: (payload: AppointmentPayload & { treatment_id: number }) => {
     const { treatment_id: treatmentId, ...body } = payload
@@ -88,14 +94,14 @@ function onCancel() {
       Você não pode criar sessões na agenda.
     </Banner>
 
-    <SurfaceCard v-else-if="treatmentsQuery.isPending || professionalsQuery.isPending">
+    <SurfaceCard v-else-if="catalogsPending">
       <Skeleton class="h-11" />
       <Skeleton class="mt-3 h-11" />
       <Skeleton class="mt-3 h-11" />
     </SurfaceCard>
 
     <Banner
-      v-else-if="(treatmentsQuery.data?.data.length ?? 0) === 0"
+      v-else-if="openTreatments.length === 0"
       variant="warning"
       title="Nenhum tratamento aberto"
     >
@@ -105,8 +111,8 @@ function onCancel() {
     <SurfaceCard v-else>
       <AppointmentForm
         ref="formRef"
-        :treatments="treatmentsQuery.data?.data ?? []"
-        :professionals="professionalsQuery.data ?? []"
+        :treatments="openTreatments"
+        :professionals="professionals"
         :initial-treatment-id="initialTreatmentId"
         submit-label="Agendar"
         :loading="saving"

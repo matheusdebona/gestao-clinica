@@ -9,12 +9,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class AppointmentResource extends JsonResource
 {
     /**
-     * @param  array{suggested_consumptions?: list<array<string, mixed>>, stock_warnings?: list<array<string, mixed>>, warnings?: list<string>}|null  $extras
+     * @param  array{suggested_consumptions?: list<array<string, mixed>>, stock_warnings?: list<array<string, mixed>>, warnings?: list<string>}|int|null  $extras
      */
-    public function __construct($resource, private readonly ?array $extras = null)
+    public function __construct($resource, mixed $extras = null)
     {
         parent::__construct($resource);
+        $this->extras = is_array($extras) ? $extras : null;
     }
+
+    /**
+     * @var array{suggested_consumptions?: list<array<string, mixed>>, stock_warnings?: list<array<string, mixed>>, warnings?: list<string>}|null
+     */
+    private ?array $extras = null;
 
     public function toArray(Request $request): array
     {
