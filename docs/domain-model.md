@@ -418,12 +418,14 @@ A **treatment** is the clinical case opened from a **confirmed sale** (1:1).
 | Field | Purpose |
 | --- | --- |
 | `treatment_id` | Parent clinical case |
-| `scheduled_at` | Planned visit (nullable for immediate start) |
+| `scheduled_at` | Planned visit (required for calendar booking; immediate start may set “now”) |
 | `status` | `scheduled`, `in_progress`, `completed`, `cancelled` |
-| `professional_user_id` | Who performed the session |
+| `professional_user_id` | **Required** — who will run / ran the session |
 | `started_at` / `finished_at` / `duration_minutes` | Session window |
 | `stock_warning` | JSON warnings captured on start (stock < suggested) |
-| `total_cost` / `total_charged_on_appointment` | Session cost + extra charges |
+| `total_cost` / `total_charged_on_appointment` | Session cost + extra charges (on **complete**) |
+
+**Scheduling rules (UI Fase 4.6):** no two `scheduled`/`in_progress` appointments for the **same professional** with overlapping time windows. Clinic-wide calendar via `GET /appointments?from=&to=…`. Permissions: `appointments.view|manage|start|cancel` (separate from `treatments.*` consumption). Detail: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.6.
 
 ### AppointmentConsumption
 
@@ -456,7 +458,9 @@ A **treatment** is the clinical case opened from a **confirmed sale** (1:1).
 
 ### Permissions
 
-`treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel`
+**Treatment (caso clínico / consumo):** `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel`
+
+**Appointments (agenda):** `appointments.view`, `appointments.manage`, `appointments.start`, `appointments.cancel`
 
 ---
 
@@ -495,6 +499,7 @@ Clinic exists
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
 | Treatments | `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel` |
+| Appointments | `appointments.view`, `appointments.manage`, `appointments.start`, `appointments.cancel` |
 
 All checks remain **permission-first**; roles only group these permissions per clinic job (receptionist, seller, stock manager, professional, clinic admin).
 

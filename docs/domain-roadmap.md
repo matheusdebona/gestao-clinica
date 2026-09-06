@@ -166,8 +166,8 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] Equipe: RBAC + CRUD usuários (Fase 4.2b)
 - [ ] **Produtos** (+ marcas/tipos/unidades, cascata marca→tipo, `?q=`, ajuste estoque) — Fase 4.3; ver detalhe em [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3
 - [ ] **Protocolos** (pacote de produtos, itens no form, preços editáveis, `?q=`) — Fase 4.4; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.4
-- [ ] Agendamentos (Fase 4.5)
-- [ ] Vendas / orçamentos (Fase 4.6)
+- [ ] Vendas / orçamentos (Fase 4.5)
+- [ ] **Agendamentos** (agenda dia/semana, `appointments.*`, overlap por profissional, start sem estoque) — Fase 4.6; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.6
 - [ ] Tratamento — consumo clínico (Fase 4.7)
 - [ ] Métricas (Fase 4.8)
 - [ ] Notificações (Fase 4.9)

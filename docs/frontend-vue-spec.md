@@ -385,8 +385,8 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | 4.2b | Equipe (RBAC) | feito |
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | próximo — detalhe abaixo |
 | **4.4** | **Protocolos** (pacote de produtos) | detalhe abaixo |
-| 4.5 | Agendamentos (sessões / agenda) | |
-| 4.6 | Vendas / orçamentos | |
+| 4.5 | Vendas / orçamentos | (detalhar em seguida) |
+| **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
 | 4.7 | Tratamento — consumo clínico (baixa estoque) | |
 | 4.8 | Métricas | |
 | 4.9 | Notificações | |
@@ -502,7 +502,7 @@ Chrome: nav **Protocolos** (`protocols.view`); na lista/detalhe de **Produtos**,
    - edição: sugerido, mínimo, especial (opcional).
 4. Salvar cabeçalho + sync de itens (create pode mandar `items` no POST; edit usa update + `PUT …/items` conforme API).
 
-Fora de escopo 4.4: aplicar protocolo em venda (`POST /sales/{sale}/apply-protocol`) — fica em **4.6 Vendas**.
+Fora de escopo 4.4: aplicar protocolo em venda (`POST /sales/{sale}/apply-protocol`) — fica em **4.5 Vendas**.
 
 ##### Patterns
 
@@ -516,6 +516,84 @@ Fora de escopo 4.4: aplicar protocolo em venda (`POST /sales/{sale}/apply-protoc
 - [ ] Desativar + “somente ativos”; busca por nome
 - [ ] Nav Protocolos + atalho em Produtos
 - [ ] Testes API `?q=` (se novo); smoke Vue do fluxo create/edit/items
+
+#### 4.6 — Agendamentos (especificação de UI)
+
+Objetivo: **agenda completa da clínica** (dia/semana) — criar, remarcar, cancelar e **iniciar** sessão.  
+**Não** inclui consumo de produtos nem baixa de estoque (isso é **4.7**).  
+Pré-requisito de domínio: tratamento aberto a partir de **venda confirmada** → por isso esta fase vem **depois** de **4.5 Vendas / orçamentos**.
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo visual | Agenda completa (visões **dia** e **semana**) |
+| Ordem no roadmap | Agendamento **depois** de orçamento/venda (não antes) |
+| Listagem API | Novo `GET /appointments?from=&to=&status=&professional_user_id=&client_id=` (visão clínica; não só nested no treatment) |
+| Permissões | **Novas** `appointments.*` (não reutilizar só `treatments.*` para agenda) |
+| Profissional | **Obrigatório** em create/update; validar **conflito de horário** do mesmo profissional |
+| Ações nesta fase | Criar, remarcar (patch enquanto `scheduled`), cancelar, **iniciar** (`start` → `in_progress`, avisos de estoque não bloqueantes) |
+| Fora desta fase | Sync de consumptions + `complete` (estoque) → **4.7** |
+| Card / evento | Cliente, data/hora, status (chip), profissional, link do tratamento |
+| Nav | Item **Agenda** (`/appointments` ou `/agenda`) — não depende de nav de Tratamentos |
+
+##### Permissões novas (API + seed + roles)
+
+| Permission | Uso |
+| --- | --- |
+| `appointments.view` | Ver agenda e detalhe da sessão |
+| `appointments.manage` | Criar / remarcar sessão |
+| `appointments.start` | Iniciar atendimento (`in_progress`) |
+| `appointments.cancel` | Cancelar sessão (`scheduled` / `in_progress`) |
+
+Atribuição sugerida na seed (ajustável):
+
+- **receptionist**: `view` + `manage` + `cancel` (+ `start` se a recepção inicia o check-in)
+- **professional**: `view` + `manage` + `start` + `cancel`
+- **admin**: todas
+
+Abrir tratamento a partir da venda continua em `treatments.start` (fluxo comercial/clínico em 4.5/4.7) — agenda só agenda sessões de tratamento **já aberto**.
+
+##### API / modelo (gaps nesta fase)
+
+- [ ] `GET /appointments` com `from`, `to`, `status`, `professional_user_id`, `client_id` (paginação ou janela de calendário)
+- [ ] `professional_user_id` **required** no store/update (hoje nullable)
+- [ ] Validação de **overlap**: mesmo `professional_user_id`, status `scheduled` ou `in_progress`, intervalos que se cruzam → 422 (definir duração padrão se só houver `scheduled_at` pontual — ex. usar `client.service_duration_minutes` ou duração default da clínica / campo futuro `duration_minutes` planejado)
+- [ ] Endpoints de create/patch/start/cancel passam a checar `appointments.*` (ou dual-check documentado na implementação)
+- Nested `GET/POST treatments/{id}/appointments` pode permanecer para detalhe do caso; a **Agenda** usa o index global
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/appointments` (ou `/agenda`) | Calendário dia/semana + filtros | `appointments.view` |
+| `/appointments/new` | Nova sessão (tratamento + profissional + data/hora + notas) | `appointments.manage` |
+| `/appointments/:id` | Detalhe + remarcar / cancelar / iniciar | `appointments.view` |
+
+Mobile-first: no phone, default **dia**; semana como progressive enhancement (`md:`).
+
+##### UX
+
+1. Abrir Agenda → ver slots do dia/semana por profissional (ou grade única com cor/profissional).
+2. Nova sessão: escolher **tratamento aberto** (cliente vem do tratamento) → **profissional** → data/hora → notas.
+3. Conflito de horário do profissional → erro claro no form (422).
+4. Iniciar: confirma check-in; status `in_progress`; pode mostrar warning de estoque **sem** bloquear; **não** abre tela de consumo (link “Registrar consumo” só quando 4.7 existir).
+5. Cancelar: `ConfirmDialog`; sem efeito em estoque.
+
+##### Patterns
+
+- Calendário / grade de agenda (novo pattern — evitar inventar fora de `components/ui` + `patterns`)
+- `Badge` de status (`scheduled` / `in_progress` / `completed` / `cancelled`)
+- `ListCard` ou eventos na grade; `ConfirmDialog`; `FormField` + `Select` de profissional (usuários da clínica com papel profissional / permissão adequada)
+
+##### DoD 4.6
+
+- [ ] Agenda dia/semana lista sessões da clínica via `GET /appointments`
+- [ ] Criar sessão com profissional obrigatório; overlap rejeitado
+- [ ] Remarcar / cancelar / iniciar sem baixar estoque
+- [ ] Card mostra cliente, horário, status, profissional, link tratamento
+- [ ] Nav **Agenda**; permissões `appointments.*` no seed e `PermissionGate`
+- [ ] Testes API (index, overlap, perms); smoke Vue do calendário
 
 ### Fase 5 — PWA (depois da web estável)
 
@@ -555,6 +633,7 @@ Fora de escopo 4.4: aplicar protocolo em venda (`POST /sales/{sale}/apply-protoc
 | `/units` | Unidades | `units.manage` |
 | `/protocols` | Protocolos | `protocols.view` |
 | `/sales` | Vendas | `sales.view` |
+| `/appointments` | Agenda | `appointments.view` |
 | `/treatments` | Tratamentos (consumo) | `treatments.view` |
 | `/notifications` | Inbox | auth |
 | `/metrics` | Dashboard KPIs | `metrics.view` |
