@@ -5,6 +5,7 @@ import {
   SelectContent,
   SelectItem,
   SelectItemIndicator,
+  SelectItemText,
   SelectPortal,
   SelectRoot,
   SelectTrigger,
@@ -72,7 +73,7 @@ const triggerClass = computed(() =>
             :value="option.value"
             class="relative flex cursor-pointer select-none items-center rounded-[8px] py-2.5 pr-8 pl-3 text-[15px] text-body outline-none data-[highlighted]:bg-surface-muted data-[state=checked]:text-title"
           >
-            <span>{{ option.label }}</span>
+            <SelectItemText>{{ option.label }}</SelectItemText>
             <SelectItemIndicator class="absolute right-2 inline-flex items-center">
               <Check class="size-4 text-brand" :stroke-width="2" />
             </SelectItemIndicator>

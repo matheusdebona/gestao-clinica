@@ -30,6 +30,8 @@ import {
 import { formatBRL, formatQty } from '@/lib/formatters'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
+import type { Brand, ProductType, UnitOfMeasure } from '@/types/catalog'
+import type { Paginated } from '@/types/pagination'
 import type { Product, ProductPayload } from '@/types/product'
 import { ApiError } from '@/types/user'
 
@@ -156,6 +158,19 @@ watch(
   { immediate: true },
 )
 
+function prependCatalogItem<T extends { id: number }>(
+  old: Paginated<T> | undefined,
+  item: T,
+): Paginated<T> | undefined {
+  if (!old) {
+    return old
+  }
+  if (old.data.some((row) => row.id === item.id)) {
+    return old
+  }
+  return { ...old, data: [item, ...old.data] }
+}
+
 function onBrandUpdate(value: string) {
   if (value === brandId.value) {
     return
@@ -171,9 +186,12 @@ const { mutate: createBrandMutate, isPending: creatingBrand } = useMutation({
     newBrandName.value = ''
     brandDialogError.value = ''
     toast.success('Marca cadastrada')
-    await queryClient.invalidateQueries({ queryKey: ['brands'] })
+    queryClient.setQueryData(['brands', 'active'], (old: Paginated<Brand> | undefined) =>
+      prependCatalogItem(old, brand),
+    )
     setFieldValue('brand_id', String(brand.id))
     setFieldValue('product_type_id', '')
+    await queryClient.invalidateQueries({ queryKey: ['brands'] })
   },
   onError: (error) => {
     if (error instanceof ApiError && error.status === 422) {
@@ -195,8 +213,12 @@ const { mutate: createTypeMutate, isPending: creatingType } = useMutation({
     newTypeName.value = ''
     typeDialogError.value = ''
     toast.success('Tipo cadastrado')
-    await queryClient.invalidateQueries({ queryKey: ['product-types'] })
+    queryClient.setQueryData(
+      ['product-types', 'by-brand', selectedBrandId.value],
+      (old: Paginated<ProductType> | undefined) => prependCatalogItem(old, type),
+    )
     setFieldValue('product_type_id', String(type.id))
+    await queryClient.invalidateQueries({ queryKey: ['product-types'] })
   },
   onError: (error) => {
     if (error instanceof ApiError && error.status === 422) {
@@ -219,8 +241,11 @@ const { mutate: createUnitMutate, isPending: creatingUnit } = useMutation({
     newUnitSymbol.value = ''
     unitDialogError.value = ''
     toast.success('Unidade cadastrada')
-    await queryClient.invalidateQueries({ queryKey: ['units'] })
+    queryClient.setQueryData(['units', 'active'], (old: Paginated<UnitOfMeasure> | undefined) =>
+      prependCatalogItem(old, unit),
+    )
     setFieldValue('unit_of_measure_id', String(unit.id))
+    await queryClient.invalidateQueries({ queryKey: ['units'] })
   },
   onError: (error) => {
     if (error instanceof ApiError && error.status === 422) {
