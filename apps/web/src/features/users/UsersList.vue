@@ -53,8 +53,7 @@ function userMeta(user: ClinicUser) {
     .filter((role) => role !== 'super-admin')
     .map((role) => (role === 'admin' ? 'Admin' : roleLabel(role)))
     .join(', ')
-  const status = user.is_active ? 'Ativo' : 'Inativo'
-  return [user.email, roles || 'Sem papel', status].join(' · ')
+  return [user.email, roles || 'Sem papel'].join(' · ')
 }
 </script>
 
@@ -78,33 +77,38 @@ function userMeta(user: ClinicUser) {
       </Banner>
 
       <SurfaceCard v-else-if="isPending" :padding="false">
-        <div class="flex flex-col gap-3 p-4">
-          <Skeleton class="h-14 w-full" />
-          <Skeleton class="h-14 w-full" />
-          <Skeleton class="h-14 w-full" />
+        <div class="flex flex-col gap-3 p-5">
+          <Skeleton class="h-12" />
+          <Skeleton class="h-12" />
+          <Skeleton class="h-12" />
         </div>
       </SurfaceCard>
 
-      <EmptyState
-        v-else-if="!users.length"
-        title="Nenhum usuário"
-        description="Cadastre a equipe da clínica."
-      >
-        <template #action>
-          <PermissionGate permission="users.create">
-            <Button @click="goNew">Novo usuário</Button>
-          </PermissionGate>
-        </template>
-      </EmptyState>
+      <SurfaceCard v-else-if="!users.length" :padding="false">
+        <EmptyState
+          title="Nenhum usuário"
+          description="Cadastre a equipe da clínica."
+        >
+          <template #action>
+            <PermissionGate permission="users.create">
+              <Button @click="goNew">Novo usuário</Button>
+            </PermissionGate>
+          </template>
+        </EmptyState>
+      </SurfaceCard>
 
       <SurfaceCard v-else :padding="false">
-        <ListCard
-          v-for="user in users"
-          :key="user.id"
-          :title="user.name"
-          :meta="userMeta(user)"
-          @click="openUser(user.id)"
-        />
+        <div class="divide-y divide-border-divider px-5 py-2">
+          <ListCard
+            v-for="user in users"
+            :key="user.id"
+            :title="user.name"
+            :meta="userMeta(user)"
+            :badge="user.is_active ? 'Ativo' : 'Inativo'"
+            :badge-variant="user.is_active ? 'success' : 'muted'"
+            @action="openUser(user.id)"
+          />
+        </div>
       </SurfaceCard>
 
       <Pagination

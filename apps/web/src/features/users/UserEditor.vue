@@ -37,7 +37,9 @@ const {
   enabled: computed(() => Boolean(props.userId) && allowed.value),
 })
 
-const rolesLocked = computed(() => Boolean(user.value?.roles?.includes('admin')))
+const rolesLocked = computed(
+  () => isEdit.value && Boolean(user.value?.roles?.includes('admin')),
+)
 
 const { mutate: save, isPending: saving } = useMutation({
   mutationFn: (payload: UserPayload) => {
@@ -105,7 +107,7 @@ function onCancel() {
     <SurfaceCard v-else>
       <UserForm
         ref="formRef"
-        :user="user"
+        :user="isEdit ? user : undefined"
         :loading="saving"
         :roles-locked="rolesLocked"
         :submit-label="isEdit ? 'Salvar' : 'Criar usuário'"

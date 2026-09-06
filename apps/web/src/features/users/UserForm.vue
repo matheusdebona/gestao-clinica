@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-import { computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import Button from '@/components/ui/Button.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
+import PasswordInput from '@/components/ui/PasswordInput.vue'
 import Switch from '@/components/ui/Switch.vue'
 import { listAssignableRoles } from '@/features/users/api'
 import {
   emptyUserForm,
+  permissionLabel,
   roleLabel,
+  roleSummary,
   toUserPayload,
   userFormSchema,
-  type UserFormValues,
 } from '@/features/users/schema'
 import type { ClinicUser, UserPayload } from '@/types/team-user'
 
@@ -30,8 +32,12 @@ const emit = defineEmits<{
 }>()
 
 const isEdit = computed(() => Boolean(props.user))
+const selectedRoles = ref<string[]>([])
+const rolesError = ref('')
+const expandedRole = ref<string | null>(null)
+const isActive = ref(true)
 
-const { defineField, handleSubmit, errors, setErrors, resetForm, setFieldValue } = useForm({
+const { defineField, handleSubmit, errors, setErrors, resetForm } = useForm({
   validationSchema: computed(() => userFormSchema(isEdit.value)),
   initialValues: emptyUserForm(),
 })
@@ -40,8 +46,6 @@ const [name, nameAttrs] = defineField('name')
 const [email, emailAttrs] = defineField('email')
 const [password, passwordAttrs] = defineField('password')
 const [passwordConfirmation, passwordConfirmationAttrs] = defineField('password_confirmation')
-const [isActive] = defineField('is_active')
-const [roles] = defineField('roles')
 
 const rolesQuery = useQuery({
   queryKey: ['roles', 'assignable'],
@@ -53,10 +57,18 @@ const assignableRoles = computed(() => rolesQuery.data.value ?? [])
 watch(
   () => props.user,
   (user) => {
+    rolesError.value = ''
     if (!user) {
+      selectedRoles.value = []
+      isActive.value = true
       resetForm({ values: emptyUserForm() })
       return
     }
+    const roles = [...(user.roles ?? [])].filter(
+      (role) => role !== 'admin' && role !== 'super-admin',
+    )
+    selectedRoles.value = roles
+    isActive.value = user.is_active
     resetForm({
       values: {
         name: user.name,
@@ -64,8 +76,7 @@ watch(
         password: '',
         password_confirmation: '',
         is_active: user.is_active,
-        roles: [...(user.roles ?? [])].filter((role) => role !== 'admin' && role !== 'super-admin'),
-      } satisfies UserFormValues,
+      },
     })
   },
   { immediate: true },
@@ -75,21 +86,54 @@ function toggleRole(role: string, checked: boolean) {
   if (props.rolesLocked) {
     return
   }
-  const current = new Set(roles.value ?? [])
+  const current = new Set(selectedRoles.value)
   if (checked) {
     current.add(role)
   } else {
     current.delete(role)
   }
-  setFieldValue('roles', [...current])
+  selectedRoles.value = [...current]
+  if (selectedRoles.value.length > 0) {
+    rolesError.value = ''
+  }
 }
 
-const onSubmit = handleSubmit((formValues) => {
-  emit('submit', toUserPayload(formValues, isEdit.value))
+function toggleExpanded(role: string) {
+  expandedRole.value = expandedRole.value === role ? null : role
+}
+
+const submitForm = handleSubmit((formValues) => {
+  if (!props.rolesLocked && selectedRoles.value.length < 1) {
+    rolesError.value = 'Selecione ao menos um papel.'
+    return
+  }
+
+  emit(
+    'submit',
+    toUserPayload(
+      {
+        ...formValues,
+        is_active: isActive.value,
+        roles: [...selectedRoles.value],
+      },
+      isEdit.value,
+    ),
+  )
 })
 
+function onSubmit() {
+  rolesError.value = ''
+  void submitForm()
+}
+
 defineExpose({
-  setErrors: (fieldErrors: Record<string, string>) => setErrors(fieldErrors),
+  setErrors: (fieldErrors: Record<string, string>) => {
+    if (fieldErrors.roles) {
+      rolesError.value = fieldErrors.roles
+    }
+    const { roles: _roles, ...rest } = fieldErrors
+    setErrors(rest)
+  },
 })
 </script>
 
@@ -114,11 +158,10 @@ defineExpose({
       html-for="user-password"
     >
       <template #default="{ invalid }">
-        <Input
+        <PasswordInput
           id="user-password"
           v-model="password"
           v-bind="passwordAttrs"
-          type="password"
           autocomplete="new-password"
           :invalid="invalid"
         />
@@ -131,11 +174,10 @@ defineExpose({
       html-for="user-password-2"
     >
       <template #default="{ invalid }">
-        <Input
+        <PasswordInput
           id="user-password-2"
           v-model="passwordConfirmation"
           v-bind="passwordConfirmationAttrs"
-          type="password"
           autocomplete="new-password"
           :invalid="invalid"
         />
@@ -144,20 +186,50 @@ defineExpose({
 
     <Switch v-model="isActive" label="Ativo" :disabled="rolesLocked" />
 
-    <FormField label="Papéis" :error="errors.roles" hint="Pacotes de permissões da clínica.">
+    <FormField
+      label="Papéis"
+      :error="rolesError"
+      hint="Cada papel é um pacote de permissões. O e-mail precisa ser único na plataforma."
+    >
       <div class="flex flex-col gap-3 rounded-[10px] border border-border-subtle bg-canvas/60 px-3 py-3">
         <p v-if="rolesLocked" class="text-[13px] text-muted">
           O administrador da clínica não pode ter os papéis alterados.
         </p>
         <template v-else>
-          <Checkbox
+          <div
             v-for="role in assignableRoles"
-            :id="`role-${role.name}`"
             :key="role.name"
-            :model-value="(roles ?? []).includes(role.name)"
-            :label="roleLabel(role.name)"
-            @update:model-value="(checked) => toggleRole(role.name, checked)"
-          />
+            class="flex flex-col gap-2 border-b border-border-subtle pb-3 last:border-b-0 last:pb-0"
+          >
+            <div class="flex items-start justify-between gap-3">
+              <Checkbox
+                :id="`role-${role.name}`"
+                class="min-w-0 flex-1"
+                :model-value="selectedRoles.includes(role.name)"
+                @update:model-value="(checked) => toggleRole(role.name, checked)"
+              >
+                <span class="flex flex-col gap-0.5">
+                  <span class="font-medium text-title">{{ roleLabel(role.name) }}</span>
+                  <span class="text-[13px] font-normal text-muted">{{ roleSummary(role.name) }}</span>
+                </span>
+              </Checkbox>
+              <button
+                type="button"
+                class="shrink-0 pt-0.5 text-[13px] text-brand"
+                @click="toggleExpanded(role.name)"
+              >
+                {{ expandedRole === role.name ? 'Ocultar permissões' : 'Ver permissões' }}
+              </button>
+            </div>
+            <ul
+              v-if="expandedRole === role.name"
+              class="grid list-disc grid-cols-1 gap-x-4 gap-y-1 pl-5 text-[13px] text-muted sm:grid-cols-2"
+            >
+              <li v-for="permission in role.permissions" :key="permission">
+                {{ permissionLabel(permission) }}
+              </li>
+            </ul>
+          </div>
           <p v-if="!assignableRoles.length && !rolesQuery.isPending" class="text-[13px] text-muted">
             Nenhum papel disponível.
           </p>
@@ -165,8 +237,10 @@ defineExpose({
       </div>
     </FormField>
 
-    <div class="mt-2 flex gap-3">
-      <Button type="button" variant="ghost" @click="emit('cancel')">Cancelar</Button>
+    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <Button type="button" variant="ghost" :disabled="loading" @click="emit('cancel')">
+        Cancelar
+      </Button>
       <Button type="submit" :loading="loading">{{ submitLabel ?? 'Salvar' }}</Button>
     </div>
   </form>

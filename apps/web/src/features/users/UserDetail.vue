@@ -10,7 +10,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { deactivateUser, getUser, updateUser } from '@/features/users/api'
-import { roleLabel } from '@/features/users/schema'
+import { permissionLabel, roleLabel } from '@/features/users/schema'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
@@ -88,6 +88,12 @@ function displayRoles(roles: string[] = []) {
     .map((role) => (role === 'admin' ? 'Admin' : roleLabel(role)))
     .join(', ')
 }
+
+const permissionList = computed(() =>
+  [...(user.value?.permissions ?? [])]
+    .filter((name) => name !== 'clinics.manage')
+    .sort((a, b) => permissionLabel(a).localeCompare(permissionLabel(b), 'pt-BR')),
+)
 </script>
 
 <template>
@@ -141,6 +147,16 @@ function displayRoles(roles: string[] = []) {
           <div>
             <dt class="text-[13px] text-muted">Status</dt>
             <dd class="mt-0.5 text-title">{{ user.is_active ? 'Ativo' : 'Inativo' }}</dd>
+          </div>
+          <div v-if="permissionList.length">
+            <dt class="text-[13px] text-muted">Permissões efetivas</dt>
+            <dd class="mt-2">
+              <ul class="grid list-disc grid-cols-1 gap-x-4 gap-y-1 pl-5 text-[13px] text-muted sm:grid-cols-2">
+                <li v-for="permission in permissionList" :key="permission">
+                  {{ permissionLabel(permission) }}
+                </li>
+              </ul>
+            </dd>
           </div>
         </dl>
       </SurfaceCard>

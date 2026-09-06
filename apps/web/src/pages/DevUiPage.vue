@@ -17,6 +17,7 @@ import ListCard from '@/components/ui/ListCard.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Pagination from '@/components/ui/Pagination.vue'
+import PasswordInput from '@/components/ui/PasswordInput.vue'
 import SearchField from '@/components/ui/SearchField.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
@@ -32,6 +33,7 @@ const toast = useToastStore()
 const textValue = ref('Maria Silva')
 const numberValue = ref('12')
 const passwordValue = ref('senha123')
+const passwordConfirmValue = ref('senha123')
 const emailValue = ref('maria@clinica.test')
 const dateValue = ref('2026-09-05')
 const notesValue = ref('Observações da consulta')
@@ -167,7 +169,17 @@ function simulateLoading() {
                 <Input id="ok-number" v-model="numberValue" type="number" />
               </FormField>
               <FormField label="Senha" html-for="ok-password">
-                <Input id="ok-password" v-model="passwordValue" type="password" />
+                <PasswordInput id="ok-password" v-model="passwordValue" />
+              </FormField>
+              <FormField label="Confirmar senha" html-for="ok-password-2">
+                <PasswordInput
+                  id="ok-password-2"
+                  v-model="passwordConfirmValue"
+                  autocomplete="new-password"
+                />
+              </FormField>
+              <FormField label="Senha (desabilitada)" html-for="ok-password-disabled">
+                <PasswordInput id="ok-password-disabled" model-value="••••••••" disabled />
               </FormField>
               <FormField label="E-mail" html-for="ok-email">
                 <Input id="ok-email" v-model="emailValue" type="email" />
@@ -206,6 +218,11 @@ function simulateLoading() {
               <FormField label="Quantidade" error="Número inválido." html-for="err-number">
                 <template #default="{ invalid }">
                   <Input id="err-number" v-model="numberValue" type="number" :invalid="invalid" />
+                </template>
+              </FormField>
+              <FormField label="Senha" error="Senha obrigatória." html-for="err-password">
+                <template #default="{ invalid }">
+                  <PasswordInput id="err-password" v-model="passwordValue" :invalid="invalid" />
                 </template>
               </FormField>
               <FormField label="E-mail" error="E-mail inválido." html-for="err-email">
