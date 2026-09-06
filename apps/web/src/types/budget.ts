@@ -62,11 +62,4 @@ export interface DocumentRecord {
   created_at: string
 }
 
-export interface Treatment {
-  id: number
-  clinic_id: number
-  sale_id: number
-  client_id: number
-  status: string
-  notes: string | null
-}
+export type { Treatment } from './treatment'

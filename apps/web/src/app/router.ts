@@ -196,7 +196,29 @@ const router = createRouter({
           component: () => import('@/pages/BudgetsPage.vue'),
         },
         {
+          path: 'appointments',
+          name: 'appointments',
+          meta: { title: 'Agenda' },
+          component: () => import('@/pages/AppointmentsPage.vue'),
+        },
+        {
+          path: 'appointments/new',
+          name: 'appointments-new',
+          component: () => import('@/pages/AppointmentFormPage.vue'),
+        },
+        {
+          path: 'appointments/:id',
+          name: 'appointments-show',
+          component: () => import('@/pages/AppointmentDetailPage.vue'),
+        },
+        {
           path: 'treatments',
+          meta: { title: 'Tratamentos' },
+          component: () => import('@/pages/ComingSoonPage.vue'),
+        },
+        {
+          path: 'treatments/:id',
+          name: 'treatments-show',
           meta: { title: 'Tratamentos' },
           component: () => import('@/pages/ComingSoonPage.vue'),
         },

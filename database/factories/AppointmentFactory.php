@@ -24,6 +24,7 @@ class AppointmentFactory extends Factory
             'professional_user_id' => null,
             'status' => Appointment::STATUS_SCHEDULED,
             'scheduled_at' => now()->addDay(),
+            'duration_minutes' => Appointment::DEFAULT_DURATION_MINUTES,
             'notes' => null,
         ];
     }

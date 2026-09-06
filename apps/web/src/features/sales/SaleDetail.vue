@@ -193,9 +193,30 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
           Abrir tratamento
         </Button>
       </PermissionGate>
-      <Banner v-else-if="sale.treatment_id" variant="info" title="Tratamento aberto">
-        O tratamento já foi iniciado a partir desta venda. A agenda entra na próxima fase.
-      </Banner>
+      <template v-else-if="sale.treatment_id">
+        <Banner variant="info" title="Tratamento aberto">
+          O caso clínico já foi iniciado a partir desta venda.
+        </Banner>
+        <div class="flex flex-wrap gap-2">
+          <PermissionGate permission="appointments.manage">
+            <Button
+              @click="
+                router.push({
+                  name: 'appointments-new',
+                  query: { treatment_id: String(sale.treatment_id) },
+                })
+              "
+            >
+              Agendar sessão
+            </Button>
+          </PermissionGate>
+          <PermissionGate permission="appointments.view">
+            <Button variant="secondary" @click="router.push({ name: 'appointments' })">
+              Ver agenda
+            </Button>
+          </PermissionGate>
+        </div>
+      </template>
 
       <SaleBudgetsPanel :sale-id="sale.id" :can-create="isDraft && items.length > 0" />
     </template>

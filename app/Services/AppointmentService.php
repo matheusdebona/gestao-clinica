@@ -11,6 +11,7 @@ use App\Models\SaleItem;
 use App\Models\SalePayment;
 use App\Models\Treatment;
 use App\Models\User;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -23,7 +24,7 @@ class AppointmentService
     ) {}
 
     /**
-     * @param  array{scheduled_at?: string|null, professional_user_id?: int|null, notes?: string|null}  $data
+     * @param  array{scheduled_at?: string|null, professional_user_id: int, duration_minutes?: int|null, notes?: string|null}  $data
      * @return array{appointment: Appointment, warnings: list<string>}
      */
     public function schedule(Treatment $treatment, array $data): array
@@ -34,28 +35,46 @@ class AppointmentService
             ]);
         }
 
-        $appointment = Appointment::query()->create([
-            'clinic_id' => $treatment->clinic_id,
-            'treatment_id' => $treatment->id,
-            'client_id' => $treatment->client_id,
-            'professional_user_id' => $data['professional_user_id'] ?? null,
-            'status' => Appointment::STATUS_SCHEDULED,
-            'scheduled_at' => $data['scheduled_at'] ?? null,
-            'notes' => $data['notes'] ?? null,
-        ]);
+        $treatment->loadMissing('client');
+        $professionalId = (int) $data['professional_user_id'];
+        $scheduledAt = $data['scheduled_at'] ?? null;
+        $duration = $this->resolveDurationMinutes(
+            clientDuration: $treatment->client?->service_duration_minutes,
+            storedDuration: null,
+            override: $data['duration_minutes'] ?? null,
+        );
 
-        $suggested = $this->treatments->suggestedConsumptions($treatment);
-        $warnings = $this->stockAlerts->warningMessagesForSuggested($suggested);
-        $this->stockAlerts->notifyAppointmentWarnings($appointment, $warnings);
+        return DB::transaction(function () use ($treatment, $data, $professionalId, $scheduledAt, $duration) {
+            $this->assertNoProfessionalOverlap(
+                professionalUserId: $professionalId,
+                scheduledAt: $scheduledAt,
+                durationMinutes: $duration,
+            );
 
-        return [
-            'appointment' => $appointment->fresh(['consumptions', 'treatment', 'client']),
-            'warnings' => $warnings,
-        ];
+            $appointment = Appointment::query()->create([
+                'clinic_id' => $treatment->clinic_id,
+                'treatment_id' => $treatment->id,
+                'client_id' => $treatment->client_id,
+                'professional_user_id' => $professionalId,
+                'status' => Appointment::STATUS_SCHEDULED,
+                'scheduled_at' => $scheduledAt,
+                'duration_minutes' => $duration,
+                'notes' => $data['notes'] ?? null,
+            ]);
+
+            $suggested = $this->treatments->suggestedConsumptions($treatment);
+            $warnings = $this->stockAlerts->warningMessagesForSuggested($suggested);
+            $this->stockAlerts->notifyAppointmentWarnings($appointment, $warnings);
+
+            return [
+                'appointment' => $appointment->fresh(['consumptions', 'treatment', 'client', 'professionalUser']),
+                'warnings' => $warnings,
+            ];
+        });
     }
 
     /**
-     * @param  array{scheduled_at?: string|null, professional_user_id?: int|null, notes?: string|null}  $data
+     * @param  array{scheduled_at?: string|null, professional_user_id?: int|null, duration_minutes?: int|null, notes?: string|null}  $data
      */
     public function update(Appointment $appointment, array $data): Appointment
     {
@@ -65,16 +84,45 @@ class AppointmentService
             ]);
         }
 
-        $appointment->fill([
-            'scheduled_at' => array_key_exists('scheduled_at', $data) ? $data['scheduled_at'] : $appointment->scheduled_at,
-            'professional_user_id' => array_key_exists('professional_user_id', $data)
-                ? $data['professional_user_id']
-                : $appointment->professional_user_id,
-            'notes' => array_key_exists('notes', $data) ? $data['notes'] : $appointment->notes,
-        ]);
-        $appointment->save();
+        $appointment->loadMissing('client');
 
-        return $appointment->fresh(['consumptions', 'treatment', 'client']);
+        $professionalId = array_key_exists('professional_user_id', $data)
+            ? $data['professional_user_id']
+            : $appointment->professional_user_id;
+
+        if ($professionalId === null) {
+            throw ValidationException::withMessages([
+                'professional_user_id' => ['Selecione o profissional.'],
+            ]);
+        }
+
+        $scheduledAt = array_key_exists('scheduled_at', $data)
+            ? $data['scheduled_at']
+            : $appointment->scheduled_at;
+        $duration = $this->resolveDurationMinutes(
+            clientDuration: $appointment->client?->service_duration_minutes,
+            storedDuration: $appointment->duration_minutes,
+            override: $data['duration_minutes'] ?? null,
+        );
+
+        return DB::transaction(function () use ($appointment, $data, $professionalId, $scheduledAt, $duration) {
+            $this->assertNoProfessionalOverlap(
+                professionalUserId: (int) $professionalId,
+                scheduledAt: $scheduledAt,
+                durationMinutes: $duration,
+                ignoreAppointmentId: $appointment->id,
+            );
+
+            $appointment->fill([
+                'scheduled_at' => $scheduledAt,
+                'professional_user_id' => $professionalId,
+                'duration_minutes' => $duration,
+                'notes' => array_key_exists('notes', $data) ? $data['notes'] : $appointment->notes,
+            ]);
+            $appointment->save();
+
+            return $appointment->fresh(['consumptions', 'treatment', 'client', 'professionalUser']);
+        });
     }
 
     /**
@@ -199,7 +247,7 @@ class AppointmentService
                 ]);
             }
 
-            return $appointment->fresh(['consumptions.product', 'consumptions.salePayment', 'treatment', 'client']);
+            return $appointment->fresh(['consumptions.product', 'consumptions.salePayment', 'treatment', 'client', 'professionalUser']);
         });
     }
 
@@ -285,8 +333,69 @@ class AppointmentService
             $appointment->status = Appointment::STATUS_CANCELLED;
             $appointment->save();
 
-            return $appointment->fresh(['treatment', 'client']);
+            return $appointment->fresh(['treatment', 'client', 'professionalUser']);
         });
+    }
+
+    public function resolveDurationMinutes(
+        ?int $clientDuration,
+        ?int $storedDuration,
+        ?int $override,
+    ): int {
+        if ($override !== null && $override > 0) {
+            return $override;
+        }
+
+        if ($storedDuration !== null && $storedDuration > 0) {
+            return $storedDuration;
+        }
+
+        if ($clientDuration !== null && $clientDuration > 0) {
+            return $clientDuration;
+        }
+
+        return Appointment::DEFAULT_DURATION_MINUTES;
+    }
+
+    private function assertNoProfessionalOverlap(
+        int $professionalUserId,
+        mixed $scheduledAt,
+        int $durationMinutes,
+        ?int $ignoreAppointmentId = null,
+    ): void {
+        if ($scheduledAt === null || $scheduledAt === '') {
+            return;
+        }
+
+        $startsAt = $scheduledAt instanceof CarbonInterface
+            ? $scheduledAt->copy()
+            : \Illuminate\Support\Carbon::parse($scheduledAt);
+        $endsAt = $startsAt->copy()->addMinutes($durationMinutes);
+
+        $candidates = Appointment::query()
+            ->where('professional_user_id', $professionalUserId)
+            ->whereIn('status', [Appointment::STATUS_SCHEDULED, Appointment::STATUS_IN_PROGRESS])
+            ->whereNotNull('scheduled_at')
+            ->when($ignoreAppointmentId, fn ($query) => $query->whereKeyNot($ignoreAppointmentId))
+            ->with('client')
+            ->lockForUpdate()
+            ->get();
+
+        foreach ($candidates as $existing) {
+            $existingDuration = $this->resolveDurationMinutes(
+                clientDuration: $existing->client?->service_duration_minutes,
+                storedDuration: $existing->duration_minutes,
+                override: null,
+            );
+            $existingStart = $existing->scheduled_at;
+            $existingEnd = $existingStart->copy()->addMinutes($existingDuration);
+
+            if ($existingStart->lt($endsAt) && $existingEnd->gt($startsAt)) {
+                throw ValidationException::withMessages([
+                    'scheduled_at' => ['Já existe sessão agendada ou em andamento neste horário para o profissional.'],
+                ]);
+            }
+        }
     }
 
     /**

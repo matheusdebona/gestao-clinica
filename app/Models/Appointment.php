@@ -18,6 +18,8 @@ class Appointment extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
+    public const DEFAULT_DURATION_MINUTES = 60;
+
     /** @var list<string> */
     public const STATUSES = [
         self::STATUS_SCHEDULED,

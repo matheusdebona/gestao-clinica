@@ -628,10 +628,10 @@ Abrir tratamento a partir da venda continua em `treatments.start` (fluxo comerci
 
 ##### API / modelo (gaps nesta fase)
 
-- [ ] `GET /appointments` com `from`, `to`, `status`, `professional_user_id`, `client_id` (paginação ou janela de calendário)
-- [ ] `professional_user_id` **required** no store/update (hoje nullable)
-- [ ] Validação de **overlap**: mesmo `professional_user_id`, status `scheduled` ou `in_progress`, intervalos que se cruzam → 422 (definir duração padrão se só houver `scheduled_at` pontual — ex. usar `client.service_duration_minutes` ou duração default da clínica / campo futuro `duration_minutes` planejado)
-- [ ] Endpoints de create/patch/start/cancel passam a checar `appointments.*` (ou dual-check documentado na implementação)
+- [x] `GET /appointments` com `from`, `to`, `status`, `professional_user_id`, `client_id` (paginação ou janela de calendário)
+- [x] `professional_user_id` **required** no store/update (hoje nullable)
+- [x] Validação de **overlap**: mesmo `professional_user_id`, status `scheduled` ou `in_progress`, intervalos que se cruzam → 422 (definir duração padrão se só houver `scheduled_at` pontual — ex. usar `client.service_duration_minutes` ou duração default da clínica / campo futuro `duration_minutes` planejado)
+- [x] Endpoints de create/patch/start/cancel passam a checar `appointments.*` (ou dual-check documentado na implementação)
 - Nested `GET/POST treatments/{id}/appointments` pode permanecer para detalhe do caso; a **Agenda** usa o index global
 
 ##### Telas / rotas
@@ -660,12 +660,12 @@ Mobile-first: no phone, default **dia**; semana como progressive enhancement (`m
 
 ##### DoD 4.6
 
-- [ ] Agenda dia/semana lista sessões da clínica via `GET /appointments`
-- [ ] Criar sessão com profissional obrigatório; overlap rejeitado
-- [ ] Remarcar / cancelar / iniciar sem baixar estoque
-- [ ] Card mostra cliente, horário, status, profissional, link tratamento
-- [ ] Nav **Agenda**; permissões `appointments.*` no seed e `PermissionGate`
-- [ ] Testes API (index, overlap, perms); smoke Vue do calendário
+- [x] Agenda dia/semana lista sessões da clínica via `GET /appointments`
+- [x] Criar sessão com profissional obrigatório; overlap rejeitado
+- [x] Remarcar / cancelar / iniciar sem baixar estoque
+- [x] Card mostra cliente, horário, status, profissional, link tratamento
+- [x] Nav **Agenda**; permissões `appointments.*` no seed e `PermissionGate`
+- [x] Testes API (index, overlap, perms); smoke Vue do calendário
 
 #### 4.7 — Tratamento / consumo clínico (especificação de UI)
 

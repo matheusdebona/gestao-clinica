@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Bell,
+  CalendarDays,
   ClipboardList,
   FileText,
   LayoutDashboard,
@@ -30,7 +31,8 @@ const items = computed(() => {
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', pinMobile: true },
     { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', pinMobile: true },
-    { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view', pinMobile: true },
+    { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view' },
+    { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', pinMobile: true },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
     { to: '/notifications', label: 'Alertas', icon: Bell },
     { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view' },

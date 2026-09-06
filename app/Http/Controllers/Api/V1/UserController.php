@@ -26,6 +26,20 @@ class UserController extends Controller
         return UserResource::collection($users);
     }
 
+    /**
+     * Active clinic users who can run a session (professional or admin).
+     */
+    public function professionals(): AnonymousResourceCollection
+    {
+        $users = User::query()
+            ->where('is_active', true)
+            ->role(['professional', 'admin'])
+            ->orderBy('name')
+            ->get();
+
+        return UserResource::collection($users);
+    }
+
     public function store(StoreUserRequest $request): JsonResponse
     {
         EnsureRolesAndPermissions::run();
