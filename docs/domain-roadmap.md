@@ -145,6 +145,7 @@ See detailed KPI build guide: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap
 - [x] Metrics API wave C — real margin (`GET /metrics/margin`, period + cohort_sale)
 - [x] Metrics API wave D — inventory + clinical operations (`GET /metrics/inventory`, `GET /metrics/operations`)
 - [x] Low-stock alerts (in-app inbox + PushChannel stub): daily job (atual + projeção pelos agendamentos do dia); warnings não-bloqueantes no `schedule`; destinatários com `products.view`
+- [ ] **UI inbox** (Fase 4.9 Vue) — list/read/read-all + badge; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.9
 - [ ] Real push / email / WhatsApp channels (FCM/Web Push later)
 - [ ] Audit log for stock and treatment overrides
 - [ ] Dashboard UI (Vue web / later PWA) consuming metrics endpoints
@@ -163,7 +164,14 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] Design system **Modern Soft Violet** + `/dev/ui` kitchen sink (Fase 3)
 - [x] Auth + `ClinicShell` (Fase 4.1)
 - [x] Clientes: lista, busca `?q=`, CRUD (Fase 4.2)
-- [ ] Features clínicas restantes: products, sales, treatments, notifications, metrics (Fase 4.3+)
+- [x] Equipe: RBAC + CRUD usuários (Fase 4.2b)
+- [ ] **Produtos** (+ marcas/tipos/unidades, cascata marca→tipo, `?q=`, ajuste estoque) — Fase 4.3; ver detalhe em [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3
+- [ ] **Protocolos** (pacote de produtos, itens no form, preços editáveis, `?q=`) — Fase 4.4; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.4
+- [ ] **Vendas / orçamentos** (wizard, protocolo+itens, soft min, pagamentos fechados, orçamento+PDF, nav inbox) — Fase 4.5; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.5
+- [ ] **Agendamentos** (agenda dia/semana, `appointments.*`, overlap por profissional, start sem estoque) — Fase 4.6; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.6
+- [ ] **Tratamento — consumo clínico** (`treatments.consume`, checklist sessão, extras, stock no complete) — Fase 4.7; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.7
+- [ ] **Métricas** (página única A–D, hero faturamento/ticket/conversão/margem, charts) — Fase 4.8; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8
+- [ ] **Notificações** (inbox Alertas, badge unread, chips, deep links; só `products.view`) — Fase 4.9; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.9
 - [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)
 - [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI
 - [ ] Desktop layouts as progressive enhancement of the mobile design

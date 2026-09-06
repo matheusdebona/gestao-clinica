@@ -58,11 +58,12 @@ All commercial and clinical data belongs to a **clinic** (tenant). Users belong 
 Clinic
 ├── Users
 ├── Product catalogs
-│   ├── ProductType          (botox, filler, toxin, acid, …)
 │   ├── Brand
+│   ├── ProductType          (belongs to Brand — brand_id required)
 │   ├── UnitOfMeasure        (mg, ml, unit, kg, …)
 │   └── Product
-│         ├── cost, sale_price
+│         ├── brand_id + product_type_id (type must match brand)
+│         ├── cost, sale_price, min_sale_price
 │         ├── stock_quantity, min_stock, lead_time_days
 │         └── purpose / description
 ├── Protocol
@@ -89,7 +90,18 @@ Clinic
 
 ## 4. Products & stock
 
-Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./produto-financeiro.md).
+Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./produto-financeiro.md).  
+UI Phase 4.3 detail: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3.
+
+### Catalog hierarchy (marca → tipo → produto)
+
+| Entity | Fields (core) | Notes |
+| --- | --- | --- |
+| `Brand` | `clinic_id`, `name`, `is_active` | Clinic-scoped |
+| `ProductType` | `clinic_id`, **`brand_id`**, `name`, `slug`, `is_active` | **Belongs to a brand**; list filter `?brand_id=` |
+| `UnitOfMeasure` | `clinic_id`, `name`, `symbol`, `is_active` | Independent of brand |
+
+Product form cascade: choose brand → types of that brand → product fields + unit.
 
 ### Product
 
@@ -98,8 +110,8 @@ Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./p
 | `clinic_id` | Tenant |
 | `name` | Product name |
 | `sku` | Optional internal/supplier code |
-| `product_type_id` | Category (botox, filling, toxin, acid, …) |
-| `brand_id` | Brand |
+| `brand_id` | Brand (chosen first in UI) |
+| `product_type_id` | Type **of that brand** (must match `brand_id`) |
 | `unit_of_measure_id` | kg, mg, ml, unit, … — qty and cost share this UoM |
 | `purpose` | What it is for |
 | `cost` | **Weighted average unit cost** (CMV / inventory valuation base) |
@@ -406,12 +418,14 @@ A **treatment** is the clinical case opened from a **confirmed sale** (1:1).
 | Field | Purpose |
 | --- | --- |
 | `treatment_id` | Parent clinical case |
-| `scheduled_at` | Planned visit (nullable for immediate start) |
+| `scheduled_at` | Planned visit (required for calendar booking; immediate start may set “now”) |
 | `status` | `scheduled`, `in_progress`, `completed`, `cancelled` |
-| `professional_user_id` | Who performed the session |
+| `professional_user_id` | **Required** — who will run / ran the session |
 | `started_at` / `finished_at` / `duration_minutes` | Session window |
 | `stock_warning` | JSON warnings captured on start (stock < suggested) |
-| `total_cost` / `total_charged_on_appointment` | Session cost + extra charges |
+| `total_cost` / `total_charged_on_appointment` | Session cost + extra charges (on **complete**) |
+
+**Scheduling rules (UI Fase 4.6):** no two `scheduled`/`in_progress` appointments for the **same professional** with overlapping time windows. Clinic-wide calendar via `GET /appointments?from=&to=…`. Permissions: `appointments.view|manage|start|cancel` (separate from `treatments.*` consumption). Detail: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.6.
 
 ### AppointmentConsumption
 
@@ -444,7 +458,11 @@ A **treatment** is the clinical case opened from a **confirmed sale** (1:1).
 
 ### Permissions
 
-`treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel`
+**Treatment (caso clínico / consumo):** `treatments.view`, `treatments.manage`, `treatments.start`, **`treatments.consume`**, `treatments.complete`, `treatments.cancel`
+
+**Appointments (agenda):** `appointments.view`, `appointments.manage`, `appointments.start`, `appointments.cancel`
+
+UI Fase 4.7 (consumo): [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.7 — `PUT …/consumptions` gated by `treatments.consume`.
 
 ---
 
@@ -482,7 +500,8 @@ Clinic exists
 | Metrics | `metrics.view` (`GET /metrics/commercial`, `/metrics/acquisition`, `/metrics/margin`) |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
-| Treatments | `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel` |
+| Treatments | `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.consume`, `treatments.complete`, `treatments.cancel` |
+| Appointments | `appointments.view`, `appointments.manage`, `appointments.start`, `appointments.cancel` |
 
 All checks remain **permission-first**; roles only group these permissions per clinic job (receptionist, seller, stock manager, professional, clinic admin).
 
