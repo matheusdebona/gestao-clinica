@@ -41,10 +41,13 @@ import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
 import Tabs from '@/components/ui/Tabs.vue'
 import Textarea from '@/components/ui/Textarea.vue'
+import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 import { useToastStore } from '@/stores/toast'
+import { useThemeStore } from '@/stores/theme'
 import { formatBRL } from '@/lib/formatters'
 
 const toast = useToastStore()
+const theme = useThemeStore()
 
 const textValue = ref('Maria Silva')
 const numberValue = ref('12')
@@ -93,14 +96,14 @@ const radioOptions = [
 ]
 
 const palette = [
-  { name: 'Brand', hex: '#5956A6' },
-  { name: 'Canvas', hex: '#F2F2F7' },
-  { name: 'Surface', hex: '#FFFFFF' },
-  { name: 'Title', hex: '#1C1C1E' },
-  { name: 'Muted', hex: '#8E8E93' },
-  { name: 'Success', hex: '#34C759' },
-  { name: 'Warning', hex: '#FF9F0A' },
-  { name: 'Danger', hex: '#FF3B30' },
+  { name: 'Brand', swatchClass: 'bg-brand', caption: 'brand' },
+  { name: 'Canvas', swatchClass: 'bg-canvas', caption: 'canvas' },
+  { name: 'Surface', swatchClass: 'bg-surface', caption: 'surface' },
+  { name: 'Title', swatchClass: 'bg-title', caption: 'title' },
+  { name: 'Muted', swatchClass: 'bg-muted', caption: 'muted' },
+  { name: 'Success', swatchClass: 'bg-success', caption: 'success' },
+  { name: 'Warning', swatchClass: 'bg-warning', caption: 'warning' },
+  { name: 'Danger', swatchClass: 'bg-danger', caption: 'danger' },
 ]
 
 function simulateLoading() {
@@ -118,8 +121,24 @@ function simulateLoading() {
       <PageHeader
         sticky
         title="Componentes"
-        description="Soft Violet Liquid Glass (heavy). Violeta só como acento — o resto é material translúcido."
-      />
+        description="Soft Violet Liquid Glass (heavy), claro e escuro. Violeta só como acento — o resto é material translúcido."
+      >
+        <template #actions>
+          <ThemeToggle />
+        </template>
+      </PageHeader>
+
+      <section class="flex flex-col gap-2">
+        <p class="section-label">Tema</p>
+        <SurfaceCard>
+          <ThemeToggle variant="segmented" />
+          <p class="mt-3 text-[13px] text-muted">
+            Preferência: {{ theme.preference === 'system' ? 'sistema' : theme.preference === 'light' ? 'claro' : 'escuro' }}
+            · resolvido: {{ theme.resolved === 'dark' ? 'escuro' : 'claro' }}.
+            Escuro aplica a classe dark no html e atualiza todos os controles abaixo.
+          </p>
+        </SurfaceCard>
+      </section>
 
       <section class="flex flex-col gap-2">
         <p class="section-label">Materiais</p>
@@ -143,14 +162,15 @@ function simulateLoading() {
               v-for="s in palette"
               :key="s.name"
               :name="s.name"
-              :hex="s.hex"
+              :swatch-class="s.swatchClass"
+              :caption="s.caption"
             />
             <ColorSwatch name="Regular" swatch-class="glass-regular" />
             <ColorSwatch name="Clear" swatch-class="glass-clear" />
             <ColorSwatch name="Dark" swatch-class="glass-dark" />
           </div>
           <p class="mt-4 text-[13px] text-muted">
-            Com prefers-reduced-transparency as superfícies ficam sólidas (canvas, surface, input).
+            Com prefers-reduced-transparency as superfícies ficam sólidas (canvas, surface, input) nos dois temas.
           </p>
         </SurfaceCard>
       </section>

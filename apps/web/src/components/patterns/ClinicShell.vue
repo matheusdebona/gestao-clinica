@@ -20,6 +20,7 @@ import Button from '@/components/ui/Button.vue'
 import IconButton from '@/components/ui/IconButton.vue'
 import NavBadge from '@/components/ui/NavBadge.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
+import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 import { getUnreadNotificationCount } from '@/features/notifications/api'
 import { useAuthStore } from '@/stores/auth'
 
@@ -117,9 +118,12 @@ async function onLogout() {
           </SidebarNavItem>
         </RouterLink>
       </nav>
-      <button type="button" class="mt-4 w-full text-left" @click="onLogout">
-        <SidebarNavItem label="Sair" :icon="LogOut" />
-      </button>
+      <div class="mt-4 flex items-center gap-1">
+        <button type="button" class="min-w-0 flex-1 text-left" @click="onLogout">
+          <SidebarNavItem label="Sair" :icon="LogOut" />
+        </button>
+        <ThemeToggle tone="inverse" />
+      </div>
     </aside>
 
     <div class="flex min-w-0 flex-1 flex-col">
@@ -130,6 +134,7 @@ async function onLogout() {
           {{ auth.clinicName || 'Gestão' }}
         </p>
         <div class="flex items-center gap-1">
+          <ThemeToggle />
           <div v-if="canAlerts" class="relative">
             <IconButton label="Alertas" @click="openAlerts">
               <Bell class="size-5" :stroke-width="1.75" />

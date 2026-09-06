@@ -2,7 +2,7 @@
 
 ## Frontend UI (non-negotiable)
 
-The Vue app in `apps/web` has a frozen design system (Apple Liquid Glass, Soft Violet, **heavy**).
+The Vue app in `apps/web` has a frozen design system (Apple Liquid Glass, Soft Violet, **heavy**, light + dark).
 
 - **Always** build screens from `@/components/ui` (and `@/components/patterns` later).
 - **Never** hand-roll buttons, inputs, dialogs, toasts, or cards in a feature.

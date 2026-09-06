@@ -1,5 +1,6 @@
 @import "@fontsource-variable/inter";
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 @import "./design-tokens/tokens.css";
 
 @layer base {
@@ -8,6 +9,11 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {

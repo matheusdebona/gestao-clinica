@@ -37,7 +37,7 @@ const emit = defineEmits<{
       @click.stop
     >
       <SwitchThumb
-        class="block size-[27px] translate-x-[2px] rounded-full bg-surface shadow-thumb transition-transform data-[state=checked]:translate-x-[22px]"
+        class="block size-[27px] translate-x-[2px] rounded-full bg-inverse shadow-thumb transition-transform data-[state=checked]:translate-x-[22px]"
       />
     </SwitchRoot>
   </label>

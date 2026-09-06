@@ -10,7 +10,7 @@ Any Vue/UI work in `apps/web` **must** use existing design-system components. Do
 - Import from `@/components/ui` (and `@/components/patterns` when they exist).
 - Features and pages compose those components. They do not ship raw `<button>`, `<input>`, `<select>`, `<textarea>`, or one-off styled divs that look like controls.
 - Visual source of truth: `apps/web/src/design-tokens/tokens.css` + kitchen sink `/dev/ui`.
-- Spec: `docs/frontend-vue-spec.md` §3 and §5 (Soft Violet Liquid Glass, heavy).
+- Spec: `docs/frontend-vue-spec.md` §3 and §5 (Soft Violet Liquid Glass, heavy, light + dark).
 - Surfaces use `GlassSurface` or tokenized glass classes (`glass-regular`, `glass-clear`, `glass-dark`, `glass-field`, `glass-menu`). Never add a one-off `backdrop-filter` in a feature.
 - If a control is missing: add it under `components/ui`, put every state on `/dev/ui`, then use it. Never style a one-off in a feature.
 

@@ -159,14 +159,31 @@ Dois materiais claros + um escuro. Implementar como classes em `tokens.css` (`gl
 
 Componente `GlassSurface` (`material`: `regular` \| `clear` \| `dark`) é o wrapper; features não reimplementam `backdrop-filter`.
 
+#### Tema claro / escuro
+
+Tema **explícito** via classe `dark` em `html` (não só `prefers-color-scheme`). Tokens em `:root` (claro) e `html.dark` (escuro). Tailwind `@theme inline` aponta para as CSS vars, então primitivos de glass/input/overlay acompanham o tema sem `dark:` em cada feature.
+
+| Peça | Comportamento |
+| --- | --- |
+| Preferência | `system` \| `light` \| `dark` — Pinia `theme`, persistida em `localStorage` (`gc_theme`) |
+| Default | **sistema** (`prefers-color-scheme`) |
+| Toggle | `ThemeToggle` no `ClinicShell` (sidebar + header mobile), login e `/dev/ui` (segmentado no kitchen sink) |
+| Brand no escuro | `#7A77C9` (ligeiramente mais claro que `#5956A6`); pressed `#5956A6` |
+| Glass no escuro | fills cinza translúcidos (`rgba(44,44,46,…)`), hairline branco 10–14%, highlight inset fraco — **sem vidro leitoso branco** |
+| Canvas | claro `#F2F2F7`; escuro `#000000` + mesh brand calmo |
+| `color-scheme` | `light` / `dark` no `html` (date/scroll nativos) |
+| Reduced transparency | sólidos `--sv-bg-surface` / `--sv-bg-input` / `--sv-bg-sidebar` **do tema ativo** |
+
+Script inline em `index.html` aplica a classe antes do Vue para evitar flash.
+
 #### Acessibilidade
 
 | Preferência | Fallback |
 | --- | --- |
-| `prefers-reduced-transparency` | Superfícies sólidas (`--sv-bg-surface` / `--sv-bg-input` / `--sv-bg-sidebar`); sem `backdrop-filter`; mesh do canvas desligado; bordas `--sv-border-subtle` |
+| `prefers-reduced-transparency` | Superfícies sólidas (`--sv-bg-surface` / `--sv-bg-input` / `--sv-bg-sidebar` do tema ativo); sem `backdrop-filter`; mesh do canvas desligado; bordas `--sv-border-subtle` |
 | `prefers-reduced-motion` | Transições/animações ≈ 0 (já global em `tokens.css`) |
 
-Contraste de texto: `--sv-text-title` / `--sv-text-body` sobre o vidro; não usar texto branco em `glass-regular`.
+Contraste de texto: `--sv-text-title` / `--sv-text-body` sobre o vidro; no claro não usar texto branco em `glass-regular`; no escuro o título é claro (`#F5F5F7`).
 
 ### 5.1 Tokens (CSS variables → Tailwind theme)
 
@@ -268,7 +285,7 @@ Motion: duração curta; respeitar `prefers-reduced-motion` e `prefers-reduced-t
 
 | Componente | Propósito | Estados | Breakpoints |
 | --- | --- | --- | --- |
-| `AppShell` / `ClinicShell` | Canvas + mesh + nav **flutuante** em glass | loading skeleton | **&lt; md:** tab bar cápsula `glass-regular` + header sticky glass; **≥ md:** sidebar `glass-dark` flutuante (não edge-to-edge) |
+| `AppShell` / `ClinicShell` | Canvas + mesh + nav **flutuante** em glass + `ThemeToggle` | loading skeleton | **&lt; md:** tab bar cápsula `glass-regular` + header sticky glass; **≥ md:** sidebar `glass-dark` flutuante (não edge-to-edge) |
 | `SidebarNavItem` | Item de navegação | default / hover / active | Active: brand tint, peso 500 |
 | `NavBadge` | Contagem (ex. inbox) | — | Pill sólido danger (leitura) |
 | `Page` | Conteúdo principal | — | Padding 24; gap 20 entre blocos |
@@ -353,7 +370,7 @@ Validação: Zod no client + exibir `errors.field` do Laravel `422`.
 
 Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
-- Mostra tokens (swatches) + **materiais glass** + todos os primitives/compostos em todos os estados (inclui todo input e todo menu/overlay).
+- Mostra tokens (swatches vivos do tema) + **materiais glass** + **Tema** (Sistema / Claro / Escuro) + todos os primitives/compostos em todos os estados (inclui todo input e todo menu/overlay).
 - Gate de qualidade **antes** de abrir PRs de features.
 - Storybook fica opcional (fase 3.5); default é este sink.
 
@@ -420,6 +437,7 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
 - [x] Tokens Soft Violet em CSS vars → Tailwind theme (§5.1)
 - [x] Materiais Liquid Glass heavy (`glass-regular` / `glass-clear` / `glass-dark` / `glass-field`) + fallbacks a11y
+- [x] Tema claro/escuro (`html.dark`, default sistema, `ThemeToggle`)
 - [x] `PageHeader` / `SearchField` + primitives de form/feedback/overlay no `/dev/ui`
 - [x] Página `/dev/ui` com swatches + materiais + estados (default / erro / snack)
 - [x] `ClinicShell` flutuante (`glass-dark` desktop; tab bar cápsula no phone)
@@ -994,7 +1012,6 @@ Nav do `ClinicShell` só mostra itens permitidos.
 - Features clínicas e auth (Fases 2 e 4)
 - PWA / service worker
 - Storybook (opcional)
-- Temas dark mode como prioridade
 - App nativo
 - Substituição do PushChannel stub por FCM (backend)
 

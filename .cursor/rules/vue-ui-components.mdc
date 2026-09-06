@@ -30,8 +30,9 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `EmptyState` — título + descrição + slot `action`
 - `Pagination` — `page` / `lastPage` (`update:page`)
 - `Tabs` — segmento (`v-model` + `items`; `block` para largura total)
-- `LineChart` — série (Chart.js; cores via tokens Soft Violet)
+- `LineChart` — série (Chart.js; cores via tokens Soft Violet; re-render no tema)
 - `NavBadge` — contador numérico da nav (some se `count` for 0; `99+`)
+- `ThemeToggle` — `icon` (ciclo sistema/claro/escuro) ou `segmented`; `tone` `inverse` na sidebar
 
 ## Layout
 - `GlassSurface` — `material` `regular` | `clear` | `dark`

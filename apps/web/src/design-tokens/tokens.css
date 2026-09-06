@@ -99,13 +99,77 @@
   --sv-glass-input-border: rgba(255, 255, 255, 0.18);
   --sv-glass-filter-field: blur(20px) saturate(150%);
 
-  --sv-scrim: color-mix(in srgb, var(--sv-text-title) 32%, transparent);
+  --sv-scrim: rgba(28, 28, 30, 0.32);
   --sv-switch-off: color-mix(in srgb, var(--sv-text-muted) 28%, transparent);
+  --sv-switch-thumb: #ffffff;
 
   --sv-canvas-mesh:
     radial-gradient(ellipse 90% 55% at 6% -8%, color-mix(in srgb, var(--sv-brand-primary) 11%, transparent), transparent 58%),
     radial-gradient(ellipse 70% 45% at 100% 0%, color-mix(in srgb, var(--sv-brand-primary) 8%, transparent), transparent 52%),
     radial-gradient(ellipse 55% 40% at 70% 110%, color-mix(in srgb, var(--sv-brand-primary) 7%, transparent), transparent 55%);
+}
+
+html.dark {
+  color-scheme: dark;
+
+  --sv-brand-primary: #7a77c9;
+  --sv-brand-primary-dark: #5956a6;
+  --sv-brand-primary-light: #2c2a4a;
+  --sv-brand-primary-hover: #6b68b8;
+
+  --sv-bg-canvas: #000000;
+  --sv-bg-sidebar: #121214;
+  --sv-bg-surface: #1c1c1e;
+  --sv-bg-surface-muted: #2c2c2e;
+  --sv-bg-input: #2c2c2e;
+
+  --sv-text-title: #f5f5f7;
+  --sv-text-body: #d1d1d6;
+  --sv-text-muted: #8e8e93;
+  --sv-text-inverse: #ffffff;
+
+  --sv-success: #30d158;
+  --sv-success-light: #15361f;
+  --sv-danger: #ff453a;
+  --sv-danger-light: #3a1412;
+  --sv-warning: #ffd60a;
+  --sv-warning-light: #3a280c;
+  --sv-card-pink: #2c2c2e;
+  --sv-card-purple: #2c2c2e;
+  --sv-card-blue: #2c2c2e;
+  --sv-badge-purple: #7a77c9;
+
+  --sv-border-subtle: rgba(255, 255, 255, 0.12);
+  --sv-border-divider: rgba(255, 255, 255, 0.08);
+
+  --sv-shadow-card: 0 8px 28px rgba(0, 0, 0, 0.45);
+  --sv-shadow-floating: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --sv-shadow-glass:
+    0 10px 36px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  --sv-shadow-glass-dark:
+    0 12px 40px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --sv-shadow-field: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --sv-shadow-thumb: 0 1px 3px rgba(0, 0, 0, 0.45);
+
+  --sv-glass-regular-bg: rgba(44, 44, 46, 0.72);
+  --sv-glass-regular-border: rgba(255, 255, 255, 0.14);
+  --sv-glass-clear-bg: rgba(58, 58, 60, 0.42);
+  --sv-glass-clear-border: rgba(255, 255, 255, 0.1);
+  --sv-glass-dark-bg: rgba(22, 22, 24, 0.76);
+  --sv-glass-dark-border: rgba(255, 255, 255, 0.12);
+  --sv-glass-input-bg: rgba(58, 58, 60, 0.55);
+  --sv-glass-input-border: rgba(255, 255, 255, 0.12);
+
+  --sv-scrim: rgba(0, 0, 0, 0.52);
+  --sv-switch-off: color-mix(in srgb, var(--sv-text-muted) 28%, transparent);
+  --sv-switch-thumb: #ffffff;
+
+  --sv-canvas-mesh:
+    radial-gradient(ellipse 90% 55% at 6% -8%, color-mix(in srgb, var(--sv-brand-primary) 18%, transparent), transparent 58%),
+    radial-gradient(ellipse 70% 45% at 100% 0%, color-mix(in srgb, var(--sv-brand-primary) 12%, transparent), transparent 52%),
+    radial-gradient(ellipse 55% 40% at 70% 110%, color-mix(in srgb, var(--sv-brand-primary) 10%, transparent), transparent 55%);
 }
 
 @theme inline {
