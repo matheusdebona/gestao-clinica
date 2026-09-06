@@ -12,6 +12,10 @@ const router = useRouter()
 function openMetrics() {
   void router.push({ name: 'metrics' })
 }
+
+function openAlerts() {
+  void router.push({ name: 'notifications' })
+}
 </script>
 
 <template>
@@ -20,6 +24,17 @@ function openMetrics() {
       :title="auth.clinicName ? auth.clinicName : 'Início'"
       :description="auth.user ? `Olá, ${auth.user.name}.` : undefined"
     />
+    <PermissionGate permission="products.view">
+      <SurfaceCard :padding="false">
+        <div class="px-5 py-2">
+          <ListCard
+            title="Alertas"
+            meta="Estoque baixo e avisos da agenda"
+            @action="openAlerts"
+          />
+        </div>
+      </SurfaceCard>
+    </PermissionGate>
     <PermissionGate permission="metrics.view">
       <SurfaceCard :padding="false">
         <div class="px-5 py-2">

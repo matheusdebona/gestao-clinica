@@ -31,6 +31,7 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `Pagination` — `page` / `lastPage` (`update:page`)
 - `Tabs` — segmento (`v-model` + `items`; `block` para largura total)
 - `LineChart` — série (Chart.js; cores via tokens Soft Violet)
+- `NavBadge` — contador numérico da nav (some se `count` for 0; `99+`)
 
 ## Layout
 - `PageHeader`, `SurfaceCard`
@@ -46,6 +47,7 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `AgendaEventCard` — `components/patterns`; evento da agenda (cliente, horário, status, profissional, tratamento)
 - `MetricCard` — `components/patterns`; label + valor (slot) + hint
 - `RankBar` — `components/patterns`; ranking com barra proporcional (tokens)
+- `NotificationInboxItem` — `components/patterns`; linha do inbox (título, message, tempo relativo, unread)
 
 ## Tokens
 Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows.

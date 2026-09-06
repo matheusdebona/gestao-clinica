@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\V1\Notifications\IndexNotificationRequest;
 use App\Http\Resources\Api\V1\NotificationResource;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -11,13 +12,39 @@ use Illuminate\Notifications\DatabaseNotification;
 
 class NotificationController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
-    {
-        $notifications = $request->user()
-            ->notifications()
-            ->paginate(20);
+    /**
+     * @var array<string, list<string>>
+     */
+    private const CATEGORY_TYPES = [
+        'stock' => ['low_stock', 'projected_low_stock'],
+        'agenda' => ['appointment_stock_warning'],
+    ];
 
-        return NotificationResource::collection($notifications);
+    public function index(IndexNotificationRequest $request): AnonymousResourceCollection
+    {
+        $query = $request->user()
+            ->notifications()
+            ->latest();
+
+        if ($request->boolean('unread')) {
+            $query->whereNull('read_at');
+        }
+
+        $category = $request->validated('category');
+        if (is_string($category) && isset(self::CATEGORY_TYPES[$category])) {
+            $query->whereIn('data->type', self::CATEGORY_TYPES[$category]);
+        }
+
+        return NotificationResource::collection($query->paginate(20));
+    }
+
+    public function unreadCount(Request $request): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'unread_count' => $request->user()->unreadNotifications()->count(),
+            ],
+        ]);
     }
 
     public function markRead(Request $request, string $id): NotificationResource

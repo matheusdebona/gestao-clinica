@@ -115,3 +115,36 @@ export function formatPercent(value: string | number | null | undefined): string
     minimumFractionDigits: 0,
   }).format(amount)}%`
 }
+
+export function formatRelativeTime(value: string | null | undefined, now = new Date()): string {
+  if (!value) {
+    return '—'
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return '—'
+  }
+
+  const diffMs = parsed.getTime() - now.getTime()
+  const absMs = Math.abs(diffMs)
+  const minute = 60_000
+  const hour = 60 * minute
+  const day = 24 * hour
+
+  if (absMs < minute) {
+    return 'agora'
+  }
+
+  const rtf = new Intl.RelativeTimeFormat('pt-BR', { numeric: 'auto' })
+  if (absMs < hour) {
+    return rtf.format(Math.round(diffMs / minute), 'minute')
+  }
+  if (absMs < day) {
+    return rtf.format(Math.round(diffMs / hour), 'hour')
+  }
+  if (absMs < 7 * day) {
+    return rtf.format(Math.round(diffMs / day), 'day')
+  }
+
+  return formatDate(value)
+}

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useQuery } from '@tanstack/vue-query'
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -16,7 +17,10 @@ import {
   ChartNoAxesCombined,
 } from '@lucide/vue'
 import Button from '@/components/ui/Button.vue'
+import IconButton from '@/components/ui/IconButton.vue'
+import NavBadge from '@/components/ui/NavBadge.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
+import { getUnreadNotificationCount } from '@/features/notifications/api'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
@@ -34,7 +38,7 @@ const items = computed(() => {
     { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view' },
     { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', pinMobile: true },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
-    { to: '/notifications', label: 'Alertas', icon: Bell },
+    { to: '/notifications', label: 'Alertas', icon: Bell, permission: 'products.view' },
     { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view' },
   ]
 
@@ -47,11 +51,25 @@ const mobileItems = computed(() => {
   return [...pinned, ...rest].slice(0, 5)
 })
 
+const canAlerts = computed(() => auth.can('products.view') || auth.permissions.length === 0)
+
+const { data: unreadCount } = useQuery({
+  queryKey: ['notifications', 'unread-count'],
+  queryFn: getUnreadNotificationCount,
+  enabled: canAlerts,
+})
+
+const alertCount = computed(() => unreadCount.value ?? 0)
+
 function isNavActive(to: string) {
   if (to === '/') {
     return route.path === '/'
   }
   return route.path === to || route.path.startsWith(`${to}/`)
+}
+
+function openAlerts() {
+  void router.push({ name: 'notifications' })
 }
 
 async function onLogout() {
@@ -81,7 +99,11 @@ async function onLogout() {
             :label="item.label"
             :icon="item.icon"
             :active="isNavActive(item.to)"
-          />
+          >
+            <template v-if="item.to === '/notifications'" #badge>
+              <NavBadge :count="alertCount" />
+            </template>
+          </SidebarNavItem>
         </RouterLink>
       </nav>
       <button type="button" class="mt-4 w-full text-left" @click="onLogout">
@@ -94,7 +116,17 @@ async function onLogout() {
         <p class="truncate text-[15px] font-medium text-title">
           {{ auth.clinicName || 'Gestão' }}
         </p>
-        <Button variant="ghost" @click="onLogout">Sair</Button>
+        <div class="flex items-center gap-1">
+          <div v-if="canAlerts" class="relative">
+            <IconButton label="Alertas" @click="openAlerts">
+              <Bell class="size-5" :stroke-width="1.75" />
+            </IconButton>
+            <span class="pointer-events-none absolute right-0 top-0">
+              <NavBadge :count="alertCount" />
+            </span>
+          </div>
+          <Button variant="ghost" @click="onLogout">Sair</Button>
+        </div>
       </header>
       <main class="flex-1 px-5 py-8 pb-24 md:px-8 md:pb-8">
         <RouterView />
@@ -107,10 +139,16 @@ async function onLogout() {
           v-for="item in mobileItems"
           :key="item.to"
           :to="item.to"
-          class="flex flex-col items-center gap-1 px-2 py-1 text-[11px]"
+          class="relative flex flex-col items-center gap-1 px-2 py-1 text-[11px]"
           :class="isNavActive(item.to) ? 'text-brand' : 'text-muted'"
         >
           <component :is="item.icon" class="size-5" :stroke-width="1.75" />
+          <span
+            v-if="item.to === '/notifications'"
+            class="pointer-events-none absolute right-1 top-0"
+          >
+            <NavBadge :count="alertCount" />
+          </span>
           {{ item.label }}
         </RouterLink>
       </nav>
