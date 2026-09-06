@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
@@ -61,6 +61,9 @@ const newUnitSymbol = ref('')
 const brandDialogError = ref('')
 const typeDialogError = ref('')
 const unitDialogError = ref('')
+const extraBrands = ref<Brand[]>([])
+const extraTypes = ref<ProductType[]>([])
+const extraUnits = ref<UnitOfMeasure[]>([])
 
 const { defineField, handleSubmit, errors, setErrors, resetForm, setFieldValue } = useForm({
   validationSchema: productFormSchema,
@@ -112,38 +115,52 @@ function withCurrentOption<T extends { id: number; name: string }>(
   list: T[],
   current: T | null | undefined,
 ): T[] {
-  if (!current) {
-    return list
+  const merged: T[] = []
+  const seen = new Set<number>()
+  for (const item of list) {
+    if (seen.has(item.id)) {
+      continue
+    }
+    seen.add(item.id)
+    merged.push(item)
   }
-  if (list.some((item) => item.id === current.id)) {
-    return list
+  if (current && !seen.has(current.id)) {
+    merged.unshift(current)
   }
-  return [current, ...list]
+  return merged
 }
 
 const brandOptions = computed(() =>
-  withCurrentOption(brandsQuery.data.value?.data ?? [], props.product?.brand ?? null).map((brand) => ({
+  withCurrentOption(
+    [...extraBrands.value, ...(brandsQuery.data.value?.data ?? [])],
+    props.product?.brand ?? null,
+  ).map((brand) => ({
     value: String(brand.id),
     label: brand.name,
   })),
 )
 
 const typeOptions = computed(() =>
-  withCurrentOption(typesQuery.data.value?.data ?? [], props.product?.product_type ?? null).map(
-    (type) => ({
-      value: String(type.id),
-      label: type.name,
-    }),
-  ),
+  withCurrentOption(
+    [
+      ...extraTypes.value.filter((type) => type.brand_id === selectedBrandId.value),
+      ...(typesQuery.data.value?.data ?? []),
+    ],
+    props.product?.product_type ?? null,
+  ).map((type) => ({
+    value: String(type.id),
+    label: type.name,
+  })),
 )
 
 const unitOptions = computed(() =>
-  withCurrentOption(unitsQuery.data.value?.data ?? [], props.product?.unit_of_measure ?? null).map(
-    (unit) => ({
-      value: String(unit.id),
-      label: `${unit.name} (${unit.symbol})`,
-    }),
-  ),
+  withCurrentOption(
+    [...extraUnits.value, ...(unitsQuery.data.value?.data ?? [])],
+    props.product?.unit_of_measure ?? null,
+  ).map((unit) => ({
+    value: String(unit.id),
+    label: `${unit.name} (${unit.symbol})`,
+  })),
 )
 
 watch(
@@ -158,17 +175,28 @@ watch(
   { immediate: true },
 )
 
-function prependCatalogItem<T extends { id: number }>(
-  old: Paginated<T> | undefined,
-  item: T,
-): Paginated<T> | undefined {
+function prependCatalogItem<T extends { id: number }>(old: Paginated<T> | undefined, item: T): Paginated<T> {
   if (!old) {
-    return old
+    return {
+      data: [item],
+      meta: { current_page: 1, last_page: 1, per_page: 15, total: 1 },
+    }
   }
   if (old.data.some((row) => row.id === item.id)) {
     return old
   }
-  return { ...old, data: [item, ...old.data] }
+  return {
+    ...old,
+    data: [item, ...old.data],
+    meta: { ...old.meta, total: old.meta.total + 1 },
+  }
+}
+
+function rememberCatalogItem<T extends { id: number }>(list: T[], item: T): T[] {
+  if (list.some((row) => row.id === item.id)) {
+    return list
+  }
+  return [item, ...list]
 }
 
 function onBrandUpdate(value: string) {
@@ -186,11 +214,13 @@ const { mutate: createBrandMutate, isPending: creatingBrand } = useMutation({
     newBrandName.value = ''
     brandDialogError.value = ''
     toast.success('Marca cadastrada')
+    extraBrands.value = rememberCatalogItem(extraBrands.value, brand)
     queryClient.setQueryData(['brands', 'active'], (old: Paginated<Brand> | undefined) =>
       prependCatalogItem(old, brand),
     )
     setFieldValue('brand_id', String(brand.id))
     setFieldValue('product_type_id', '')
+    await nextTick()
     await queryClient.invalidateQueries({ queryKey: ['brands'] })
   },
   onError: (error) => {
@@ -213,11 +243,13 @@ const { mutate: createTypeMutate, isPending: creatingType } = useMutation({
     newTypeName.value = ''
     typeDialogError.value = ''
     toast.success('Tipo cadastrado')
+    extraTypes.value = rememberCatalogItem(extraTypes.value, type)
     queryClient.setQueryData(
       ['product-types', 'by-brand', selectedBrandId.value],
       (old: Paginated<ProductType> | undefined) => prependCatalogItem(old, type),
     )
     setFieldValue('product_type_id', String(type.id))
+    await nextTick()
     await queryClient.invalidateQueries({ queryKey: ['product-types'] })
   },
   onError: (error) => {
@@ -241,10 +273,12 @@ const { mutate: createUnitMutate, isPending: creatingUnit } = useMutation({
     newUnitSymbol.value = ''
     unitDialogError.value = ''
     toast.success('Unidade cadastrada')
+    extraUnits.value = rememberCatalogItem(extraUnits.value, unit)
     queryClient.setQueryData(['units', 'active'], (old: Paginated<UnitOfMeasure> | undefined) =>
       prependCatalogItem(old, unit),
     )
     setFieldValue('unit_of_measure_id', String(unit.id))
+    await nextTick()
     await queryClient.invalidateQueries({ queryKey: ['units'] })
   },
   onError: (error) => {

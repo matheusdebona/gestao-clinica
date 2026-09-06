@@ -40,6 +40,10 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+const selectedLabel = computed(
+  () => props.options.find((option) => option.value === props.modelValue)?.label ?? '',
+)
+
 const triggerClass = computed(() =>
   cn(
     'inline-flex h-11 w-full items-center justify-between gap-2 rounded-[10px] border bg-input px-3.5 text-[15px] text-title outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-50',
@@ -57,7 +61,9 @@ const triggerClass = computed(() =>
     @update:model-value="(v) => emit('update:modelValue', String(v ?? ''))"
   >
     <SelectTrigger :id="id" :class="triggerClass" :aria-invalid="invalid || undefined">
-      <SelectValue :placeholder="placeholder" class="truncate text-left" />
+      <SelectValue :placeholder="placeholder" class="truncate text-left">
+        <span :class="selectedLabel ? 'text-title' : 'text-muted'">{{ selectedLabel || placeholder }}</span>
+      </SelectValue>
       <ChevronDown class="size-4 shrink-0 text-muted" :stroke-width="1.75" aria-hidden="true" />
     </SelectTrigger>
     <SelectPortal>
