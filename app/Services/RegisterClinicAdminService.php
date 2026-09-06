@@ -4,8 +4,8 @@ namespace App\Services;
 
 use App\Models\Clinic;
 use App\Models\User;
+use App\Support\EnsureRolesAndPermissions;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 
 class RegisterClinicAdminService
 {
@@ -14,7 +14,7 @@ class RegisterClinicAdminService
      */
     public function register(array $payload): User
     {
-        Role::findByName('admin', 'web');
+        EnsureRolesAndPermissions::run();
 
         return DB::transaction(function () use ($payload): User {
             $clinic = Clinic::query()->create([

@@ -74,7 +74,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('permissions', [PermissionCatalogController::class, 'permissions'])
             ->middleware('permission:permissions.view');
         Route::get('roles', [PermissionCatalogController::class, 'roles'])
-            ->middleware('permission:roles.manage');
+            ->middleware('permission:roles.manage|users.create|users.update');
 
         Route::get('product-types', [ProductTypeController::class, 'index'])
             ->middleware('permission:product_types.manage');

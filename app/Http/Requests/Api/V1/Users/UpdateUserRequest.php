@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1\Users;
 
+use App\Support\EnsureRolesAndPermissions;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -20,13 +21,26 @@ class UpdateUserRequest extends FormRequest
         return [
             'name' => ['sometimes', 'string', 'max:255'],
             'email' => ['sometimes', 'email', 'max:255', Rule::unique('users', 'email')->ignore($userId)],
-            'password' => ['sometimes', 'confirmed', Password::defaults()],
-            'clinic_id' => ['nullable', 'integer', 'exists:clinics,id'],
+            'password' => ['sometimes', 'nullable', 'confirmed', Password::defaults()],
             'is_active' => ['sometimes', 'boolean'],
-            'roles' => ['sometimes', 'array'],
-            'roles.*' => ['string', Rule::exists('roles', 'name')],
-            'permissions' => ['sometimes', 'array'],
-            'permissions.*' => ['string', Rule::exists('permissions', 'name')],
+            'roles' => ['sometimes', 'array', 'min:1'],
+            'roles.*' => [
+                'string',
+                Rule::in(EnsureRolesAndPermissions::ASSIGNABLE_ROLES),
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'name' => 'nome',
+            'email' => 'e-mail',
+            'password' => 'senha',
+            'roles' => 'papéis',
         ];
     }
 }

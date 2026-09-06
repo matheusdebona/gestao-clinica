@@ -17,6 +17,7 @@ class AuthTest extends TestCase
     {
         parent::setUp();
         $this->seed(RolesAndPermissionsSeeder::class);
+        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
     }
 
     public function test_login_returns_token_and_user(): void
@@ -124,6 +125,35 @@ class AuthTest extends TestCase
         $user = User::query()->where('email', 'ana@aurora.test')->first();
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('admin'));
+    }
+
+    public function test_register_bootstraps_roles_when_catalog_is_missing(): void
+    {
+        \Illuminate\Support\Facades\DB::table('model_has_roles')->delete();
+        \Illuminate\Support\Facades\DB::table('model_has_permissions')->delete();
+        \Illuminate\Support\Facades\DB::table('role_has_permissions')->delete();
+        \Spatie\Permission\Models\Role::query()->delete();
+        \Spatie\Permission\Models\Permission::query()->delete();
+        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+
+        $response = $this->postJson('/api/v1/auth/register', [
+            'clinic_name' => 'Clínica Sem Seed',
+            'name' => 'Bruno Lima',
+            'email' => 'bruno@semseed.test',
+            'password' => 'ChangeMe!123',
+            'password_confirmation' => 'ChangeMe!123',
+        ]);
+
+        $response->assertCreated()
+            ->assertJsonPath('user.email', 'bruno@semseed.test');
+
+        $user = User::query()->where('email', 'bruno@semseed.test')->first();
+        $this->assertNotNull($user);
+        $this->assertTrue($user->hasRole('admin'));
+        $this->assertDatabaseHas('roles', ['name' => 'receptionist', 'guard_name' => 'web']);
+        $this->assertDatabaseHas('roles', ['name' => 'seller', 'guard_name' => 'web']);
+        $this->assertDatabaseHas('roles', ['name' => 'stock', 'guard_name' => 'web']);
+        $this->assertDatabaseHas('roles', ['name' => 'professional', 'guard_name' => 'web']);
     }
 
     public function test_register_rejects_duplicate_email(): void

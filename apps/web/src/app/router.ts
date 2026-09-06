@@ -43,6 +43,27 @@ const router = createRouter({
           component: () => import('@/pages/ClientDetailPage.vue'),
         },
         {
+          path: 'users',
+          name: 'users',
+          meta: { title: 'Equipe' },
+          component: () => import('@/pages/UsersPage.vue'),
+        },
+        {
+          path: 'users/new',
+          name: 'users-new',
+          component: () => import('@/pages/UserFormPage.vue'),
+        },
+        {
+          path: 'users/:id/edit',
+          name: 'users-edit',
+          component: () => import('@/pages/UserFormPage.vue'),
+        },
+        {
+          path: 'users/:id',
+          name: 'users-show',
+          component: () => import('@/pages/UserDetailPage.vue'),
+        },
+        {
           path: 'products',
           meta: { title: 'Produtos' },
           component: () => import('@/pages/ComingSoonPage.vue'),
