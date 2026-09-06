@@ -19,7 +19,7 @@ import {
 } from '@/features/appointments/api'
 import { APPOINTMENT_STATUS_LABELS } from '@/features/appointments/labels'
 import { listTreatments } from '@/features/treatments/api'
-import { formatDateTime } from '@/lib/formatters'
+import { formatBRL, formatDateTime } from '@/lib/formatters'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import type { AppointmentPayload, StockWarning } from '@/types/appointment'
@@ -179,7 +179,10 @@ function goBack() {
 
     <template v-else-if="appointment">
       <Banner v-if="appointment.status === 'in_progress'" variant="info" title="Em atendimento">
-        Consumo e baixa de estoque entram na próxima etapa.
+        Registre o consumo desta sessão para baixar o estoque ao concluir.
+      </Banner>
+      <Banner v-else-if="appointment.status === 'completed'" variant="success" title="Concluída">
+        Estoque baixado. Custo da sessão {{ formatBRL(appointment.total_cost) }}.
       </Banner>
       <Banner v-else-if="appointment.status === 'cancelled'" variant="warning" title="Cancelada">
         Esta sessão foi cancelada. O estoque não foi alterado.
@@ -233,12 +236,21 @@ function goBack() {
             <dt class="text-[13px] text-muted">Notas</dt>
             <dd class="mt-0.5 whitespace-pre-wrap text-[15px] text-title">{{ appointment.notes || '—' }}</dd>
           </div>
+          <div v-if="appointment.status === 'completed'">
+            <dt class="text-[13px] text-muted">Custo da sessão</dt>
+            <dd class="mt-0.5 text-[15px] text-title">{{ formatBRL(appointment.total_cost) }}</dd>
+          </div>
         </dl>
       </SurfaceCard>
 
       <div class="flex flex-wrap gap-2">
         <PermissionGate v-if="isScheduled" permission="appointments.start">
           <Button @click="startOpen = true">Iniciar atendimento</Button>
+        </PermissionGate>
+        <PermissionGate v-if="appointment.status === 'in_progress'" permission="treatments.consume">
+          <Button @click="router.push({ name: 'appointments-consume', params: { id: String(appointment.id) } })">
+            Registrar consumo
+          </Button>
         </PermissionGate>
         <PermissionGate v-if="canCancelStatus" permission="appointments.cancel">
           <Button variant="destructive" @click="cancelOpen = true">Cancelar sessão</Button>

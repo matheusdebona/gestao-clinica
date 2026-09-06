@@ -10,10 +10,10 @@ export const ROLE_LABELS: Record<string, string> = {
 }
 
 export const ROLE_SUMMARIES: Record<string, string> = {
-  receptionist: 'Clientes, orçamentos, criar vendas e ver documentos.',
+  receptionist: 'Clientes, orçamentos, criar vendas, agenda e ver documentos.',
   seller: 'Clientes, vendas completas, orçamentos e meios de pagamento.',
   stock: 'Produtos, estoque, catálogo (tipos/marcas/unidades) e upload de arquivos.',
-  professional: 'Ver clientes, tratamentos, documentos e ver produtos.',
+  professional: 'Clientes, tratamentos, consumo de sessão, agenda e documentos.',
 }
 
 export const PERMISSION_LABELS: Record<string, string> = {
@@ -64,9 +64,14 @@ export const PERMISSION_LABELS: Record<string, string> = {
   'documents.delete': 'Excluir documentos',
   'treatments.view': 'Ver tratamentos',
   'treatments.manage': 'Gerenciar tratamentos',
-  'treatments.start': 'Iniciar tratamentos',
+  'treatments.start': 'Abrir tratamentos',
+  'treatments.consume': 'Registrar consumo',
   'treatments.complete': 'Concluir tratamentos',
   'treatments.cancel': 'Cancelar tratamentos',
+  'appointments.view': 'Ver agenda',
+  'appointments.manage': 'Gerenciar agenda',
+  'appointments.start': 'Iniciar sessões',
+  'appointments.cancel': 'Cancelar sessões',
   'metrics.view': 'Ver métricas',
 }
 

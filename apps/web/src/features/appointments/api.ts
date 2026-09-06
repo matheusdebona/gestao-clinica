@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import type { Appointment, AppointmentPayload } from '@/types/appointment'
+import type { Appointment, AppointmentPayload, ConsumptionPayload } from '@/types/appointment'
 import type { DataEnvelope, Paginated } from '@/types/pagination'
 import type { ClinicUser } from '@/types/team-user'
 
@@ -83,6 +83,25 @@ export async function startAppointment(id: number): Promise<Appointment> {
 
 export async function cancelAppointment(id: number): Promise<Appointment> {
   const payload = await api<DataEnvelope<Appointment>>(`/appointments/${id}/cancel`, {
+    method: 'POST',
+    body: {},
+  })
+  return payload.data
+}
+
+export async function syncAppointmentConsumptions(
+  id: number,
+  consumptions: ConsumptionPayload[],
+): Promise<Appointment> {
+  const payload = await api<DataEnvelope<Appointment>>(`/appointments/${id}/consumptions`, {
+    method: 'PUT',
+    body: { consumptions },
+  })
+  return payload.data
+}
+
+export async function completeAppointment(id: number): Promise<Appointment> {
+  const payload = await api<DataEnvelope<Appointment>>(`/appointments/${id}/complete`, {
     method: 'POST',
     body: {},
   })

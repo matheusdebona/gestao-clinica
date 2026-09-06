@@ -169,7 +169,7 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] **Protocolos** (pacote de produtos, itens no form, preços editáveis, `?q=`) — Fase 4.4; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.4
 - [x] **Vendas / orçamentos** (wizard, protocolo+itens, soft min, pagamentos fechados, orçamento+PDF, nav inbox) — Fase 4.5; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.5
 - [x] **Agendamentos** (agenda dia/semana, `appointments.*`, overlap por profissional, start sem estoque) — Fase 4.6; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.6
-- [ ] **Tratamento — consumo clínico** (`treatments.consume`, checklist sessão, extras, stock no complete) — Fase 4.7; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.7
+- [x] **Tratamento — consumo clínico** (`treatments.consume`, checklist sessão, extras, stock no complete) — Fase 4.7; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.7
 - [ ] **Métricas** (página única A–D, hero faturamento/ticket/conversão/margem, charts) — Fase 4.8; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8
 - [ ] **Notificações** (inbox Alertas, badge unread, chips, deep links; só `products.view`) — Fase 4.9; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.9
 - [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)

@@ -12,7 +12,6 @@ use App\Models\ProductType;
 use App\Models\Sale;
 use App\Models\SalePayment;
 use App\Models\StockMovement;
-use App\Models\Treatment;
 use App\Models\UnitOfMeasure;
 use App\Models\User;
 use App\Support\CurrentClinic;
@@ -331,5 +330,95 @@ class TreatmentAppointmentTest extends TestCase
         Sanctum::actingAs($user);
         CurrentClinic::setId($this->clinic->id);
         $this->getJson('/api/v1/treatments')->assertForbidden();
+    }
+
+    public function test_index_filters_by_status_and_client_search(): void
+    {
+        $product = $this->makeProduct('Botox', '10.0000', '100.00');
+        $sale = $this->createConfirmedSale($product, 1);
+        $treatmentId = $this->postJson("/api/v1/sales/{$sale->id}/treatments")
+            ->assertCreated()
+            ->json('data.id');
+
+        $otherClient = Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'Joao Outro',
+            'whatsapp' => '11988887777',
+        ]);
+        $this->client = $otherClient;
+        $otherSale = $this->createConfirmedSale($product, 1);
+        $this->postJson("/api/v1/sales/{$otherSale->id}/treatments")->assertCreated();
+
+        $this->getJson('/api/v1/treatments?status=open')
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
+
+        $this->getJson('/api/v1/treatments?q='.urlencode($this->client->name))
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.client_id', $otherClient->id);
+
+        $this->getJson('/api/v1/treatments?q=11988887777')
+            ->assertOk()
+            ->assertJsonCount(1, 'data');
+
+        $this->getJson('/api/v1/treatments?client_id='.$sale->client_id)
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.id', $treatmentId);
+
+        $this->getJson('/api/v1/treatments?status=completed')
+            ->assertOk()
+            ->assertJsonCount(0, 'data');
+
+        $this->getJson('/api/v1/treatments?status=nope')->assertStatus(422);
+    }
+
+    public function test_sync_consumptions_requires_treatments_consume(): void
+    {
+        $product = $this->makeProduct('Botox', '10.0000', '100.00');
+        $sale = $this->createConfirmedSale($product, 1);
+        $saleItemId = $sale->items()->first()->id;
+        $treatmentId = $this->postJson("/api/v1/sales/{$sale->id}/treatments")
+            ->assertCreated()
+            ->json('data.id');
+        $appointmentId = $this->createAppointment($treatmentId);
+        $this->postJson("/api/v1/appointments/{$appointmentId}/start")->assertOk();
+
+        $payload = [
+            'consumptions' => [[
+                'source' => 'suggested',
+                'product_id' => $product->id,
+                'sale_item_id' => $saleItemId,
+                'quantity' => 1,
+            ]],
+        ];
+
+        $viewer = User::factory()->forClinic($this->clinic)->create();
+        $viewer->givePermissionTo(['treatments.view', 'treatments.manage']);
+        Sanctum::actingAs($viewer);
+        CurrentClinic::setId($this->clinic->id);
+        $this->putJson("/api/v1/appointments/{$appointmentId}/consumptions", $payload)
+            ->assertForbidden();
+
+        $receptionist = User::factory()->forClinic($this->clinic)->create();
+        $receptionist->assignRole('receptionist');
+        Sanctum::actingAs($receptionist);
+        $this->putJson("/api/v1/appointments/{$appointmentId}/consumptions", $payload)
+            ->assertForbidden();
+
+        $consumer = User::factory()->forClinic($this->clinic)->create();
+        $consumer->givePermissionTo(['treatments.view', 'treatments.consume']);
+        Sanctum::actingAs($consumer);
+        $this->putJson("/api/v1/appointments/{$appointmentId}/consumptions", $payload)
+            ->assertOk()
+            ->assertJsonPath('data.consumptions.0.product_id', $product->id);
+
+        $professional = User::factory()->forClinic($this->clinic)->create();
+        $professional->assignRole('professional');
+        Sanctum::actingAs($professional);
+        $this->putJson("/api/v1/appointments/{$appointmentId}/consumptions", [
+            'consumptions' => [],
+        ])->assertOk();
+        $this->getJson('/api/v1/payment-methods')->assertOk();
     }
 }

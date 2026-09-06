@@ -387,8 +387,8 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | feito |
 | **4.4** | **Protocolos** (pacote de produtos) | feito |
 | **4.5** | **Vendas / orçamentos** | feito |
-| **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
-| **4.7** | **Tratamento — consumo clínico** (baixa estoque) | detalhe abaixo |
+| **4.6** | **Agendamentos** (agenda completa) | feito |
+| **4.7** | **Tratamento — consumo clínico** (baixa estoque) | feito |
 | **4.8** | **Métricas** | detalhe abaixo |
 | **4.9** | **Notificações** | detalhe abaixo |
 
@@ -649,7 +649,7 @@ Mobile-first: no phone, default **dia**; semana como progressive enhancement (`m
 1. Abrir Agenda → ver slots do dia/semana por profissional (ou grade única com cor/profissional).
 2. Nova sessão: escolher **tratamento aberto** (cliente vem do tratamento) → **profissional** → data/hora → notas.
 3. Conflito de horário do profissional → erro claro no form (422).
-4. Iniciar: confirma check-in; status `in_progress`; pode mostrar warning de estoque **sem** bloquear; **não** abre tela de consumo (link “Registrar consumo” só quando 4.7 existir).
+4. Iniciar: confirma check-in; status `in_progress`; pode mostrar warning de estoque **sem** bloquear; CTA **Registrar consumo** → `/appointments/:id/consume` (4.7).
 5. Cancelar: `ConfirmDialog`; sem efeito em estoque.
 
 ##### Patterns
@@ -711,8 +711,8 @@ Seed sugerido: **professional** e **admin** com `consume` + `complete`; recepç�
 
 ##### API / gaps
 
-- [ ] Seed + middleware: `treatments.consume` no `PUT …/consumptions` (hoje é `treatments.manage`)
-- [ ] `GET /treatments?q=` (cliente) além de `status`, `client_id`, `sale_id`
+- [x] Seed + middleware: `treatments.consume` no `PUT …/consumptions` (hoje é `treatments.manage`)
+- [x] `GET /treatments?q=` (cliente) além de `status`, `client_id`, `sale_id`
 - Fluxo já existe: open from sale → start → suggested remaining → PUT consumptions → complete (stock out `allowNegative`)
 - Fulfillment: `GET …/fulfillment` no detalhe do tratamento
 - Cancel appointment `in_progress`: remove consumptions draft + pagamentos extra; **sem** estorno de estoque de sessões já completed (fase posterior)
@@ -742,12 +742,12 @@ Seed sugerido: **professional** e **admin** com `consume` + `complete`; recepç�
 
 ##### DoD 4.7
 
-- [ ] Lista tratamentos com status + busca; card cliente/status/venda/custo
-- [ ] Consumo a partir da Agenda; sugeridos ajustáveis; extras cortesia e cobrado
-- [ ] Completar sessão baixa estoque; concluir sem produtos ok; warning não bloqueia
-- [ ] Nav Tratamentos + links Agenda/Venda
-- [ ] `treatments.consume` no seed e nas rotas de sync
-- [ ] Testes API da nova perm + smoke Vue do fluxo start→consume→complete
+- [x] Lista tratamentos com status + busca; card cliente/status/venda/custo
+- [x] Consumo a partir da Agenda; sugeridos ajustáveis; extras cortesia e cobrado
+- [x] Completar sessão baixa estoque; concluir sem produtos ok; warning não bloqueia
+- [x] Nav Tratamentos + links Agenda/Venda
+- [x] `treatments.consume` no seed e nas rotas de sync
+- [x] Testes API da nova perm + smoke Vue do fluxo start→consume→complete
 
 #### 4.8 — Métricas (especificação de UI)
 
