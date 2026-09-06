@@ -1,0 +1,42 @@
+---
+description: Catalog and usage of Soft Violet UI components in apps/web
+globs:
+  - apps/web/**/*.vue
+  - apps/web/**/*.css
+  - apps/web/src/design-tokens/**
+alwaysApply: false
+---
+
+# Compose only from `@/components/ui`
+
+When editing Vue in `apps/web`, reuse these components. Do not recreate their look with Tailwind on raw HTML.
+
+## Actions
+- `Button` — `primary` | `secondary` | `ghost` | `destructive` (+ `loading` / `disabled`)
+- `ButtonAccent` — outline only (no gradient)
+- `IconButton` — icon + `label` (aria)
+
+## Forms
+- `FormField` — label + hint + **error 422**; slot gets `{ invalid }`
+- `Input` — `text` | `number` | `password` | `email` | `date` | `search` | `tel`
+- `Textarea`, `Select`, `Checkbox`, `Switch`
+- `SearchField`, `MaskedBox`
+
+## Feedback / overlay
+- `Banner`, `InlineAlert`, `Badge`, `Spinner`, `Skeleton`
+- Toasts: `useToastStore()` (`success` / `error` / `info`) — host is already in `App.vue`
+- `AppDialog`, `ConfirmDialog`
+
+## Layout
+- `PageHeader`, `SurfaceCard`
+- `ListCard` — grouped row + chevron (no pastel variants)
+
+## Tokens
+Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows.
+
+## Extending the system
+1. Add or change the primitive in `apps/web/src/components/ui/`.
+2. Show default, disabled, invalid, and loading on `apps/web/src/pages/DevUiPage.vue`.
+3. Only then import it from a feature.
+
+`components/ui` must not import `features/*`.

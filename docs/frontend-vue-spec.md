@@ -80,6 +80,8 @@ flowchart TD
 
 **Regra:** feature não monta HTML “cru” de controle; só importa `components/ui` e `components/patterns`.
 
+Agentes Cursor: regra **always-on** em [`.cursor/rules/design-system.mdc`](../.cursor/rules/design-system.mdc); catálogo em [`.cursor/rules/vue-ui-components.mdc`](../.cursor/rules/vue-ui-components.mdc). Também em [`AGENTS.md`](../AGENTS.md).
+
 ---
 
 ## 4. Estrutura de pastas (alvo do scaffold)
