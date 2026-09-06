@@ -458,9 +458,11 @@ A **treatment** is the clinical case opened from a **confirmed sale** (1:1).
 
 ### Permissions
 
-**Treatment (caso clínico / consumo):** `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel`
+**Treatment (caso clínico / consumo):** `treatments.view`, `treatments.manage`, `treatments.start`, **`treatments.consume`**, `treatments.complete`, `treatments.cancel`
 
 **Appointments (agenda):** `appointments.view`, `appointments.manage`, `appointments.start`, `appointments.cancel`
+
+UI Fase 4.7 (consumo): [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.7 — `PUT …/consumptions` gated by `treatments.consume`.
 
 ---
 
@@ -498,7 +500,7 @@ Clinic exists
 | Metrics | `metrics.view` (`GET /metrics/commercial`, `/metrics/acquisition`, `/metrics/margin`) |
 | Budgets | `budgets.view`, `budgets.create`, `budgets.update`, `budgets.convert` |
 | Documents | `documents.view`, `documents.generate`, `documents.delete` |
-| Treatments | `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.complete`, `treatments.cancel` |
+| Treatments | `treatments.view`, `treatments.manage`, `treatments.start`, `treatments.consume`, `treatments.complete`, `treatments.cancel` |
 | Appointments | `appointments.view`, `appointments.manage`, `appointments.start`, `appointments.cancel` |
 
 All checks remain **permission-first**; roles only group these permissions per clinic job (receptionist, seller, stock manager, professional, clinic admin).

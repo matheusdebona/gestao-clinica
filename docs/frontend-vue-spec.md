@@ -387,7 +387,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | **4.4** | **Protocolos** (pacote de produtos) | detalhe abaixo |
 | **4.5** | **Vendas / orçamentos** | detalhe abaixo |
 | **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
-| 4.7 | Tratamento — consumo clínico (baixa estoque) | |
+| **4.7** | **Tratamento — consumo clínico** (baixa estoque) | detalhe abaixo |
 | 4.8 | Métricas | |
 | 4.9 | Notificações | |
 
@@ -666,6 +666,88 @@ Mobile-first: no phone, default **dia**; semana como progressive enhancement (`m
 - [ ] Nav **Agenda**; permissões `appointments.*` no seed e `PermissionGate`
 - [ ] Testes API (index, overlap, perms); smoke Vue do calendário
 
+#### 4.7 — Tratamento / consumo clínico (especificação de UI)
+
+Objetivo: registrar o que foi **realmente usado** na sessão e **completar o appointment** → snapshot de custo + **baixa de estoque**.  
+Agenda (calendário, remarcar, overlap) fica no **4.6**. Aqui entra o checklist de consumo + fechar o caso clínico.
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Lista de tratamentos + detalhe (fulfillment + sessões) + tela de **consumo** da sessão + completar/cancelar sessão e tratamento |
+| Entrada no dia a dia | Principal pela **Agenda** (sessão `in_progress` → consumir); `/treatments` como apoio |
+| Qtys sugeridas | Pré-preenche com **saldo restante** da venda; profissional **ajusta** antes de concluir |
+| Extras | Cortesia **e** cobrado (pagamento na hora, como a API — `SalePayment` na venda) |
+| Estoque baixo no start | Banner **não bloqueante** (API); conclusão **não** bloqueia estoque negativo |
+| Sessão sem produtos | Permitido — “Concluir sem produtos” (avaliação) |
+| Lista | Filtro **status** + busca cliente (`?q=` / `client_id`); card: **cliente · status · venda · custo total** |
+| Nav | **Tratamentos** **e** links a partir de Agenda / Venda confirmada |
+| Permissões | Nova **`treatments.consume`** para sync de consumptions (+ complete de sessão usa `treatments.complete` como hoje, ou exige `consume` — ver abaixo) |
+
+##### Fronteira 4.6 × 4.7
+
+| 4.6 Agenda | 4.7 Consumo |
+| --- | --- |
+| Criar / remarcar / cancelar / **iniciar** | Tela de linhas de consumo |
+| `appointments.*` | `treatments.view` + **`treatments.consume`** + `treatments.complete` / `cancel` |
+| Sem baixa de estoque | Estoque só no **complete** da sessão |
+
+Após **iniciar** na Agenda: CTA “Registrar consumo” → `/appointments/:id/consume` (ou `/treatments/:id/sessions/:appointmentId`).
+
+##### Permissões (ajuste nesta fase)
+
+| Permission | Uso |
+| --- | --- |
+| `treatments.view` | Lista/detalhe/fulfillment |
+| `treatments.start` | Abrir tratamento da venda (já em 4.5 pós-confirm) |
+| **`treatments.consume`** | **Nova** — `PUT …/consumptions` (sugerido + extras) |
+| `treatments.complete` | Completar appointment (estoque) e/ou fechar treatment |
+| `treatments.cancel` | Cancelar appointment/treatment (regras atuais da API) |
+| `treatments.manage` | Manter para ajustes estruturais se ainda necessário; **preferir `consume` na UI de sessão** |
+
+Seed sugerido: **professional** e **admin** com `consume` + `complete`; recepção sem `consume` (só agenda), salvo decisão operacional.
+
+##### API / gaps
+
+- [ ] Seed + middleware: `treatments.consume` no `PUT …/consumptions` (hoje é `treatments.manage`)
+- [ ] `GET /treatments?q=` (cliente) além de `status`, `client_id`, `sale_id`
+- Fluxo já existe: open from sale → start → suggested remaining → PUT consumptions → complete (stock out `allowNegative`)
+- Fulfillment: `GET …/fulfillment` no detalhe do tratamento
+- Cancel appointment `in_progress`: remove consumptions draft + pagamentos extra; **sem** estorno de estoque de sessões já completed (fase posterior)
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/treatments` | Lista (status, busca cliente) | `treatments.view` |
+| `/treatments/:id` | Detalhe: fulfillment, sessões, abrir consumo, completar/cancelar caso | `treatments.view` |
+| `/appointments/:id/consume` (ou nested) | Checklist de consumo da sessão `in_progress` | `treatments.consume` |
+| Deep links | Venda confirmada → abrir tratamento; Agenda → consumir | conforme ação |
+
+##### UX da tela de consumo
+
+1. Entrar com sessão `in_progress` (via Agenda ou detalhe).
+2. Banner de `stock_warning` se houver (não bloqueia).
+3. Linhas **sugeridas** pré-preenchidas com saldo restante — editar qty / zerar.
+4. Adicionar **extra**: cortesia ou cobrado (+ método/valor de pagamento se cobrado).
+5. Salvar sync (`PUT consumptions`) e/ou **Concluir sessão** (`complete`) → estoque desce; mostrar custo da sessão.
+6. Opção **Concluir sem produtos**.
+7. No tratamento: quando não houver sessão ativa e saldo ok, **completar tratamento**; cancelar tratamento só se nenhuma sessão completed (regra API).
+
+##### Patterns
+
+- Reutilizar linhas de item (4.4/4.5), `MoneyDisplay`, `Badge`, `Banner`/`InlineAlert` para stock warning, `ConfirmDialog`, pagamentos (subset do wizard de venda para extra cobrado).
+
+##### DoD 4.7
+
+- [ ] Lista tratamentos com status + busca; card cliente/status/venda/custo
+- [ ] Consumo a partir da Agenda; sugeridos ajustáveis; extras cortesia e cobrado
+- [ ] Completar sessão baixa estoque; concluir sem produtos ok; warning não bloqueia
+- [ ] Nav Tratamentos + links Agenda/Venda
+- [ ] `treatments.consume` no seed e nas rotas de sync
+- [ ] Testes API da nova perm + smoke Vue do fluxo start→consume→complete
+
 ### Fase 5 — PWA (depois da web estável)
 
 1. `vite-plugin-pwa` (manifest, ícones, service worker).
@@ -707,6 +789,7 @@ Mobile-first: no phone, default **dia**; semana como progressive enhancement (`m
 | `/budgets` | Orçamentos (inbox) | `budgets.view` |
 | `/appointments` | Agenda | `appointments.view` |
 | `/treatments` | Tratamentos (consumo) | `treatments.view` |
+| `/appointments/:id/consume` | Consumo da sessão | `treatments.consume` |
 | `/notifications` | Inbox | auth |
 | `/metrics` | Dashboard KPIs | `metrics.view` |
 | `/dev/ui` | Kitchen sink | DEV ou admin |
