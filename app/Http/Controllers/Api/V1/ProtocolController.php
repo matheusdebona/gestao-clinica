@@ -10,20 +10,29 @@ use App\Http\Resources\Api\V1\ProtocolResource;
 use App\Models\Protocol;
 use App\Services\ProtocolPricingService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
 class ProtocolController extends Controller
 {
     public function __construct(private readonly ProtocolPricingService $pricing) {}
 
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return ProtocolResource::collection(
-            Protocol::query()
-                ->with(['items.product'])
-                ->orderBy('name')
-                ->paginate(20)
-        );
+        $query = Protocol::query()
+            ->with(['items.product.unitOfMeasure'])
+            ->orderBy('name');
+
+        if ($request->filled('q')) {
+            $term = '%'.$request->string('q')->toString().'%';
+            $query->where('name', 'like', $term);
+        }
+
+        if ($request->has('is_active')) {
+            $query->where('is_active', $request->boolean('is_active'));
+        }
+
+        return ProtocolResource::collection($query->paginate(20));
     }
 
     public function store(StoreProtocolRequest $request): JsonResponse
@@ -48,7 +57,7 @@ class ProtocolController extends Controller
             $protocol = $this->pricing->recalculate($protocol);
         }
 
-        return (new ProtocolResource($protocol->load(['items.product'])))
+        return (new ProtocolResource($protocol->load(['items.product.unitOfMeasure', 'items.product.brand'])))
             ->response()
             ->setStatusCode(201);
     }
@@ -86,7 +95,7 @@ class ProtocolController extends Controller
             );
         }
 
-        return new ProtocolResource($protocol->fresh()->load(['items.product']));
+        return new ProtocolResource($protocol->fresh()->load(['items.product.unitOfMeasure', 'items.product.brand']));
     }
 
     public function destroy(Protocol $protocol): JsonResponse
@@ -100,7 +109,7 @@ class ProtocolController extends Controller
     {
         $protocol = $this->pricing->syncItems($protocol, $request->validated('items'));
 
-        return new ProtocolResource($protocol->load(['items.product']));
+        return new ProtocolResource($protocol->load(['items.product.unitOfMeasure', 'items.product.brand']));
     }
 
     public function recalculate(Protocol $protocol): ProtocolResource
@@ -111,6 +120,6 @@ class ProtocolController extends Controller
             forceMin: true,
         );
 
-        return new ProtocolResource($protocol->load(['items.product']));
+        return new ProtocolResource($protocol->load(['items.product.unitOfMeasure', 'items.product.brand']));
     }
 }

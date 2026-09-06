@@ -100,6 +100,7 @@ apps/web/                    # default no monorepo (ou repo separado com a mesma
       auth/
       clients/
       products/
+      protocols/
       sales/
       treatments/
       notifications/
@@ -384,7 +385,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | 4.2 | Clientes | feito |
 | 4.2b | Equipe (RBAC) | feito |
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | feito |
-| **4.4** | **Protocolos** (pacote de produtos) | detalhe abaixo |
+| **4.4** | **Protocolos** (pacote de produtos) | feito |
 | **4.5** | **Vendas / orçamentos** | detalhe abaixo |
 | **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
 | **4.7** | **Tratamento — consumo clínico** (baixa estoque) | detalhe abaixo |
@@ -478,7 +479,7 @@ Objetivo: montar o **serviço completo** como pacote de produtos (custo/sugerido
 
 ##### API / gaps nesta fase
 
-- [ ] `GET /protocols?q=` (nome) + filtro `is_active` se ainda não exposto de forma clara na listagem
+- [x] `GET /protocols?q=` (nome) + filtro `is_active` se ainda não exposto de forma clara na listagem
 - CRUD / `PUT …/items` / `POST …/recalculate` já existem — UI pode chamar recalculate se quiser reset explícito depois; **v1 não exige** botão “Recalcular” (decisão 3C: edição direta marca manual)
 - Itens: sync replace-all via `PUT /protocols/{id}/items` após editar a lista no form
 
@@ -511,11 +512,11 @@ Fora de escopo 4.4: aplicar protocolo em venda (`POST /sales/{sale}/apply-protoc
 
 ##### DoD 4.4
 
-- [ ] Secretária monta protocolo com ≥1 produto, vê sugerido na lista, edita sugerido/mín/especial
-- [ ] Atalho criar produto a partir do form do protocolo
-- [ ] Desativar + “somente ativos”; busca por nome
-- [ ] Nav Protocolos + atalho em Produtos
-- [ ] Testes API `?q=` (se novo); smoke Vue do fluxo create/edit/items
+- [x] Secretária monta protocolo com ≥1 produto, vê sugerido na lista, edita sugerido/mín/especial
+- [x] Atalho criar produto a partir do form do protocolo
+- [x] Desativar + “somente ativos”; busca por nome
+- [x] Nav Protocolos + atalho em Produtos
+- [x] Testes API `?q=` (se novo); smoke Vue do fluxo create/edit/items
 
 #### 4.5 — Vendas / orçamentos (especificação de UI)
 

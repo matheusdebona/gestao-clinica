@@ -17,5 +17,13 @@ const router = useRouter()
     <PermissionGate permission="units.manage">
       <Button variant="secondary" @click="router.push({ name: 'units' })">Unidades</Button>
     </PermissionGate>
+    <PermissionGate permission="protocols.view">
+      <Button variant="secondary" @click="router.push({ name: 'protocols' })">Ver protocolos</Button>
+    </PermissionGate>
+    <PermissionGate permission="protocols.create">
+      <Button variant="secondary" @click="router.push({ name: 'protocols-new' })">
+        Novo protocolo
+      </Button>
+    </PermissionGate>
   </div>
 </template>

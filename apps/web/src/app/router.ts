@@ -148,6 +148,27 @@ const router = createRouter({
           component: () => import('@/pages/UnitDetailPage.vue'),
         },
         {
+          path: 'protocols',
+          name: 'protocols',
+          meta: { title: 'Protocolos' },
+          component: () => import('@/pages/ProtocolsPage.vue'),
+        },
+        {
+          path: 'protocols/new',
+          name: 'protocols-new',
+          component: () => import('@/pages/ProtocolFormPage.vue'),
+        },
+        {
+          path: 'protocols/:id/edit',
+          name: 'protocols-edit',
+          component: () => import('@/pages/ProtocolFormPage.vue'),
+        },
+        {
+          path: 'protocols/:id',
+          name: 'protocols-show',
+          component: () => import('@/pages/ProtocolDetailPage.vue'),
+        },
+        {
           path: 'sales',
           meta: { title: 'Vendas' },
           component: () => import('@/pages/ComingSoonPage.vue'),
