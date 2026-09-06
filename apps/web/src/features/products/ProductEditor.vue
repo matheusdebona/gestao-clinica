@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import Banner from '@/components/ui/Banner.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import ProductForm from '@/features/products/ProductForm.vue'
 import { createProduct, getProduct, updateProduct } from '@/features/products/api'
+import { safeAppPath } from '@/lib/return-to'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import type { ProductPayload } from '@/types/product'
@@ -17,8 +18,11 @@ const props = defineProps<{
   productId?: number
 }>()
 
+const route = useRoute()
 const router = useRouter()
 const toast = useToastStore()
+
+const returnTo = computed(() => safeAppPath(route.query.returnTo))
 const auth = useAuthStore()
 const queryClient = useQueryClient()
 const formRef = ref<{ setErrors: (errors: Record<string, string>) => void } | null>(null)
@@ -47,6 +51,13 @@ const { mutate: save, isPending: saving } = useMutation({
   onSuccess: async (saved) => {
     toast.success(isEdit.value ? 'Produto atualizado' : 'Produto cadastrado')
     await queryClient.invalidateQueries({ queryKey: ['products'] })
+    if (!isEdit.value && returnTo.value) {
+      await router.push({
+        path: returnTo.value,
+        query: { selectProduct: String(saved.id) },
+      })
+      return
+    }
     await router.push({ name: 'products-show', params: { id: String(saved.id) } })
   },
   onError: (error) => {
@@ -70,6 +81,10 @@ const { mutate: save, isPending: saving } = useMutation({
 })
 
 function onCancel() {
+  if (returnTo.value) {
+    void router.push(returnTo.value)
+    return
+  }
   if (props.productId) {
     void router.push({ name: 'products-show', params: { id: String(props.productId) } })
     return

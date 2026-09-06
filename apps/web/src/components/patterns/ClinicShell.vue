@@ -3,6 +3,7 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Bell,
+  ClipboardList,
   LayoutDashboard,
   LogOut,
   Package,
@@ -26,6 +27,7 @@ const items = computed(() => {
     { to: '/clients', label: 'Clientes', icon: Users, permission: 'clients.view' },
     { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view' },
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view' },
+    { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view' },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
     { to: '/notifications', label: 'Alertas', icon: Bell },

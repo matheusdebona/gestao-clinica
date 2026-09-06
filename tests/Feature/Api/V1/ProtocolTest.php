@@ -154,4 +154,62 @@ class ProtocolTest extends TestCase
         $this->assertTrue($names->contains('Mine'));
         $this->assertFalse($names->contains('Theirs'));
     }
+
+    public function test_can_search_protocols_by_name(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        Protocol::factory()->create([
+            'clinic_id' => $this->clinic->id,
+            'name' => 'Full face toxina',
+        ]);
+        Protocol::factory()->create([
+            'clinic_id' => $this->clinic->id,
+            'name' => 'Bioestimulador',
+        ]);
+
+        $byName = $this->getJson('/api/v1/protocols?q=face')->assertOk();
+        $this->assertSame(['Full face toxina'], collect($byName->json('data'))->pluck('name')->all());
+    }
+
+    public function test_can_filter_protocols_by_active_flag(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        Protocol::factory()->create([
+            'clinic_id' => $this->clinic->id,
+            'name' => 'Ativo',
+            'is_active' => true,
+        ]);
+        Protocol::factory()->create([
+            'clinic_id' => $this->clinic->id,
+            'name' => 'Inativo',
+            'is_active' => false,
+        ]);
+
+        $active = $this->getJson('/api/v1/protocols?is_active=1')->assertOk();
+        $this->assertSame(['Ativo'], collect($active->json('data'))->pluck('name')->all());
+
+        $inactive = $this->getJson('/api/v1/protocols?is_active=0')->assertOk();
+        $this->assertSame(['Inativo'], collect($inactive->json('data'))->pluck('name')->all());
+    }
+
+    public function test_can_deactivate_protocol(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $product = $this->makeProduct('Item', '5.0000', '25.00', '15.00');
+
+        $id = $this->postJson('/api/v1/protocols', [
+            'name' => 'Para desativar',
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 1],
+            ],
+        ])->json('data.id');
+
+        $this->deleteJson("/api/v1/protocols/{$id}")
+            ->assertOk()
+            ->assertJsonPath('message', 'Protocol deactivated.');
+
+        $this->assertFalse(Protocol::query()->findOrFail($id)->is_active);
+    }
 }

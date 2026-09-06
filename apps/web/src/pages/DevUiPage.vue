@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
+import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import StockStatusBadge from '@/components/patterns/StockStatusBadge.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
@@ -44,6 +45,7 @@ const searchValue = ref('')
 const checked = ref(true)
 const enabled = ref(false)
 const loadingPrimary = ref(false)
+const itemQty = ref('1')
 
 const dialogOpen = ref(false)
 const confirmOpen = ref(false)
@@ -120,6 +122,15 @@ function simulateLoading() {
               <StockStatusBadge level="low" />
               <StockStatusBadge level="reorder" />
               <StockStatusBadge level="negative" />
+            </div>
+            <div class="mt-4">
+              <ItemLineRow
+                v-model:quantity="itemQty"
+                title="Toxina 100U"
+                unit="Frasco (un)"
+                line-sale="80.00"
+                @remove="toast.info('Item removido')"
+              />
             </div>
           </div>
         </SurfaceCard>

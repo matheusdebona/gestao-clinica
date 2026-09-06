@@ -11,6 +11,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import CatalogShortcuts from '@/features/products/CatalogShortcuts.vue'
 import StockAdjustDialog from '@/features/products/StockAdjustDialog.vue'
 import { adjustStock, deactivateProduct, getProduct, updateProduct } from '@/features/products/api'
 import { formatQty } from '@/lib/formatters'
@@ -133,6 +134,8 @@ function goBack() {
         </PermissionGate>
       </template>
     </PageHeader>
+
+    <CatalogShortcuts />
 
     <Banner v-if="product && !product.is_active" variant="warning" title="Inativo">
       Este produto está desativado e não aparece na lista padrão.
