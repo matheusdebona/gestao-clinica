@@ -20,7 +20,7 @@ withDefaults(
     <label
       v-if="label"
       :for="htmlFor"
-      class="text-[13px] font-medium text-muted"
+      class="text-[13px] font-medium text-title/70"
     >
       {{ label }}
     </label>

@@ -19,9 +19,9 @@ const props = withDefaults(
 const classes = computed(() =>
   cn(
     'flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-left text-[15px] font-medium transition-colors',
-    props.active && 'bg-white/12 text-inverse',
-    !props.active && !props.disabled && 'text-white/70 hover:bg-white/8 hover:text-inverse',
-    props.disabled && 'cursor-not-allowed text-white/35',
+    props.active && 'bg-brand/40 text-inverse',
+    !props.active && !props.disabled && 'text-inverse/70 hover:bg-inverse/10 hover:text-inverse',
+    props.disabled && 'cursor-not-allowed text-inverse/35',
   ),
 )
 </script>

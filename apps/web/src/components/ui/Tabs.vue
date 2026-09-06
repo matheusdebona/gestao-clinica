@@ -23,7 +23,7 @@ withDefaults(
 
 <template>
   <div
-    :class="cn('rounded-[10px] bg-input p-1', block ? 'flex w-full' : 'inline-flex')"
+    :class="cn('glass-field rounded-[12px] p-1', block ? 'flex w-full' : 'inline-flex')"
     role="tablist"
   >
     <button
@@ -33,9 +33,9 @@ withDefaults(
       role="tab"
       :class="
         cn(
-          'h-9 rounded-[8px] px-3.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40',
+          'h-9 rounded-[10px] px-3.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40',
           block && 'min-w-0 flex-1 px-2',
-          model === item.value ? 'bg-surface text-title' : 'text-muted',
+          model === item.value ? 'glass-regular text-title' : 'border-transparent text-muted shadow-none',
         )
       "
       :aria-selected="model === item.value"

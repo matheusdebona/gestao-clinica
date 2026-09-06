@@ -4,7 +4,7 @@ import { computed, useAttrs } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     modelValue?: string | number
     type?: 'text' | 'number' | 'password' | 'email' | 'date' | 'datetime-local' | 'search' | 'tel'
@@ -30,10 +30,8 @@ const attrs = useAttrs()
 
 const classes = computed(() =>
   cn(
-    'h-11 w-full rounded-[10px] border bg-input px-3.5 text-[15px] text-title transition-colors placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
-    props.invalid
-      ? 'border-danger/50 bg-danger-light'
-      : 'border-transparent focus-visible:border-brand/40 focus-visible:bg-surface',
+    'glass-field h-11 w-full rounded-[12px] px-3.5 text-[15px] text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
+    typeof attrs.class === 'string' ? attrs.class : undefined,
   ),
 )
 
@@ -51,7 +49,7 @@ function onInput(event: Event) {
     :placeholder="placeholder"
     :disabled="disabled"
     :aria-invalid="invalid || undefined"
-    v-bind="attrs"
+    v-bind="{ ...attrs, class: undefined }"
     @input="onInput"
   />
 </template>

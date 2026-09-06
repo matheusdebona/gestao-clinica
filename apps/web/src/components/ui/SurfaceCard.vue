@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { cn } from '@/lib/cn'
+import GlassSurface from './GlassSurface.vue'
 
 withDefaults(
   defineProps<{
@@ -13,9 +14,12 @@ withDefaults(
 </script>
 
 <template>
-  <section
-    :class="cn('rounded-card border border-border-subtle bg-surface', padding && 'p-5', $props.class)"
+  <GlassSurface
+    as="section"
+    material="regular"
+    :padding="padding"
+    :class="cn($props.class)"
   >
     <slot />
-  </section>
+  </GlassSurface>
 </template>

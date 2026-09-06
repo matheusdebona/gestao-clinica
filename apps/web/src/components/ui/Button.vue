@@ -22,16 +22,16 @@ const props = withDefaults(
 
 const classes = computed(() =>
   cn(
-    'inline-flex h-10 items-center justify-center gap-2 rounded-[10px] px-4 text-[15px] font-medium tracking-[-0.01em] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40',
+    'inline-flex h-10 items-center justify-center gap-2 rounded-[12px] px-4 text-[15px] font-medium tracking-[-0.01em] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40',
     props.block && 'w-full',
     props.variant === 'primary' &&
       'bg-brand text-inverse hover:bg-brand-hover active:bg-brand-dark',
     props.variant === 'secondary' &&
-      'bg-surface-muted text-title hover:bg-border-subtle active:bg-border-divider',
+      'glass-clear text-title hover:bg-surface/50 active:bg-surface/60',
     props.variant === 'ghost' &&
-      'bg-transparent text-brand hover:bg-brand-light active:bg-brand/10',
+      'bg-transparent text-brand hover:bg-brand-light/70 active:bg-brand/10',
     props.variant === 'destructive' &&
-      'bg-danger-light text-danger hover:bg-danger/15 active:bg-danger/20',
+      'glass-chip-danger text-danger hover:bg-danger/15 active:bg-danger/20',
   ),
 )
 </script>

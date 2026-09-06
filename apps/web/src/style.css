@@ -1,5 +1,6 @@
 @import "@fontsource-variable/inter";
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 @import "./design-tokens/tokens.css";
 
 @layer base {
@@ -8,12 +9,19 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
   }
 
   body {
     margin: 0;
     min-height: 100vh;
-    background: var(--sv-bg-canvas);
+    background-color: var(--sv-bg-canvas);
+    background-image: var(--sv-canvas-mesh);
+    background-attachment: fixed;
     color: var(--sv-text-body);
     font-size: var(--sv-text-body);
     line-height: var(--sv-leading-body);

@@ -22,7 +22,7 @@ const emit = defineEmits<{
 <template>
   <div class="relative flex w-full items-center">
     <Search
-      class="pointer-events-none absolute left-3 size-4 text-muted"
+      class="pointer-events-none absolute left-3.5 size-4 text-muted"
       :stroke-width="1.75"
       aria-hidden="true"
     />
@@ -31,7 +31,7 @@ const emit = defineEmits<{
       type="search"
       :placeholder="placeholder"
       :disabled="disabled"
-      class="h-11 w-full rounded-[10px] border border-transparent bg-input pr-3.5 pl-10 text-[15px] text-title placeholder:text-muted disabled:opacity-50"
+      class="glass-field h-11 w-full rounded-full py-0 pr-3.5 pl-10 text-[15px] text-title placeholder:text-muted disabled:opacity-50"
       @keydown.enter="emit('search', model)"
     />
   </div>

@@ -12,35 +12,39 @@ alwaysApply: false
 When editing Vue in `apps/web`, reuse these components. Do not recreate their look with Tailwind on raw HTML.
 
 ## Actions
-- `Button` — `primary` | `secondary` | `ghost` | `destructive` (+ `loading` / `disabled`)
-- `ButtonAccent` — outline only (no gradient)
-- `IconButton` — icon + `label` (aria)
+- `Button` — `primary` (solid brand) | `secondary` (glass) | `ghost` | `destructive` (+ `loading` / `disabled`)
+- `ButtonAccent` — outline glass (no gradient)
+- `IconButton` — icon + `label` (aria); círculo `glass-clear`
 
 ## Forms
 - `FormField` — label + hint + **error 422**; slot gets `{ invalid }`
-- `Input` — `text` | `number` | `password` | `email` | `date` | `datetime-local` | `search` | `tel`
+- `Input` — `text` | `number` | `password` | `email` | `date` | `datetime-local` | `search` | `tel` (`glass-field`)
 - `PasswordInput` — senha com mostrar/ocultar (olho)
-- `Textarea`, `Select`, `Checkbox`, `Switch`
-- `SearchField`, `MaskedBox`
+- `Textarea`, `Select` (menu `glass-menu`), `Radio`, `Checkbox`, `Switch`
+- `SearchField` (pill glass), `MaskedBox`
 
 ## Feedback / overlay
-- `Banner`, `InlineAlert`, `Badge`, `Spinner`, `Skeleton`
-- Toasts: `useToastStore()` (`success` / `error` / `info`) — host is already in `App.vue`
-- `AppDialog`, `ConfirmDialog`
+- `Banner`, `InlineAlert`, `Badge` (chips glass), `Spinner`, `Skeleton`
+- Toasts: `useToastStore()` (`success` / `error` / `info`) — host is already in `App.vue` (`glass-toast`)
+- `AppDialog`, `AppSheet`, `ConfirmDialog` — painéis `glass-regular` + scrim
 - `EmptyState` — título + descrição + slot `action`
 - `Pagination` — `page` / `lastPage` (`update:page`)
 - `Tabs` — segmento (`v-model` + `items`; `block` para largura total)
-- `LineChart` — série (Chart.js; cores via tokens Soft Violet)
+- `LineChart` — série (Chart.js; cores via tokens Soft Violet; re-render no tema)
 - `NavBadge` — contador numérico da nav (some se `count` for 0; `99+`)
+- `ThemeToggle` — `icon` (ciclo sistema/claro/escuro) ou `segmented`; `tone` `inverse` na sidebar
 
 ## Layout
-- `PageHeader`, `SurfaceCard`
+- `GlassSurface` — `material` `regular` | `clear` | `dark`
+- `PageHeader` — `sticky` opcional (glass)
+- `SurfaceCard` — `glass-regular`
 - `ListCard` — grouped row + chevron (no pastel variants)
 - `SidebarNavItem` — item da nav (shell)
-- `ClinicShell` — `components/patterns` (sidebar + bottom nav)
+- `ClinicShell` — `components/patterns` (sidebar `glass-dark` flutuante + tab bar cápsula)
 - `PermissionGate` — `components/patterns`; slot só com a permission
 - `ClientSearchBar` — `components/patterns`; busca com debounce (`search`)
 - `MoneyDisplay` — `components/patterns`; BRL (`formatBRL`); `size` `md` | `lg`
+- `MoneyInput` — `components/patterns`; BRL sobre `Input` glass
 - `StockStatusBadge` — `components/patterns`; Normal / estoque baixo / reposição / negativo
 - `ItemLineRow` — `components/patterns`; produto + quantidade + preço opcional + remover (protocolos / vendas)
 - `WizardStepper` — `components/patterns`; passos mobile (venda)
@@ -50,7 +54,7 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `NotificationInboxItem` — `components/patterns`; linha do inbox (título, message, tempo relativo, unread)
 
 ## Tokens
-Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows.
+Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, `glass-regular`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows. Never invent `backdrop-filter` outside the glass utilities.
 
 ## Extending the system
 1. Add or change the primitive in `apps/web/src/components/ui/`.

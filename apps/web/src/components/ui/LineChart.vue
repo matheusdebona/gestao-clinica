@@ -10,6 +10,7 @@ import {
   Tooltip,
 } from 'chart.js'
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useThemeStore } from '@/stores/theme'
 
 Chart.register(CategoryScale, LinearScale, LineController, LineElement, PointElement, Filler, Tooltip)
 
@@ -57,7 +58,6 @@ function render() {
   const brand = readToken('--sv-brand-primary', 'currentColor')
   const muted = readToken('--sv-text-muted', 'currentColor')
   const grid = readToken('--sv-border-subtle', 'transparent')
-  const title = readToken('--sv-text-title', 'currentColor')
 
   chart?.destroy()
   chart = new Chart(canvas.value, {
@@ -89,7 +89,7 @@ function render() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: title,
+          backgroundColor: readToken('--sv-bg-sidebar', '#0a101c'),
           titleColor: readToken('--sv-text-inverse', 'white'),
           bodyColor: readToken('--sv-text-inverse', 'white'),
           displayColors: false,
@@ -125,12 +125,14 @@ function render() {
   })
 }
 
+const theme = useThemeStore()
+
 onMounted(() => {
   void nextTick(render)
 })
 
 watch(
-  () => [props.labels, props.values] as const,
+  () => [props.labels, props.values, theme.resolved] as const,
   () => {
     render()
   },

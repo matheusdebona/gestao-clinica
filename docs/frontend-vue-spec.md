@@ -130,16 +130,64 @@ Evitar: `components/ui` → `features` (ciclo e vazamento de domínio).
 
 ---
 
-## 5. Design system — Soft Violet, Apple-minimal
+## 5. Design system — Soft Violet Liquid Glass (heavy)
 
 **Nome:** Modern Soft Violet  
-**Estilo:** Apple-minimal / Settings — grouped lists, hairline borders, violeta só como acento  
+**Estilo:** Apple Liquid Glass adaptado à web — materiais translúcidos com `backdrop-filter`, chrome flutuante, grouped lists, hairline claro, violeta só como acento.
 
-Referência visual: canvas `#F2F2F7`, superfícies brancas, pouca sombra, tipografia Inter. Sem cards pastéis, sem CTA gradient, sem sidebar “roxa sólida” como peça principal.
+**Intensidade (congelada):** **HEAVY** — glass no shell, cards/superfícies, overlays, menus, headers sticky, busca, campos e chips onde fizer sentido.
+
+Referência visual: canvas `#F2F2F7` com mesh violeta calmo (não neon); superfícies `glass-regular` / `glass-clear`; chrome escuro `glass-dark`. Sem cards pastéis, sem CTA gradient, sem sidebar “roxa sólida” como peça principal. Texto de título/corpo permanece opaco e contrastado.
+
+Princípio Apple na web: o conteúdo continua legível; o vidro é o material, não um efeito em cima de um layout sólido.
+
+### 5.0 Materiais Liquid Glass
+
+Dois materiais claros + um escuro. Implementar como classes em `tokens.css` (`glass-regular`, `glass-clear`, `glass-dark`, `glass-field`, `glass-menu`, `glass-chip`) e/ou o primitive `GlassSurface`.
+
+| Material | Uso | Recurso |
+| --- | --- | --- |
+| `glass-regular` | **Obrigatório** em cards (`SurfaceCard`), dialogs, sheets, menus, sidebar clara / tab bar, toasts escuros via `glass-dark` | bg ~branco 64%, blur 40px, saturate 180%, borda `rgba(255,255,255,0.22)`, sombra flutuante + highlight inset |
+| `glass-clear` | **Obrigatório** em search pill, chips/badges, botões secondary/accent, sticky headers, wells leves | bg ~branco 40%, blur 24px, saturate 160%, borda `rgba(255,255,255,0.14)` |
+| `glass-dark` | **Obrigatório** na sidebar desktop e toasts | bg `#1C1C1E` ~62%, mesmo blur/saturate do regular, borda branca ~16% |
+| `glass-field` | **Obrigatório** em todo controle que aceita input (text, email, password, number, search, tel, date, textarea, select trigger, masked, money) | bg ~branco 50%, blur 20px; foco sobe para regular + hairline brand |
+| `glass-menu` | **Obrigatório** em dropdowns / select / popover | igual regular, radius 14, elevação flutuante |
+
+**Opcional:** glass em rows (`ListCard` hover), tracks de tabs, banners (tinted chip).
+
+**Não usar glass:** CTA `Button` primary (sólido `#5956A6`), switch/checkbox/radio **checked** (sólido brand/success para leitura), `NavBadge` de alerta (sólido danger).
+
+Componente `GlassSurface` (`material`: `regular` \| `clear` \| `dark`) é o wrapper; features não reimplementam `backdrop-filter`.
+
+#### Tema claro / escuro
+
+Tema **explícito** via classe `dark` em `html` (não só `prefers-color-scheme`). Tokens em `:root` (claro) e `html.dark` (escuro). Tailwind `@theme inline` aponta para as CSS vars, então primitivos de glass/input/overlay acompanham o tema sem `dark:` em cada feature.
+
+| Peça | Comportamento |
+| --- | --- |
+| Preferência | `system` \| `light` \| `dark` — Pinia `theme`, persistida em `localStorage` (`gc_theme`) |
+| Default | **sistema** (`prefers-color-scheme`) |
+| Toggle | `ThemeToggle` no `ClinicShell` (sidebar + header mobile), login e `/dev/ui` (segmentado no kitchen sink) |
+| Brand no escuro | `#7A77C9` (ligeiramente mais claro que `#5956A6`); pressed `#5956A6` |
+| Glass no escuro | painéis azul-cinza translúcidos (`rgba(26,36,56,…)`), hairline azul-frio — **sem vidro leitoso branco** nem cinza iOS |
+| Canvas | claro `#F2F2F7`; escuro **midnight navy** `#0B1220` + mesh brand/azul calmo (não preto puro) |
+| `color-scheme` | `light` / `dark` no `html` (date/scroll nativos) |
+| Reduced transparency | sólidos `--sv-bg-surface` / `--sv-bg-input` / `--sv-bg-sidebar` **do tema ativo** |
+
+Script inline em `index.html` aplica a classe antes do Vue para evitar flash.
+
+#### Acessibilidade
+
+| Preferência | Fallback |
+| --- | --- |
+| `prefers-reduced-transparency` | Superfícies sólidas (`--sv-bg-surface` / `--sv-bg-input` / `--sv-bg-sidebar` do tema ativo); sem `backdrop-filter`; mesh do canvas desligado; bordas `--sv-border-subtle` |
+| `prefers-reduced-motion` | Transições/animações ≈ 0 (já global em `tokens.css`) |
+
+Contraste de texto: `--sv-text-title` / `--sv-text-body` sobre o vidro; no claro não usar texto branco em `glass-regular`; no escuro o título é slate claro (`#F1F5F9`) sobre canvas midnight.
 
 ### 5.1 Tokens (CSS variables → Tailwind theme)
 
-Implementar em `design-tokens/tokens.css` e mapear no `tailwind.config`.
+Implementar em `design-tokens/tokens.css` (Tailwind 4 `@theme inline`).
 
 #### Cores — brand
 
@@ -207,28 +255,46 @@ Implementar em `design-tokens/tokens.css` e mapear no `tailwind.config`.
 | Token | Valor |
 | --- | --- |
 | Radius `sm` … `card` | 8 / 10 / 14 / 12 (+ `full`) |
-| Shadow card | nenhuma — hairline |
-| Shadow floating | `0 8px 28px rgba(0,0,0,0.12)` overlays |
-| Shadow input | nenhuma |
+| Radius chrome | 22px (sidebar / sheet) |
+| Shadow card | `0 8px 28px rgba(28,28,30,0.08)` (glass) |
+| Shadow floating / glass | overlays e menus; highlight inset branco |
+| Shadow input | inset highlight no `glass-field` |
 | Sidebar width (desktop) | `240px` |
+| Chrome inset | `12px` (sidebar e tab bar flutuam sobre o canvas) |
 | Gap / padding página | `20px` / `24px` |
 
-Motion: duração curta; respeitar `prefers-reduced-motion`.
+Motion: duração curta; respeitar `prefers-reduced-motion` e `prefers-reduced-transparency`.
+
+#### Tokens — glass
+
+| Token | Valor típico (heavy) |
+| --- | --- |
+| `--sv-glass-intensity` | `heavy` |
+| `--sv-glass-regular-bg` | `rgba(255,255,255,0.64)` |
+| `--sv-glass-regular-blur` / saturate | `40px` / `180%` |
+| `--sv-glass-regular-border` | `rgba(255,255,255,0.22)` |
+| `--sv-glass-clear-bg` | `rgba(255,255,255,0.40)` |
+| `--sv-glass-clear-blur` / saturate | `24px` / `160%` |
+| `--sv-glass-clear-border` | `rgba(255,255,255,0.14)` |
+| `--sv-glass-dark-bg` | `rgba(28,28,30,0.62)` |
+| `--sv-glass-input-bg` | `rgba(255,255,255,0.50)` |
+| `--sv-scrim` | title ~32% + blur 10px |
+| `--sv-canvas-mesh` | radiais brand 7–11% no canvas |
 
 ### 5.2 Layout / shell
 
 | Componente | Propósito | Estados | Breakpoints |
 | --- | --- | --- | --- |
-| `AppShell` / `ClinicShell` | Canvas `#F2F2F7` + nav | loading skeleton | **&lt; md:** tab bar clara; **≥ md:** sidebar `#1C1C1E` estreita |
+| `AppShell` / `ClinicShell` | Canvas + mesh + nav **flutuante** em glass + `ThemeToggle` | loading skeleton | **&lt; md:** tab bar cápsula `glass-regular` + header sticky glass; **≥ md:** sidebar `glass-dark` flutuante (não edge-to-edge) |
 | `SidebarNavItem` | Item de navegação | default / hover / active | Active: brand tint, peso 500 |
-| `NavBadge` | Contagem (ex. inbox) | — | Pill, fundo `rgba(255,255,255,0.2)` |
+| `NavBadge` | Contagem (ex. inbox) | — | Pill sólido danger (leitura) |
 | `Page` | Conteúdo principal | — | Padding 24; gap 20 entre blocos |
-| `PageHeader` | H1 título + ações | — | Phone: título acima; ações empilham |
-| `SearchField` | Busca global/página | — | Pill, bg `surfaceMuted`, ícone circular à direita |
-| `IconButton` | Ações do header | hover soft | Ghost sobre canvas |
+| `PageHeader` | H1 título + ações; `sticky` opcional | — | Phone: título acima; ações empilham; sticky = `glass-clear` |
+| `SearchField` | Busca global/página | — | Pill `glass-field` |
+| `IconButton` | Ações do header | hover soft | Círculo `glass-clear` |
 | `Stack` / `Inline` | Espaçamento | — | `Inline` → stack no xs |
 
-**Sidebar desktop:** fundo neutro escuro (não violeta sólido). Sem ilustração no rodapé.
+**Sidebar desktop:** material `glass-dark` (não violeta sólido), inset 12px, radius chrome. Sem ilustração no rodapé.
 
 ### 5.3 Surface / cards
 
@@ -236,8 +302,9 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 
 | Componente | Spec |
 | --- | --- |
-| `SurfaceCard` | bg `#FFF`, radius 12, padding 20, hairline, sem shadow |
-| `ListCard` | Linha grouped + chevron; sem pastéis |
+| `GlassSurface` | Wrapper de material `regular` / `clear` / `dark` |
+| `SurfaceCard` | `glass-regular`, radius 12, padding 20, hairline branco 12–22%, texto contrastado |
+| `ListCard` | Linha grouped + chevron; sem pastéis; hover leve sobre o vidro |
 | `MetaPair` | Par label/valor com ícone suave (detalhe de cliente, produto) |
 | `PromoBanner` | **Não usar** na v1 clínica (reservado; design original tinha CTA gradient) |
 
@@ -245,8 +312,8 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 
 | Componente | Propósito | Estados |
 | --- | --- | --- |
-| `Toast` | Feedback temporário | success, error, info |
-| `Banner` | Aviso persistente na página | info, warning, danger |
+| `Toast` | Feedback temporário | success, error, info — `glass-toast` (dark) |
+| `Banner` | Aviso persistente na página | info, warning, danger, success — chip glass tintado |
 | `InlineAlert` | Erro/aviso junto ao form | — |
 | `Skeleton` | Placeholder de loading | — |
 | `EmptyState` | Lista vazia + CTA | — |
@@ -257,15 +324,16 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 
 | Componente | Propósito | Estados / spec |
 | --- | --- | --- |
-| `Button` | primary / secondary / ghost / destructive | Primary: brand; hover `primaryHover`; loading / disabled |
-| `ButtonAccent` | CTA raro (gradient pink→purple) | Só destaques explícitos |
-| `Input` | Texto / number / password | bg `inputBackground`, radius ≥10, sombra inset opcional; invalid |
+| `Button` | primary / secondary / ghost / destructive | Primary: brand **sólido**; secondary/ghost hover em glass; loading / disabled |
+| `ButtonAccent` | CTA raro (outline glass, sem gradient) | Só destaques explícitos |
+| `Input` | Texto / number / password / email / date / datetime-local / search / tel | `glass-field`, radius ≥10; invalid via `aria-invalid` |
 | `Textarea` | Texto longo | idem |
-| `Select` | Escolha única (headless) | idem |
-| `Checkbox` / `Switch` | Boolean | idem |
-| `FormField` | Label + control + hint + **erro 422** | caption muted |
-| `MoneyInput` / `MoneyDisplay` | BRL | parsing pt-BR |
-| `MaskedBox` | Valor mascarado / read-only | bg `#F0F4F8`, radius 10, padding `10×14` |
+| `Select` | Escolha única (headless) | trigger `glass-field`; menu `glass-menu` flutuante |
+| `Radio` | Escolha única (grupo) | unchecked glass; checked brand sólido |
+| `Checkbox` / `Switch` | Boolean | unchecked glass; checked brand / success sólido |
+| `FormField` | Label + control + hint + **erro 422** | label sobre vidro; caption muted |
+| `MoneyInput` / `MoneyDisplay` | BRL | `MoneyInput` prefixa R$ sobre `Input` glass; parsing pt-BR |
+| `MaskedBox` | Valor mascarado / read-only | `glass-field`, radius 12, padding `10×14` |
 
 Validação: Zod no client + exibir `errors.field` do Laravel `422`.
 
@@ -273,8 +341,8 @@ Validação: Zod no client + exibir `errors.field` do Laravel `422`.
 
 | Componente | Propósito | Breakpoints |
 | --- | --- | --- |
-| `Sheet` | Painel lateral/bottom (surface branca, radius grande) | Preferir no phone |
-| `Dialog` | Modal centrado | Preferir ≥ `md` |
+| `Sheet` (`AppSheet`) | Painel lateral/bottom **flutuante** `glass-regular` | Preferir no phone (cápsula inferior) |
+| `Dialog` | Modal centrado `glass-regular` + scrim | Preferir ≥ `md` |
 | `ConfirmDialog` | Confirmação destrutiva | Ambos |
 
 ### 5.7 Data
@@ -296,13 +364,13 @@ Validação: Zod no client + exibir `errors.field` do Laravel `422`.
 | `StockStatusBadge` | Normal / low / reorder / negativo (success / warning / danger / purple) |
 | `NotificationInboxItem` | Linha do inbox (`low_stock`, `projected_low_stock`, `appointment_stock_warning`, …) |
 | `NavBadge` | Contador numérico de não lidas no item Alertas |
-| `ClinicShell` | AppShell Soft Violet + nav filtrada por permissions |
+| `ClinicShell` | AppShell Soft Violet Liquid Glass + nav filtrada por permissions |
 
 ### 5.9 Kitchen sink
 
 Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
-- Mostra tokens (swatches) + todos os primitives/compostos em todos os estados.
+- Mostra tokens (swatches vivos do tema) + **materiais glass** + **Tema** (Sistema / Claro / Escuro) + todos os primitives/compostos em todos os estados (inclui todo input e todo menu/overlay).
 - Gate de qualidade **antes** de abrir PRs de features.
 - Storybook fica opcional (fase 3.5); default é este sink.
 
@@ -365,16 +433,18 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
 **DoD Fase 2:** login e cadastro reais contra Sanctum; `/auth/me` popula permissions.
 
-### Fase 3 — Design system (“Modern Soft Violet”)
+### Fase 3 — Design system (“Modern Soft Violet” → Liquid Glass heavy)
 
 - [x] Tokens Soft Violet em CSS vars → Tailwind theme (§5.1)
+- [x] Materiais Liquid Glass heavy (`glass-regular` / `glass-clear` / `glass-dark` / `glass-field`) + fallbacks a11y
+- [x] Tema claro/escuro (`html.dark`, default sistema, `ThemeToggle`)
 - [x] `PageHeader` / `SearchField` + primitives de form/feedback/overlay no `/dev/ui`
-- [x] Página `/dev/ui` com swatches + estados (default / erro / snack)
-- [x] `ClinicShell` + `SidebarNavItem` (sidebar neutra; brand só como acento)
+- [x] Página `/dev/ui` com swatches + materiais + estados (default / erro / snack)
+- [x] `ClinicShell` flutuante (`glass-dark` desktop; tab bar cápsula no phone)
 - [x] Patterns: `PermissionGate`, `ClientSearchBar`
-- [x] Patterns: `MoneyDisplay`, `StockStatusBadge`
+- [x] Patterns: `MoneyDisplay`, `MoneyInput`, `StockStatusBadge`
 
-**DoD Fase 3 (parcial):** kitchen sink revisável no visual Soft Violet; features de negócio ainda não.
+**DoD Fase 3 (parcial):** kitchen sink revisável no visual Soft Violet Liquid Glass (heavy); features de negócio ainda não.
 
 ### Fase 4 — Features (ordem de valor clínico)
 
@@ -942,7 +1012,6 @@ Nav do `ClinicShell` só mostra itens permitidos.
 - Features clínicas e auth (Fases 2 e 4)
 - PWA / service worker
 - Storybook (opcional)
-- Temas dark mode como prioridade
 - App nativo
 - Substituição do PushChannel stub por FCM (backend)
 
