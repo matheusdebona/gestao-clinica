@@ -385,7 +385,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | 4.2b | Equipe (RBAC) | feito |
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | próximo — detalhe abaixo |
 | **4.4** | **Protocolos** (pacote de produtos) | detalhe abaixo |
-| 4.5 | Vendas / orçamentos | (detalhar em seguida) |
+| **4.5** | **Vendas / orçamentos** | detalhe abaixo |
 | **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
 | 4.7 | Tratamento — consumo clínico (baixa estoque) | |
 | 4.8 | Métricas | |
@@ -517,6 +517,77 @@ Fora de escopo 4.4: aplicar protocolo em venda (`POST /sales/{sale}/apply-protoc
 - [ ] Nav Protocolos + atalho em Produtos
 - [ ] Testes API `?q=` (se novo); smoke Vue do fluxo create/edit/items
 
+#### 4.5 — Vendas / orçamentos (especificação de UI)
+
+Objetivo: fluxo comercial mobile-first — montar venda (protocolo + produtos), orçar, pagar e **confirmar sem baixar estoque**. Abrir tratamento / agenda ficam para **4.6+**. Pricing/estoque: [`domain-model.md`](./domain-model.md) §§8–10. API Phases 6–7 já existem.
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Vendas **completas** (lista, draft, itens, pagamentos, confirm/cancel) **e** orçamentos (gerar / enviar / aceitar / rejeitar / expirar / **PDF**) |
+| Fluxo mobile | **Wizard**: Cliente → Itens → Valores → Pagamentos → Revisar / Confirmar |
+| Itens | Aplicar **protocolo** (explode/mescla) + produtos avulsos (busca) + editar qty/preço das linhas |
+| Valor efetivo | Editável (manual); se &lt; mínimo → aviso + confirmação `confirm_below_minimum` (soft gate) |
+| Pagamentos | Soma **deve fechar** o efetivo (sem parcial nesta fase); N métodos + meta de cartão quando `requires_card_meta` |
+| Orçamentos | Timeline **dentro da venda**; criar só a partir de draft com itens |
+| Lista vendas | Filtro **status** + busca cliente + chips de status no card |
+| Card lista | **Cliente · status · valor efetivo · data** |
+| Pós-confirmação | Ver / cancelar + link **Abrir tratamento** (API); sem PDF de contrato/recibo nesta fase |
+| Nav | **Vendas** e **Orçamentos** |
+
+##### Orçamentos × nav
+
+- Criação e ações (send/accept/PDF) vivem no contexto da **venda** (`/sales/:id`, seção orçamentos).
+- Item de nav **Orçamentos** = lista/inbox global (`GET /budgets`) que **abre a venda** (deep link) — não é um fluxo de create paralelo.
+
+##### API / gaps nesta fase
+
+- [ ] `GET /sales?q=` (nome/WhatsApp do cliente) e/ou entrada sempre via `client_id` + busca de clientes — **preferir `q` no index de sales** para a lista
+- [ ] Filtros de lista já têm `status`, `client_id`; documentar uso na UI
+- [ ] `GET /budgets` para nav Orçamentos (já existe: `sale_id`, `status`) — considerar `client_id` / ocultar `superseded` por default se faltar
+- apply-protocol **mescla** quantidades: copy da UI = “Adicionar protocolo”, não “substituir pacote”
+- `PUT …/items` e `PUT …/payments` = replace-all — o wizard mantém o array completo no client
+- PDF orçamento: `POST /budgets/{id}/pdf` + `documents.generate`
+- Confirm: `POST …/confirm` (+ `confirm_below_minimum` se preciso); **estoque inalterado**
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/sales` | Lista (status, busca cliente, chips) | `sales.view` |
+| `/sales/new` | Wizard create (passo cliente…) | `sales.create` |
+| `/sales/:id` | Detalhe / retomar wizard se draft; orçamentos; ações | `sales.view` |
+| `/sales/:id/edit` | Continuar draft (mesmos passos) | `sales.update` |
+| `/budgets` | Inbox de orçamentos → deep link venda | `budgets.view` |
+
+Passos do wizard (draft):
+
+1. **Cliente** — busca (pattern `ClientSearchBar`); `client_id` imutável após create.
+2. **Itens** — adicionar protocolo + produtos; editar qty/preços de linha; ver `expected_amount` / mínimos.
+3. **Valores** — `effective_amount` editável; indicar se abaixo do mínimo.
+4. **Pagamentos** — linhas método/valor (+ cartão); saldo até zerar.
+5. **Revisar** — confirmar (dialog se below-min) ou caminho orçamento (gerar versão → enviar → PDF → aceitar/rejeitar).
+
+Orçamento aceito: venda permanece `draft` para pagamentos/confirm (comportamento atual da API).
+
+Confirmada: read-only (notas opcionais) + cancelar + **Abrir tratamento** (`treatments.start`) quando permitido — agenda de sessões no **4.6**.
+
+##### Patterns
+
+- Wizard / stepper (novo pattern mobile)
+- Reutilizar linhas de item (4.4), `MoneyDisplay`, `Badge` status, `ClientSearchBar`, `ConfirmDialog`, `PermissionGate` por ação (`sales.confirm`, `budgets.convert`, `documents.generate`, …)
+
+##### DoD 4.5
+
+- [ ] Criar venda com protocolo + produto avulso, editar efetivo, pagar fechando o total, confirmar
+- [ ] Soft confirm abaixo do mínimo
+- [ ] Gerar orçamento, enviar, PDF, aceitar; depois confirmar venda
+- [ ] Lista com status + busca cliente; card com cliente/status/efetivo/data
+- [ ] Nav Vendas + Orçamentos (inbox)
+- [ ] Pós-confirm: link abrir tratamento; estoque inalterado
+- [ ] Testes API dos gaps (`q` se novo); smoke Vue do wizard
+
 #### 4.6 — Agendamentos (especificação de UI)
 
 Objetivo: **agenda completa da clínica** (dia/semana) — criar, remarcar, cancelar e **iniciar** sessão.  
@@ -633,6 +704,7 @@ Mobile-first: no phone, default **dia**; semana como progressive enhancement (`m
 | `/units` | Unidades | `units.manage` |
 | `/protocols` | Protocolos | `protocols.view` |
 | `/sales` | Vendas | `sales.view` |
+| `/budgets` | Orçamentos (inbox) | `budgets.view` |
 | `/appointments` | Agenda | `appointments.view` |
 | `/treatments` | Tratamentos (consumo) | `treatments.view` |
 | `/notifications` | Inbox | auth |
