@@ -58,11 +58,12 @@ All commercial and clinical data belongs to a **clinic** (tenant). Users belong 
 Clinic
 ├── Users
 ├── Product catalogs
-│   ├── ProductType          (botox, filler, toxin, acid, …)
 │   ├── Brand
+│   ├── ProductType          (belongs to Brand — brand_id required)
 │   ├── UnitOfMeasure        (mg, ml, unit, kg, …)
 │   └── Product
-│         ├── cost, sale_price
+│         ├── brand_id + product_type_id (type must match brand)
+│         ├── cost, sale_price, min_sale_price
 │         ├── stock_quantity, min_stock, lead_time_days
 │         └── purpose / description
 ├── Protocol
@@ -89,7 +90,18 @@ Clinic
 
 ## 4. Products & stock
 
-Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./produto-financeiro.md).
+Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./produto-financeiro.md).  
+UI Phase 4.3 detail: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3.
+
+### Catalog hierarchy (marca → tipo → produto)
+
+| Entity | Fields (core) | Notes |
+| --- | --- | --- |
+| `Brand` | `clinic_id`, `name`, `is_active` | Clinic-scoped |
+| `ProductType` | `clinic_id`, **`brand_id`**, `name`, `slug`, `is_active` | **Belongs to a brand**; list filter `?brand_id=` |
+| `UnitOfMeasure` | `clinic_id`, `name`, `symbol`, `is_active` | Independent of brand |
+
+Product form cascade: choose brand → types of that brand → product fields + unit.
 
 ### Product
 
@@ -98,8 +110,8 @@ Financial field rationale (cost, revenue, margin): [`produto-financeiro.md`](./p
 | `clinic_id` | Tenant |
 | `name` | Product name |
 | `sku` | Optional internal/supplier code |
-| `product_type_id` | Category (botox, filling, toxin, acid, …) |
-| `brand_id` | Brand |
+| `brand_id` | Brand (chosen first in UI) |
+| `product_type_id` | Type **of that brand** (must match `brand_id`) |
 | `unit_of_measure_id` | kg, mg, ml, unit, … — qty and cost share this UoM |
 | `purpose` | What it is for |
 | `cost` | **Weighted average unit cost** (CMV / inventory valuation base) |

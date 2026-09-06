@@ -376,19 +376,89 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 
 ### Fase 4 — Features (ordem de valor clínico)
 
-| Ordem | Feature | API / notas | Status |
-| --- | --- | --- | --- |
-| 4.1 | Auth polish | Lembrar clinic name, erros de login | feito |
-| 4.2 | Clientes | CRUD + busca `?q=` | feito |
-| 4.3 | Produtos | Lista, filtro low-stock, `lead_time_days` no form | |
-| 4.4 | Vendas / orçamentos | Fluxos principais confirm/cancel; sem baixar estoque na confirmação | |
-| 4.5 | Tratamentos / appointments | Start/complete, warnings de estoque, fulfillment | |
-| 4.6 | Notificações | Inbox list/read/read-all | |
-| 4.7 | Métricas | Cards A–D (`/metrics/commercial`, `acquisition`, `margin`, `inventory`, `operations`) | |
+Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
+
+| Ordem | Feature | Status |
+| --- | --- | --- |
+| 4.1 | Auth polish | feito |
+| 4.2 | Clientes | feito |
+| 4.2b | Equipe (RBAC) | feito |
+| **4.3** | **Produtos** (+ marcas, tipos, unidades) | próximo — detalhe abaixo |
+| 4.4 | Protocolos (pacote de produtos) | |
+| 4.5 | Agendamentos (sessões / agenda) | |
+| 4.6 | Vendas / orçamentos | |
+| 4.7 | Tratamento — consumo clínico (baixa estoque) | |
+| 4.8 | Métricas | |
+| 4.9 | Notificações | |
 
 Cada feature: páginas mobile-first + `PermissionGate` nas ações.
 
 **DoD Fase 4:** secretária e médico completam o fluxo diário no viewport phone.
+
+#### 4.3 — Produtos (especificação de UI)
+
+Objetivo: cadastro operacional do catálogo e estoque. API Phase 2 já existe; esta fase fecha a web e um ajuste de modelo para a cascata marca → tipo.
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Lista + detalhe + criar/editar + desativar + **ajustar estoque**; CRUD de **marcas**, **tipos** e **unidades** na mesma fase |
+| Cascata no form do produto | **Marca** → popula **tipos daquela marca** → preenche dados do produto (preços, estoque, unidade, etc.) |
+| Lista — filtros | Switch “somente estoque baixo” + filtro por tipo + **busca `?q=`** (nome/SKU) — **API precisa ganhar `q`** |
+| Lista — linha (`ListCard`) | Título = nome; meta = **tipo · marca · estoque**; badge estoque baixo quando `is_low_stock` |
+| Form — campos | nome, marca, tipo, unidade, SKU, `purpose`, custo (criação / entrada), `sale_price`, `min_sale_price`, estoque inicial (criar), `min_stock`, `lead_time_days`, ativo |
+| Estoque | Ação **Ajustar estoque**: `in`/`out`, qty, `unit_cost` obrigatório na entrada, motivo/notas |
+| Desativar | DELETE soft (`is_active=false`); lista com filtro “somente ativos” (padrão ligado, como Clientes) |
+
+##### Mudança de modelo / API (obrigatória nesta fase)
+
+Hoje `product_type_id` e `brand_id` são FKs **independentes** em `products`. Para a cascata “tipos da marca”:
+
+- [ ] `product_types.brand_id` (obrigatório, clinic-scoped) — tipo pertence a uma marca
+- [ ] Migration + backfill dos tipos seedados (atribuir marca ou recriar seeds)
+- [ ] `GET /product-types?brand_id=` para popular o select
+- [ ] Validar no store/update de produto: `product_type.brand_id === product.brand_id`
+- [ ] `GET /products?q=` busca por `name` / `sku` (além de `low_stock`, `product_type_id`, e opcional `is_active`)
+
+Unidades de medida **continuam independentes** da marca (escolha no form do produto).
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/products` | Lista (busca, low-stock, ativos, tipo) | `products.view` |
+| `/products/new` | Criar produto | `products.create` |
+| `/products/:id` | Detalhe + ações (editar, ajustar estoque, desativar) | `products.view` |
+| `/products/:id/edit` | Editar | `products.update` |
+| `/brands` | CRUD marcas | `brands.manage` |
+| `/product-types` | CRUD tipos (sempre ligados a uma marca) | `product_types.manage` |
+| `/units` | CRUD unidades | `units.manage` |
+
+Nav: manter **Produtos**; catálogos podem ficar como subtela/atalhos no detalhe ou itens secundários na nav (decisão de chrome na implementação — preferir atalhos a partir da lista/form se a nav ficar pesada).
+
+##### UX do formulário (produto)
+
+1. Select **Marca** (ou criar marca se `brands.manage`).
+2. Select **Tipo** filtrado por `brand_id` (ou criar tipo da marca se `product_types.manage`).
+3. Demais campos: nome, SKU, unidade, purpose, preços, estoques, lead time, ativo.
+4. Na **criação**, estoque inicial > 0 vira movimento `in` (já suportado pela API).
+5. **Custo / quantidade de estoque** não editáveis no update direto — só via ajuste de estoque / criação.
+
+##### Patterns de UI a reutilizar / acrescentar
+
+- `ListCard`, `SearchField` / pattern de busca, `Switch` “somente ativos” / “estoque baixo”, `FormField`, `Select`, `Pagination`, `EmptyState`, `ConfirmDialog` (desativar).
+- [ ] `MoneyDisplay` — preços e custo
+- [ ] `StockStatusBadge` — baixo / ok (token success/warning)
+
+##### DoD 4.3
+
+- [ ] Secretária cadastra marca → tipo da marca → produto com unidade e preços
+- [ ] Lista filtra por texto, tipo, estoque baixo e ativos
+- [ ] Ajuste de estoque (entrada com custo recalcula média; saída sem mudar custo médio)
+- [ ] Desativar produto e ocultar com “somente ativos”
+- [ ] Outra clínica não vê o catálogo (já garantido na API; cobrir na UI só por escopo de sessão)
+- [ ] Testes API da cascata marca/tipo + `?q=`; smoke manual das telas Vue
 
 ### Fase 5 — PWA (depois da web estável)
 
@@ -421,9 +491,13 @@ Cada feature: páginas mobile-first + `PermissionGate` nas ações.
 | `/` | Home / atalhos | auth |
 | `/clients` | Lista/busca | `clients.view` |
 | `/clients/:id` | Detalhe | `clients.view` |
+| `/users` | Equipe | `users.view` |
 | `/products` | Catálogo | `products.view` |
+| `/brands` | Marcas | `brands.manage` |
+| `/product-types` | Tipos de produto | `product_types.manage` |
+| `/units` | Unidades | `units.manage` |
 | `/sales` | Vendas | `sales.view` |
-| `/treatments` | Tratamentos | `treatments.view` |
+| `/treatments` | Tratamentos (consumo) | `treatments.view` |
 | `/notifications` | Inbox | auth |
 | `/metrics` | Dashboard KPIs | `metrics.view` |
 | `/dev/ui` | Kitchen sink | DEV ou admin |

@@ -163,7 +163,14 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] Design system **Modern Soft Violet** + `/dev/ui` kitchen sink (Fase 3)
 - [x] Auth + `ClinicShell` (Fase 4.1)
 - [x] Clientes: lista, busca `?q=`, CRUD (Fase 4.2)
-- [ ] Features clínicas restantes: products, sales, treatments, notifications, metrics (Fase 4.3+)
+- [x] Equipe: RBAC + CRUD usuários (Fase 4.2b)
+- [ ] **Produtos** (+ marcas/tipos/unidades, cascata marca→tipo, `?q=`, ajuste estoque) — Fase 4.3; ver detalhe em [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3
+- [ ] Protocolos (Fase 4.4)
+- [ ] Agendamentos (Fase 4.5)
+- [ ] Vendas / orçamentos (Fase 4.6)
+- [ ] Tratamento — consumo clínico (Fase 4.7)
+- [ ] Métricas (Fase 4.8)
+- [ ] Notificações (Fase 4.9)
 - [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)
 - [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI
 - [ ] Desktop layouts as progressive enhancement of the mobile design
