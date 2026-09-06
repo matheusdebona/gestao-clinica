@@ -137,7 +137,7 @@ Receita de setembro vs custo de sessões de setembro **não** é a mesma coisa q
 
 **Status:** implementado (`GET /api/v1/metrics/margin`).
 
-**DoD onda C (API):** margem period e cohort testadas; `pending_fulfillment_count` em cohort. UI pendente.
+**DoD onda C (API):** margem period e cohort testadas; `pending_fulfillment_count` em cohort. UI na Fase 4.8.
 
 ---
 
@@ -173,7 +173,7 @@ Receita de setembro vs custo de sessões de setembro **não** é a mesma coisa q
 5. Testes de isolamento + stock math.
 6. UI: lista low-stock; cards de sessões; tabela “pacotes com saldo pendente”.
 
-**DoD onda D:** low-stock e saldo pendente acionáveis no dia a dia. **API entregue** (`/metrics/inventory`, `/metrics/operations`); UI na PWA.
+**DoD onda D:** low-stock e saldo pendente acionáveis no dia a dia. **API entregue** (`/metrics/inventory`, `/metrics/operations`); UI na Fase 4.8.
 
 ---
 
@@ -232,20 +232,20 @@ Response shape sugerida:
 - [x] `CommercialMetricsService` + endpoint
 - [x] Feature tests (isolation, draft excluded, granularity)
 - [x] Docs: campo de data da receita = `sold_at`; períodos via `from`/`to` + granularidade
-- [ ] (UI) 4 cards + mix pagamento
+- [x] (UI) 4 cards + mix pagamento
 
 ### B — Aquisição
 - [x] `AcquisitionMetricsService` + endpoint
 - [x] Definição de conversão documentada (**lifetime**)
 - [x] Tests por origin/campaign
 - [ ] (Opcional / B+) `campaigns.spend_amount`
-- [ ] (UI) ranking canais
+- [x] (UI) ranking canais
 
 ### C — Margem
 - [x] modes `period` e `cohort_sale`
 - [x] Cortesia e extras charged
 - [x] Tests period vs cohort / isolamento
-- [ ] (UI) margem + aviso saldo pendente
+- [x] (UI) margem + aviso saldo pendente
 - [ ] (C+) breakdown por produto/protocolo
 - [ ] (Futuro) impostos, taxas, custos fixos
 
@@ -253,7 +253,7 @@ Response shape sugerida:
 - [x] inventory + operations endpoints
 - [x] Agregação fulfillment
 - [x] Tests stock / cancel rate
-- [ ] (UI) low-stock + saldo a aplicar
+- [x] (UI) low-stock + saldo a aplicar
 - [x] Job de alerta low-stock (já entregue na Phase 10; lead-time-aware reorder depois)
 
 ---
@@ -283,4 +283,4 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 
 **Status Onda D:** implementado — `GET /api/v1/metrics/inventory` (snapshot + `from`/`to` opcionais, default 30d) e `GET /api/v1/metrics/operations` (período obrigatório, saldo a aplicar + lista).
 
-Próximo: frontend Vue conforme [`frontend-vue-spec.md`](./frontend-vue-spec.md) (design system → features → PWA).
+UI Fase 4.8: página `/metrics` (hero + seções A–D). Próximo no front: alertas in-app (Fase 4.9) e PWA (Fase 5).

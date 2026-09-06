@@ -86,3 +86,32 @@ export function formatDate(value: string | null | undefined): string {
   }
   return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(parsed)
 }
+
+export function formatIsoDate(value: string | null | undefined): string {
+  if (!value) {
+    return '—'
+  }
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value)
+  if (!match) {
+    return formatDate(value)
+  }
+  const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
+  if (Number.isNaN(date.getTime())) {
+    return '—'
+  }
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(date)
+}
+
+export function formatPercent(value: string | number | null | undefined): string {
+  if (value === null || value === undefined || value === '') {
+    return '—'
+  }
+  const amount = typeof value === 'number' ? value : Number(value)
+  if (!Number.isFinite(amount)) {
+    return '—'
+  }
+  return `${new Intl.NumberFormat('pt-BR', {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  }).format(amount)}%`
+}

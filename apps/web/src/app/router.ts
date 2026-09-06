@@ -235,8 +235,9 @@ const router = createRouter({
         },
         {
           path: 'metrics',
-          meta: { title: 'Métricas' },
-          component: () => import('@/pages/ComingSoonPage.vue'),
+          name: 'metrics',
+          meta: { title: 'Métricas', permission: 'metrics.view' },
+          component: () => import('@/pages/MetricsPage.vue'),
         },
       ],
     },
