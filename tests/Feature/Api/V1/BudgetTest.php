@@ -282,4 +282,56 @@ class BudgetTest extends TestCase
 
         $this->assertTrue($ids->every(fn ($id) => (int) $id === $this->clinic->id));
     }
+
+    public function test_budget_index_hides_superseded_by_default(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $product = $this->makeProduct('Versao', '10.0000', '100.00', '80.00');
+        $saleId = $this->createSaleWithItem($product);
+
+        $firstId = $this->postJson("/api/v1/sales/{$saleId}/budgets")->assertCreated()->json('data.id');
+        $secondId = $this->postJson("/api/v1/sales/{$saleId}/budgets")->assertCreated()->json('data.id');
+
+        $this->assertSame('superseded', Budget::query()->findOrFail($firstId)->status);
+        $this->assertSame('draft', Budget::query()->findOrFail($secondId)->status);
+
+        $default = collect($this->getJson('/api/v1/budgets')->assertOk()->json('data'))->pluck('id');
+        $this->assertTrue($default->contains($secondId));
+        $this->assertFalse($default->contains($firstId));
+
+        $withSuperseded = collect(
+            $this->getJson('/api/v1/budgets?include_superseded=1')->assertOk()->json('data')
+        )->pluck('id');
+        $this->assertTrue($withSuperseded->contains($firstId));
+        $this->assertTrue($withSuperseded->contains($secondId));
+
+        $onlySuperseded = collect(
+            $this->getJson('/api/v1/budgets?status=superseded')->assertOk()->json('data')
+        )->pluck('id');
+        $this->assertTrue($onlySuperseded->contains($firstId));
+        $this->assertFalse($onlySuperseded->contains($secondId));
+    }
+
+    public function test_budget_index_filters_by_client_id(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $product = $this->makeProduct('Cliente filtro', '10.0000', '100.00', '80.00');
+        $saleId = $this->createSaleWithItem($product);
+        $mine = $this->postJson("/api/v1/sales/{$saleId}/budgets")->assertCreated()->json('data.id');
+
+        $otherClient = Client::factory()->forClinic($this->clinic)->create();
+        $otherSaleId = $this->postJson('/api/v1/sales', [
+            'client_id' => $otherClient->id,
+        ])->assertCreated()->json('data.id');
+        $this->putJson("/api/v1/sales/{$otherSaleId}/items", [
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+        ])->assertOk();
+        $otherBudget = $this->postJson("/api/v1/sales/{$otherSaleId}/budgets")->assertCreated()->json('data.id');
+
+        $filtered = collect(
+            $this->getJson('/api/v1/budgets?client_id='.$this->client->id)->assertOk()->json('data')
+        )->pluck('id');
+        $this->assertTrue($filtered->contains($mine));
+        $this->assertFalse($filtered->contains($otherBudget));
+    }
 }

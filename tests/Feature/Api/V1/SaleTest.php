@@ -345,4 +345,102 @@ class SaleTest extends TestCase
             ->assertJsonPath('data.expected_amount', '200.00')
             ->assertJsonPath('data.effective_amount', '90.00');
     }
+
+    public function test_can_search_sales_by_client_name_or_whatsapp(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        $named = Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'Ana Beatriz',
+            'whatsapp' => '11988887777',
+        ]);
+        $other = Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'Carlos Souza',
+            'whatsapp' => '21911112222',
+        ]);
+
+        $namedSaleId = $this->postJson('/api/v1/sales', [
+            'client_id' => $named->id,
+        ])->assertCreated()->json('data.id');
+
+        $this->postJson('/api/v1/sales', [
+            'client_id' => $other->id,
+        ])->assertCreated();
+
+        $byName = $this->getJson('/api/v1/sales?q=Beatriz')->assertOk();
+        $this->assertSame([$namedSaleId], collect($byName->json('data'))->pluck('id')->all());
+
+        $byWhatsapp = $this->getJson('/api/v1/sales?q=11988887777')->assertOk();
+        $this->assertSame([$namedSaleId], collect($byWhatsapp->json('data'))->pluck('id')->all());
+    }
+
+    public function test_can_filter_sales_by_status_and_client_id(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $product = $this->makeProduct('Filtro', '10.0000', '100.00', '80.00');
+        $pix = PaymentMethod::factory()->forClinic($this->clinic)->create([
+            'code' => 'pix_filter',
+            'kind' => PaymentMethod::KIND_PIX,
+        ]);
+
+        $draftId = $this->createDraftSale();
+        $confirmedId = $this->createDraftSale();
+
+        $this->putJson("/api/v1/sales/{$confirmedId}/items", [
+            'items' => [['product_id' => $product->id, 'quantity' => 1]],
+        ])->assertOk();
+        $this->putJson("/api/v1/sales/{$confirmedId}/payments", [
+            'payments' => [['payment_method_id' => $pix->id, 'amount' => 100]],
+        ])->assertOk();
+        $this->postJson("/api/v1/sales/{$confirmedId}/confirm")->assertOk();
+
+        $otherClient = Client::factory()->forClinic($this->clinic)->create();
+        $otherSaleId = $this->postJson('/api/v1/sales', [
+            'client_id' => $otherClient->id,
+        ])->assertCreated()->json('data.id');
+
+        $drafts = $this->getJson('/api/v1/sales?status=draft')->assertOk();
+        $draftIds = collect($drafts->json('data'))->pluck('id');
+        $this->assertTrue($draftIds->contains($draftId));
+        $this->assertTrue($draftIds->contains($otherSaleId));
+        $this->assertFalse($draftIds->contains($confirmedId));
+
+        $confirmed = $this->getJson('/api/v1/sales?status=confirmed')->assertOk();
+        $this->assertSame([$confirmedId], collect($confirmed->json('data'))->pluck('id')->all());
+
+        $byClient = $this->getJson('/api/v1/sales?client_id='.$otherClient->id)->assertOk();
+        $this->assertSame([$otherSaleId], collect($byClient->json('data'))->pluck('id')->all());
+    }
+
+    public function test_sale_resource_exposes_null_treatment_id_until_opened(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $saleId = $this->createDraftSale();
+
+        $this->getJson("/api/v1/sales/{$saleId}")
+            ->assertOk()
+            ->assertJsonPath('data.treatment_id', null);
+    }
+
+    public function test_seller_can_list_catalog_and_payment_methods_for_sales(): void
+    {
+        $seller = User::factory()->forClinic($this->clinic)->create();
+        $seller->assignRole('seller');
+        Sanctum::actingAs($seller);
+
+        $this->makeProduct('Toxina seller', '10.0000', '40.00', '30.00');
+
+        PaymentMethod::factory()->forClinic($this->clinic)->create([
+            'code' => 'pix_seller',
+            'kind' => PaymentMethod::KIND_PIX,
+        ]);
+
+        $products = $this->getJson('/api/v1/products')->assertOk();
+        $this->assertNotEmpty($products->json('data'));
+
+        $this->getJson('/api/v1/protocols')->assertOk();
+        $this->getJson('/api/v1/payment-methods')->assertOk();
+        $this->getJson('/api/v1/card-operators')->assertOk();
+        $this->getJson('/api/v1/card-brands')->assertOk();
+    }
 }

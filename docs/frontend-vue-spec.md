@@ -386,7 +386,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | 4.2b | Equipe (RBAC) | feito |
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | feito |
 | **4.4** | **Protocolos** (pacote de produtos) | feito |
-| **4.5** | **Vendas / orçamentos** | detalhe abaixo |
+| **4.5** | **Vendas / orçamentos** | feito |
 | **4.6** | **Agendamentos** (agenda completa) | detalhe abaixo — **depois** de vendas |
 | **4.7** | **Tratamento — consumo clínico** (baixa estoque) | detalhe abaixo |
 | **4.8** | **Métricas** | detalhe abaixo |
@@ -544,9 +544,9 @@ Objetivo: fluxo comercial mobile-first — montar venda (protocolo + produtos), 
 
 ##### API / gaps nesta fase
 
-- [ ] `GET /sales?q=` (nome/WhatsApp do cliente) e/ou entrada sempre via `client_id` + busca de clientes — **preferir `q` no index de sales** para a lista
-- [ ] Filtros de lista já têm `status`, `client_id`; documentar uso na UI
-- [ ] `GET /budgets` para nav Orçamentos (já existe: `sale_id`, `status`) — considerar `client_id` / ocultar `superseded` por default se faltar
+- [x] `GET /sales?q=` (nome/WhatsApp do cliente) e/ou entrada sempre via `client_id` + busca de clientes — **preferir `q` no index de sales** para a lista
+- [x] Filtros de lista já têm `status`, `client_id`; documentar uso na UI
+- [x] `GET /budgets` para nav Orçamentos (já existe: `sale_id`, `status`) — considerar `client_id` / ocultar `superseded` por default se faltar
 - apply-protocol **mescla** quantidades: copy da UI = “Adicionar protocolo”, não “substituir pacote”
 - `PUT …/items` e `PUT …/payments` = replace-all — o wizard mantém o array completo no client
 - PDF orçamento: `POST /budgets/{id}/pdf` + `documents.generate`
@@ -581,13 +581,13 @@ Confirmada: read-only (notas opcionais) + cancelar + **Abrir tratamento** (`trea
 
 ##### DoD 4.5
 
-- [ ] Criar venda com protocolo + produto avulso, editar efetivo, pagar fechando o total, confirmar
-- [ ] Soft confirm abaixo do mínimo
-- [ ] Gerar orçamento, enviar, PDF, aceitar; depois confirmar venda
-- [ ] Lista com status + busca cliente; card com cliente/status/efetivo/data
-- [ ] Nav Vendas + Orçamentos (inbox)
-- [ ] Pós-confirm: link abrir tratamento; estoque inalterado
-- [ ] Testes API dos gaps (`q` se novo); smoke Vue do wizard
+- [x] Criar venda com protocolo + produto avulso, editar efetivo, pagar fechando o total, confirmar
+- [x] Soft confirm abaixo do mínimo
+- [x] Gerar orçamento, enviar, PDF, aceitar; depois confirmar venda
+- [x] Lista com status + busca cliente; card com cliente/status/efetivo/data
+- [x] Nav Vendas + Orçamentos (inbox)
+- [x] Pós-confirm: link abrir tratamento; estoque inalterado
+- [x] Testes API dos gaps (`q` se novo); smoke Vue do wizard
 
 #### 4.6 — Agendamentos (especificação de UI)
 

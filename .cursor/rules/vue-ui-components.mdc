@@ -39,7 +39,8 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `ClientSearchBar` — `components/patterns`; busca com debounce (`search`)
 - `MoneyDisplay` — `components/patterns`; BRL (`formatBRL`)
 - `StockStatusBadge` — `components/patterns`; Normal / estoque baixo / reposição / negativo
-- `ItemLineRow` — `components/patterns`; produto + quantidade + remover (protocolos / itens)
+- `ItemLineRow` — `components/patterns`; produto + quantidade + preço opcional + remover (protocolos / vendas)
+- `WizardStepper` — `components/patterns`; passos mobile (venda)
 
 ## Tokens
 Use Tailwind mapped from `tokens.css` (`bg-canvas`, `bg-surface`, `text-title`, `text-muted`, `bg-brand`, `rounded-card`, `border-border-subtle`, …). Never hardcode `#5956A6`, `#F2F2F7`, or new shadows.

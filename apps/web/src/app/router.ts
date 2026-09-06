@@ -170,8 +170,30 @@ const router = createRouter({
         },
         {
           path: 'sales',
+          name: 'sales',
           meta: { title: 'Vendas' },
-          component: () => import('@/pages/ComingSoonPage.vue'),
+          component: () => import('@/pages/SalesPage.vue'),
+        },
+        {
+          path: 'sales/new',
+          name: 'sales-new',
+          component: () => import('@/pages/SaleFormPage.vue'),
+        },
+        {
+          path: 'sales/:id/edit',
+          name: 'sales-edit',
+          component: () => import('@/pages/SaleFormPage.vue'),
+        },
+        {
+          path: 'sales/:id',
+          name: 'sales-show',
+          component: () => import('@/pages/SaleDetailPage.vue'),
+        },
+        {
+          path: 'budgets',
+          name: 'budgets',
+          meta: { title: 'Orçamentos' },
+          component: () => import('@/pages/BudgetsPage.vue'),
         },
         {
           path: 'treatments',

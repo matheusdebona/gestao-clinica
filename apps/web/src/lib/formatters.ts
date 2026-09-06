@@ -47,3 +47,28 @@ export function formatQty(value: string | number | null | undefined): string {
   }
   return new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 4 }).format(amount)
 }
+
+export function formatDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return '—'
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return '—'
+  }
+  return new Intl.DateTimeFormat('pt-BR', {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(parsed)
+}
+
+export function formatDate(value: string | null | undefined): string {
+  if (!value) {
+    return '—'
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return '—'
+  }
+  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(parsed)
+}

@@ -7,6 +7,7 @@ import Input from '@/components/ui/Input.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
 
 const quantity = defineModel<string>('quantity', { required: true })
+const unitPrice = defineModel<string>('unitPrice')
 
 withDefaults(
   defineProps<{
@@ -16,6 +17,9 @@ withDefaults(
     invalid?: boolean
     readonly?: boolean
     quantityId?: string
+    priceId?: string
+    showUnitPrice?: boolean
+    priceInvalid?: boolean
   }>(),
   {
     unit: '',
@@ -23,6 +27,9 @@ withDefaults(
     invalid: false,
     readonly: false,
     quantityId: undefined,
+    priceId: undefined,
+    showUnitPrice: false,
+    priceInvalid: false,
   },
 )
 
@@ -39,25 +46,44 @@ const emit = defineEmits<{
       <p v-if="lineSale !== null && lineSale !== undefined && lineSale !== ''" class="mt-0.5">
         <MoneyDisplay :value="lineSale" />
       </p>
+      <div class="mt-3 flex flex-wrap gap-3">
+        <div class="w-24 shrink-0">
+          <FormField v-if="!readonly" label="Qtd" :html-for="quantityId">
+            <template #default="{ invalid: fieldInvalid }">
+              <Input
+                :id="quantityId"
+                v-model="quantity"
+                type="text"
+                inputmode="decimal"
+                :invalid="invalid || fieldInvalid"
+                aria-label="Quantidade"
+              />
+            </template>
+          </FormField>
+          <FormField v-else label="Qtd">
+            <MaskedBox :value="quantity" />
+          </FormField>
+        </div>
+        <div v-if="showUnitPrice" class="w-32 shrink-0">
+          <FormField v-if="!readonly" label="Preço" :html-for="priceId">
+            <template #default="{ invalid: fieldInvalid }">
+              <Input
+                :id="priceId"
+                v-model="unitPrice"
+                type="text"
+                inputmode="decimal"
+                :invalid="priceInvalid || fieldInvalid"
+                aria-label="Preço unitário"
+              />
+            </template>
+          </FormField>
+          <FormField v-else label="Preço">
+            <MaskedBox :value="unitPrice || '—'" />
+          </FormField>
+        </div>
+      </div>
     </div>
-    <div class="w-24 shrink-0">
-      <FormField v-if="!readonly" label="Qtd" :html-for="quantityId">
-        <template #default="{ invalid: fieldInvalid }">
-          <Input
-            :id="quantityId"
-            v-model="quantity"
-            type="text"
-            inputmode="decimal"
-            :invalid="invalid || fieldInvalid"
-            aria-label="Quantidade"
-          />
-        </template>
-      </FormField>
-      <FormField v-else label="Qtd">
-        <MaskedBox :value="quantity" />
-      </FormField>
-    </div>
-    <div v-if="!readonly" class="mt-6">
+    <div v-if="!readonly" class="mt-1">
       <IconButton label="Remover item" @click="emit('remove')">
         <X class="size-4" :stroke-width="1.75" />
       </IconButton>

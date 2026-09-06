@@ -110,7 +110,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:units.manage');
 
         Route::get('products', [ProductController::class, 'index'])
-            ->middleware('permission:products.view');
+            ->middleware('permission:products.view|sales.view');
         Route::post('products', [ProductController::class, 'store'])
             ->middleware('permission:products.create');
         Route::get('products/{product}', [ProductController::class, 'show'])
@@ -123,7 +123,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:products.adjust_stock');
 
         Route::get('protocols', [ProtocolController::class, 'index'])
-            ->middleware('permission:protocols.view');
+            ->middleware('permission:protocols.view|sales.view');
         Route::post('protocols', [ProtocolController::class, 'store'])
             ->middleware('permission:protocols.create');
         Route::get('protocols/{protocol}', [ProtocolController::class, 'show'])
@@ -171,7 +171,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:campaigns.manage');
 
         Route::get('payment-methods', [PaymentMethodController::class, 'index'])
-            ->middleware('permission:payment_methods.manage');
+            ->middleware('permission:payment_methods.manage|sales.view');
         Route::post('payment-methods', [PaymentMethodController::class, 'store'])
             ->middleware('permission:payment_methods.manage');
         Route::get('payment-methods/{payment_method}', [PaymentMethodController::class, 'show'])
@@ -182,7 +182,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:payment_methods.manage');
 
         Route::get('card-operators', [CardOperatorController::class, 'index'])
-            ->middleware('permission:card_operators.manage');
+            ->middleware('permission:card_operators.manage|sales.view');
         Route::post('card-operators', [CardOperatorController::class, 'store'])
             ->middleware('permission:card_operators.manage');
         Route::get('card-operators/{card_operator}', [CardOperatorController::class, 'show'])
@@ -193,7 +193,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:card_operators.manage');
 
         Route::get('card-brands', [CardBrandController::class, 'index'])
-            ->middleware('permission:card_brands.manage');
+            ->middleware('permission:card_brands.manage|sales.view');
         Route::post('card-brands', [CardBrandController::class, 'store'])
             ->middleware('permission:card_brands.manage');
         Route::get('card-brands/{card_brand}', [CardBrandController::class, 'show'])
