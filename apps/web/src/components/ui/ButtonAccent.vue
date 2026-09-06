@@ -17,21 +17,14 @@ const props = withDefaults(
 
 const classes = computed(() =>
   cn(
-    'inline-flex items-center justify-center gap-2 rounded-md px-4 py-2.5 text-sm font-semibold text-inverse transition-opacity duration-150 disabled:cursor-not-allowed disabled:opacity-50',
+    'inline-flex h-10 items-center justify-center gap-2 rounded-[10px] border border-border-subtle bg-surface px-4 text-[15px] font-medium text-title transition-colors duration-150 hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40',
     props.block && 'w-full',
   ),
 )
 </script>
 
 <template>
-  <button
-    :type="type"
-    :class="classes"
-    :disabled="disabled"
-    :style="{
-      background: 'linear-gradient(135deg, var(--sv-gradient-cta-start), var(--sv-gradient-cta-end))',
-    }"
-  >
+  <button :type="type" :class="classes" :disabled="disabled">
     <slot />
   </button>
 </template>

@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { Search } from '@lucide/vue'
-import Input from './Input.vue'
-import IconButton from './IconButton.vue'
 
 const model = defineModel<string>({ default: '' })
 
@@ -11,7 +9,7 @@ withDefaults(
     disabled?: boolean
   }>(),
   {
-    placeholder: 'Buscar…',
+    placeholder: 'Buscar',
     disabled: false,
   },
 )
@@ -23,22 +21,18 @@ const emit = defineEmits<{
 
 <template>
   <div class="relative flex w-full items-center">
-    <Input
+    <Search
+      class="pointer-events-none absolute left-3 size-4 text-muted"
+      :stroke-width="1.75"
+      aria-hidden="true"
+    />
+    <input
       v-model="model"
       type="search"
       :placeholder="placeholder"
       :disabled="disabled"
-      class="!rounded-full !bg-surface-muted !pr-12 !shadow-none"
+      class="h-11 w-full rounded-[10px] border border-transparent bg-input pr-3.5 pl-10 text-[15px] text-title placeholder:text-muted disabled:opacity-50"
+      @keydown.enter="emit('search', model)"
     />
-    <div class="absolute right-1.5">
-      <IconButton
-        label="Buscar"
-        :disabled="disabled"
-        class="!bg-brand !text-inverse hover:!bg-brand-hover"
-        @click="emit('search', model)"
-      >
-        <Search class="size-4" />
-      </IconButton>
-    </div>
   </div>
 </template>

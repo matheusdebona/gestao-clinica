@@ -127,12 +127,12 @@ Evitar: `components/ui` → `features` (ciclo e vazamento de domínio).
 
 ---
 
-## 5. Design system — “Modern Soft Violet”
+## 5. Design system — Soft Violet, Apple-minimal
 
-**Nome:** Modern Soft Violet Dashboard  
-**Estilo:** Clean SaaS, card-based, soft neumorphic / flat hybrid  
+**Nome:** Modern Soft Violet  
+**Estilo:** Apple-minimal / Settings — grouped lists, hairline borders, violeta só como acento  
 
-Referência visual congelada para tokens e shell. Adaptada ao app clínico (listas, forms, agenda) — **sem** promo banners, social bars ou ilustrações decorativas de marketing.
+Referência visual: canvas `#F2F2F7`, superfícies brancas, pouca sombra, tipografia Inter. Sem cards pastéis, sem CTA gradient, sem sidebar “roxa sólida” como peça principal.
 
 ### 5.1 Tokens (CSS variables → Tailwind theme)
 
@@ -144,71 +144,69 @@ Implementar em `design-tokens/tokens.css` e mapear no `tailwind.config`.
 | --- | --- | --- |
 | `--color-brand-primary` | `#5956A6` | Sidebar, CTAs primários, links fortes |
 | `--color-brand-primary-dark` | `#4A4791` | Pressed / active forte |
-| `--color-brand-primary-light` | `#ECEBFA` | Chips, fundos suaves, hover leve |
-| `--color-brand-primary-hover` | `#6865B8` | Hover de botão/nav |
+| `--color-brand-primary-light` | `#EEF0F7` | Hover leve, chips |
+| `--color-brand-primary-hover` | `#4F4C96` | Hover de botão |
 
 #### Cores — backgrounds
 
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `--color-bg-canvas` | `#EBF1F8` | Fundo da área principal |
-| `--color-bg-sidebar` | `#5956A6` | Sidebar (desktop) |
+| `--color-bg-canvas` | `#F2F2F7` | Fundo grouped (iOS) |
+| `--color-bg-sidebar` | `#1C1C1E` | Nav desktop (neutro; brand só no item ativo) |
 | `--color-bg-surface` | `#FFFFFF` | Cards, sheets, dialogs |
-| `--color-bg-surface-muted` | `#F5F7FB` | Search bars, zonas secundárias |
-| `--color-bg-input` | `#F0F4F8` | Inputs, boxes mascarados |
+| `--color-bg-surface-muted` | `#F2F2F7` | Search, secundário |
+| `--color-bg-input` | `#F2F2F7` | Inputs |
 
 #### Cores — texto
 
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `--color-text-title` | `#1F2430` | H1 / títulos |
-| `--color-text-body` | `#3A3F4D` | Corpo |
-| `--color-text-muted` | `#7E8597` | Captions, hints, meta |
+| `--color-text-title` | `#1C1C1E` | H1 / títulos |
+| `--color-text-body` | `#3A3A3C` | Corpo |
+| `--color-text-muted` | `#8E8E93` | Captions, hints, meta |
 | `--color-text-inverse` | `#FFFFFF` | Texto sobre brand / sidebar |
 
 #### Cores — accents / feedback
 
 | Token | Hex | Uso |
 | --- | --- | --- |
-| `--color-success` | `#10B981` | Sucesso |
-| `--color-success-light` | `#D1FAE5` | Badge / fundo sucesso |
-| `--color-danger` | `#EF4444` | Erros / destructive (extensão clínica) |
-| `--color-danger-light` | `#FEE2E2` | Fundo erro |
-| `--color-warning` | `#F59E0B` | Avisos de estoque (extensão clínica) |
-| `--color-warning-light` | `#FEF3C7` | Fundo aviso |
-| `--color-card-pink` | `#FDF2F4` | Variante de list card |
-| `--color-card-purple` | `#F8F5FE` | Variante de list card |
-| `--color-card-blue` | `#EFF6FF` | Variante de list card |
-| `--color-badge-purple` | `#A855F7` | Badge de progresso / data |
-| `--gradient-cta-start` / `end` | `#EC4899` → `#C084FC` | CTA destaque (usar com parcimônia) |
+| `--color-success` | `#34C759` | Sucesso (switch on) |
+| `--color-success-light` | `#E8F8ED` | Fundo sucesso |
+| `--color-danger` | `#FF3B30` | Erros / destructive |
+| `--color-danger-light` | `#FFECEA` | Fundo erro |
+| `--color-warning` | `#FF9F0A` | Avisos de estoque |
+| `--color-warning-light` | `#FFF4E5` | Fundo aviso |
+| `--color-card-*` | `#F7F7F8` | Sem pastéis; lista grouped |
+| `--color-badge-purple` | `#5956A6` | Badge de progresso |
+| Gradient CTA | — | **Não usar** |
 
 #### Cores — borders
 
 | Token | Hex |
 | --- | --- |
-| `--color-border-subtle` | `#E5E9F2` |
-| `--color-border-divider` | `#E2E8F0` |
+| `--color-border-subtle` | `rgba(60,60,67,0.12)` |
+| `--color-border-divider` | `rgba(60,60,67,0.08)` |
 
 #### Tipografia
 
 | Token | Valor |
 | --- | --- |
-| Font family | `Inter, "Plus Jakarta Sans", system-ui, sans-serif` |
-| H1 | 24px / 700 / 32px |
-| H2 | 20px / 600 / 28px |
-| H3 | 16px / 600 / 24px |
-| Body | 14px / 400 / 20px |
-| Caption | 12px / 400 / 16px |
-| Badge | 11px / 600 / letter-spacing 0.02em |
+| Font family | `Inter Variable, -apple-system, BlinkMacSystemFont, system-ui` |
+| H1 | 28px / 600 / 34px, tracking −0.03em |
+| H2 | 17px / 600 / 22px |
+| H3 | 15px / 500 / 20px |
+| Body | 15px / 400 / 20px |
+| Caption | 13px / 400 / 18px |
+| Badge | 12px / 500, sentence case |
 
 #### Radius / shadow / layout
 
 | Token | Valor |
 | --- | --- |
-| Radius `sm` … `xl` | 8 / 12 / 20 / 28 (+ `full` pill) |
-| Shadow card | `0 4px 20px rgba(0,0,0,0.04)` |
-| Shadow floating | `0 10px 30px rgba(89,86,166,0.12)` |
-| Shadow input inset | `inset 0 1px 2px rgba(0,0,0,0.03)` |
+| Radius `sm` … `card` | 8 / 10 / 14 / 12 (+ `full`) |
+| Shadow card | nenhuma — hairline |
+| Shadow floating | `0 8px 28px rgba(0,0,0,0.12)` overlays |
+| Shadow input | nenhuma |
 | Sidebar width (desktop) | `240px` |
 | Gap / padding página | `20px` / `24px` |
 
@@ -218,8 +216,8 @@ Motion: duração curta; respeitar `prefers-reduced-motion`.
 
 | Componente | Propósito | Estados | Breakpoints |
 | --- | --- | --- | --- |
-| `AppShell` / `ClinicShell` | Canvas `#EBF1F8` + nav | loading skeleton | **&lt; md:** bottom nav brand; **≥ md:** sidebar `#5956A6`, radius `xl` (28px), padding `24×16` |
-| `SidebarNavItem` | Item de navegação | default / hover / active | Active: `rgba(255,255,255,0.2)`, texto inverse, radius `md`, weight 600 |
+| `AppShell` / `ClinicShell` | Canvas `#F2F2F7` + nav | loading skeleton | **&lt; md:** tab bar clara; **≥ md:** sidebar `#1C1C1E` estreita |
+| `SidebarNavItem` | Item de navegação | default / hover / active | Active: brand tint, peso 500 |
 | `NavBadge` | Contagem (ex. inbox) | — | Pill, fundo `rgba(255,255,255,0.2)` |
 | `Page` | Conteúdo principal | — | Padding 24; gap 20 entre blocos |
 | `PageHeader` | H1 título + ações | — | Phone: título acima; ações empilham |
@@ -227,7 +225,7 @@ Motion: duração curta; respeitar `prefers-reduced-motion`.
 | `IconButton` | Ações do header | hover soft | Ghost sobre canvas |
 | `Stack` / `Inline` | Espaçamento | — | `Inline` → stack no xs |
 
-**Sidebar desktop:** fundo sólido brand; itens default texto `rgba(255,255,255,0.75)`; hover `rgba(255,255,255,0.1)`. Sem ilustração decorativa no rodapé (app clínico).
+**Sidebar desktop:** fundo neutro escuro (não violeta sólido). Sem ilustração no rodapé.
 
 ### 5.3 Surface / cards
 
@@ -235,8 +233,8 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 
 | Componente | Spec |
 | --- | --- |
-| `SurfaceCard` | bg `#FFF`, radius ~24px, padding 24, sem border, shadow card |
-| `ListCard` | Variantes bg soft blue / purple / pink para linhas de agenda/tratamento; radius 16; ação circular à direita |
+| `SurfaceCard` | bg `#FFF`, radius 12, padding 20, hairline, sem shadow |
+| `ListCard` | Linha grouped + chevron; sem pastéis |
 | `MetaPair` | Par label/valor com ícone suave (detalhe de cliente, produto) |
 | `PromoBanner` | **Não usar** na v1 clínica (reservado; design original tinha CTA gradient) |
 

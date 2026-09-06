@@ -1,77 +1,68 @@
 /**
- * Modern Soft Violet — design tokens
- * Source of truth for the clinical UI visual language.
+ * Soft Violet, Apple-minimal.
+ * Brand stays violet; chrome is quiet — hairlines, grouped fills, little shadow.
  */
 
 :root {
-  /* Brand */
   --sv-brand-primary: #5956a6;
   --sv-brand-primary-dark: #4a4791;
-  --sv-brand-primary-light: #ecebfa;
-  --sv-brand-primary-hover: #6865b8;
+  --sv-brand-primary-light: #eef0f7;
+  --sv-brand-primary-hover: #4f4c96;
 
-  /* Backgrounds */
-  --sv-bg-canvas: #ebf1f8;
-  --sv-bg-sidebar: #5956a6;
+  --sv-bg-canvas: #f2f2f7;
+  --sv-bg-sidebar: #1c1c1e;
   --sv-bg-surface: #ffffff;
-  --sv-bg-surface-muted: #f5f7fb;
-  --sv-bg-input: #f0f4f8;
+  --sv-bg-surface-muted: #f2f2f7;
+  --sv-bg-input: #f2f2f7;
 
-  /* Text */
-  --sv-text-title: #1f2430;
-  --sv-text-body: #3a3f4d;
-  --sv-text-muted: #7e8597;
+  --sv-text-title: #1c1c1e;
+  --sv-text-body: #3a3a3c;
+  --sv-text-muted: #8e8e93;
   --sv-text-inverse: #ffffff;
 
-  /* Accents / feedback */
-  --sv-success: #10b981;
-  --sv-success-light: #d1fae5;
-  --sv-danger: #ef4444;
-  --sv-danger-light: #fee2e2;
-  --sv-warning: #f59e0b;
-  --sv-warning-light: #fef3c7;
-  --sv-card-pink: #fdf2f4;
-  --sv-card-purple: #f8f5fe;
-  --sv-card-blue: #eff6ff;
-  --sv-badge-purple: #a855f7;
-  --sv-gradient-cta-start: #ec4899;
-  --sv-gradient-cta-end: #c084fc;
+  --sv-success: #34c759;
+  --sv-success-light: #e8f8ed;
+  --sv-danger: #ff3b30;
+  --sv-danger-light: #ffecea;
+  --sv-warning: #ff9f0a;
+  --sv-warning-light: #fff4e5;
+  --sv-card-pink: #f7f7f8;
+  --sv-card-purple: #f7f7f8;
+  --sv-card-blue: #f7f7f8;
+  --sv-badge-purple: #5956a6;
+  --sv-gradient-cta-start: #5956a6;
+  --sv-gradient-cta-end: #5956a6;
 
-  /* Borders */
-  --sv-border-subtle: #e5e9f2;
-  --sv-border-divider: #e2e8f0;
+  --sv-border-subtle: rgba(60, 60, 67, 0.12);
+  --sv-border-divider: rgba(60, 60, 67, 0.08);
 
-  /* Radius */
   --sv-radius-sm: 8px;
-  --sv-radius-md: 12px;
-  --sv-radius-lg: 20px;
-  --sv-radius-xl: 28px;
-  --sv-radius-card: 24px;
+  --sv-radius-md: 10px;
+  --sv-radius-lg: 14px;
+  --sv-radius-xl: 18px;
+  --sv-radius-card: 12px;
   --sv-radius-full: 9999px;
 
-  /* Shadows */
-  --sv-shadow-card: 0 4px 20px rgba(0, 0, 0, 0.04);
-  --sv-shadow-floating: 0 10px 30px rgba(89, 86, 166, 0.12);
-  --sv-shadow-input: inset 0 1px 2px rgba(0, 0, 0, 0.03);
+  --sv-shadow-card: none;
+  --sv-shadow-floating: 0 8px 28px rgba(0, 0, 0, 0.12);
+  --sv-shadow-input: none;
 
-  /* Layout */
   --sv-sidebar-width: 240px;
-  --sv-page-gap: 20px;
-  --sv-page-padding: 24px;
+  --sv-page-gap: 24px;
+  --sv-page-padding: 20px;
 
-  /* Typography */
-  --sv-font-sans: "Inter Variable", "Plus Jakarta Sans Variable", system-ui, sans-serif;
-  --sv-text-h1: 24px;
-  --sv-leading-h1: 32px;
-  --sv-text-h2: 20px;
-  --sv-leading-h2: 28px;
-  --sv-text-h3: 16px;
-  --sv-leading-h3: 24px;
-  --sv-text-body: 14px;
+  --sv-font-sans: "Inter Variable", -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  --sv-text-h1: 28px;
+  --sv-leading-h1: 34px;
+  --sv-text-h2: 17px;
+  --sv-leading-h2: 22px;
+  --sv-text-h3: 15px;
+  --sv-leading-h3: 20px;
+  --sv-text-body: 15px;
   --sv-leading-body: 20px;
-  --sv-text-caption: 12px;
-  --sv-leading-caption: 16px;
-  --sv-text-badge: 11px;
+  --sv-text-caption: 13px;
+  --sv-leading-caption: 18px;
+  --sv-text-badge: 12px;
 }
 
 @theme inline {

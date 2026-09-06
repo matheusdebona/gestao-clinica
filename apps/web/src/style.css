@@ -1,5 +1,4 @@
 @import "@fontsource-variable/inter";
-@import "@fontsource-variable/plus-jakarta-sans";
 @import "tailwindcss";
 @import "./design-tokens/tokens.css";
 
@@ -8,6 +7,7 @@
     font-family: var(--sv-font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   body {
@@ -17,6 +17,7 @@
     color: var(--sv-text-body);
     font-size: var(--sv-text-body);
     line-height: var(--sv-leading-body);
+    letter-spacing: -0.01em;
   }
 
   #app {
@@ -27,8 +28,9 @@
     margin: 0;
     color: var(--sv-text-title);
     font-size: var(--sv-text-h1);
-    font-weight: 700;
+    font-weight: 600;
     line-height: var(--sv-leading-h1);
+    letter-spacing: -0.03em;
   }
 
   h2 {
@@ -37,13 +39,14 @@
     font-size: var(--sv-text-h2);
     font-weight: 600;
     line-height: var(--sv-leading-h2);
+    letter-spacing: -0.02em;
   }
 
   h3 {
     margin: 0;
     color: var(--sv-text-title);
     font-size: var(--sv-text-h3);
-    font-weight: 600;
+    font-weight: 500;
     line-height: var(--sv-leading-h3);
   }
 
@@ -55,7 +58,7 @@
   }
 
   *:focus-visible {
-    outline: 2px solid var(--sv-brand-primary);
+    outline: 2px solid color-mix(in srgb, var(--sv-brand-primary) 55%, transparent);
     outline-offset: 2px;
   }
 }

@@ -20,23 +20,16 @@ withDefaults(
     <label
       v-if="label"
       :for="htmlFor"
-      class="text-sm font-semibold text-title"
+      class="text-[13px] font-medium text-muted"
     >
       {{ label }}
     </label>
     <slot :invalid="Boolean(error)" />
-    <p v-if="error" class="text-caption text-danger" role="alert">
+    <p v-if="error" class="text-[13px] text-danger" role="alert">
       {{ error }}
     </p>
-    <p v-else-if="hint" class="text-caption text-muted">
+    <p v-else-if="hint" class="text-[13px] text-muted">
       {{ hint }}
     </p>
   </div>
 </template>
-
-<style scoped>
-.text-caption {
-  font-size: var(--sv-text-caption);
-  line-height: var(--sv-leading-caption);
-}
-</style>

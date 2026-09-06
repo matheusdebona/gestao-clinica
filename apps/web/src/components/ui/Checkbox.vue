@@ -24,13 +24,13 @@ const emit = defineEmits<{
 
 <template>
   <label
-    :class="cn('inline-flex cursor-pointer items-center gap-2.5 text-sm text-body', disabled && 'cursor-not-allowed opacity-60')"
+    :class="cn('inline-flex cursor-pointer items-center gap-2.5 text-[15px] text-title', disabled && 'cursor-not-allowed opacity-40')"
   >
     <CheckboxRoot
       :id="id"
       :checked="modelValue"
       :disabled="disabled"
-      class="flex size-5 shrink-0 items-center justify-center rounded-sm border border-border-subtle bg-input shadow-input outline-none data-[state=checked]:border-brand data-[state=checked]:bg-brand"
+      class="flex size-[22px] shrink-0 items-center justify-center rounded-[6px] border border-border-subtle bg-surface outline-none data-[state=checked]:border-brand data-[state=checked]:bg-brand"
       @update:checked="(v: boolean | 'indeterminate') => emit('update:modelValue', v === true)"
     >
       <CheckboxIndicator>

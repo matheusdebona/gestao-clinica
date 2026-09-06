@@ -26,21 +26,23 @@ withDefaults(
 <template>
   <DialogRoot v-model:open="open">
     <DialogPortal>
-      <DialogOverlay class="fixed inset-0 z-40 bg-title/40 data-[state=open]:animate-in" />
+      <DialogOverlay class="fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px]" />
       <DialogContent
-        class="fixed top-1/2 left-1/2 z-50 w-[min(100%-2rem,420px)] -translate-x-1/2 -translate-y-1/2 rounded-card bg-surface p-6 shadow-floating outline-none"
+        class="fixed top-1/2 left-1/2 z-50 w-[min(100%-2rem,400px)] -translate-x-1/2 -translate-y-1/2 rounded-[14px] bg-surface p-5 outline-none"
       >
-        <DialogTitle class="text-lg font-semibold text-title">{{ title }}</DialogTitle>
-        <DialogDescription v-if="description" class="mt-2 text-sm text-muted">
+        <DialogTitle class="text-[17px] font-semibold tracking-[-0.02em] text-title">
+          {{ title }}
+        </DialogTitle>
+        <DialogDescription v-if="description" class="mt-1.5 text-[13px] text-muted">
           {{ description }}
         </DialogDescription>
-        <div class="mt-4 text-sm text-body">
+        <div class="mt-4 text-[15px] text-body">
           <slot />
         </div>
-        <div class="mt-6 flex flex-wrap justify-end gap-2">
+        <div class="mt-5 flex justify-end gap-2">
           <slot name="footer">
             <DialogClose as-child>
-              <Button variant="secondary">Fechar</Button>
+              <Button variant="secondary">OK</Button>
             </DialogClose>
           </slot>
         </div>

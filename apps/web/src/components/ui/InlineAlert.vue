@@ -11,16 +11,16 @@ const props = withDefaults(
 
 const classes = computed(() =>
   cn(
-    'rounded-md px-3 py-2 text-sm',
-    props.variant === 'error' && 'bg-danger-light text-danger',
-    props.variant === 'warning' && 'bg-warning-light text-warning',
-    props.variant === 'info' && 'bg-brand-light text-brand-dark',
+    'text-[13px]',
+    props.variant === 'error' && 'text-danger',
+    props.variant === 'warning' && 'text-warning',
+    props.variant === 'info' && 'text-muted',
   ),
 )
 </script>
 
 <template>
-  <div :class="classes" role="alert">
+  <p :class="classes" role="alert">
     <slot />
-  </div>
+  </p>
 </template>

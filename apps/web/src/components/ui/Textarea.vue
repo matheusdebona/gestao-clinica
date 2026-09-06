@@ -30,10 +30,10 @@ const attrs = useAttrs()
 
 const classes = computed(() =>
   cn(
-    'w-full resize-y rounded-[10px] border bg-input px-3.5 py-2.5 text-sm text-title shadow-input transition-colors placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-60',
+    'w-full resize-y rounded-[10px] border bg-input px-3.5 py-2.5 text-[15px] text-title transition-colors placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
     props.invalid
-      ? 'border-danger focus-visible:outline-danger'
-      : 'border-transparent focus-visible:border-brand',
+      ? 'border-danger/50 bg-danger-light'
+      : 'border-transparent focus-visible:border-brand/40 focus-visible:bg-surface',
   ),
 )
 

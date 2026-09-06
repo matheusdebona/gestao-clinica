@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <div class="rounded-[10px] bg-input px-3.5 py-2.5 font-mono text-sm tracking-wide text-title">
+  <div class="flex h-11 items-center rounded-[10px] bg-input px-3.5 font-mono text-[15px] tracking-[0.08em] text-title">
     {{ value }}
   </div>
 </template>

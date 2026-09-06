@@ -14,7 +14,7 @@ withDefaults(
 
 <template>
   <section
-    :class="cn('rounded-card bg-surface shadow-card', padding && 'p-6', $props.class)"
+    :class="cn('rounded-card border border-border-subtle bg-surface', padding && 'p-5', $props.class)"
   >
     <slot />
   </section>

@@ -23,21 +23,21 @@ const emit = defineEmits<{
 
 <template>
   <label
-    :class="cn('inline-flex cursor-pointer items-center gap-2.5 text-sm text-body', disabled && 'cursor-not-allowed opacity-60')"
+    :class="cn('inline-flex cursor-pointer items-center justify-between gap-3 text-[15px] text-title', disabled && 'cursor-not-allowed opacity-40')"
   >
+    <span v-if="label || $slots.default">
+      <slot>{{ label }}</slot>
+    </span>
     <SwitchRoot
       :id="id"
       :checked="modelValue"
       :disabled="disabled"
-      class="relative h-6 w-11 shrink-0 rounded-full bg-border-subtle outline-none transition-colors data-[state=checked]:bg-brand"
+      class="relative h-[31px] w-[51px] shrink-0 rounded-full bg-[#e9e9ea] outline-none transition-colors data-[state=checked]:bg-success"
       @update:checked="(v: boolean) => emit('update:modelValue', v === true)"
     >
       <SwitchThumb
-        class="block size-5 translate-x-0.5 rounded-full bg-surface shadow-card transition-transform data-[state=checked]:translate-x-[22px]"
+        class="block size-[27px] translate-x-[2px] rounded-full bg-white shadow-[0_1px_3px_rgba(0,0,0,0.2)] transition-transform data-[state=checked]:translate-x-[22px]"
       />
     </SwitchRoot>
-    <span v-if="label || $slots.default">
-      <slot>{{ label }}</slot>
-    </span>
   </label>
 </template>
