@@ -384,7 +384,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | 4.2 | Clientes | feito |
 | 4.2b | Equipe (RBAC) | feito |
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | próximo — detalhe abaixo |
-| 4.4 | Protocolos (pacote de produtos) | |
+| **4.4** | **Protocolos** (pacote de produtos) | detalhe abaixo |
 | 4.5 | Agendamentos (sessões / agenda) | |
 | 4.6 | Vendas / orçamentos | |
 | 4.7 | Tratamento — consumo clínico (baixa estoque) | |
@@ -460,6 +460,63 @@ Nav: manter **Produtos**; catálogos podem ficar como subtela/atalhos no detalhe
 - [ ] Outra clínica não vê o catálogo (já garantido na API; cobrir na UI só por escopo de sessão)
 - [ ] Testes API da cascata marca/tipo + `?q=`; smoke manual das telas Vue
 
+#### 4.4 — Protocolos (especificação de UI)
+
+Objetivo: montar o **serviço completo** como pacote de produtos (custo/sugerido/mínimo/especial). Não baixa estoque. Pricing: [`protocolo.md`](./protocolo.md). API Phase 3 já existe.
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Lista + detalhe + criar/editar + desativar + **itens no mesmo fluxo** (não tela separada de items) |
+| Adicionar itens | Busca de produto (`?q=`) + quantidade; atalho **criar produto** se faltar no catálogo (`products.create`) |
+| Preços no form | `total_cost` e `products_sale_total` **somente leitura** (calculados). `suggested_price`, `min_price`, `special_price` **todos editáveis**. Sem UI de flags manuais — ao salvar valor editado, a API marca `*_is_manual` |
+| Lista — linha (`ListCard`) | Título = nome; meta/destaque = **valor sugerido** (`suggested_price`); badge **Inativo** se aplicável |
+| Lista — filtros | Switch “somente ativos” (padrão ligado) + **busca `?q=`** por nome — **API precisa ganhar `q`** |
+| Desativar | DELETE soft (`is_active=false`); filtro “somente ativos” |
+| Nav | Item **Protocolos** no `ClinicShell` **e** atalho a partir de Produtos |
+
+##### API / gaps nesta fase
+
+- [ ] `GET /protocols?q=` (nome) + filtro `is_active` se ainda não exposto de forma clara na listagem
+- CRUD / `PUT …/items` / `POST …/recalculate` já existem — UI pode chamar recalculate se quiser reset explícito depois; **v1 não exige** botão “Recalcular” (decisão 3C: edição direta marca manual)
+- Itens: sync replace-all via `PUT /protocols/{id}/items` após editar a lista no form
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/protocols` | Lista (busca, somente ativos) | `protocols.view` |
+| `/protocols/new` | Criar (cabeçalho + itens + preços) | `protocols.create` |
+| `/protocols/:id` | Detalhe (itens, preços, margens derivadas, ações) | `protocols.view` |
+| `/protocols/:id/edit` | Editar mesmo fluxo do create | `protocols.update` |
+
+Chrome: nav **Protocolos** (`protocols.view`); na lista/detalhe de **Produtos**, link “Ver protocolos” / “Novo protocolo” quando permitido.
+
+##### UX do formulário (protocolo)
+
+1. Nome + descrição (opcional) + ativo.
+2. Bloco **Itens**: buscar produto → quantidade (UoM do produto) → adicionar linha; remover/editar qty; se não achar produto → atalho para `/products/new` (voltar com produto selecionável).
+3. Bloco **Preços**:
+   - leitura: custo total, soma preços de tabela, margens do Resource se úteis no detalhe;
+   - edição: sugerido, mínimo, especial (opcional).
+4. Salvar cabeçalho + sync de itens (create pode mandar `items` no POST; edit usa update + `PUT …/items` conforme API).
+
+Fora de escopo 4.4: aplicar protocolo em venda (`POST /sales/{sale}/apply-protocol`) — fica em **4.6 Vendas**.
+
+##### Patterns
+
+- Reutilizar `ListCard`, busca, `Switch` ativos, `FormField`, `MoneyDisplay` (de 4.3), `Pagination`, `EmptyState`, `ConfirmDialog`.
+- Pattern de **linhas de item** (produto + qty) — pode nascer em `components/patterns` se servir depois a vendas/tratamento.
+
+##### DoD 4.4
+
+- [ ] Secretária monta protocolo com ≥1 produto, vê sugerido na lista, edita sugerido/mín/especial
+- [ ] Atalho criar produto a partir do form do protocolo
+- [ ] Desativar + “somente ativos”; busca por nome
+- [ ] Nav Protocolos + atalho em Produtos
+- [ ] Testes API `?q=` (se novo); smoke Vue do fluxo create/edit/items
+
 ### Fase 5 — PWA (depois da web estável)
 
 1. `vite-plugin-pwa` (manifest, ícones, service worker).
@@ -496,6 +553,7 @@ Nav: manter **Produtos**; catálogos podem ficar como subtela/atalhos no detalhe
 | `/brands` | Marcas | `brands.manage` |
 | `/product-types` | Tipos de produto | `product_types.manage` |
 | `/units` | Unidades | `units.manage` |
+| `/protocols` | Protocolos | `protocols.view` |
 | `/sales` | Vendas | `sales.view` |
 | `/treatments` | Tratamentos (consumo) | `treatments.view` |
 | `/notifications` | Inbox | auth |

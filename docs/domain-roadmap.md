@@ -165,7 +165,7 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] Clientes: lista, busca `?q=`, CRUD (Fase 4.2)
 - [x] Equipe: RBAC + CRUD usuários (Fase 4.2b)
 - [ ] **Produtos** (+ marcas/tipos/unidades, cascata marca→tipo, `?q=`, ajuste estoque) — Fase 4.3; ver detalhe em [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3
-- [ ] Protocolos (Fase 4.4)
+- [ ] **Protocolos** (pacote de produtos, itens no form, preços editáveis, `?q=`) — Fase 4.4; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.4
 - [ ] Agendamentos (Fase 4.5)
 - [ ] Vendas / orçamentos (Fase 4.6)
 - [ ] Tratamento — consumo clínico (Fase 4.7)
