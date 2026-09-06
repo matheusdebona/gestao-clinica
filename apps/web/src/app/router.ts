@@ -23,8 +23,24 @@ const router = createRouter({
         },
         {
           path: 'clients',
+          name: 'clients',
           meta: { title: 'Clientes' },
-          component: () => import('@/pages/ComingSoonPage.vue'),
+          component: () => import('@/pages/ClientsPage.vue'),
+        },
+        {
+          path: 'clients/new',
+          name: 'clients-new',
+          component: () => import('@/pages/ClientFormPage.vue'),
+        },
+        {
+          path: 'clients/:id/edit',
+          name: 'clients-edit',
+          component: () => import('@/pages/ClientFormPage.vue'),
+        },
+        {
+          path: 'clients/:id',
+          name: 'clients-show',
+          component: () => import('@/pages/ClientDetailPage.vue'),
         },
         {
           path: 'products',

@@ -160,8 +160,10 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 
 - [x] Spec MD — Vue 3 + Vite + TS; Tailwind + Reka UI; web responsiva primeiro; componentes antes das features
 - [x] Scaffold `apps/web` (Fase 1 do spec)
-- [x] Design system **Modern Soft Violet** + `/dev/ui` kitchen sink (Fase 3 — tokens + primitives; shell/auth no próximo PR)
-- [ ] Features clínicas: auth, clients, products, sales, treatments, notifications, metrics (Fase 4)
+- [x] Design system **Modern Soft Violet** + `/dev/ui` kitchen sink (Fase 3)
+- [x] Auth + `ClinicShell` (Fase 4.1)
+- [x] Clientes: lista, busca `?q=`, CRUD (Fase 4.2)
+- [ ] Features clínicas restantes: products, sales, treatments, notifications, metrics (Fase 4.3+)
 - [ ] Ship as installable **PWA** after web is stable (Fase 5 — manifest + service worker)
 - [ ] Touch-friendly forms and lists; avoid desktop-only dense tables as primary UI
 - [ ] Desktop layouts as progressive enhancement of the mobile design

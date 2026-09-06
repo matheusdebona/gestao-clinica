@@ -33,6 +33,13 @@ const items = computed(() => {
   return all.filter((item) => !item.permission || auth.can(item.permission) || auth.permissions.length === 0)
 })
 
+function isNavActive(to: string) {
+  if (to === '/') {
+    return route.path === '/'
+  }
+  return route.path === to || route.path.startsWith(`${to}/`)
+}
+
 async function onLogout() {
   await auth.logout()
   await router.push('/login')
@@ -59,7 +66,7 @@ async function onLogout() {
           <SidebarNavItem
             :label="item.label"
             :icon="item.icon"
-            :active="route.path === item.to"
+            :active="isNavActive(item.to)"
           />
         </RouterLink>
       </nav>
@@ -87,7 +94,7 @@ async function onLogout() {
           :key="item.to"
           :to="item.to"
           class="flex flex-col items-center gap-1 px-2 py-1 text-[11px]"
-          :class="route.path === item.to ? 'text-brand' : 'text-muted'"
+          :class="isNavActive(item.to) ? 'text-brand' : 'text-muted'"
         >
           <component :is="item.icon" class="size-5" :stroke-width="1.75" />
           {{ item.label }}
