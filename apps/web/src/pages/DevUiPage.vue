@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
+import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
+import StockStatusBadge from '@/components/patterns/StockStatusBadge.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
@@ -111,6 +113,13 @@ function simulateLoading() {
               <Badge variant="success">Concluído</Badge>
               <Badge variant="warning">Estoque</Badge>
               <Badge variant="danger">Atraso</Badge>
+            </div>
+            <div class="mt-4 flex flex-wrap items-center gap-3">
+              <MoneyDisplay value="120.5" />
+              <StockStatusBadge level="ok" />
+              <StockStatusBadge level="low" />
+              <StockStatusBadge level="reorder" />
+              <StockStatusBadge level="negative" />
             </div>
           </div>
         </SurfaceCard>

@@ -20,24 +20,29 @@ class ProductCatalogSeeder extends Seeder
 
         CurrentClinic::setId($clinic->id);
 
+        $brands = [];
+        foreach (['Allergan', 'Galderma', 'IPEN'] as $brandName) {
+            $brands[$brandName] = Brand::query()->firstOrCreate(
+                ['clinic_id' => $clinic->id, 'name' => $brandName],
+                ['is_active' => true]
+            );
+        }
+
         $types = [
-            ['name' => 'Botox', 'slug' => 'botox'],
-            ['name' => 'Preenchimento', 'slug' => 'preenchimento'],
-            ['name' => 'Toxina botulínica', 'slug' => 'toxina-botulinica'],
-            ['name' => 'Ácido', 'slug' => 'acido'],
+            ['name' => 'Botox', 'slug' => 'botox', 'brand' => 'Allergan'],
+            ['name' => 'Preenchimento', 'slug' => 'preenchimento', 'brand' => 'Galderma'],
+            ['name' => 'Toxina botulínica', 'slug' => 'toxina-botulinica', 'brand' => 'Allergan'],
+            ['name' => 'Ácido', 'slug' => 'acido', 'brand' => 'IPEN'],
         ];
 
         foreach ($types as $type) {
             ProductType::query()->firstOrCreate(
-                ['clinic_id' => $clinic->id, 'slug' => $type['slug']],
+                [
+                    'clinic_id' => $clinic->id,
+                    'brand_id' => $brands[$type['brand']]->id,
+                    'slug' => $type['slug'],
+                ],
                 ['name' => $type['name'], 'is_active' => true]
-            );
-        }
-
-        foreach (['Allergan', 'Galderma', 'IPEN'] as $brand) {
-            Brand::query()->firstOrCreate(
-                ['clinic_id' => $clinic->id, 'name' => $brand],
-                ['is_active' => true]
             );
         }
 

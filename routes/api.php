@@ -1,12 +1,12 @@
 <?php
 
-use App\Http\Controllers\Api\V1\Auth\AuthController;
 use App\Http\Controllers\Api\V1\AppointmentController;
+use App\Http\Controllers\Api\V1\Auth\AuthController;
+use App\Http\Controllers\Api\V1\BudgetController;
 use App\Http\Controllers\Api\V1\CampaignController;
 use App\Http\Controllers\Api\V1\Catalog\BrandController;
 use App\Http\Controllers\Api\V1\Catalog\ProductTypeController;
 use App\Http\Controllers\Api\V1\Catalog\UnitOfMeasureController;
-use App\Http\Controllers\Api\V1\BudgetController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\ClientOriginController;
 use App\Http\Controllers\Api\V1\ClinicBrandingController;
@@ -77,33 +77,33 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:roles.manage|users.create|users.update');
 
         Route::get('product-types', [ProductTypeController::class, 'index'])
-            ->middleware('permission:product_types.manage');
+            ->middleware('permission:product_types.manage|products.view');
         Route::post('product-types', [ProductTypeController::class, 'store'])
             ->middleware('permission:product_types.manage');
         Route::get('product-types/{product_type}', [ProductTypeController::class, 'show'])
-            ->middleware('permission:product_types.manage');
+            ->middleware('permission:product_types.manage|products.view');
         Route::put('product-types/{product_type}', [ProductTypeController::class, 'update'])
             ->middleware('permission:product_types.manage');
         Route::delete('product-types/{product_type}', [ProductTypeController::class, 'destroy'])
             ->middleware('permission:product_types.manage');
 
         Route::get('brands', [BrandController::class, 'index'])
-            ->middleware('permission:brands.manage');
+            ->middleware('permission:brands.manage|products.view');
         Route::post('brands', [BrandController::class, 'store'])
             ->middleware('permission:brands.manage');
         Route::get('brands/{brand}', [BrandController::class, 'show'])
-            ->middleware('permission:brands.manage');
+            ->middleware('permission:brands.manage|products.view');
         Route::put('brands/{brand}', [BrandController::class, 'update'])
             ->middleware('permission:brands.manage');
         Route::delete('brands/{brand}', [BrandController::class, 'destroy'])
             ->middleware('permission:brands.manage');
 
         Route::get('units-of-measure', [UnitOfMeasureController::class, 'index'])
-            ->middleware('permission:units.manage');
+            ->middleware('permission:units.manage|products.view');
         Route::post('units-of-measure', [UnitOfMeasureController::class, 'store'])
             ->middleware('permission:units.manage');
         Route::get('units-of-measure/{unit_of_measure}', [UnitOfMeasureController::class, 'show'])
-            ->middleware('permission:units.manage');
+            ->middleware('permission:units.manage|products.view');
         Route::put('units-of-measure/{unit_of_measure}', [UnitOfMeasureController::class, 'update'])
             ->middleware('permission:units.manage');
         Route::delete('units-of-measure/{unit_of_measure}', [UnitOfMeasureController::class, 'destroy'])

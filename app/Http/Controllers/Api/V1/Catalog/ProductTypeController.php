@@ -8,16 +8,27 @@ use App\Http\Requests\Api\V1\Catalog\UpdateProductTypeRequest;
 use App\Http\Resources\Api\V1\ProductTypeResource;
 use App\Models\ProductType;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Str;
 
 class ProductTypeController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
-        return ProductTypeResource::collection(
-            ProductType::query()->orderBy('name')->paginate(50)
-        );
+        $query = ProductType::query()
+            ->with('brand')
+            ->orderBy('name');
+
+        if ($request->filled('brand_id')) {
+            $query->where('brand_id', $request->integer('brand_id'));
+        }
+
+        if ($request->boolean('active_only')) {
+            $query->where('is_active', true);
+        }
+
+        return ProductTypeResource::collection($query->paginate(50));
     }
 
     public function store(StoreProductTypeRequest $request): JsonResponse
@@ -27,14 +38,14 @@ class ProductTypeController extends Controller
 
         $type = ProductType::query()->create($data);
 
-        return (new ProductTypeResource($type))
+        return (new ProductTypeResource($type->load('brand')))
             ->response()
             ->setStatusCode(201);
     }
 
     public function show(ProductType $productType): ProductTypeResource
     {
-        return new ProductTypeResource($productType);
+        return new ProductTypeResource($productType->load('brand'));
     }
 
     public function update(UpdateProductTypeRequest $request, ProductType $productType): ProductTypeResource
@@ -46,7 +57,7 @@ class ProductTypeController extends Controller
 
         $productType->update($data);
 
-        return new ProductTypeResource($productType->fresh());
+        return new ProductTypeResource($productType->fresh()->load('brand'));
     }
 
     public function destroy(ProductType $productType): JsonResponse

@@ -35,10 +35,15 @@ class ProductFactory extends Factory
     public function forClinic(Clinic $clinic): static
     {
         return $this->state(function () use ($clinic) {
+            $brand = Brand::factory()->create(['clinic_id' => $clinic->id]);
+
             return [
                 'clinic_id' => $clinic->id,
-                'product_type_id' => ProductType::factory()->state(['clinic_id' => $clinic->id]),
-                'brand_id' => Brand::factory()->state(['clinic_id' => $clinic->id]),
+                'brand_id' => $brand->id,
+                'product_type_id' => ProductType::factory()->state([
+                    'clinic_id' => $clinic->id,
+                    'brand_id' => $brand->id,
+                ]),
                 'unit_of_measure_id' => UnitOfMeasure::factory()->state(['clinic_id' => $clinic->id]),
             ];
         });

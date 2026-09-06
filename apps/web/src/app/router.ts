@@ -65,8 +65,87 @@ const router = createRouter({
         },
         {
           path: 'products',
+          name: 'products',
           meta: { title: 'Produtos' },
-          component: () => import('@/pages/ComingSoonPage.vue'),
+          component: () => import('@/pages/ProductsPage.vue'),
+        },
+        {
+          path: 'products/new',
+          name: 'products-new',
+          component: () => import('@/pages/ProductFormPage.vue'),
+        },
+        {
+          path: 'products/:id/edit',
+          name: 'products-edit',
+          component: () => import('@/pages/ProductFormPage.vue'),
+        },
+        {
+          path: 'products/:id',
+          name: 'products-show',
+          component: () => import('@/pages/ProductDetailPage.vue'),
+        },
+        {
+          path: 'brands',
+          name: 'brands',
+          meta: { title: 'Marcas' },
+          component: () => import('@/pages/BrandsPage.vue'),
+        },
+        {
+          path: 'brands/new',
+          name: 'brands-new',
+          component: () => import('@/pages/BrandFormPage.vue'),
+        },
+        {
+          path: 'brands/:id/edit',
+          name: 'brands-edit',
+          component: () => import('@/pages/BrandFormPage.vue'),
+        },
+        {
+          path: 'brands/:id',
+          name: 'brands-show',
+          component: () => import('@/pages/BrandDetailPage.vue'),
+        },
+        {
+          path: 'product-types',
+          name: 'product-types',
+          meta: { title: 'Tipos' },
+          component: () => import('@/pages/ProductTypesPage.vue'),
+        },
+        {
+          path: 'product-types/new',
+          name: 'product-types-new',
+          component: () => import('@/pages/ProductTypeFormPage.vue'),
+        },
+        {
+          path: 'product-types/:id/edit',
+          name: 'product-types-edit',
+          component: () => import('@/pages/ProductTypeFormPage.vue'),
+        },
+        {
+          path: 'product-types/:id',
+          name: 'product-types-show',
+          component: () => import('@/pages/ProductTypeDetailPage.vue'),
+        },
+        {
+          path: 'units',
+          name: 'units',
+          meta: { title: 'Unidades' },
+          component: () => import('@/pages/UnitsPage.vue'),
+        },
+        {
+          path: 'units/new',
+          name: 'units-new',
+          component: () => import('@/pages/UnitFormPage.vue'),
+        },
+        {
+          path: 'units/:id/edit',
+          name: 'units-edit',
+          component: () => import('@/pages/UnitFormPage.vue'),
+        },
+        {
+          path: 'units/:id',
+          name: 'units-show',
+          component: () => import('@/pages/UnitDetailPage.vue'),
         },
         {
           path: 'sales',
