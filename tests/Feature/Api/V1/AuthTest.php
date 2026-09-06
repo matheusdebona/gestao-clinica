@@ -49,6 +49,38 @@ class AuthTest extends TestCase
         ])->assertStatus(422);
     }
 
+    public function test_login_validation_errors_are_in_portuguese(): void
+    {
+        $response = $this->postJson('/api/v1/auth/login', []);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email', 'password']);
+
+        $emailError = $response->json('errors.email.0');
+        $passwordError = $response->json('errors.password.0');
+
+        $this->assertIsString($emailError);
+        $this->assertIsString($passwordError);
+        $this->assertStringContainsString('obrigatório', $emailError);
+        $this->assertStringContainsString('obrigatório', $passwordError);
+        $this->assertStringNotContainsString('validation.required', $emailError);
+        $this->assertStringNotContainsString('validation.required', $passwordError);
+    }
+
+    public function test_register_validation_errors_are_in_portuguese(): void
+    {
+        $response = $this->postJson('/api/v1/auth/register', []);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['clinic_name', 'name', 'email', 'password']);
+
+        $clinicNameError = $response->json('errors.clinic_name.0');
+
+        $this->assertIsString($clinicNameError);
+        $this->assertStringContainsString('obrigatório', $clinicNameError);
+        $this->assertStringNotContainsString('validation.required', $clinicNameError);
+    }
+
     public function test_me_requires_authentication(): void
     {
         $this->getJson('/api/v1/auth/me')->assertUnauthorized();
