@@ -27,7 +27,7 @@ const page = ref(1)
 const status = ref('')
 
 const statusOptions = [
-  { value: '', label: 'Todos os status' },
+  { value: '', label: 'Todas as situações' },
   { value: 'open', label: TREATMENT_STATUS_LABELS.open },
   { value: 'completed', label: TREATMENT_STATUS_LABELS.completed },
   { value: 'cancelled', label: TREATMENT_STATUS_LABELS.cancelled },
@@ -88,7 +88,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhum tratamento encontrado' : 'N
         @search="onSearch"
       />
 
-      <FormField label="Status">
+      <FormField label="Situação">
         <Select v-model="status" :options="statusOptions" />
       </FormField>
 
@@ -107,7 +107,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhum tratamento encontrado' : 'N
       <SurfaceCard v-else-if="treatments.length === 0" :padding="false">
         <EmptyState
           :title="emptyTitle"
-          :description="q || status ? 'Tente outro cliente ou status.' : 'Abra um tratamento a partir de uma venda confirmada.'"
+          :description="q || status ? 'Tente outro cliente ou situação.' : 'Abra um tratamento a partir de uma venda confirmada.'"
         />
       </SurfaceCard>
 

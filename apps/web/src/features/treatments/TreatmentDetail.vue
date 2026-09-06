@@ -156,7 +156,7 @@ function sessionMeta(item: TreatmentSessionSummary) {
       <SurfaceCard>
         <dl class="flex flex-col gap-4">
           <div>
-            <dt class="text-[13px] text-muted">Status</dt>
+            <dt class="text-[13px] text-muted">Situação</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ TREATMENT_STATUS_LABELS[treatment.status] }}</dd>
           </div>
           <div>

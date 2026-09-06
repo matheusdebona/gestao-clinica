@@ -26,7 +26,7 @@ const status = ref('')
 const includeSuperseded = ref(false)
 
 const statusOptions = [
-  { value: '', label: 'Todos os status' },
+  { value: '', label: 'Todas as situações' },
   { value: 'draft', label: BUDGET_STATUS_LABELS.draft },
   { value: 'sent', label: BUDGET_STATUS_LABELS.sent },
   { value: 'accepted', label: BUDGET_STATUS_LABELS.accepted },
@@ -80,7 +80,7 @@ function budgetMeta(budget: Budget) {
     </Banner>
 
     <template v-else>
-      <FormField label="Status">
+      <FormField label="Situação">
         <Select v-model="status" :options="statusOptions" />
       </FormField>
 

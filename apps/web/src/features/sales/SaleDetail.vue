@@ -121,7 +121,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
       <SurfaceCard>
         <dl class="flex flex-col gap-4">
           <div>
-            <dt class="text-[13px] text-muted">Status</dt>
+            <dt class="text-[13px] text-muted">Situação</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ SALE_STATUS_LABELS[sale.status] }}</dd>
           </div>
           <div>
