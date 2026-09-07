@@ -9,6 +9,7 @@ import Select from '@/components/ui/Select.vue'
 import Switch from '@/components/ui/Switch.vue'
 import { listClientOrigins } from '@/features/clients/api'
 import { campaignFormSchema } from '@/features/clients/schema'
+import { useAuthStore } from '@/stores/auth'
 import type { Campaign, CampaignPayload } from '@/types/client'
 
 const props = defineProps<{
@@ -22,6 +23,8 @@ const emit = defineEmits<{
   submit: [payload: CampaignPayload]
   cancel: []
 }>()
+
+const auth = useAuthStore()
 
 const { defineField, handleSubmit, errors, setErrors, resetForm } = useForm({
   validationSchema: campaignFormSchema,
