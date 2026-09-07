@@ -36,11 +36,6 @@ function onTyped(raw: string) {
 
 <template>
   <div class="relative w-full">
-    <span
-      class="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-[15px] text-muted"
-    >
-      R$
-    </span>
     <Input
       v-bind="forwarded"
       :id="id"
@@ -54,5 +49,11 @@ function onTyped(raw: string) {
       :placeholder="placeholder"
       @update:model-value="onTyped"
     />
+    <span
+      class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-[15px] text-muted"
+      :class="disabled ? 'opacity-50' : undefined"
+    >
+      R$
+    </span>
   </div>
 </template>
