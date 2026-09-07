@@ -20,6 +20,7 @@ import Checkbox from '@/components/ui/Checkbox.vue'
 import ColorSwatch from '@/components/ui/ColorSwatch.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import DatePicker from '@/components/ui/DatePicker.vue'
+import DateTimePicker from '@/components/ui/DateTimePicker.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import FormField from '@/components/ui/FormField.vue'
 import GlassSurface from '@/components/ui/GlassSurface.vue'
@@ -60,6 +61,8 @@ const dateValue = ref('2026-09-05')
 const dateEmpty = ref('')
 const datePickerOpen = ref(true)
 const datetimeValue = ref('2026-09-08T14:30')
+const datetimeEmpty = ref('')
+const datetimePickerOpen = ref(true)
 const notesValue = ref('Observações da consulta')
 const selectValue = ref('protocolo-a')
 const filterSelectValue = ref('')
@@ -316,12 +319,8 @@ function simulateLoading() {
               <FormField label="Data" html-for="ok-date">
                 <DatePicker id="ok-date" v-model="dateValue" />
               </FormField>
-              <FormField
-                label="Data e hora"
-                hint="datetime-local nativo até existir DateTimePicker"
-                html-for="ok-datetime"
-              >
-                <Input id="ok-datetime" v-model="datetimeValue" type="datetime-local" />
+              <FormField label="Data e hora" html-for="ok-datetime">
+                <DateTimePicker id="ok-datetime" v-model="datetimeValue" />
               </FormField>
               <FormField label="Notas" html-for="ok-notes">
                 <Textarea id="ok-notes" v-model="notesValue" />
@@ -402,7 +401,7 @@ function simulateLoading() {
               </FormField>
               <FormField label="Data e hora" error="Informe data e hora." html-for="err-datetime">
                 <template #default="{ invalid }">
-                  <Input id="err-datetime" v-model="datetimeValue" type="datetime-local" :invalid="invalid" />
+                  <DateTimePicker id="err-datetime" v-model="datetimeEmpty" :invalid="invalid" />
                 </template>
               </FormField>
               <FormField label="Notas" error="Mínimo de 10 caracteres." html-for="err-notes">
@@ -466,6 +465,43 @@ function simulateLoading() {
             </FormField>
             <FormField label="Desabilitado" html-for="dp-disabled">
               <DatePicker id="dp-disabled" model-value="2026-09-05" disabled />
+            </FormField>
+          </div>
+        </SurfaceCard>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <p class="section-label">DateTimePicker</p>
+        <SurfaceCard>
+          <div class="grid gap-4 md:grid-cols-2">
+            <FormField label="Vazio" html-for="dtp-empty">
+              <DateTimePicker id="dtp-empty" v-model="datetimeEmpty" />
+            </FormField>
+            <FormField label="Preenchido" html-for="dtp-filled">
+              <DateTimePicker id="dtp-filled" v-model="datetimeValue" />
+            </FormField>
+            <FormField
+              class="md:col-span-2"
+              label="Aberto"
+              hint="Calendário e hora visíveis neste demo (modal desligado para não prender o foco da página)."
+              html-for="dtp-open"
+            >
+              <div class="min-h-[32rem]">
+                <DateTimePicker
+                  id="dtp-open"
+                  v-model="datetimeValue"
+                  v-model:open="datetimePickerOpen"
+                  :modal="false"
+                />
+              </div>
+            </FormField>
+            <FormField label="Erro" error="Informe data e hora." html-for="dtp-error">
+              <template #default="{ invalid }">
+                <DateTimePicker id="dtp-error" v-model="datetimeEmpty" :invalid="invalid" />
+              </template>
+            </FormField>
+            <FormField label="Desabilitado" html-for="dtp-disabled">
+              <DateTimePicker id="dtp-disabled" model-value="2026-09-08T14:30" disabled />
             </FormField>
           </div>
         </SurfaceCard>

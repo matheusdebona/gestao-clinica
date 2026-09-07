@@ -31,7 +31,7 @@ const emit = defineEmits<{
       type="search"
       :placeholder="placeholder"
       :disabled="disabled"
-      class="glass-field h-11 w-full rounded-full py-0 pr-3.5 pl-10 text-[15px] text-title placeholder:text-muted disabled:opacity-50"
+      class="glass-field h-11 w-full rounded-[12px] py-0 pr-3.5 pl-10 text-[15px] text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50"
       @keydown.enter="emit('search', model)"
     />
   </div>

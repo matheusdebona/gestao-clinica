@@ -73,7 +73,7 @@ flowchart TD
 ```
 
 1. **Tokens** — cores, tipografia, spacing, radii, z-index (CSS variables + Tailwind theme).
-2. **Primitives** — Button, Input, DatePicker, Select, Textarea, Checkbox, Switch, Badge, Avatar, Spinner, Icon.
+2. **Primitives** — Button, Input, DatePicker, DateTimePicker, Select, Textarea, Checkbox, Switch, Badge, Avatar, Spinner, Icon.
 3. **Compostos** — FormField, Dialog/Sheet, Toast, Tabs, ListRow/Table, EmptyState, PageHeader, Skeleton, Banner.
 4. **Patterns de domínio** — ClientSearchBar, MoneyInput/Display, StockStatusBadge, PermissionGate, ClinicShell.
 5. **Páginas/features** — só depois do kitchen sink `/dev/ui` estar estável.
@@ -148,10 +148,10 @@ Dois materiais claros + um escuro. Implementar como classes em `tokens.css` (`gl
 | Material | Uso | Recurso |
 | --- | --- | --- |
 | `glass-regular` | **Obrigatório** em cards (`SurfaceCard`), dialogs, sheets, menus, sidebar clara / tab bar, toasts escuros via `glass-dark` | bg ~branco 64%, blur 40px, saturate 180%, borda `rgba(255,255,255,0.22)`, sombra flutuante + highlight inset |
-| `glass-clear` | **Obrigatório** em search pill, chips/badges, botões secondary/accent, sticky headers, wells leves | bg ~branco 40%, blur 24px, saturate 160%, borda `rgba(255,255,255,0.14)` |
+| `glass-clear` | **Obrigatório** em chips/badges, botões secondary/accent, sticky headers, wells leves | bg ~branco 40%, blur 24px, saturate 160%, borda `rgba(255,255,255,0.14)` |
 | `glass-dark` | **Obrigatório** na sidebar desktop e toasts | bg `#1C1C1E` ~62%, mesmo blur/saturate do regular, borda branca ~16% |
-| `glass-field` | **Obrigatório** em todo controle que aceita input (text, email, password, number, search, tel, datetime-local, textarea, select/DatePicker trigger, masked, money) | bg ~branco 50%, blur 20px; foco sobe para regular + hairline brand |
-| `glass-menu` | **Obrigatório** em dropdowns / select / DatePicker / popover | igual regular, radius 14, elevação flutuante |
+| `glass-field` | **Obrigatório** em todo controle que aceita input (text, email, password, number, search, tel, textarea, select/DatePicker/DateTimePicker trigger, masked, money) | bg ~branco 50%, blur 20px; foco sobe para regular + hairline brand |
+| `glass-menu` | **Obrigatório** em dropdowns / select / DatePicker / DateTimePicker / popover | igual regular, radius 14, elevação flutuante |
 
 **Opcional:** glass em rows (`ListCard` hover), tracks de tabs, banners (tinted chip).
 
@@ -290,7 +290,7 @@ Motion: duração curta; respeitar `prefers-reduced-motion` e `prefers-reduced-t
 | `NavBadge` | Contagem (ex. inbox) | — | Pill sólido danger (leitura) |
 | `Page` | Conteúdo principal | — | Padding 24; gap 20 entre blocos |
 | `PageHeader` | H1 título + ações; `sticky` opcional | — | Phone: título acima; ações empilham; sticky = `glass-clear` |
-| `SearchField` | Busca global/página | — | Pill `glass-field` |
+| `SearchField` | Busca global/página | — | `glass-field`, radius 12 (`--sv-radius-card`) like Input/Select — not pill |
 | `IconButton` | Ações do header | hover soft | Círculo `glass-clear` |
 | `Stack` / `Inline` | Espaçamento | — | `Inline` → stack no xs |
 
@@ -326,8 +326,9 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 | --- | --- | --- |
 | `Button` | primary / secondary / ghost / destructive | Primary: brand **sólido**; secondary/ghost hover em glass; loading / disabled |
 | `ButtonAccent` | CTA raro (outline glass, sem gradient) | Só destaques explícitos |
-| `Input` | Texto / number / password / email / datetime-local / search / tel | `glass-field`, radius ≥10; invalid via `aria-invalid`. **Não** usar `type="date"`. |
+| `Input` | Texto / number / password / email / search / tel | `glass-field`, radius 12; invalid via `aria-invalid`. **Não** usar `type="date"` nem `type="datetime-local"`. |
 | `DatePicker` | Data civil (não nativo) | `v-model` ISO `YYYY-MM-DD`; trigger `glass-field`; calendário `glass-menu`; PT-BR (Seg–Dom); `id` / `invalid` / `disabled`; Limpar / Hoje |
+| `DateTimePicker` | Data e hora (não nativo) | `v-model` `YYYY-MM-DDTHH:mm`; mesmo trigger/menu; hora 0–23 + minutos (passo 5); Limpar / Agora |
 | `Textarea` | Texto longo | idem |
 | `Select` | Escolha única (headless) | trigger `glass-field`; menu `glass-menu` flutuante |
 | `Radio` | Escolha única (grupo) | unchecked glass; checked brand sólido |

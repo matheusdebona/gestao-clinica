@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate'
 import { computed, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
+import DateTimePicker from '@/components/ui/DateTimePicker.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
 import Select from '@/components/ui/Select.vue'
@@ -50,7 +51,7 @@ const { defineField, handleSubmit, errors, setErrors, resetForm } = useForm({
 
 const [treatmentId] = defineField('treatment_id')
 const [professionalId] = defineField('professional_user_id')
-const [scheduledAt, scheduledAttrs] = defineField('scheduled_at')
+const [scheduledAt] = defineField('scheduled_at')
 const [duration, durationAttrs] = defineField('duration_minutes')
 const [notes, notesAttrs] = defineField('notes')
 
@@ -146,11 +147,9 @@ defineExpose({ setErrors })
 
     <FormField label="Data e hora" :error="errors.scheduled_at" html-for="appointment-when">
       <template #default="{ invalid }">
-        <Input
+        <DateTimePicker
           id="appointment-when"
           v-model="scheduledAt"
-          v-bind="scheduledAttrs"
-          type="datetime-local"
           :invalid="invalid"
         />
       </template>

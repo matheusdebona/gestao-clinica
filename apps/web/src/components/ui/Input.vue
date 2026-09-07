@@ -7,7 +7,7 @@ defineOptions({ inheritAttrs: false })
 withDefaults(
   defineProps<{
     modelValue?: string | number
-    type?: 'text' | 'number' | 'password' | 'email' | 'datetime-local' | 'search' | 'tel'
+    type?: 'text' | 'number' | 'password' | 'email' | 'search' | 'tel'
     invalid?: boolean
     disabled?: boolean
     placeholder?: string

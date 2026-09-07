@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from '@lucide/vue'
+import { Calendar as CalendarIcon } from '@lucide/vue'
 import {
   PopoverContent,
   PopoverPortal,
@@ -8,17 +8,10 @@ import {
 } from 'reka-ui'
 import { computed, nextTick, ref, useId, watch } from 'vue'
 import Button from '@/components/ui/Button.vue'
-import IconButton from '@/components/ui/IconButton.vue'
+import CalendarMonth from '@/components/ui/CalendarMonth.vue'
 import { cn } from '@/lib/cn'
 import { formatIsoDate } from '@/lib/formatters'
-import {
-  addMonths,
-  monthGrid,
-  monthHeading,
-  parseIsoDate,
-  todayIso,
-  weekdayHeaders,
-} from '@/lib/iso-date'
+import { todayIso } from '@/lib/iso-date'
 
 const model = defineModel<string>({ default: '' })
 const open = defineModel<boolean>('open', { default: false })
@@ -41,14 +34,7 @@ const props = withDefaults(
 
 const instanceId = useId()
 const headingId = computed(() => `date-picker-heading-${props.id ?? instanceId}`)
-const gridRef = ref<HTMLElement | null>(null)
-const weekdays = weekdayHeaders('pt-BR')
-const cursor = ref(parseIsoDate(model.value) ?? new Date())
-const activeIso = ref(model.value || todayIso())
-
-const heading = computed(() => monthHeading(cursor.value))
-const cells = computed(() => monthGrid(cursor.value.getFullYear(), cursor.value.getMonth()))
-const today = computed(() => todayIso())
+const calendarRef = ref<{ focusSelected: () => void } | null>(null)
 const display = computed(() => (model.value ? formatIsoDate(model.value) : props.placeholder))
 
 const triggerClass = computed(() =>
@@ -57,34 +43,13 @@ const triggerClass = computed(() =>
   ),
 )
 
-watch(
-  () => model.value,
-  (value) => {
-    const parsed = parseIsoDate(value)
-    if (parsed) {
-      cursor.value = parsed
-      activeIso.value = value
-    }
-  },
-)
-
 watch(open, async (isOpen) => {
   if (!isOpen) {
     return
   }
-  cursor.value = parseIsoDate(model.value) ?? new Date()
-  activeIso.value = model.value || todayIso()
   await nextTick()
-  focusIso(activeIso.value)
+  calendarRef.value?.focusSelected()
 })
-
-function focusIso(iso: string | undefined) {
-  if (!iso) {
-    return
-  }
-  activeIso.value = iso
-  gridRef.value?.querySelector<HTMLButtonElement>(`[data-iso="${iso}"]`)?.focus()
-}
 
 function selectDay(iso: string) {
   model.value = iso
@@ -92,73 +57,12 @@ function selectDay(iso: string) {
 }
 
 function goToday() {
-  selectDay(today.value)
+  selectDay(todayIso())
 }
 
 function clear() {
   model.value = ''
   open.value = false
-}
-
-function shiftMonth(amount: number) {
-  cursor.value = addMonths(cursor.value, amount)
-}
-
-function onGridKeydown(event: KeyboardEvent) {
-  const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End']
-  if (!keys.includes(event.key)) {
-    return
-  }
-  const current = (event.target as HTMLElement | null)?.dataset.iso
-  if (!current) {
-    return
-  }
-  const list = cells.value
-  const index = list.findIndex((cell) => cell.iso === current)
-  if (index < 0) {
-    return
-  }
-  event.preventDefault()
-  if (event.key === 'Home') {
-    const first = list.find((cell) => cell.inMonth)
-    void nextTick(() => focusIso(first?.iso))
-    return
-  }
-  if (event.key === 'End') {
-    const last = [...list].reverse().find((cell) => cell.inMonth)
-    void nextTick(() => focusIso(last?.iso))
-    return
-  }
-  let next = index
-  if (event.key === 'ArrowLeft') {
-    next -= 1
-  }
-  if (event.key === 'ArrowRight') {
-    next += 1
-  }
-  if (event.key === 'ArrowUp') {
-    next -= 7
-  }
-  if (event.key === 'ArrowDown') {
-    next += 7
-  }
-  if (next < 0) {
-    shiftMonth(-1)
-    void nextTick(() => {
-      const nextCells = cells.value
-      focusIso(nextCells[nextCells.length + next]?.iso ?? nextCells.at(-1)?.iso)
-    })
-    return
-  }
-  if (next >= list.length) {
-    const overflow = next - list.length
-    shiftMonth(1)
-    void nextTick(() => {
-      focusIso(cells.value[overflow]?.iso ?? cells.value[0]?.iso)
-    })
-    return
-  }
-  focusIso(list[next]?.iso)
 }
 </script>
 
@@ -182,60 +86,12 @@ function onGridKeydown(event: KeyboardEvent) {
         :collision-padding="12"
         :aria-labelledby="headingId"
       >
-        <div class="flex items-center justify-between gap-2">
-          <IconButton label="Mês anterior" @click="shiftMonth(-1)">
-            <ChevronLeft class="size-4" :stroke-width="1.75" />
-          </IconButton>
-          <p :id="headingId" class="min-w-0 truncate text-center text-[15px] font-medium tracking-[-0.02em] text-title">
-            {{ heading }}
-          </p>
-          <IconButton label="Próximo mês" @click="shiftMonth(1)">
-            <ChevronRight class="size-4" :stroke-width="1.75" />
-          </IconButton>
-        </div>
-
-        <div
-          ref="gridRef"
-          class="mt-3 grid grid-cols-7 gap-0.5"
-          role="grid"
-          :aria-labelledby="headingId"
-          @keydown="onGridKeydown"
-        >
-          <div
-            v-for="weekday in weekdays"
-            :key="weekday.long"
-            class="pb-1 text-center text-[11px] font-medium text-muted"
-            role="columnheader"
-            :aria-label="weekday.long"
-          >
-            {{ weekday.short }}
-          </div>
-          <button
-            v-for="cell in cells"
-            :key="cell.iso"
-            type="button"
-            class="date-picker-day"
-            role="gridcell"
-            :data-iso="cell.iso"
-            :tabindex="cell.iso === activeIso ? 0 : -1"
-            :aria-label="formatIsoDate(cell.iso)"
-            :aria-selected="model === cell.iso"
-            :class="
-              cn(
-                'flex size-9 items-center justify-center justify-self-center rounded-full text-[13px] outline-none',
-                cell.inMonth ? 'text-title' : 'text-muted/50',
-                cell.iso === today && model !== cell.iso && 'ring-1 ring-brand/50',
-                model === cell.iso
-                  ? 'bg-brand font-medium text-inverse'
-                  : 'hover:bg-brand-light/70',
-              )
-            "
-            @click="selectDay(cell.iso)"
-          >
-            {{ cell.day }}
-          </button>
-        </div>
-
+        <CalendarMonth
+          ref="calendarRef"
+          :selected-iso="model"
+          :heading-id="headingId"
+          @select="selectDay"
+        />
         <div class="mt-3 flex items-center justify-between gap-2">
           <Button variant="ghost" type="button" :disabled="!model" @click="clear">
             Limpar
@@ -246,14 +102,3 @@ function onGridKeydown(event: KeyboardEvent) {
     </PopoverPortal>
   </PopoverRoot>
 </template>
-
-<style scoped>
-.date-picker-day {
-  font-variant-numeric: tabular-nums;
-}
-
-.date-picker-day:focus-visible {
-  outline: 2px solid var(--sv-brand-primary);
-  outline-offset: 2px;
-}
-</style>

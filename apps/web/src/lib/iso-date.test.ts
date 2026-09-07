@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import {
   addMonths,
+  formatDatetimeLocal,
+  minuteOptions,
   monthGrid,
   monthHeading,
+  nowDatetimeLocal,
+  parseDatetimeLocal,
   parseIsoDate,
+  toDatetimeLocal,
   toIsoDate,
   todayIso,
   weekdayHeaders,
@@ -51,5 +56,27 @@ describe('iso-date', () => {
 
   it('formats a capitalized PT-BR month heading', () => {
     expect(monthHeading(new Date(2026, 8, 1))).toMatch(/^Setembro de 2026$/i)
+  })
+
+  it('round-trips datetime-local without UTC shift', () => {
+    expect(toDatetimeLocal('2026-09-08', 14, 30)).toBe('2026-09-08T14:30')
+    expect(parseDatetimeLocal('2026-09-08T14:30')).toEqual({
+      dateIso: '2026-09-08',
+      hours: 14,
+      minutes: 30,
+    })
+    expect(parseDatetimeLocal('2026-02-31T10:00')).toBeNull()
+    expect(formatDatetimeLocal('2026-09-08T14:30')).toMatch(/08\/09\/2026/)
+    expect(formatDatetimeLocal('2026-09-08T14:30')).toMatch(/14:30/)
+  })
+
+  it('snaps nowDatetimeLocal to a 5-minute step', () => {
+    expect(nowDatetimeLocal(new Date(2026, 8, 8, 14, 32), 5)).toBe('2026-09-08T14:30')
+    expect(nowDatetimeLocal(new Date(2026, 8, 8, 14, 58), 5)).toBe('2026-09-08T15:00')
+  })
+
+  it('keeps an off-step minute in the picker list', () => {
+    expect(minuteOptions(32)).toContain(32)
+    expect(minuteOptions(30)).not.toContain(32)
   })
 })

@@ -18,11 +18,12 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 
 ## Forms
 - `FormField` — label + hint + **error 422**; slot gets `{ invalid }`
-- `Input` — `text` | `number` | `password` | `email` | `datetime-local` | `search` | `tel` (`glass-field`). **Never** `type="date"` — use `DatePicker`.
-- `DatePicker` — date-only ISO `YYYY-MM-DD` (`v-model`); trigger `glass-field`; popover `glass-menu`; PT-BR, Monday-start. Optional `v-model:open`. Same FormField API as Select (`id`, `invalid`, `disabled`). Keep `datetime-local` on `Input` until a DateTimePicker exists.
+- `Input` — `text` | `number` | `password` | `email` | `search` | `tel` (`glass-field`). **Never** `type="date"` or `type="datetime-local"`.
+- `DatePicker` — date-only ISO `YYYY-MM-DD` (`v-model`); trigger `glass-field`; popover `glass-menu`; PT-BR, Monday-start. Optional `v-model:open`. Same FormField API as Select (`id`, `invalid`, `disabled`).
+- `DateTimePicker` — date+time `YYYY-MM-DDTHH:mm` (`v-model`, datetime-local compatible); same trigger/menu as DatePicker; hour + 5-min lists; Limpar / Agora.
 - `PasswordInput` — senha com mostrar/ocultar (olho)
 - `Textarea`, `Select` (menu `glass-menu`), `Radio`, `Checkbox`, `Switch`
-- `SearchField` (pill glass), `MaskedBox`
+- `SearchField` (`glass-field`, radius 12 like Input/Select — **not** pill), `MaskedBox`
 
 ## Feedback / overlay
 - `Banner`, `InlineAlert`, `Badge` (chips glass), `Spinner`, `Skeleton`
