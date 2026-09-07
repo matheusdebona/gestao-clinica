@@ -70,20 +70,26 @@ onUnmounted(() => {
 const canSearchProducts = computed(() => auth.can('products.view') || auth.can('sales.view'))
 const canSearchProtocols = computed(() => auth.can('protocols.view') || auth.can('sales.view'))
 
-const productQuery = useQuery({
+const {
+  data: productListData,
+  isPending: productsPending,
+} = useQuery({
   queryKey: ['products', 'sale-pick', productQ],
   queryFn: () => listProducts({ q: productQ.value, page: 1, is_active: true }),
   enabled: computed(() => canSearchProducts.value && productQ.value.length > 0),
 })
 
-const protocolQuery = useQuery({
+const {
+  data: protocolListData,
+  isPending: protocolsPending,
+} = useQuery({
   queryKey: ['protocols', 'sale-pick', protocolQ],
   queryFn: () => listProtocols({ q: protocolQ.value, page: 1, is_active: true }),
   enabled: computed(() => canSearchProtocols.value && protocolQ.value.length > 0),
 })
 
-const productHits = computed(() => productQuery.data.value?.data ?? [])
-const protocolHits = computed(() => protocolQuery.data.value?.data ?? [])
+const productHits = computed(() => productListData.value?.data ?? [])
+const protocolHits = computed(() => protocolListData.value?.data ?? [])
 
 const selectProductId = computed(() => {
   const raw = route.query.selectProduct
@@ -185,7 +191,7 @@ function itemUnit(item: SaleItemDraft) {
       @search="protocolQ = $event.trim()"
     />
 
-    <SurfaceCard v-if="protocolQ && protocolQuery.isPending" :padding="false">
+    <SurfaceCard v-if="protocolQ && protocolsPending" :padding="false">
       <div class="flex flex-col gap-3 p-5">
         <Skeleton class="h-12" />
       </div>
@@ -222,7 +228,7 @@ function itemUnit(item: SaleItemDraft) {
     <Banner v-if="!canSearchProducts" variant="warning" title="Sem busca de produtos">
       Você pode cadastrar um produto e voltar para incluí-lo na venda.
     </Banner>
-    <SurfaceCard v-else-if="productQ && productQuery.isPending" :padding="false">
+    <SurfaceCard v-else-if="productQ && productsPending" :padding="false">
       <div class="flex flex-col gap-3 p-5">
         <Skeleton class="h-12" />
       </div>

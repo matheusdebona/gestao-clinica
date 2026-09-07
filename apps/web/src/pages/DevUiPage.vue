@@ -62,6 +62,7 @@ const datePickerOpen = ref(true)
 const datetimeValue = ref('2026-09-08T14:30')
 const notesValue = ref('Observações da consulta')
 const selectValue = ref('protocolo-a')
+const filterSelectValue = ref('')
 const searchValue = ref('')
 const moneyValue = ref('1280,00')
 const radioValue = ref('presencial')
@@ -91,6 +92,12 @@ const selectOptions = [
   { value: 'protocolo-a', label: 'Protocolo A' },
   { value: 'protocolo-b', label: 'Protocolo B' },
   { value: 'protocolo-c', label: 'Protocolo C' },
+]
+
+const filterSelectOptions = [
+  { value: '', label: 'Todas as situações' },
+  { value: 'draft', label: 'Rascunho' },
+  { value: 'confirmed', label: 'Confirmada' },
 ]
 
 const radioOptions = [
@@ -321,6 +328,13 @@ function simulateLoading() {
               </FormField>
               <FormField label="Protocolo" html-for="ok-select">
                 <Select id="ok-select" v-model="selectValue" :options="selectOptions" />
+              </FormField>
+              <FormField label="Situação (filtro)" html-for="ok-select-empty">
+                <Select
+                  id="ok-select-empty"
+                  v-model="filterSelectValue"
+                  :options="filterSelectOptions"
+                />
               </FormField>
               <FormField label="Atendimento" html-for="ok-radio">
                 <Radio id="ok-radio" v-model="radioValue" name="dev-radio" :options="radioOptions" />

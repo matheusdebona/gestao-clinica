@@ -98,13 +98,16 @@ watch(
   { immediate: true },
 )
 
-const clientQuery = useQuery({
+const {
+  data: clientListData,
+  isPending: clientsPending,
+} = useQuery({
   queryKey: ['clients', 'sale-pick', clientQ],
   queryFn: () => listClients({ q: clientQ.value, page: 1, is_active: true }),
   enabled: computed(() => step.value === 0 && auth.can('clients.view') && clientQ.value.length > 0),
 })
 
-const clients = computed(() => clientQuery.data.value?.data ?? [])
+const clients = computed(() => clientListData.value?.data ?? [])
 
 const catalogsEnabled = computed(() => Boolean(props.saleId || currentSale.value) && step.value >= 2)
 
@@ -441,7 +444,7 @@ function methodName(id: string) {
         </p>
         <template v-if="!currentSale">
           <ClientSearchBar v-model="clientSearch" @search="clientQ = $event" />
-          <SurfaceCard v-if="clientQ && clientQuery.isPending" :padding="false">
+          <SurfaceCard v-if="clientQ && clientsPending" :padding="false">
             <div class="p-5"><Skeleton class="h-12" /></div>
           </SurfaceCard>
           <SurfaceCard v-else-if="clientQ && clients.length === 0" :padding="false">

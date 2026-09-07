@@ -19,6 +19,9 @@ interface SelectOption {
   label: string
 }
 
+/** Reka UI forbids empty SelectItem values; filters use `value: ''` for "all". */
+const EMPTY_OPTION_VALUE = '__empty__'
+
 const props = withDefaults(
   defineProps<{
     modelValue?: string
@@ -44,6 +47,22 @@ const selectedLabel = computed(
   () => props.options.find((option) => option.value === props.modelValue)?.label ?? '',
 )
 
+const rootValue = computed(() => {
+  if (props.modelValue !== '') {
+    return props.modelValue
+  }
+  return props.options.some((option) => option.value === '') ? EMPTY_OPTION_VALUE : undefined
+})
+
+function itemValue(option: SelectOption): string {
+  return option.value === '' ? EMPTY_OPTION_VALUE : option.value
+}
+
+function onRootUpdate(value: unknown) {
+  const next = value == null ? '' : String(value)
+  emit('update:modelValue', next === EMPTY_OPTION_VALUE ? '' : next)
+}
+
 const triggerClass = computed(() =>
   cn(
     'glass-field inline-flex h-11 w-full items-center justify-between gap-2 rounded-[12px] px-3.5 text-[15px] text-title outline-none disabled:cursor-not-allowed disabled:opacity-50',
@@ -53,9 +72,9 @@ const triggerClass = computed(() =>
 
 <template>
   <SelectRoot
-    :model-value="modelValue || undefined"
+    :model-value="rootValue"
     :disabled="disabled"
-    @update:model-value="(v) => emit('update:modelValue', String(v ?? ''))"
+    @update:model-value="onRootUpdate"
   >
     <SelectTrigger :id="id" :class="triggerClass" :aria-invalid="invalid || undefined">
       <SelectValue :placeholder="placeholder" class="truncate text-left">
@@ -72,8 +91,8 @@ const triggerClass = computed(() =>
         <SelectViewport class="p-1">
           <SelectItem
             v-for="option in options"
-            :key="option.value"
-            :value="option.value"
+            :key="itemValue(option)"
+            :value="itemValue(option)"
             class="relative flex cursor-pointer select-none items-center rounded-[10px] py-2.5 pr-8 pl-3 text-[15px] text-body outline-none data-[highlighted]:bg-brand-light/60 data-[state=checked]:text-title"
           >
             <SelectItemText>{{ option.label }}</SelectItemText>
