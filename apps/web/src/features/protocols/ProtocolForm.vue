@@ -12,6 +12,7 @@ import InlineAlert from '@/components/ui/InlineAlert.vue'
 import Input from '@/components/ui/Input.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 import SearchField from '@/components/ui/SearchField.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
@@ -412,11 +413,9 @@ defineExpose({
       html-for="protocol-suggested"
     >
       <template #default="{ invalid }">
-        <Input
+        <MoneyInput
           id="protocol-suggested"
           :model-value="suggestedPrice"
-          type="text"
-          inputmode="decimal"
           :invalid="invalid"
           @update:model-value="onSuggestedUpdate"
         />
@@ -429,11 +428,9 @@ defineExpose({
       html-for="protocol-min"
     >
       <template #default="{ invalid }">
-        <Input
+        <MoneyInput
           id="protocol-min"
           :model-value="minPrice"
-          type="text"
-          inputmode="decimal"
           :invalid="invalid"
           @update:model-value="onMinUpdate"
         />
@@ -446,12 +443,10 @@ defineExpose({
       html-for="protocol-special"
     >
       <template #default="{ invalid }">
-        <Input
+        <MoneyInput
           id="protocol-special"
           v-model="specialPrice"
           v-bind="specialAttrs"
-          type="text"
-          inputmode="decimal"
           :invalid="invalid"
         />
       </template>

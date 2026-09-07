@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import FormField from '@/components/ui/FormField.vue'
-import Input from '@/components/ui/Input.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 import Select from '@/components/ui/Select.vue'
 import type { ConsumptionDraft } from '@/features/treatments/consumptions'
 import type { CardBrand, CardOperator, PaymentMethod } from '@/types/sale'
@@ -44,11 +44,9 @@ function methodFor(id: string) {
 <template>
   <div class="mt-3 flex flex-col gap-3">
     <FormField label="Valor cobrado" :html-for="`extra-amount-${line.key}`">
-      <Input
+      <MoneyInput
         :id="`extra-amount-${line.key}`"
         v-model="line.charged_amount"
-        type="text"
-        inputmode="decimal"
       />
     </FormField>
     <FormField label="Método" :html-for="`extra-method-${line.key}`">

@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 import Select from '@/components/ui/Select.vue'
 import Switch from '@/components/ui/Switch.vue'
 import Textarea from '@/components/ui/Textarea.vue'
@@ -384,12 +385,10 @@ defineExpose({ setErrors })
       html-for="product-cost"
     >
       <template #default="{ invalid }">
-        <Input
+        <MoneyInput
           id="product-cost"
           v-model="cost"
           v-bind="costAttrs"
-          type="text"
-          inputmode="decimal"
           :invalid="invalid"
         />
       </template>
@@ -400,12 +399,10 @@ defineExpose({ setErrors })
 
     <FormField label="Preço de venda" :error="errors.sale_price" html-for="product-sale">
       <template #default="{ invalid }">
-        <Input
+        <MoneyInput
           id="product-sale"
           v-model="salePrice"
           v-bind="salePriceAttrs"
-          type="text"
-          inputmode="decimal"
           :invalid="invalid"
         />
       </template>
@@ -413,12 +410,10 @@ defineExpose({ setErrors })
 
     <FormField label="Preço mínimo" :error="errors.min_sale_price" html-for="product-min-sale">
       <template #default="{ invalid }">
-        <Input
+        <MoneyInput
           id="product-min-sale"
           v-model="minSalePrice"
           v-bind="minSalePriceAttrs"
-          type="text"
-          inputmode="decimal"
           :invalid="invalid"
         />
       </template>

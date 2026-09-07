@@ -5,7 +5,7 @@ import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import IconButton from '@/components/ui/IconButton.vue'
 import InlineAlert from '@/components/ui/InlineAlert.vue'
-import Input from '@/components/ui/Input.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 import Select from '@/components/ui/Select.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { X } from '@lucide/vue'
@@ -107,11 +107,9 @@ function removePayment(key: string) {
           />
         </FormField>
         <FormField label="Valor" :html-for="`pay-amount-${payment.key}`">
-          <Input
+          <MoneyInput
             :id="`pay-amount-${payment.key}`"
             v-model="payment.amount"
-            type="text"
-            inputmode="decimal"
           />
         </FormField>
         <template v-if="methodFor(payment)?.requires_card_meta">
