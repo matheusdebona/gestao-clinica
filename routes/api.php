@@ -149,11 +149,11 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:clients.delete');
 
         Route::get('client-origins', [ClientOriginController::class, 'index'])
-            ->middleware('permission:client_origins.manage|clients.create|clients.update');
+            ->middleware('permission:client_origins.manage|campaigns.manage|clients.create|clients.update');
         Route::post('client-origins', [ClientOriginController::class, 'store'])
             ->middleware('permission:client_origins.manage');
         Route::get('client-origins/{client_origin}', [ClientOriginController::class, 'show'])
-            ->middleware('permission:client_origins.manage|clients.create|clients.update');
+            ->middleware('permission:client_origins.manage|campaigns.manage|clients.create|clients.update');
         Route::put('client-origins/{client_origin}', [ClientOriginController::class, 'update'])
             ->middleware('permission:client_origins.manage');
         Route::delete('client-origins/{client_origin}', [ClientOriginController::class, 'destroy'])

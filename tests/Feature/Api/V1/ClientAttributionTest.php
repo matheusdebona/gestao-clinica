@@ -264,4 +264,24 @@ class ClientAttributionTest extends TestCase
             'name' => 'Setembro',
         ])->assertForbidden();
     }
+
+    public function test_campaigns_manage_can_list_origins_for_campaign_form(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Google']);
+
+        $manager = User::factory()->forClinic($this->clinic)->create();
+        $manager->givePermissionTo('campaigns.manage');
+        Sanctum::actingAs($manager);
+
+        $this->getJson('/api/v1/client-origins?active_only=1')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Google');
+        $this->getJson("/api/v1/client-origins/{$origin->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $origin->id);
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'TikTok'])->assertForbidden();
+        $this->putJson("/api/v1/client-origins/{$origin->id}", ['name' => 'G'])->assertForbidden();
+        $this->deleteJson("/api/v1/client-origins/{$origin->id}")->assertForbidden();
+    }
 }

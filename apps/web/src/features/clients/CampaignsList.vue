@@ -53,6 +53,7 @@ const originsQuery = useQuery({
   enabled: computed(
     () =>
       auth.can('client_origins.manage') ||
+      auth.can('campaigns.manage') ||
       auth.can('clients.create') ||
       auth.can('clients.update'),
   ),

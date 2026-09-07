@@ -484,7 +484,7 @@ Domínio: [`domain-model.md`](./domain-model.md) §6 (`ClientOrigin`, `Campaign`
 | --- | --- |
 | Domínio | `ClientOrigin` + `Campaign` (campanha **pertence** à origem); FKs opcionais no cliente; `campaign_id` exige origem da mesma campanha |
 | API CRUD | `GET/POST/PUT/DELETE /api/v1/client-origins` e `/api/v1/campaigns` (filtro `client_origin_id`, `active_only`; DELETE = soft deactivate `is_active=false`) |
-| Permissões Spatie | CRUD (store/update/destroy) = `client_origins.manage` / `campaigns.manage`. **GET index/show = permissão A:** `*.manage\|clients.create\|clients.update` |
+| Permissões Spatie | CRUD (store/update/destroy) = `client_origins.manage` / `campaigns.manage`. **GET index/show = permissão A:** `*.manage\|clients.create\|clients.update`. GET origens também aceita `campaigns.manage` (form de campanha precisa da origem pai) |
 | Form do cliente | Selects **Origem → Campanha** (cascata; campanha só após origem; opção “Nenhuma”) + atalhos **Nova origem** / **Nova campanha desta origem** |
 | Métricas | Onda B: ranking origem/campanha (`GET /metrics/acquisition?group_by=origin\|campaign`) |
 | Telas de catálogo | `/client-origins` e `/campaigns` (lista, detalhe, criar, editar, desativar) — mesmo padrão de `/brands` / `/product-types` |
@@ -499,7 +499,7 @@ Domínio: [`domain-model.md`](./domain-model.md) §6 (`ClientOrigin`, `Campaign`
 | Desativar | DELETE soft (`is_active=false`); vínculos históricos no cliente **permanecem**. Lista com switch “somente ativas” (padrão ligado, como Clientes / Marcas) |
 | Visual | Soft Violet Liquid Glass **heavy** — só `components/ui` + `patterns`; sem controle cru |
 | Nav | Manter **Clientes** no `ClinicShell`. Catálogos como **subtela/atalhos** na lista e no form de clientes (como Marcas/Tipos a partir de Produtos). Evitar novo pin na tab bar |
-| Permissão GET | **A (fechada)** — `GET` index e show com `client_origins.manage\|clients.create\|clients.update` (e o equivalente em campanhas). Sem `*.view` novas. CRUD das telas e atalhos de criar permanecem `*.manage`. Espelha `GET /brands` com `brands.manage\|products.view` |
+| Permissão GET | **A (fechada)** — `GET` index e show com `client_origins.manage\|clients.create\|clients.update` (e o equivalente em campanhas). GET origens também inclui `campaigns.manage` para o select pai no form de campanha. Sem `*.view` novas. CRUD das telas e atalhos de criar permanecem `*.manage`. Espelha `GET /brands` com `brands.manage\|products.view` |
 | Fora desta fase | `campaigns.spend_amount` / CAC de mídia (métricas B+) — ver [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap.md) |
 
 ##### Telas / rotas
@@ -538,7 +538,7 @@ Chrome: atalhos **Origens** / **Campanhas** na lista, detalhe e form de **Client
 
 | Método | Recurso | Notas para a UI |
 | --- | --- | --- |
-| `GET /client-origins` | Lista | `active_only`, paginação (API: 50/página). Middleware: `client_origins.manage\|clients.create\|clients.update` |
+| `GET /client-origins` | Lista | `active_only`, paginação (API: 50/página). Middleware: `client_origins.manage\|campaigns.manage\|clients.create\|clients.update` |
 | `POST /client-origins` | Criar | `{ name, is_active? }`; nome único por clínica; `client_origins.manage` |
 | `GET/PUT /client-origins/{id}` | Ver / editar | GET no mesmo conjunto da permissão A; PUT só `*.manage` |
 | `DELETE /client-origins/{id}` | Desativar | `is_active=false`; não apaga linhas |
