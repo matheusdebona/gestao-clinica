@@ -175,12 +175,93 @@ class ClientAttributionTest extends TestCase
             ->assertJsonCount(0, 'data');
     }
 
-    public function test_forbidden_without_catalog_permission(): void
+    public function test_forbidden_without_catalog_or_client_write_permission(): void
     {
         $user = User::factory()->forClinic($this->clinic)->create();
         Sanctum::actingAs($user);
 
         $this->getJson('/api/v1/client-origins')->assertForbidden();
         $this->getJson('/api/v1/campaigns')->assertForbidden();
+    }
+
+    public function test_clients_create_can_index_and_show_catalog_but_not_mutate(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Instagram']);
+        $campaign = Campaign::factory()->forOrigin($origin)->create(['name' => 'Reels']);
+
+        $creator = User::factory()->forClinic($this->clinic)->create();
+        $creator->givePermissionTo('clients.create');
+        Sanctum::actingAs($creator);
+
+        $this->getJson('/api/v1/client-origins')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Instagram');
+        $this->getJson("/api/v1/client-origins/{$origin->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $origin->id);
+
+        $this->getJson('/api/v1/campaigns?client_origin_id='.$origin->id)
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Reels');
+        $this->getJson("/api/v1/campaigns/{$campaign->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $campaign->id);
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'Google'])->assertForbidden();
+        $this->putJson("/api/v1/client-origins/{$origin->id}", ['name' => 'IG'])->assertForbidden();
+        $this->deleteJson("/api/v1/client-origins/{$origin->id}")->assertForbidden();
+
+        $this->postJson('/api/v1/campaigns', [
+            'client_origin_id' => $origin->id,
+            'name' => 'Stories',
+        ])->assertForbidden();
+        $this->putJson("/api/v1/campaigns/{$campaign->id}", ['name' => 'Reels 2'])->assertForbidden();
+        $this->deleteJson("/api/v1/campaigns/{$campaign->id}")->assertForbidden();
+    }
+
+    public function test_clients_update_can_index_catalog(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Facebook']);
+        Campaign::factory()->forOrigin($origin)->create(['name' => 'FB Ads']);
+
+        $editor = User::factory()->forClinic($this->clinic)->create();
+        $editor->givePermissionTo('clients.update');
+        Sanctum::actingAs($editor);
+
+        $this->getJson('/api/v1/client-origins?active_only=1')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Facebook');
+        $this->getJson('/api/v1/campaigns?active_only=1&client_origin_id='.$origin->id)
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'FB Ads');
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'Indicação'])->assertForbidden();
+        $this->postJson('/api/v1/campaigns', [
+            'client_origin_id' => $origin->id,
+            'name' => 'Nova',
+        ])->assertForbidden();
+    }
+
+    public function test_receptionist_can_list_origins_and_campaigns_for_client_form(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Indicação']);
+        Campaign::factory()->forOrigin($origin)->create(['name' => 'Amigos']);
+
+        $receptionist = User::factory()->forClinic($this->clinic)->create();
+        $receptionist->assignRole('receptionist');
+        Sanctum::actingAs($receptionist);
+
+        $this->getJson('/api/v1/client-origins?active_only=1')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Indicação');
+        $this->getJson('/api/v1/campaigns?active_only=1&client_origin_id='.$origin->id)
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Amigos');
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'TikTok'])->assertForbidden();
+        $this->postJson('/api/v1/campaigns', [
+            'client_origin_id' => $origin->id,
+            'name' => 'Setembro',
+        ])->assertForbidden();
     }
 }

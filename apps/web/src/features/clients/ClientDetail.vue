@@ -9,6 +9,7 @@ import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import AttributionShortcuts from '@/features/clients/AttributionShortcuts.vue'
 import { deactivateClient, getClient, updateClient } from '@/features/clients/api'
 import { formatBRL } from '@/lib/formatters'
 import { useToastStore } from '@/stores/toast'
@@ -96,6 +97,8 @@ function onConfirmDeactivate() {
         </PermissionGate>
       </template>
     </PageHeader>
+
+    <AttributionShortcuts />
 
     <Banner v-if="client && !client.is_active" variant="warning" title="Inativo">
       Este cliente está desativado e não aparece na lista padrão.

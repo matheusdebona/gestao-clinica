@@ -43,6 +43,48 @@ const router = createRouter({
           component: () => import('@/pages/ClientDetailPage.vue'),
         },
         {
+          path: 'client-origins',
+          name: 'client-origins',
+          meta: { title: 'Origens' },
+          component: () => import('@/pages/ClientOriginsPage.vue'),
+        },
+        {
+          path: 'client-origins/new',
+          name: 'client-origins-new',
+          component: () => import('@/pages/ClientOriginFormPage.vue'),
+        },
+        {
+          path: 'client-origins/:id/edit',
+          name: 'client-origins-edit',
+          component: () => import('@/pages/ClientOriginFormPage.vue'),
+        },
+        {
+          path: 'client-origins/:id',
+          name: 'client-origins-show',
+          component: () => import('@/pages/ClientOriginDetailPage.vue'),
+        },
+        {
+          path: 'campaigns',
+          name: 'campaigns',
+          meta: { title: 'Campanhas' },
+          component: () => import('@/pages/CampaignsPage.vue'),
+        },
+        {
+          path: 'campaigns/new',
+          name: 'campaigns-new',
+          component: () => import('@/pages/CampaignFormPage.vue'),
+        },
+        {
+          path: 'campaigns/:id/edit',
+          name: 'campaigns-edit',
+          component: () => import('@/pages/CampaignFormPage.vue'),
+        },
+        {
+          path: 'campaigns/:id',
+          name: 'campaigns-show',
+          component: () => import('@/pages/CampaignDetailPage.vue'),
+        },
+        {
           path: 'users',
           name: 'users',
           meta: { title: 'Equipe' },

@@ -237,6 +237,8 @@ Attribution fields on the client are optional. When `campaign_id` is set, `clien
 `clients.view`, `clients.create`, `clients.update`, `clients.delete`  
 `client_origins.manage`, `campaigns.manage`
 
+GET index/show de origens e campanhas também aceita `clients.create` ou `clients.update` (permissão **A**, Fase 4.2b) para popular os selects no cadastro do cliente. CRUD do catálogo permanece `*.manage`. UI: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b.
+
 ---
 
 ## 7. Payment methods & card fees (separate catalogs)

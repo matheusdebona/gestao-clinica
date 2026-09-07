@@ -149,22 +149,22 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:clients.delete');
 
         Route::get('client-origins', [ClientOriginController::class, 'index'])
-            ->middleware('permission:client_origins.manage');
+            ->middleware('permission:client_origins.manage|clients.create|clients.update');
         Route::post('client-origins', [ClientOriginController::class, 'store'])
             ->middleware('permission:client_origins.manage');
         Route::get('client-origins/{client_origin}', [ClientOriginController::class, 'show'])
-            ->middleware('permission:client_origins.manage');
+            ->middleware('permission:client_origins.manage|clients.create|clients.update');
         Route::put('client-origins/{client_origin}', [ClientOriginController::class, 'update'])
             ->middleware('permission:client_origins.manage');
         Route::delete('client-origins/{client_origin}', [ClientOriginController::class, 'destroy'])
             ->middleware('permission:client_origins.manage');
 
         Route::get('campaigns', [CampaignController::class, 'index'])
-            ->middleware('permission:campaigns.manage');
+            ->middleware('permission:campaigns.manage|clients.create|clients.update');
         Route::post('campaigns', [CampaignController::class, 'store'])
             ->middleware('permission:campaigns.manage');
         Route::get('campaigns/{campaign}', [CampaignController::class, 'show'])
-            ->middleware('permission:campaigns.manage');
+            ->middleware('permission:campaigns.manage|clients.create|clients.update');
         Route::put('campaigns/{campaign}', [CampaignController::class, 'update'])
             ->middleware('permission:campaigns.manage');
         Route::delete('campaigns/{campaign}', [CampaignController::class, 'destroy'])
