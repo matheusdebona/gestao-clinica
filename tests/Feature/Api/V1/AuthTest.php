@@ -2,11 +2,19 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Models\Campaign;
+use App\Models\ClientOrigin;
 use App\Models\Clinic;
 use App\Models\User;
+use App\Support\EnsureDefaultClientOrigins;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -17,7 +25,7 @@ class AuthTest extends TestCase
     {
         parent::setUp();
         $this->seed(RolesAndPermissionsSeeder::class);
-        $this->withoutMiddleware(\Illuminate\Routing\Middleware\ThrottleRequests::class);
+        $this->withoutMiddleware(ThrottleRequests::class);
     }
 
     public function test_login_returns_token_and_user(): void
@@ -127,14 +135,42 @@ class AuthTest extends TestCase
         $this->assertTrue($user->hasRole('admin'));
     }
 
+    public function test_register_seeds_default_client_origins(): void
+    {
+        $this->postJson('/api/v1/auth/register', [
+            'clinic_name' => 'Clínica Origens',
+            'name' => 'Carla Dias',
+            'email' => 'carla@origens.test',
+            'password' => 'ChangeMe!123',
+            'password_confirmation' => 'ChangeMe!123',
+        ])->assertCreated();
+
+        $clinic = Clinic::query()->where('name', 'Clínica Origens')->first();
+        $this->assertNotNull($clinic);
+
+        $names = ClientOrigin::query()
+            ->where('clinic_id', $clinic->id)
+            ->pluck('name')
+            ->all();
+
+        $this->assertEqualsCanonicalizing(EnsureDefaultClientOrigins::NAMES, $names);
+        $this->assertTrue(
+            ClientOrigin::query()
+                ->where('clinic_id', $clinic->id)
+                ->where('is_active', false)
+                ->doesntExist()
+        );
+        $this->assertSame(0, Campaign::query()->where('clinic_id', $clinic->id)->count());
+    }
+
     public function test_register_bootstraps_roles_when_catalog_is_missing(): void
     {
-        \Illuminate\Support\Facades\DB::table('model_has_roles')->delete();
-        \Illuminate\Support\Facades\DB::table('model_has_permissions')->delete();
-        \Illuminate\Support\Facades\DB::table('role_has_permissions')->delete();
-        \Spatie\Permission\Models\Role::query()->delete();
-        \Spatie\Permission\Models\Permission::query()->delete();
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        DB::table('model_has_roles')->delete();
+        DB::table('model_has_permissions')->delete();
+        DB::table('role_has_permissions')->delete();
+        Role::query()->delete();
+        Permission::query()->delete();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
         $response = $this->postJson('/api/v1/auth/register', [
             'clinic_name' => 'Clínica Sem Seed',

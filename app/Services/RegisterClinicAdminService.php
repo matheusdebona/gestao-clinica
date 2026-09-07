@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Clinic;
 use App\Models\User;
+use App\Support\EnsureDefaultClientOrigins;
 use App\Support\EnsureRolesAndPermissions;
 use Illuminate\Support\Facades\DB;
 
@@ -26,6 +27,8 @@ class RegisterClinicAdminService
                     'currency' => 'BRL',
                 ],
             ]);
+
+            EnsureDefaultClientOrigins::run($clinic);
 
             $user = User::query()->create([
                 'name' => $payload['name'],

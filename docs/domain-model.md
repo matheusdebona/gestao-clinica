@@ -221,6 +221,8 @@ A **protocol** is a reusable **set of products that forms a complete service**. 
 | `name` | Unique per clinic (e.g. Instagram) |
 | `is_active` | Soft deactivate; historical client links kept |
 
+New clinics (auth register, `POST /clinics`, demo seed) get a default active catalog of 10 origins (Google, Instagram, Facebook, TikTok, Indicação, WhatsApp, Outros, Site, YouTube, Fachada). No default campaigns. Seed is idempotent by `(clinic_id, name)`.
+
 ### Campaign (clinic catalog)
 
 | Field | Notes |

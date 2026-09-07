@@ -8,6 +8,7 @@ use App\Models\ClientOrigin;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Support\CurrentClinic;
+use App\Support\EnsureDefaultClientOrigins;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -263,6 +264,56 @@ class ClientAttributionTest extends TestCase
             'client_origin_id' => $origin->id,
             'name' => 'Setembro',
         ])->assertForbidden();
+    }
+
+    public function test_creating_clinic_seeds_default_origins_without_campaigns(): void
+    {
+        $manager = User::factory()->forClinic($this->clinic)->create();
+        $manager->givePermissionTo('clinics.manage');
+        Sanctum::actingAs($manager);
+
+        $id = $this->postJson('/api/v1/clinics', [
+            'name' => 'Clínica Recém-aberta',
+        ])->assertCreated()
+            ->json('data.id');
+
+        $this->assertDefaultOriginsForClinic((int) $id);
+    }
+
+    public function test_default_origins_are_idempotent_by_name(): void
+    {
+        ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Instagram']);
+
+        EnsureDefaultClientOrigins::run($this->clinic);
+        EnsureDefaultClientOrigins::run($this->clinic);
+
+        $this->assertDefaultOriginsForClinic($this->clinic->id);
+        $this->assertSame(
+            1,
+            ClientOrigin::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->where('name', 'Instagram')
+                ->count()
+        );
+    }
+
+    protected function assertDefaultOriginsForClinic(int $clinicId): void
+    {
+        $origins = ClientOrigin::query()
+            ->withoutGlobalScopes()
+            ->where('clinic_id', $clinicId)
+            ->get();
+
+        $this->assertEqualsCanonicalizing(
+            EnsureDefaultClientOrigins::NAMES,
+            $origins->pluck('name')->all()
+        );
+        $this->assertTrue($origins->every(fn (ClientOrigin $origin) => $origin->is_active));
+        $this->assertSame(
+            0,
+            Campaign::query()->withoutGlobalScopes()->where('clinic_id', $clinicId)->count()
+        );
     }
 
     public function test_campaigns_manage_can_list_origins_for_campaign_form(): void

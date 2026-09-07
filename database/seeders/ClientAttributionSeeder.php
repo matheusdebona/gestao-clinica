@@ -2,34 +2,16 @@
 
 namespace Database\Seeders;
 
-use App\Models\ClientOrigin;
 use App\Models\Clinic;
-use App\Support\CurrentClinic;
+use App\Support\EnsureDefaultClientOrigins;
 use Illuminate\Database\Seeder;
 
 class ClientAttributionSeeder extends Seeder
 {
     public function run(): void
     {
-        $clinic = Clinic::query()->first();
-        if ($clinic === null) {
-            return;
+        foreach (Clinic::query()->get() as $clinic) {
+            EnsureDefaultClientOrigins::run($clinic);
         }
-
-        CurrentClinic::setId($clinic->id);
-
-        foreach (['Instagram', 'Facebook', 'Indicação', 'Google', 'Outros'] as $name) {
-            ClientOrigin::query()->firstOrCreate(
-                [
-                    'clinic_id' => $clinic->id,
-                    'name' => $name,
-                ],
-                [
-                    'is_active' => true,
-                ]
-            );
-        }
-
-        CurrentClinic::forget();
     }
 }

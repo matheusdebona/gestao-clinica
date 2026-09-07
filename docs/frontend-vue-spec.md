@@ -500,6 +500,7 @@ Domínio: [`domain-model.md`](./domain-model.md) §6 (`ClientOrigin`, `Campaign`
 | Visual | Soft Violet Liquid Glass **heavy** — só `components/ui` + `patterns`; sem controle cru |
 | Nav | Manter **Clientes** no `ClinicShell`. Catálogos como **subtela/atalhos** na lista e no form de clientes (como Marcas/Tipos a partir de Produtos). Evitar novo pin na tab bar |
 | Permissão GET | **A (fechada)** — `GET` index e show com `client_origins.manage\|clients.create\|clients.update` (e o equivalente em campanhas). GET origens também inclui `campaigns.manage` para o select pai no form de campanha. Sem `*.view` novas. CRUD das telas e atalhos de criar permanecem `*.manage`. Espelha `GET /brands` com `brands.manage\|products.view` |
+| Catálogo inicial | Nova clínica (register, `POST /clinics`, demo seed) recebe **10 origens ativas** — Google, Instagram, Facebook, TikTok, Indicação, WhatsApp, Outros, Site, YouTube, Fachada. Sem campanhas. Idempotente por nome (`EnsureDefaultClientOrigins`) |
 | Fora desta fase | `campaigns.spend_amount` / CAC de mídia (métricas B+) — ver [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap.md) |
 
 ##### Telas / rotas
