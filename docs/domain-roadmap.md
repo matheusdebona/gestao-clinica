@@ -57,8 +57,10 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 - [x] Search by name / WhatsApp within clinic (`?q=`)
 - [x] Soft deactivate via DELETE (`is_active=false`)
 - [x] Permissions + tests (isolation, 403, validation)
+- [x] Catalogs `ClientOrigin` + `Campaign` (API CRUD, `client_origin_id` filter, soft deactivate, `client_origins.manage` / `campaigns.manage`)
+- [ ] **UI catalog** origins/campaigns (CRUD screens + ClientForm shortcuts) — Vue phase **4.2b**; spec: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b
 
-**DoD:** clients usable as sale/budget counterparts.
+**DoD:** clients usable as sale/budget counterparts. Catalog UI for origins/campaigns is tracked in Phase 11 / §4.2b (API already shipped).
 
 ---
 
@@ -164,7 +166,8 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] Design system **Modern Soft Violet Liquid Glass (heavy)** + `/dev/ui` kitchen sink (Fase 3)
 - [x] Auth + `ClinicShell` (Fase 4.1)
 - [x] Clientes: lista, busca `?q=`, CRUD (Fase 4.2)
-- [x] Equipe: RBAC + CRUD usuários (Fase 4.2b)
+- [ ] **Origens e campanhas** (catálogo UI, atalhos no ClientForm, GET para quem cria/edita cliente) — Fase **4.2b**; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b
+- [x] Equipe: RBAC + CRUD usuários (Fase 4.2c; entregue como 4.2b)
 - [x] **Produtos** (+ marcas/tipos/unidades, cascata marca→tipo, `?q=`, ajuste estoque) — Fase 4.3; ver detalhe em [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3
 - [x] **Protocolos** (pacote de produtos, itens no form, preços editáveis, `?q=`) — Fase 4.4; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.4
 - [x] **Vendas / orçamentos** (wizard, protocolo+itens, soft min, pagamentos fechados, orçamento+PDF, nav inbox) — Fase 4.5; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.5

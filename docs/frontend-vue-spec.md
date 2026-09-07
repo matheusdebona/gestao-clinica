@@ -456,7 +456,8 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | --- | --- | --- |
 | 4.1 | Auth polish | feito |
 | 4.2 | Clientes | feito |
-| 4.2b | Equipe (RBAC) | feito |
+| **4.2b** | **Origens e campanhas** (catálogo) | **pendente** |
+| 4.2c | Equipe (RBAC) | feito |
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | feito |
 | **4.4** | **Protocolos** (pacote de produtos) | feito |
 | **4.5** | **Vendas / orçamentos** | feito |
@@ -468,6 +469,124 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 Cada feature: páginas mobile-first + `PermissionGate` nas ações.
 
 **DoD Fase 4:** secretária e médico completam o fluxo diário no viewport phone.
+
+**Próximo no front:** §4.2b (catálogo de origens/campanhas). Equipe RBAC já entregue; na tabela passou a **4.2c** para o 4.2b ficar livre para o gap de 4.2 Clientes.
+
+#### 4.2b — Origens e campanhas (especificação de UI)
+
+Objetivo: fechar o **catálogo operacional** de canais de aquisição (origem) e campanhas da origem, no mesmo padrão de Marcas / Tipos de produto (Fase 4.3). Atribuição no cadastro do cliente e ranking de métricas (onda B) já existem; faltam as telas de CRUD e os atalhos de criação no `ClientForm`.
+
+Domínio: [`domain-model.md`](./domain-model.md) §6 (`ClientOrigin`, `Campaign`). Métricas: [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap.md) onda B.
+
+##### Já existe vs falta
+
+| Camada | Estado |
+| --- | --- |
+| Domínio | `ClientOrigin` + `Campaign` (campanha **pertence** à origem); FKs opcionais no cliente; `campaign_id` exige origem da mesma campanha |
+| API CRUD | `GET/POST/PUT/DELETE /api/v1/client-origins` e `/api/v1/campaigns` (filtro `client_origin_id`, `active_only`; DELETE = soft deactivate `is_active=false`) |
+| Permissões Spatie | `client_origins.manage`, `campaigns.manage` (CRUD inteiro, **incluindo** index/show) |
+| Form do cliente | Selects **Origem → Campanha** (cascata; campanha só após origem; opção “Nenhuma”) |
+| Métricas | Onda B: ranking origem/campanha (`GET /metrics/acquisition?group_by=origin\|campaign`) |
+| Telas de catálogo | **Faltam** — não há `/client-origins` nem `/campaigns` (não há equivalente a `/brands` / `/product-types`) |
+| Atalhos no `ClientForm` | **Faltam** — não há “Nova origem” / “Nova campanha desta origem” (o `ProductForm` já faz isso para marca/tipo) |
+| Index para quem só cria cliente | **Gap** — recepção tem `clients.create` / `clients.update` **sem** `*.manage`; os selects de Origem/Campanha **não carregam** (`enabled` só com `client_origins.manage` / `campaigns.manage`) |
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Lista + detalhe + criar/editar + desativar **origens** e **campanhas**; atalhos de criar a partir do form do cliente |
+| Cascata | **Origem** → popula **campanhas daquela origem** (igual marca → tipo). Campanha sempre exige `client_origin_id`. No cliente, campanha só com origem selecionada; mudar a origem zera a campanha |
+| Desativar | DELETE soft (`is_active=false`); vínculos históricos no cliente **permanecem**. Lista com switch “somente ativas” (padrão ligado, como Clientes / Marcas) |
+| Visual | Soft Violet Liquid Glass **heavy** — só `components/ui` + `patterns`; sem controle cru |
+| Nav | Manter **Clientes** no `ClinicShell`. Catálogos como **subtela/atalhos** na lista e no form de clientes (como Marcas/Tipos a partir de Produtos). Evitar novo pin na tab bar |
+| Fora desta fase | `campaigns.spend_amount` / CAC de mídia (métricas B+) — ver [`metrics-kpis-roadmap.md`](./metrics-kpis-roadmap.md) |
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/client-origins` | Lista (somente ativas, paginação) | `client_origins.manage` |
+| `/client-origins/new` | Criar origem | `client_origins.manage` |
+| `/client-origins/:id` | Detalhe + editar / desativar | `client_origins.manage` |
+| `/client-origins/:id/edit` | Editar | `client_origins.manage` |
+| `/campaigns` | Lista (filtro por origem, somente ativas) | `campaigns.manage` |
+| `/campaigns/new` | Criar campanha (origem obrigatória) | `campaigns.manage` |
+| `/campaigns/:id` | Detalhe + editar / desativar | `campaigns.manage` |
+| `/campaigns/:id/edit` | Editar | `campaigns.manage` |
+
+Chrome: atalhos **Origens** / **Campanhas** na lista e no form de **Clientes** (`PermissionGate` `*.manage`), no estilo de `CatalogShortcuts` em Produtos. Deep link origem → campanhas filtradas (`?client_origin_id=`).
+
+##### UX
+
+**Catálogo (lista / CRUD)** — espelhar Marcas / Tipos:
+
+1. Lista em `ListCard`: título = nome; campanha mostra meta **origem**; badge **Inativa** se aplicável.
+2. Switch “Somente ativas”; `EmptyState` + CTA “Nova origem” / “Nova campanha”.
+3. Form origem: nome + ativo (`FormField` + `Switch`).
+4. Form campanha: select **Origem** (obrigatório, editável como tipo↔marca) → nome + ativo. Unicidade `(clinic_id, client_origin_id, name)` já é da API.
+5. Desativar: `ConfirmDialog`; copy deixa claro que clientes já atribuídos **não** perdem o vínculo.
+
+**Atalhos no `ClientForm`** (criar/editar cliente):
+
+1. Manter a cascata Origem → Campanha que já existe.
+2. Com `client_origins.manage`: botão ghost **Nova origem** → `AppDialog` (nome) → POST → selecionar a origem criada (padrão “Nova marca” no `ProductForm`).
+3. Com `campaigns.manage` e origem já escolhida: **Nova campanha desta origem** → dialog (nome; `client_origin_id` implícito) → POST → selecionar a campanha. Sem origem: toast “Selecione a origem primeiro.”
+4. Sem `*.manage`: sem botões de criar; selects continuam visíveis **se** a decisão de index abaixo permitir carregar opções.
+
+##### Permissões (decisão em aberto)
+
+Hoje **todo** GET de origens/campanhas exige `*.manage`. Quem tem só `clients.create` / `clients.update` (ex.: papel **receptionist** no seed) **não** popula os selects — o form esconde Origem/Campanha.
+
+Na implementação de 4.2b, escolher **uma** (não as duas):
+
+| Opção | API | Seed / papéis | Quando preferir |
+| --- | --- | --- | --- |
+| **A — index para quem cria/edita cliente** | `GET` index (e show, se o form precisar) com `client_origins.manage\|clients.create\|clients.update` e o equivalente em campanhas | Sem permission nova. Recepção passa a **ler** o catálogo; criar origem/campanha continua `*.manage` | Espelha marcas/tipos: `GET /brands` já é `brands.manage\|products.view` |
+| **B — permissions `*.view`** | Novas `client_origins.view` e `campaigns.view` no GET index/show; `*.manage` no POST/PUT/DELETE | Atribuir `*.view` a quem tem `clients.create` / `clients.update` (recepção, seller, professional, admin) | Se quiser o catálogo explícito no RBAC da Equipe, como `products.view` |
+
+CRUD das telas `/client-origins` e `/campaigns` **permanece** `*.manage` nas duas opções. Atalhos de criar no `ClientForm` também. Não inventar `*.view` **e** abrir o GET com `clients.*` ao mesmo tempo.
+
+**Default sugerido (não fechado):** opção **A** — menos seed, mesmo padrão do catálogo de produtos.
+
+##### API (reutilizar — sem endpoints novos)
+
+| Método | Recurso | Notas para a UI |
+| --- | --- | --- |
+| `GET /client-origins` | Lista | `active_only`, paginação (API: 50/página) |
+| `POST /client-origins` | Criar | `{ name, is_active? }`; nome único por clínica |
+| `GET/PUT /client-origins/{id}` | Ver / editar | |
+| `DELETE /client-origins/{id}` | Desativar | `is_active=false`; não apaga linhas |
+| `GET /campaigns` | Lista | `client_origin_id`, `active_only`; inclui `client_origin` |
+| `POST /campaigns` | Criar | `{ client_origin_id, name, is_active? }`; nome único por clínica+origem; origem deve estar ativa |
+| `GET/PUT /campaigns/{id}` | Ver / editar | |
+| `DELETE /campaigns/{id}` | Desativar | soft |
+
+Clinic scope = sessão. Invalidar queries Vue Query `['client-origins']` e `['campaigns']` após mutações (form do cliente e listas).
+
+Só a opção A ou B acima pode exigir **ajuste de middleware** nos GET — não criar rotas novas.
+
+##### Patterns de UI a reutilizar
+
+- `ListCard`, `PageHeader`, `SearchField` só se a API ganhar `q` (hoje **não** tem busca por nome — v1 pode omitir busca ou paginar só).
+- `Switch` “somente ativas”, `FormField`, `Select` (cascata), `Pagination`, `EmptyState`, `ConfirmDialog`, `Banner` (403), `Skeleton`.
+- `PermissionGate` nas ações e atalhos.
+- Dialog de criação rápida: `AppDialog` + `Input` + toast — copiar o fluxo marca/tipo do `ProductForm` (não navegar para outra rota no meio do cadastro do cliente).
+- Atalhos de catálogo: botões `Button` secondary na lista de clientes, no estilo `CatalogShortcuts`.
+
+Não criar primitive novo se `Select` / `ListCard` / `AppDialog` cobrirem.
+
+##### DoD 4.2b
+
+- [ ] Secretária com `*.manage` cadastra origem → campanha da origem → usa no cliente (lista + form)
+- [ ] Cascata Origem → Campanha no catálogo e no `ClientForm`; mudar origem limpa campanha
+- [ ] Atalhos **Nova origem** / **Nova campanha desta origem** no `ClientForm` (dialog, sem perder o rascunho)
+- [ ] Desativar + “somente ativas”; clientes antigos continuam mostrando o nome no detalhe
+- [ ] Decisão A ou B de GET implementada: quem tem `clients.create` / `update` **consegue** escolher origem/campanha nos selects
+- [ ] Atalhos na área de Clientes; sem item extra obrigatório na tab bar
+- [ ] Soft Violet Liquid Glass; só componentes de `@/components/ui` (e `patterns` se já existirem)
+- [ ] Sem `spend_amount` / CAC de ads nesta fase
+- [ ] Smoke Vue das listas/forms/atalhos; testes API só se o middleware de GET mudar (A ou B)
 
 #### 4.3 — Produtos (especificação de UI)
 
@@ -846,7 +965,7 @@ Objetivo: dashboard mobile-first com as **4 waves** de KPI já expostas na API. 
 1. **Período** — default mês corrente; envia `from`/`to` a todos os GETs (inventory pode usar o mesmo range).
 2. **Primeiro viewport (cards)** — faturamento · ticket médio · taxa conversão · margem (puxar de `commercial` + `acquisition` + `margin`).
 3. **Comercial (A)** — resto dos KPIs (nº vendas, desconto médio, funil orçamento, mix pagamento) + **série/chart de receita** (`granularity` auto ou escolhida).
-4. **Aquisição (B)** — ranking com toggle origem/campanha; conversão em destaque (já no hero).
+4. **Aquisição (B)** — ranking com toggle origem/campanha; conversão em destaque (já no hero). Catálogo CRUD de origens/campanhas: **§4.2b** (não nesta página).
 5. **Margem (C)** — KPIs + toggle período/cohort; nota de fulfillment pendente no modo cohort.
 6. **Estoque & operações (D)** — cards low-stock / valor estoque / sessões / cancelamentos; listas curtas (low-stock products, pending fulfillments, by_professional) com link para Produtos / Tratamentos / Agenda quando fizer sentido.
 
@@ -990,6 +1109,8 @@ Nav label: **Alertas** (já no shell) — ocultar sem `products.view`.
 | `/` | Home / atalhos | auth |
 | `/clients` | Lista/busca | `clients.view` |
 | `/clients/:id` | Detalhe | `clients.view` |
+| `/client-origins` | Origens (catálogo) | `client_origins.manage` |
+| `/campaigns` | Campanhas (catálogo) | `campaigns.manage` |
 | `/users` | Equipe | `users.view` |
 | `/products` | Catálogo | `products.view` |
 | `/brands` | Marcas | `brands.manage` |

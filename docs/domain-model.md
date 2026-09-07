@@ -237,6 +237,8 @@ Attribution fields on the client are optional. When `campaign_id` is set, `clien
 `clients.view`, `clients.create`, `clients.update`, `clients.delete`  
 `client_origins.manage`, `campaigns.manage`
 
+UI catalog (listas CRUD + atalhos no form do cliente) ainda **não** está na web — spec Fase **4.2b**: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b. Selects Origem → Campanha no cadastro do cliente já existem. GET do catálogo hoje exige `*.manage` (recepção com só `clients.create`/`update` não carrega opções).
+
 ---
 
 ## 7. Payment methods & card fees (separate catalogs)

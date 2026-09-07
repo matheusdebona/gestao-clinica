@@ -6,7 +6,8 @@ Documento de referência para construir o dashboard e os indicadores da clínica
 
 Complementa: [`domain-model.md`](./domain-model.md), [`domain-roadmap.md`](./domain-roadmap.md), [`produto-financeiro.md`](./produto-financeiro.md).
 
-**UI Fase 4.8** (página única, hero + seções A–D): [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8.
+**UI Fase 4.8** (página única, hero + seções A–D): [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8.  
+**UI Fase 4.2b** (catálogo origens/campanhas, sem spend/CAC ads): [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b.
 
 ---
 
@@ -93,7 +94,7 @@ Regra de ouro: **toda métrica é clinic-scoped** e aceita filtro de período (`
 3. Conversão **lifetime** (decidido): cliente criado no período com ≥1 sale `confirmed` onde `sold_at` ≥ `client.created_at`. A venda pode cair **depois** do período (orçamento no mês N, pagamento no N+1).
 4. Service `AcquisitionMetricsService` — cohort de clients + subquery de sales pós-cadastro.
 5. Testes: Instagram com sale no mês seguinte; Facebook sem sale; draft não converte; isolamento; `group_by=campaign`.
-6. UI (depois): ranking de canais (clientes | receita consulta | receita vendas | conversão %).
+6. UI (depois): ranking de canais (clientes | receita consulta | receita vendas | conversão %). Cadastro do catálogo origem/campanha na web: Fase **4.2b** ([`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b) — **sem** `spend_amount`.
 
 **Sem `campaigns.spend_amount` nesta onda** — CAC/ROI de ads fica para B+ quando houver gasto de mídia. Enquanto isso: `avg_consultation_amount` e `sales_to_consultation_ratio` (receita vendas ÷ receita consultas).
 
@@ -238,8 +239,9 @@ Response shape sugerida:
 - [x] `AcquisitionMetricsService` + endpoint
 - [x] Definição de conversão documentada (**lifetime**)
 - [x] Tests por origin/campaign
-- [ ] (Opcional / B+) `campaigns.spend_amount`
-- [x] (UI) ranking canais
+- [ ] (Opcional / B+) `campaigns.spend_amount` — **fora** da UI Fase 4.2b
+- [x] (UI) ranking canais (Fase 4.8)
+- [ ] (UI) catálogo origens/campanhas — Fase **4.2b**; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b
 
 ### C — Margem
 - [x] modes `period` e `cohort_sale`
@@ -283,4 +285,5 @@ Só depois da **Onda A + B** (mínimo) ou A+B+C (ideal):
 
 **Status Onda D:** implementado — `GET /api/v1/metrics/inventory` (snapshot + `from`/`to` opcionais, default 30d) e `GET /api/v1/metrics/operations` (período obrigatório, saldo a aplicar + lista).
 
-UI Fase 4.8: página `/metrics` (hero + seções A–D). UI Fase 4.9: inbox in-app de alertas. Próximo no front: PWA (Fase 5).
+UI Fase 4.8: página `/metrics` (hero + seções A–D). UI Fase 4.9: inbox in-app de alertas.  
+**Próximo no front:** catálogo de origens/campanhas (Fase **4.2b**, spec no Vue) — não inclui `spend_amount` / CAC de ads (B+). Depois: PWA (Fase 5).
