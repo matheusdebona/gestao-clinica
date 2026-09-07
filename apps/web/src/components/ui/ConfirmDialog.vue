@@ -37,9 +37,9 @@ const emit = defineEmits<{
 <template>
   <DialogRoot v-model:open="open">
     <DialogPortal>
-      <DialogOverlay class="fixed inset-0 z-40 bg-black/25 backdrop-blur-[2px]" />
+      <DialogOverlay class="sv-scrim fixed inset-0 z-40" />
       <DialogContent
-        class="fixed top-1/2 left-1/2 z-50 w-[min(100%-2rem,360px)] -translate-x-1/2 -translate-y-1/2 rounded-[14px] bg-surface p-5 outline-none"
+        class="glass-regular fixed top-1/2 left-1/2 z-50 w-[min(100%-2rem,360px)] -translate-x-1/2 -translate-y-1/2 rounded-[18px] p-5 outline-none"
       >
         <DialogTitle class="text-[17px] font-semibold tracking-[-0.02em] text-title">
           {{ title }}

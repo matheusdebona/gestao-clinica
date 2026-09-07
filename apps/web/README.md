@@ -1,6 +1,6 @@
 # apps/web — Gestão Clínica (Vue)
 
-SPA Vue 3 + TypeScript + Tailwind 4 no visual **Soft Violet / Apple-minimal**.
+SPA Vue 3 + TypeScript + Tailwind 4 no visual **Soft Violet / Apple Liquid Glass (heavy)**, com tema claro e escuro.
 
 ## Subir
 

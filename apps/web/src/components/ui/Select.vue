@@ -19,6 +19,9 @@ interface SelectOption {
   label: string
 }
 
+/** Reka UI forbids empty SelectItem values; filters use `value: ''` for "all". */
+const EMPTY_OPTION_VALUE = '__empty__'
+
 const props = withDefaults(
   defineProps<{
     modelValue?: string
@@ -44,21 +47,34 @@ const selectedLabel = computed(
   () => props.options.find((option) => option.value === props.modelValue)?.label ?? '',
 )
 
+const rootValue = computed(() => {
+  if (props.modelValue !== '') {
+    return props.modelValue
+  }
+  return props.options.some((option) => option.value === '') ? EMPTY_OPTION_VALUE : undefined
+})
+
+function itemValue(option: SelectOption): string {
+  return option.value === '' ? EMPTY_OPTION_VALUE : option.value
+}
+
+function onRootUpdate(value: unknown) {
+  const next = value == null ? '' : String(value)
+  emit('update:modelValue', next === EMPTY_OPTION_VALUE ? '' : next)
+}
+
 const triggerClass = computed(() =>
   cn(
-    'inline-flex h-11 w-full items-center justify-between gap-2 rounded-[10px] border bg-input px-3.5 text-[15px] text-title outline-none transition-colors disabled:cursor-not-allowed disabled:opacity-50',
-    props.invalid
-      ? 'border-danger/50 bg-danger-light'
-      : 'border-transparent data-[state=open]:border-brand/40 data-[state=open]:bg-surface',
+    'glass-field inline-flex h-11 w-full items-center justify-between gap-2 rounded-[12px] px-3.5 text-[15px] text-title outline-none disabled:cursor-not-allowed disabled:opacity-50',
   ),
 )
 </script>
 
 <template>
   <SelectRoot
-    :model-value="modelValue || undefined"
+    :model-value="rootValue"
     :disabled="disabled"
-    @update:model-value="(v) => emit('update:modelValue', String(v ?? ''))"
+    @update:model-value="onRootUpdate"
   >
     <SelectTrigger :id="id" :class="triggerClass" :aria-invalid="invalid || undefined">
       <SelectValue :placeholder="placeholder" class="truncate text-left">
@@ -68,16 +84,16 @@ const triggerClass = computed(() =>
     </SelectTrigger>
     <SelectPortal>
       <SelectContent
-        class="z-50 min-w-[var(--reka-select-trigger-width)] overflow-hidden rounded-[12px] border border-border-subtle bg-surface shadow-floating"
-        :side-offset="6"
+        class="glass-menu z-50 min-w-[var(--reka-select-trigger-width)] overflow-hidden rounded-[14px]"
+        :side-offset="8"
         position="popper"
       >
         <SelectViewport class="p-1">
           <SelectItem
             v-for="option in options"
-            :key="option.value"
-            :value="option.value"
-            class="relative flex cursor-pointer select-none items-center rounded-[8px] py-2.5 pr-8 pl-3 text-[15px] text-body outline-none data-[highlighted]:bg-surface-muted data-[state=checked]:text-title"
+            :key="itemValue(option)"
+            :value="itemValue(option)"
+            class="relative flex cursor-pointer select-none items-center rounded-[10px] py-2.5 pr-8 pl-3 text-[15px] text-body outline-none data-[highlighted]:bg-brand-light/60 data-[state=checked]:text-title"
           >
             <SelectItemText>{{ option.label }}</SelectItemText>
             <SelectItemIndicator class="absolute right-2 inline-flex items-center">

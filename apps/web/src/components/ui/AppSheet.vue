@@ -28,7 +28,7 @@ withDefaults(
     <DialogPortal>
       <DialogOverlay class="sv-scrim fixed inset-0 z-40" />
       <DialogContent
-        class="glass-regular fixed top-1/2 left-1/2 z-50 w-[min(100%-2rem,400px)] -translate-x-1/2 -translate-y-1/2 rounded-[18px] p-5 outline-none"
+        class="glass-regular fixed inset-x-3 bottom-3 z-50 max-h-[min(85dvh,720px)] w-auto overflow-y-auto rounded-chrome p-5 outline-none md:inset-x-auto md:top-3 md:right-3 md:bottom-3 md:w-[min(100%-1.5rem,380px)]"
       >
         <DialogTitle class="text-[17px] font-semibold tracking-[-0.02em] text-title">
           {{ title }}

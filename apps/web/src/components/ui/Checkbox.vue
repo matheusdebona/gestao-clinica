@@ -30,7 +30,7 @@ const emit = defineEmits<{
       :id="id"
       :model-value="modelValue"
       :disabled="disabled"
-      class="flex size-[22px] shrink-0 items-center justify-center rounded-[6px] border border-border-subtle bg-surface outline-none data-[state=checked]:border-brand data-[state=checked]:bg-brand"
+      class="glass-field flex size-[22px] shrink-0 items-center justify-center rounded-[6px] outline-none data-[state=checked]:border-brand data-[state=checked]:bg-brand"
       @update:model-value="(v: boolean | 'indeterminate') => emit('update:modelValue', v === true)"
       @click.stop
     >

@@ -9,9 +9,9 @@ const { items } = storeToRefs(toast)
 
 function classesFor(variant: ToastVariant) {
   return cn(
-    'pointer-events-auto flex w-auto max-w-[min(100%,360px)] items-center gap-3 rounded-full border border-white/40 bg-title/90 px-4 py-2.5 text-[13px] text-inverse shadow-floating backdrop-blur-md',
-    variant === 'success' && 'bg-[color-mix(in_srgb,var(--sv-text-title)_90%,var(--sv-success))]',
-    variant === 'error' && 'bg-[color-mix(in_srgb,var(--sv-text-title)_90%,var(--sv-danger))]',
+    'glass-toast pointer-events-auto flex w-auto max-w-[min(100%,360px)] items-center gap-3 rounded-full px-4 py-2.5 text-[13px] text-inverse',
+    variant === 'success' && 'bg-[color-mix(in_srgb,var(--sv-glass-dark-bg)_70%,var(--sv-success))]',
+    variant === 'error' && 'bg-[color-mix(in_srgb,var(--sv-glass-dark-bg)_70%,var(--sv-danger))]',
   )
 }
 

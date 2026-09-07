@@ -191,7 +191,7 @@ defineExpose({
       :error="rolesError"
       hint="Cada papel é um pacote de permissões. O e-mail precisa ser único na plataforma."
     >
-      <div class="flex flex-col gap-3 rounded-[10px] border border-border-subtle bg-canvas/60 px-3 py-3">
+      <div class="glass-clear flex flex-col gap-3 rounded-[12px] px-3 py-3">
         <p v-if="rolesLocked" class="text-[13px] text-muted">
           O administrador da clínica não pode ter os papéis alterados.
         </p>
@@ -213,13 +213,14 @@ defineExpose({
                   <span class="text-[13px] font-normal text-muted">{{ roleSummary(role.name) }}</span>
                 </span>
               </Checkbox>
-              <button
+              <Button
                 type="button"
-                class="shrink-0 pt-0.5 text-[13px] text-brand"
+                variant="ghost"
+                class="!h-auto shrink-0 !px-1 !py-0"
                 @click="toggleExpanded(role.name)"
               >
                 {{ expandedRole === role.name ? 'Ocultar permissões' : 'Ver permissões' }}
-              </button>
+              </Button>
             </div>
             <ul
               v-if="expandedRole === role.name"

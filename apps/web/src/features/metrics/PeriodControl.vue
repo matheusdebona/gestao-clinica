@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import DatePicker from '@/components/ui/DatePicker.vue'
 import FormField from '@/components/ui/FormField.vue'
-import Input from '@/components/ui/Input.vue'
 import Tabs from '@/components/ui/Tabs.vue'
 import { PERIOD_ITEMS } from '@/features/metrics/labels'
 import {
@@ -43,10 +43,10 @@ function onPreset(value: string) {
     <Tabs :model-value="preset" block :items="PERIOD_ITEMS" @update:model-value="onPreset" />
     <div v-if="showDates" class="grid grid-cols-2 gap-3">
       <FormField label="De" html-for="metrics-from">
-        <Input id="metrics-from" v-model="from" type="date" :invalid="Boolean(error)" />
+        <DatePicker id="metrics-from" v-model="from" :invalid="Boolean(error)" />
       </FormField>
       <FormField label="Até" html-for="metrics-to" :error="error">
-        <Input id="metrics-to" v-model="to" type="date" :invalid="Boolean(error)" />
+        <DatePicker id="metrics-to" v-model="to" :invalid="Boolean(error)" />
       </FormField>
     </div>
   </div>

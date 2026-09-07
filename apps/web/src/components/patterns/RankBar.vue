@@ -26,7 +26,7 @@ const width = computed(() => {
       <p class="shrink-0 tabular-nums text-[13px] text-muted">{{ value }}</p>
     </div>
     <p v-if="meta" class="truncate text-[13px] text-muted">{{ meta }}</p>
-    <div class="h-1.5 overflow-hidden rounded-full bg-brand-light" aria-hidden="true">
+    <div class="h-1.5 overflow-hidden rounded-full glass-clear" aria-hidden="true">
       <div class="h-full rounded-full bg-brand" :style="{ width }" />
     </div>
   </div>

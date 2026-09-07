@@ -11,7 +11,7 @@ withDefaults(
 
 <template>
   <div
-    :class="cn('animate-pulse rounded-md bg-surface-muted', $props.class)"
+    :class="cn('glass-clear animate-pulse rounded-md', $props.class)"
     aria-hidden="true"
   />
 </template>

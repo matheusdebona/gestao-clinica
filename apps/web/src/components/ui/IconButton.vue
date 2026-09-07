@@ -16,7 +16,7 @@ const props = withDefaults(
 
 const classes = computed(() =>
   cn(
-    'inline-flex size-9 items-center justify-center rounded-full text-title transition-colors duration-150 hover:bg-black/5 disabled:cursor-not-allowed disabled:opacity-40',
+    'glass-clear inline-flex size-9 items-center justify-center rounded-full text-title transition-colors duration-150 hover:bg-surface/50 disabled:cursor-not-allowed disabled:opacity-40',
   ),
 )
 </script>

@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
+import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
@@ -90,9 +91,12 @@ async function submitRegister() {
 </script>
 
 <template>
-  <div class="flex min-h-dvh items-center justify-center bg-canvas px-4 py-[5dvh]">
+  <div class="relative flex min-h-dvh items-center justify-center px-4 py-[5dvh]">
+    <div class="absolute top-4 right-4 z-10">
+      <ThemeToggle />
+    </div>
     <div
-      class="auth-card h-[90dvh] w-full max-w-[920px] overflow-hidden rounded-[14px] border border-border-subtle bg-surface"
+      class="glass-regular auth-card h-[90dvh] w-full max-w-[920px] overflow-hidden rounded-[22px]"
       :class="{ register: mode === 'register' }"
     >
       <div class="auth-image">
@@ -101,7 +105,7 @@ async function submitRegister() {
           alt=""
           class="size-full object-cover"
         >
-        <div class="absolute inset-0 bg-title/25" />
+        <div class="absolute inset-0 bg-sidebar/40" />
         <p class="absolute bottom-5 left-5 right-5 text-[15px] font-medium tracking-[-0.02em] text-inverse">
           Gestão da clínica, com calma.
         </p>

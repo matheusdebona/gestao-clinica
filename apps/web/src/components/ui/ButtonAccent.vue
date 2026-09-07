@@ -17,7 +17,7 @@ const props = withDefaults(
 
 const classes = computed(() =>
   cn(
-    'inline-flex h-10 items-center justify-center gap-2 rounded-[10px] border border-border-subtle bg-surface px-4 text-[15px] font-medium text-title transition-colors duration-150 hover:bg-surface-muted disabled:cursor-not-allowed disabled:opacity-40',
+    'glass-clear inline-flex h-10 items-center justify-center gap-2 rounded-[12px] px-4 text-[15px] font-medium text-title transition-colors duration-150 hover:bg-surface/50 disabled:cursor-not-allowed disabled:opacity-40',
     props.block && 'w-full',
   ),
 )
