@@ -34,8 +34,27 @@ export const BUDGET_STATUS_BADGE: Record<
   superseded: 'muted',
 }
 
+export function salePaymentSummary(payment: {
+  payment_method?: { name: string } | null
+  card_operator?: { name: string } | null
+  card_brand?: { name: string } | null
+  installments?: number | string | null
+}): string {
+  const parts = [payment.payment_method?.name ?? 'Pagamento']
+  if (payment.card_operator?.name) {
+    parts.push(payment.card_operator.name)
+  }
+  if (payment.card_brand?.name) {
+    parts.push(payment.card_brand.name)
+  }
+  if (payment.installments) {
+    parts.push(`${payment.installments}x`)
+  }
+  return parts.join(' · ')
+}
+
 export const SALE_WIZARD_STEPS = [
-  { id: 'client', label: 'Cliente' },
+  { id: 'client', label: 'Paciente' },
   { id: 'items', label: 'Itens' },
   { id: 'values', label: 'Valores' },
   { id: 'payments', label: 'Pagamentos' },

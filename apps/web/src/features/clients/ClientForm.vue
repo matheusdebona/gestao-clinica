@@ -403,7 +403,7 @@ defineExpose({ setErrors })
   <AppDialog
     v-model:open="originDialog"
     title="Nova origem"
-    description="A origem fica disponível no cadastro de clientes."
+    description="A origem fica disponível no cadastro de pacientes."
   >
     <FormField label="Nome" :error="originDialogError" html-for="new-origin-name">
       <template #default="{ invalid }">

@@ -188,7 +188,7 @@ function pendingMeta(row: (typeof pending.value)[number]) {
             <ListCard
               v-for="row in pending"
               :key="row.treatment_id"
-              :title="row.client_name || `Cliente #${row.client_id}`"
+              :title="row.client_name || `Paciente #${row.client_id}`"
               :meta="pendingMeta(row)"
               @action="openTreatment(row.treatment_id)"
             />

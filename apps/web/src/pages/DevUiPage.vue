@@ -562,7 +562,7 @@ function simulateLoading() {
         <SurfaceCard>
           <WizardStepper
             :steps="[
-              { id: 'cliente', label: 'Cliente' },
+              { id: 'cliente', label: 'Paciente' },
               { id: 'itens', label: 'Itens' },
               { id: 'valores', label: 'Valores' },
               { id: 'pagamentos', label: 'Pagamentos' },
@@ -694,7 +694,7 @@ function simulateLoading() {
                 <NavBadge :count="3" />
               </template>
             </SidebarNavItem>
-            <SidebarNavItem label="Clientes" />
+            <SidebarNavItem label="Pacientes" />
             <SidebarNavItem label="Sair" disabled />
           </div>
         </GlassSurface>
@@ -704,11 +704,11 @@ function simulateLoading() {
         <p class="section-label">Vazio e páginas</p>
         <SurfaceCard :padding="false">
           <EmptyState
-            title="Nenhum cliente ainda"
+            title="Nenhum paciente ainda"
             description="Cadastre o primeiro paciente da clínica."
           >
             <template #action>
-              <Button @click="toast.info('Novo')">Novo cliente</Button>
+              <Button @click="toast.info('Novo')">Novo paciente</Button>
             </template>
           </EmptyState>
         </SurfaceCard>

@@ -23,6 +23,7 @@ import NavBadge from '@/components/ui/NavBadge.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 import { getUnreadNotificationCount } from '@/features/notifications/api'
+import { PAYMENT_CATALOG_PERMISSIONS, paymentCatalogHome } from '@/features/payments/access'
 import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
 
@@ -35,19 +36,27 @@ type ShellNavItem = {
   label: string
   icon: Component
   permission?: string
+  anyPermission?: string[]
   pinMobile?: boolean
   aliases?: string[]
 }
 
 const items = computed(() => {
+  const paymentsHome = paymentCatalogHome((name) => auth.can(name))
   const all: ShellNavItem[] = [
     { to: '/', label: 'Início', icon: LayoutDashboard, pinMobile: true },
-    { to: '/clients', label: 'Clientes', icon: Users, permission: 'clients.view', pinMobile: true },
+    { to: '/clients', label: 'Pacientes', icon: Users, permission: 'clients.view', pinMobile: true },
     { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view' },
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', pinMobile: true },
     { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', pinMobile: true },
-    { to: '/payment-methods', label: 'Pagamentos', icon: CreditCard, permission: 'payment_methods.manage', aliases: ['/card-brands', '/card-operators'] },
+    {
+      to: `/${paymentsHome}`,
+      label: 'Pagamentos',
+      icon: CreditCard,
+      anyPermission: [...PAYMENT_CATALOG_PERMISSIONS],
+      aliases: ['/payment-methods', '/card-brands', '/card-operators'],
+    },
     { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view' },
     { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', pinMobile: true },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
@@ -55,7 +64,15 @@ const items = computed(() => {
     { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view' },
   ]
 
-  return all.filter((item) => !item.permission || auth.can(item.permission) || auth.permissions.length === 0)
+  return all.filter((item) => {
+    if (auth.permissions.length === 0) {
+      return true
+    }
+    if (item.anyPermission?.length) {
+      return item.anyPermission.some((name) => auth.can(name))
+    }
+    return !item.permission || auth.can(item.permission)
+  })
 })
 
 const mobileItems = computed(() => {

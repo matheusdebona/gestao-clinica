@@ -30,7 +30,7 @@ export const routes: RouteRecordRaw[] = [
         {
           path: 'clients',
           name: 'clients',
-          meta: { title: 'Clientes' },
+          meta: { title: 'Pacientes' },
           component: () => import('@/pages/ClientsPage.vue'),
         },
         {

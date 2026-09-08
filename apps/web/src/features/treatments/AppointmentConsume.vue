@@ -256,7 +256,7 @@ const completePending = computed(() => completeMutation.isPending.value)
       A sessão pode ter sido removida ou você não tem permissão.
     </Banner>
 
-    <SurfaceCard v-else-if="isPending || fulfillmentQuery.isPending">
+    <SurfaceCard v-else-if="isPending">
       <Skeleton class="h-6 w-40" />
       <Skeleton class="mt-3 h-5 w-56" />
     </SurfaceCard>
@@ -279,7 +279,7 @@ const completePending = computed(() => completeMutation.isPending.value)
       <SurfaceCard>
         <dl class="flex flex-col gap-4">
           <div>
-            <dt class="text-[13px] text-muted">Cliente</dt>
+            <dt class="text-[13px] text-muted">Paciente</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ appointment.client?.name ?? '—' }}</dd>
           </div>
           <div>
@@ -299,7 +299,15 @@ const completePending = computed(() => completeMutation.isPending.value)
           <p class="mb-3 text-[13px] text-muted">
             Quantidades sugeridas pelo saldo restante. Ajuste ou zere antes de concluir.
           </p>
-          <SurfaceCard v-if="suggestedLines.length === 0" :padding="false">
+          <Banner v-if="fulfillmentQuery.isError" variant="danger" title="Não foi possível carregar o consumo">
+            Tente de novo. Sem o saldo da venda não dá para sugerir as quantidades.
+          </Banner>
+          <SurfaceCard v-else-if="fulfillmentQuery.isPending" :padding="false">
+            <div class="p-5">
+              <Skeleton class="h-10" />
+            </div>
+          </SurfaceCard>
+          <SurfaceCard v-else-if="suggestedLines.length === 0" :padding="false">
             <p class="px-5 py-4 text-[15px] text-muted">Nenhum saldo restante da venda.</p>
           </SurfaceCard>
           <SurfaceCard v-else :padding="false">
@@ -324,8 +332,12 @@ const completePending = computed(() => completeMutation.isPending.value)
               <div v-for="line in extraLines" :key="line.key" class="py-3 first:pt-0 last:pb-0">
                 <ItemLineRow
                   v-model:quantity="line.quantity"
+                  v-model:unit-price="line.charged_amount"
                   :title="line.product_name"
                   :unit="lineUnit(line)"
+                  :show-unit-price="extraKind(line) === 'charged'"
+                  :quantity-id="`extra-qty-${line.key}`"
+                  :price-id="`extra-price-${line.key}`"
                   @remove="removeLine(line.key)"
                 />
                 <FormField label="Tipo" class="mt-2">
@@ -341,6 +353,9 @@ const completePending = computed(() => completeMutation.isPending.value)
                   :methods="methods"
                   :operators="operators"
                   :brands="brands"
+                  :methods-error="paymentsQuery.isError"
+                  :operators-error="operatorsQuery.isError"
+                  :brands-error="brandsQuery.isError"
                 />
               </div>
             </div>
@@ -353,12 +368,18 @@ const completePending = computed(() => completeMutation.isPending.value)
                 placeholder="Nome do produto"
               />
             </FormField>
-            <SurfaceCard v-if="productQuery.isFetching && productQ" :padding="false">
+            <Banner v-if="productQ && productQuery.isError" variant="danger" title="Não foi possível buscar produtos">
+              Tente de novo. Se continuar, confira se você pode ver o catálogo.
+            </Banner>
+            <SurfaceCard v-else-if="productQuery.isPending && productQ" :padding="false">
               <div class="p-5">
                 <Skeleton class="h-10" />
               </div>
             </SurfaceCard>
-            <SurfaceCard v-else-if="productHits.length > 0" :padding="false">
+            <SurfaceCard v-else-if="productQ && productHits.length === 0" :padding="false">
+              <p class="px-5 py-4 text-[15px] text-muted">Nenhum produto encontrado.</p>
+            </SurfaceCard>
+            <SurfaceCard v-else-if="productQ && productHits.length > 0" :padding="false">
               <div class="divide-y divide-border-divider px-5 py-2">
                 <ListCard
                   v-for="product in productHits"

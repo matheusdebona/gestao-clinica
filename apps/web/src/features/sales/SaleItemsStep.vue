@@ -73,6 +73,7 @@ const canSearchProtocols = computed(() => auth.can('protocols.view') || auth.can
 const {
   data: productListData,
   isPending: productsPending,
+  isError: productsError,
 } = useQuery({
   queryKey: ['products', 'sale-pick', productQ],
   queryFn: () => listProducts({ q: productQ.value, page: 1, is_active: true }),
@@ -82,6 +83,7 @@ const {
 const {
   data: protocolListData,
   isPending: protocolsPending,
+  isError: protocolsError,
 } = useQuery({
   queryKey: ['protocols', 'sale-pick', protocolQ],
   queryFn: () => listProtocols({ q: protocolQ.value, page: 1, is_active: true }),
@@ -191,7 +193,13 @@ function itemUnit(item: SaleItemDraft) {
       @search="protocolQ = $event.trim()"
     />
 
-    <SurfaceCard v-if="protocolQ && protocolsPending" :padding="false">
+    <Banner v-if="!canSearchProtocols" variant="warning" title="Sem busca de protocolos">
+      Você precisa ver protocolos para adicioná-los à venda.
+    </Banner>
+    <Banner v-else-if="protocolQ && protocolsError" variant="danger" title="Não foi possível buscar protocolos">
+      Tente de novo. Se continuar, confira se você pode ver o catálogo.
+    </Banner>
+    <SurfaceCard v-else-if="protocolQ && protocolsPending" :padding="false">
       <div class="flex flex-col gap-3 p-5">
         <Skeleton class="h-12" />
       </div>
@@ -199,7 +207,7 @@ function itemUnit(item: SaleItemDraft) {
     <SurfaceCard v-else-if="protocolQ && protocolHits.length === 0" :padding="false">
       <p class="px-5 py-4 text-[15px] text-muted">Nenhum protocolo encontrado.</p>
     </SurfaceCard>
-    <SurfaceCard v-else-if="protocolHits.length > 0" :padding="false">
+    <SurfaceCard v-else-if="protocolQ && protocolHits.length > 0" :padding="false">
       <div class="divide-y divide-border-divider px-5 py-2">
         <ListCard
           v-for="protocol in protocolHits"
@@ -228,6 +236,9 @@ function itemUnit(item: SaleItemDraft) {
     <Banner v-if="!canSearchProducts" variant="warning" title="Sem busca de produtos">
       Você pode cadastrar um produto e voltar para incluí-lo na venda.
     </Banner>
+    <Banner v-else-if="productQ && productsError" variant="danger" title="Não foi possível buscar produtos">
+      Tente de novo. Se continuar, confira se você pode ver o catálogo.
+    </Banner>
     <SurfaceCard v-else-if="productQ && productsPending" :padding="false">
       <div class="flex flex-col gap-3 p-5">
         <Skeleton class="h-12" />
@@ -244,7 +255,7 @@ function itemUnit(item: SaleItemDraft) {
         </PermissionGate>
       </div>
     </SurfaceCard>
-    <SurfaceCard v-else-if="productHits.length > 0" :padding="false">
+    <SurfaceCard v-else-if="productQ && productHits.length > 0" :padding="false">
       <div class="divide-y divide-border-divider px-5 py-2">
         <ListCard
           v-for="product in productHits"

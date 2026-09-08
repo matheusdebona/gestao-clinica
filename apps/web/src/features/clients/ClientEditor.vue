@@ -45,7 +45,7 @@ const { mutate: save, isPending: saving } = useMutation({
     return createClient(payload)
   },
   onSuccess: async (client) => {
-    toast.success(isEdit.value ? 'Cliente atualizado' : 'Cliente cadastrado')
+    toast.success(isEdit.value ? 'Paciente atualizado' : 'Paciente cadastrado')
     await queryClient.invalidateQueries({ queryKey: ['clients'] })
     await router.push({ name: 'clients-show', params: { id: String(client.id) } })
   },
@@ -81,16 +81,16 @@ function onCancel() {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader
-      :title="isEdit ? 'Editar cliente' : 'Novo cliente'"
+      :title="isEdit ? 'Editar paciente' : 'Novo paciente'"
       :description="isEdit ? client?.name : 'Cadastro na clínica atual.'"
     />
 
     <Banner v-if="!allowed" variant="danger" title="Sem permissão">
-      Você não pode {{ isEdit ? 'editar' : 'criar' }} clientes.
+      Você não pode {{ isEdit ? 'editar' : 'criar' }} pacientes.
     </Banner>
 
     <Banner v-else-if="isEdit && clientError" variant="danger" title="Não encontrado">
-      Este cliente não está disponível.
+      Este paciente não está disponível.
     </Banner>
 
     <SurfaceCard v-else-if="isEdit && clientPending">

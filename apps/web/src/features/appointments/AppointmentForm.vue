@@ -78,9 +78,9 @@ const selectedTreatment = computed(() =>
 const durationHint = computed(() => {
   const minutes = selectedTreatment.value?.client?.service_duration_minutes
   if (minutes) {
-    return `Padrão do cliente: ${minutes} min. Vazio usa esse valor (ou 60 min).`
+    return `Padrão do paciente: ${minutes} min. Vazio usa esse valor (ou 60 min).`
   }
-  return 'Vazio usa a duração do cliente ou 60 minutos.'
+  return 'Vazio usa a duração do paciente ou 60 minutos.'
 })
 
 watch(

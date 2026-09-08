@@ -19,6 +19,8 @@ class SalePaymentResource extends JsonResource
             'installments' => $this->installments,
             'paid_at' => $this->paid_at,
             'payment_method' => PaymentMethodResource::make($this->whenLoaded('paymentMethod')),
+            'card_operator' => CardOperatorResource::make($this->whenLoaded('cardOperator')),
+            'card_brand' => CardBrandResource::make($this->whenLoaded('cardBrand')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

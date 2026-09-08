@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
@@ -204,7 +205,7 @@ function goBack() {
             <dd class="mt-0.5 text-[15px] text-title">{{ APPOINTMENT_STATUS_LABELS[appointment.status] }}</dd>
           </div>
           <div>
-            <dt class="text-[13px] text-muted">Cliente</dt>
+            <dt class="text-[13px] text-muted">Paciente</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ appointment.client?.name ?? '—' }}</dd>
           </div>
           <div>
@@ -238,7 +239,7 @@ function goBack() {
           </div>
           <div v-if="appointment.status === 'completed'">
             <dt class="text-[13px] text-muted">Custo da sessão</dt>
-            <dd class="mt-0.5 text-[15px] text-title">{{ formatBRL(appointment.total_cost) }}</dd>
+            <dd class="mt-0.5"><MoneyDisplay :value="appointment.total_cost" /></dd>
           </div>
         </dl>
       </SurfaceCard>

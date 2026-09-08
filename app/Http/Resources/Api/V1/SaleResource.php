@@ -12,7 +12,16 @@ class SaleResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $this->resource->loadMissing(['items.product.unitOfMeasure', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser', 'treatment']);
+        $this->resource->loadMissing([
+            'items.product.unitOfMeasure',
+            'items.sourceProtocol',
+            'payments.paymentMethod',
+            'payments.cardOperator',
+            'payments.cardBrand',
+            'client',
+            'soldByUser',
+            'treatment',
+        ]);
 
         $minAmount = $this->minAmount();
         $costTotal = $this->costTotal();

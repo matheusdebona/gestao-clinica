@@ -83,7 +83,7 @@ function goCampaigns() {
     </PageHeader>
 
     <Banner v-if="origin && !origin.is_active" variant="warning" title="Inativa">
-      Esta origem está desativada. Clientes já atribuídos continuam com o vínculo.
+      Esta origem está desativada. Pacientes já atribuídos continuam com o vínculo.
     </Banner>
     <Banner v-if="isError" variant="danger" title="Não encontrado">Origem indisponível.</Banner>
     <SurfaceCard v-else-if="isPending">
@@ -105,7 +105,7 @@ function goCampaigns() {
     <ConfirmDialog
       v-model:open="confirmOpen"
       title="Desativar esta origem?"
-      description="Clientes já atribuídos não perdem o vínculo. A origem some das listas ativas."
+      description="Pacientes já atribuídos não perdem o vínculo. A origem some das listas ativas."
       confirm-label="Desativar"
       @confirm="deactivateMutation.mutate()"
     />

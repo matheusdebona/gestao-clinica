@@ -39,6 +39,8 @@ export interface SalePayment {
   installments: number | null
   paid_at: string | null
   payment_method?: PaymentMethod | null
+  card_operator?: CardOperator | null
+  card_brand?: CardBrand | null
   created_at: string
   updated_at: string
 }

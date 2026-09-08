@@ -78,7 +78,7 @@ function clientMeta(client: Client) {
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader title="Clientes" :description="total ? `${total} na clínica` : undefined">
+    <PageHeader title="Pacientes" :description="total ? `${total} na clínica` : undefined">
       <template #actions>
         <PermissionGate permission="clients.create">
           <Button @click="goNew">Novo</Button>
@@ -87,7 +87,7 @@ function clientMeta(client: Client) {
     </PageHeader>
 
     <Banner v-if="!auth.can('clients.view')" variant="danger" title="Sem permissão">
-      Você não pode ver a lista de clientes.
+      Você não pode ver a lista de pacientes.
     </Banner>
 
     <template v-else>
@@ -111,12 +111,12 @@ function clientMeta(client: Client) {
 
       <SurfaceCard v-else-if="clients.length === 0" :padding="false">
         <EmptyState
-          :title="q ? 'Nenhum cliente encontrado' : 'Nenhum cliente ainda'"
+          :title="q ? 'Nenhum paciente encontrado' : 'Nenhum paciente ainda'"
           :description="q ? 'Tente outro nome ou WhatsApp.' : 'Cadastre o primeiro paciente da clínica.'"
         >
           <template v-if="!q" #action>
             <PermissionGate permission="clients.create">
-              <Button @click="goNew">Novo cliente</Button>
+              <Button @click="goNew">Novo paciente</Button>
             </PermissionGate>
           </template>
         </EmptyState>

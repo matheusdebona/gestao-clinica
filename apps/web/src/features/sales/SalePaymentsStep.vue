@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
+import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import IconButton from '@/components/ui/IconButton.vue'
@@ -26,6 +27,9 @@ const props = defineProps<{
   operators: CardOperator[]
   brands: CardBrand[]
   error?: string
+  methodsError?: boolean
+  operatorsError?: boolean
+  brandsError?: boolean
 }>()
 
 const methodOptions = computed(() =>
@@ -64,6 +68,16 @@ function removePayment(key: string) {
     <p class="text-[13px] text-muted">
       A soma dos pagamentos precisa fechar o valor efetivo. Sem pagamento parcial nesta etapa.
     </p>
+
+    <Banner v-if="methodsError" variant="danger" title="Não foi possível carregar os métodos">
+      Sem o catálogo de pagamentos não dá para lançar esta etapa. Tente de novo.
+    </Banner>
+    <Banner v-if="operatorsError" variant="danger" title="Não foi possível carregar as operadoras">
+      Cartão exige operadora. Tente de novo.
+    </Banner>
+    <Banner v-if="brandsError" variant="danger" title="Não foi possível carregar as bandeiras">
+      Cartão exige bandeira. Tente de novo.
+    </Banner>
 
     <SurfaceCard>
       <dl class="flex flex-col gap-3">

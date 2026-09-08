@@ -113,7 +113,7 @@ function budgetMeta(budget: Budget) {
           <ListCard
             v-for="budget in budgets"
             :key="budget.id"
-            :title="budget.client?.name ?? `Cliente #${budget.client_id}`"
+            :title="budget.client?.name ?? `Paciente #${budget.client_id}`"
             :meta="budgetMeta(budget)"
             :badge="BUDGET_STATUS_LABELS[budget.status]"
             :badge-variant="BUDGET_STATUS_BADGE[budget.status]"

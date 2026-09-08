@@ -1,13 +1,48 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import { PAYMENT_CATALOG_PERMISSIONS, paymentCatalogHome } from '@/features/payments/access'
 import { useAuthStore } from '@/stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
+
+const shortcuts = computed(() => {
+  const items: { title: string; meta: string; to: { name: string } }[] = []
+  if (auth.can('sales.create')) {
+    items.push({
+      title: 'Nova venda',
+      meta: 'Paciente, itens, pagamentos e confirmação',
+      to: { name: 'sales-new' },
+    })
+  }
+  if (auth.can('appointments.view')) {
+    items.push({
+      title: 'Agenda',
+      meta: 'Sessões, retornos e o dia da clínica',
+      to: { name: 'appointments' },
+    })
+  }
+  if (auth.can('clients.view')) {
+    items.push({
+      title: 'Pacientes',
+      meta: 'Cadastro, WhatsApp e origem',
+      to: { name: 'clients' },
+    })
+  }
+  if (auth.can('treatments.view')) {
+    items.push({
+      title: 'Tratamentos',
+      meta: 'Casos clínicos e consumo de sessão',
+      to: { name: 'treatments' },
+    })
+  }
+  return items
+})
 
 function openMetrics() {
   void router.push({ name: 'metrics' })
@@ -18,7 +53,11 @@ function openAlerts() {
 }
 
 function openPayments() {
-  void router.push({ name: 'payment-methods' })
+  void router.push({ name: paymentCatalogHome((name) => auth.can(name)) })
+}
+
+function openShortcut(to: { name: string }) {
+  void router.push(to)
 }
 </script>
 
@@ -39,7 +78,7 @@ function openPayments() {
         </div>
       </SurfaceCard>
     </PermissionGate>
-    <PermissionGate permission="payment_methods.manage">
+    <PermissionGate :permission="[...PAYMENT_CATALOG_PERMISSIONS]" mode="any">
       <SurfaceCard :padding="false">
         <div class="px-5 py-2">
           <ListCard
@@ -61,11 +100,16 @@ function openPayments() {
         </div>
       </SurfaceCard>
     </PermissionGate>
-    <SurfaceCard>
-      <h2>Em construção</h2>
-      <p class="mt-2 text-[15px] text-muted">
-        O menu já segue o visual da aplicação. As áreas clínicas entram na próxima etapa.
-      </p>
+    <SurfaceCard v-if="shortcuts.length" :padding="false">
+      <div class="divide-y divide-border-divider px-5 py-2">
+        <ListCard
+          v-for="item in shortcuts"
+          :key="item.title"
+          :title="item.title"
+          :meta="item.meta"
+          @action="openShortcut(item.to)"
+        />
+      </div>
     </SurfaceCard>
   </div>
 </template>

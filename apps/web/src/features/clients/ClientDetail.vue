@@ -2,6 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
@@ -11,7 +12,6 @@ import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import AttributionShortcuts from '@/features/clients/AttributionShortcuts.vue'
 import { deactivateClient, getClient, updateClient } from '@/features/clients/api'
-import { formatBRL } from '@/lib/formatters'
 import { formatPhoneBR } from '@/lib/masks'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
@@ -35,7 +35,7 @@ const { data: client, isPending, isError } = useQuery({
 const deactivateMutation = useMutation({
   mutationFn: () => deactivateClient(props.clientId),
   onSuccess: async () => {
-    toast.success('Cliente desativado')
+    toast.success('Paciente desativado')
     await queryClient.invalidateQueries({ queryKey: ['clients'] })
     await router.push({ name: 'clients' })
   },
@@ -51,7 +51,7 @@ const deactivateMutation = useMutation({
 const { mutate: reactivate, isPending: reactivating } = useMutation({
   mutationFn: () => updateClient(props.clientId, { is_active: true }),
   onSuccess: async () => {
-    toast.success('Cliente reativado')
+    toast.success('Paciente reativado')
     await queryClient.invalidateQueries({ queryKey: ['clients'] })
   },
   onError: (error) => {
@@ -78,7 +78,7 @@ function onConfirmDeactivate() {
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader :title="client?.name ?? 'Cliente'">
+    <PageHeader :title="client?.name ?? 'Paciente'">
       <template #actions>
         <Button variant="ghost" @click="goBack">Voltar</Button>
         <PermissionGate v-if="client?.is_active" permission="clients.update">
@@ -102,11 +102,11 @@ function onConfirmDeactivate() {
     <AttributionShortcuts />
 
     <Banner v-if="client && !client.is_active" variant="warning" title="Inativo">
-      Este cliente está desativado e não aparece na lista padrão.
+      Este paciente está desativado e não aparece na lista padrão.
     </Banner>
 
     <Banner v-if="isError" variant="danger" title="Não foi possível carregar">
-      O cliente pode ter sido removido ou você não tem permissão.
+      O paciente pode ter sido removido ou você não tem permissão.
     </Banner>
 
     <SurfaceCard v-else-if="isPending">
@@ -133,8 +133,8 @@ function onConfirmDeactivate() {
         </div>
         <div>
           <dt class="text-[13px] text-muted">Valor da avaliação</dt>
-          <dd class="mt-0.5 text-[15px] text-title">
-            {{ formatBRL(client.initial_consultation_amount) }}
+          <dd class="mt-0.5">
+            <MoneyDisplay :value="client.initial_consultation_amount" />
           </dd>
         </div>
         <div>
@@ -164,7 +164,7 @@ function onConfirmDeactivate() {
 
     <ConfirmDialog
       v-model:open="confirmOpen"
-      title="Desativar este cliente?"
+      title="Desativar este paciente?"
       description="O cadastro permanece no histórico. Você pode reativar depois."
       confirm-label="Desativar"
       @confirm="onConfirmDeactivate"

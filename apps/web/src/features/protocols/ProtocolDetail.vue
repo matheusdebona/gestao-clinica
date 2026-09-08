@@ -118,8 +118,8 @@ function itemUnit(item: {
 
     <template v-else-if="protocol">
       <SurfaceCard>
-        <dl class="flex flex-col gap-4">
-          <div>
+        <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+          <div class="sm:col-span-2">
             <dt class="text-[13px] text-muted">Descrição</dt>
             <dd class="mt-0.5 whitespace-pre-wrap text-[15px] text-title">
               {{ protocol.description || '—' }}

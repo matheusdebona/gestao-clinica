@@ -201,7 +201,7 @@ function onClientSearch(value: string) {
 
       <ClientSearchBar
         v-model="searchInput"
-        placeholder="Filtrar por cliente"
+        placeholder="Filtrar por paciente"
         @search="onClientSearch"
       />
 
@@ -235,7 +235,7 @@ function onClientSearch(value: string) {
             <AgendaEventCard
               v-for="item in eventsOn(cursor)"
               :key="item.id"
-              :title="item.client?.name ?? `Cliente #${item.client_id}`"
+              :title="item.client?.name ?? `Paciente #${item.client_id}`"
               :meta="eventMeta(item)"
               :badge="APPOINTMENT_STATUS_LABELS[item.status]"
               :badge-variant="APPOINTMENT_STATUS_BADGE[item.status]"
@@ -262,7 +262,7 @@ function onClientSearch(value: string) {
             <AgendaEventCard
               v-for="item in eventsOn(day)"
               :key="item.id"
-              :title="item.client?.name ?? `Cliente #${item.client_id}`"
+              :title="item.client?.name ?? `Paciente #${item.client_id}`"
               :meta="eventMeta(item)"
               :badge="APPOINTMENT_STATUS_LABELS[item.status]"
               :badge-variant="APPOINTMENT_STATUS_BADGE[item.status]"

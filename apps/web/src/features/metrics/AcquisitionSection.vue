@@ -38,7 +38,7 @@ const rankMax = computed(() => maxNumeric(ranked.value.map((row) => row.sales_re
     </div>
 
     <p class="text-[13px] text-muted">
-      Conversão lifetime: cliente cadastrado no período com pelo menos uma venda confirmada depois
+      Conversão lifetime: paciente cadastrado no período com pelo menos uma venda confirmada depois
       do cadastro.
     </p>
 
@@ -56,7 +56,7 @@ const rankMax = computed(() => maxNumeric(ranked.value.map((row) => row.sales_re
 
     <template v-else-if="data">
       <div class="grid grid-cols-2 gap-3">
-        <MetricCard label="Novos clientes" :hint="`${data.kpis.converted_clients} converteram`">
+        <MetricCard label="Novos pacientes" :hint="`${data.kpis.converted_clients} converteram`">
           {{ data.kpis.new_clients }}
         </MetricCard>
         <MetricCard label="Receita de consulta">
@@ -71,7 +71,7 @@ const rankMax = computed(() => maxNumeric(ranked.value.map((row) => row.sales_re
         <EmptyState
           v-if="ranked.length === 0"
           title="Sem cadastros"
-          description="Nenhum cliente novo neste período."
+          description="Nenhum paciente novo neste período."
         />
         <div v-else class="mt-2 divide-y divide-border-divider">
           <RankBar
@@ -80,7 +80,7 @@ const rankMax = computed(() => maxNumeric(ranked.value.map((row) => row.sales_re
             :label="row.label"
             :meta="[
               row.origin_label,
-              `${row.new_clients} clientes`,
+              `${row.new_clients} pacientes`,
               formatPercent(row.conversion_rate),
             ]
               .filter(Boolean)

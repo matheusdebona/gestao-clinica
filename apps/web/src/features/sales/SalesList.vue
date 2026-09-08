@@ -100,7 +100,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhuma venda encontrada' : 'Nenhu
 
       <ClientSearchBar
         v-model="searchInput"
-        placeholder="Nome ou WhatsApp do cliente"
+        placeholder="Nome ou WhatsApp do paciente"
         @search="onSearch"
       />
 
@@ -123,7 +123,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhuma venda encontrada' : 'Nenhu
       <SurfaceCard v-else-if="sales.length === 0" :padding="false">
         <EmptyState
           :title="emptyTitle"
-          :description="q || status ? 'Tente outro cliente ou situação.' : 'Monte a primeira venda da clínica.'"
+          :description="q || status ? 'Tente outro paciente ou situação.' : 'Monte a primeira venda da clínica.'"
         >
           <template v-if="!q && !status" #action>
             <PermissionGate permission="sales.create">
@@ -138,7 +138,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhuma venda encontrada' : 'Nenhu
           <ListCard
             v-for="sale in sales"
             :key="sale.id"
-            :title="sale.client?.name ?? `Cliente #${sale.client_id}`"
+            :title="sale.client?.name ?? `Paciente #${sale.client_id}`"
             :meta="saleMeta(sale)"
             :badge="SALE_STATUS_LABELS[sale.status]"
             :badge-variant="SALE_STATUS_BADGE[sale.status]"

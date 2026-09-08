@@ -3,6 +3,7 @@ import { z } from 'zod'
 import type { UserPayload } from '@/types/team-user'
 
 export const ROLE_LABELS: Record<string, string> = {
+  admin: 'Administrador',
   receptionist: 'Recepção',
   seller: 'Vendas',
   stock: 'Estoque',
@@ -10,10 +11,10 @@ export const ROLE_LABELS: Record<string, string> = {
 }
 
 export const ROLE_SUMMARIES: Record<string, string> = {
-  receptionist: 'Clientes, orçamentos, criar vendas, agenda e ver documentos.',
-  seller: 'Clientes, vendas completas, orçamentos e meios de pagamento.',
+  receptionist: 'Pacientes, orçamentos, criar vendas, agenda e ver documentos.',
+  seller: 'Pacientes, vendas completas, orçamentos e meios de pagamento.',
   stock: 'Produtos, estoque, catálogo (tipos/marcas/unidades) e upload de arquivos.',
-  professional: 'Clientes, tratamentos, consumo de sessão, agenda e documentos.',
+  professional: 'Pacientes, tratamentos, consumo de sessão, agenda e documentos.',
 }
 
 export const PERMISSION_LABELS: Record<string, string> = {
@@ -40,11 +41,11 @@ export const PERMISSION_LABELS: Record<string, string> = {
   'protocols.create': 'Criar protocolos',
   'protocols.update': 'Editar protocolos',
   'protocols.delete': 'Excluir protocolos',
-  'clients.view': 'Ver clientes',
-  'clients.create': 'Criar clientes',
-  'clients.update': 'Editar clientes',
-  'clients.delete': 'Desativar clientes',
-  'client_origins.manage': 'Origens de cliente',
+  'clients.view': 'Ver pacientes',
+  'clients.create': 'Criar pacientes',
+  'clients.update': 'Editar pacientes',
+  'clients.delete': 'Desativar pacientes',
+  'client_origins.manage': 'Origens de paciente',
   'campaigns.manage': 'Campanhas',
   'payment_methods.manage': 'Formas de pagamento',
   'card_operators.manage': 'Operadoras de cartão',
