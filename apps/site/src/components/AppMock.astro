@@ -1,0 +1,38 @@
+---
+interface Props {
+  caption?: string
+  tone?: 'light' | 'dark'
+}
+
+const { caption = 'HOF Pay', tone = 'light' } = Astro.props
+---
+
+<div
+  class:list={[
+    'overflow-hidden rounded-xl',
+    tone === 'dark' ? 'glass-dark shadow-glass-dark' : 'glass-regular shadow-card',
+  ]}
+>
+  <div
+    class:list={[
+      'flex items-center gap-1.5 border-b px-3 py-2',
+      tone === 'dark' ? 'border-white/10' : 'border-border-divider',
+    ]}
+  >
+    <span class:list={['size-1.5 rounded-full', tone === 'dark' ? 'bg-inverse/25' : 'bg-muted/50']}
+    ></span>
+    <span class:list={['size-1.5 rounded-full', tone === 'dark' ? 'bg-inverse/25' : 'bg-muted/50']}
+    ></span>
+    <span class:list={['size-1.5 rounded-full', tone === 'dark' ? 'bg-inverse/25' : 'bg-muted/50']}
+    ></span>
+    <span
+      class:list={[
+        'ml-2 text-[11px] font-medium tracking-[-0.01em]',
+        tone === 'dark' ? 'text-inverse/45' : 'text-muted',
+      ]}>{caption}</span
+    >
+  </div>
+  <div class="p-3">
+    <slot />
+  </div>
+</div>
