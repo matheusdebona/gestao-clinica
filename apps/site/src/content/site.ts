@@ -82,11 +82,6 @@ export const faqs = [
     a: 'O app da clínica é mobile-first. Médico e secretária usam no dia a dia, não só no computador da recepção.',
   },
   {
-    id: 'dados',
-    q: 'Os dados da minha clínica se misturam com os de outra?',
-    a: 'Não. Os dados de cada clínica ficam separados: produtos, clientes, agenda e números não se misturam.',
-  },
-  {
     id: 'estoque',
     q: 'A venda já baixa o estoque?',
     a: 'Não. A venda e o contrato acontecem primeiro. A baixa é no tratamento, quando o médico informa o que foi de fato aplicado.',
@@ -172,8 +167,6 @@ Clínicas (estética, dermatologia, harmonização, odontologia, procedimentos i
 - Clientes: cadastro, origem e campanhas.
 - Agenda: sessões e retornos.
 - Métricas: margem, comercial e operação.
-
-Os dados de cada clínica ficam separados.
 
 ## Preço
 

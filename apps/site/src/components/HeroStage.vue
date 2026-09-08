@@ -66,7 +66,7 @@ useGsapIsland(root, ({ gsap, reduceMotion }) => {
           <a class="site-cta-secondary glass-dark text-inverse" :href="APP_LOGIN_URL">Já tenho acesso</a>
         </div>
         <p class="mt-5 text-[13px] text-inverse/55">
-          Sem planilha paralela. Sem misturar clínicas. A baixa de estoque só acontece quando o tratamento acontece.
+          Sem planilha paralela. A baixa de estoque só acontece quando o tratamento acontece.
         </p>
       </div>
 
