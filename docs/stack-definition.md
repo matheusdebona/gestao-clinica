@@ -50,7 +50,7 @@ Business domain (products, protocols, sales, treatments, clients, payments, mult
 - **Laravel 13 + PHP 8.5** — current supported line; good fit for a greenfield API.
 - **Sanctum** — lighter than Passport for first-party apps; covers SPA cookie auth and mobile/API tokens without OAuth complexity.
 - **Spatie Permission** — mature permission + optional role model; gates integrate with `$user->can()` and route middleware. Fits “check permission X at this endpoint,” not “is role Y?”.
-- **PostgreSQL 18** — strong relational defaults for clinical data, JSON when needed, solid concurrency.
+- **PostgreSQL 18** — strong relational defaults for clinical data, JSON when needed, solid concurrency. Text search (`?q=`) is case- and accent-insensitive via the `unaccent` extension (`CREATE EXTENSION IF NOT EXISTS unaccent` in migrations; enable it on managed Postgres if the role cannot create extensions).
 - **Redis** — cache, queues, and throttling from day one.
 - **MinIO** — same S3 API as AWS/GCS/R2 later; only credentials and endpoint change.
 

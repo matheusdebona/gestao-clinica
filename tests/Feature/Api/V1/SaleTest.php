@@ -378,6 +378,31 @@ class SaleTest extends TestCase
         $this->assertSame([$namedSaleId], collect($byWhatsapp->json('data'))->pluck('id')->all());
     }
 
+    public function test_can_search_sales_by_client_name_accent_insensitively(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        $named = Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'José Silva',
+            'whatsapp' => '11988887777',
+        ]);
+        $other = Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'Carlos Souza',
+            'whatsapp' => '21911112222',
+        ]);
+
+        $namedSaleId = $this->postJson('/api/v1/sales', [
+            'client_id' => $named->id,
+        ])->assertCreated()->json('data.id');
+
+        $this->postJson('/api/v1/sales', [
+            'client_id' => $other->id,
+        ])->assertCreated();
+
+        $byName = $this->getJson('/api/v1/sales?q=jose')->assertOk();
+        $this->assertSame([$namedSaleId], collect($byName->json('data'))->pluck('id')->all());
+    }
+
     public function test_can_filter_sales_by_status_and_client_id(): void
     {
         Sanctum::actingAs($this->admin);

@@ -107,6 +107,33 @@ class ClientTest extends TestCase
         $this->assertSame(['Ana Souza'], collect($byUpper->json('data'))->pluck('name')->all());
     }
 
+    public function test_can_search_clients_by_name_accent_insensitively(): void
+    {
+        Sanctum::actingAs($this->admin);
+        CurrentClinic::setId($this->clinic->id);
+
+        Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'José Silva',
+            'whatsapp' => '11911112222',
+        ]);
+        Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'Bruno Lima',
+            'whatsapp' => '11933334444',
+        ]);
+
+        $otherClinic = Clinic::factory()->create();
+        Client::factory()->forClinic($otherClinic)->create([
+            'name' => 'José Outra Clínica',
+            'whatsapp' => '11999990000',
+        ]);
+
+        $byPlain = $this->getJson('/api/v1/clients?q=jose')->assertOk();
+        $this->assertSame(['José Silva'], collect($byPlain->json('data'))->pluck('name')->all());
+
+        $byAccent = $this->getJson('/api/v1/clients?q='.urlencode('José'))->assertOk();
+        $this->assertSame(['José Silva'], collect($byAccent->json('data'))->pluck('name')->all());
+    }
+
     public function test_can_update_and_deactivate_client(): void
     {
         Sanctum::actingAs($this->admin);
