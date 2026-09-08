@@ -55,7 +55,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 
-const step = ref(props.saleId ? SALE_WIZARD_STEP.items : SALE_WIZARD_STEP.client)
+const step = ref<number>(props.saleId ? SALE_WIZARD_STEP.items : SALE_WIZARD_STEP.client)
 const saving = ref(false)
 const clientSearch = ref('')
 const clientQ = ref('')
