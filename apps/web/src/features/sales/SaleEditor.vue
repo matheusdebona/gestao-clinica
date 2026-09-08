@@ -32,7 +32,7 @@ function goBack() {
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader
       :title="isEdit ? 'Continuar venda' : 'Nova venda'"
-      description="Cliente, itens, valor, pagamentos e confirmação."
+      description="Paciente, itens, valor, pagamentos e confirmação."
     >
       <template #actions>
         <Button variant="ghost" @click="goBack">Voltar</Button>

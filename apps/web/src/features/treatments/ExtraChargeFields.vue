@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import Banner from '@/components/ui/Banner.vue'
 import FormField from '@/components/ui/FormField.vue'
-import MoneyInput from '@/components/ui/MoneyInput.vue'
 import Select from '@/components/ui/Select.vue'
 import type { ConsumptionDraft } from '@/features/treatments/consumptions'
 import type { CardBrand, CardOperator, PaymentMethod } from '@/types/sale'
@@ -11,6 +11,9 @@ const props = defineProps<{
   methods: PaymentMethod[]
   operators: CardOperator[]
   brands: CardBrand[]
+  methodsError?: boolean
+  operatorsError?: boolean
+  brandsError?: boolean
 }>()
 
 const methodOptions = computed(() =>
@@ -43,12 +46,15 @@ function methodFor(id: string) {
 
 <template>
   <div class="mt-3 flex flex-col gap-3">
-    <FormField label="Valor cobrado" :html-for="`extra-amount-${line.key}`">
-      <MoneyInput
-        :id="`extra-amount-${line.key}`"
-        v-model="line.charged_amount"
-      />
-    </FormField>
+    <Banner v-if="methodsError" variant="danger" title="Não foi possível carregar os métodos">
+      Sem o catálogo de pagamentos não dá para cobrar o extra. Tente de novo.
+    </Banner>
+    <Banner v-if="operatorsError" variant="danger" title="Não foi possível carregar as operadoras">
+      Cartão exige operadora. Tente de novo.
+    </Banner>
+    <Banner v-if="brandsError" variant="danger" title="Não foi possível carregar as bandeiras">
+      Cartão exige bandeira. Tente de novo.
+    </Banner>
     <FormField label="Método" :html-for="`extra-method-${line.key}`">
       <Select
         :id="`extra-method-${line.key}`"

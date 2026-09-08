@@ -13,7 +13,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { cancelSale, getSale } from '@/features/sales/api'
-import { SALE_STATUS_BADGE, SALE_STATUS_LABELS } from '@/features/sales/labels'
+import { SALE_STATUS_BADGE, SALE_STATUS_LABELS, salePaymentSummary } from '@/features/sales/labels'
 import SaleBudgetsPanel from '@/features/sales/SaleBudgetsPanel.vue'
 import { startTreatment } from '@/features/treatments/api'
 import { formatDateTime, formatQty } from '@/lib/formatters'
@@ -121,7 +121,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
       <SurfaceCard>
         <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
           <div>
-            <dt class="text-[13px] text-muted">Cliente</dt>
+            <dt class="text-[13px] text-muted">Paciente</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ sale.client?.name }}</dd>
           </div>
           <div>
@@ -194,7 +194,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
           <ul class="flex flex-col gap-3">
             <li v-for="payment in payments" :key="payment.id" class="flex items-center justify-between gap-3">
               <span class="text-[15px] text-title">
-                {{ payment.payment_method?.name ?? 'Pagamento' }}
+                {{ salePaymentSummary(payment) }}
               </span>
               <MoneyDisplay :value="payment.amount" />
             </li>

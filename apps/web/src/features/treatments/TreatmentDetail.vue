@@ -19,7 +19,7 @@ import {
   getTreatmentFulfillment,
 } from '@/features/treatments/api'
 import { TREATMENT_STATUS_LABELS } from '@/features/treatments/labels'
-import { formatBRL, formatDateTime, formatQty } from '@/lib/formatters'
+import { formatDateTime, formatQty } from '@/lib/formatters'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import type { TreatmentSessionSummary } from '@/types/treatment'
@@ -160,7 +160,7 @@ function sessionMeta(item: TreatmentSessionSummary) {
             <dd class="mt-0.5 text-[15px] text-title">{{ TREATMENT_STATUS_LABELS[treatment.status] }}</dd>
           </div>
           <div>
-            <dt class="text-[13px] text-muted">Cliente</dt>
+            <dt class="text-[13px] text-muted">Paciente</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ treatment.client?.name ?? '—' }}</dd>
           </div>
           <div>
@@ -187,7 +187,10 @@ function sessionMeta(item: TreatmentSessionSummary) {
 
       <div>
         <h2 class="mb-3">Consumo</h2>
-        <SurfaceCard v-if="fulfillmentQuery.isPending">
+        <Banner v-if="fulfillmentQuery.isError" variant="danger" title="Não foi possível carregar o consumo">
+          Tente de novo. Sem o saldo da venda o restante fica indisponível.
+        </Banner>
+        <SurfaceCard v-else-if="fulfillmentQuery.isPending">
           <Skeleton class="h-5 w-48" />
         </SurfaceCard>
         <SurfaceCard v-else-if="fulfillmentItems.length === 0" :padding="false">
@@ -233,8 +236,9 @@ function sessionMeta(item: TreatmentSessionSummary) {
                   {{ sessionStatusLabel(item.status) }}
                 </p>
                 <p class="mt-0.5 text-[13px] text-muted">{{ sessionMeta(item) }}</p>
-                <p v-if="item.status === 'completed'" class="mt-0.5 text-[13px] text-muted">
-                  Custo {{ formatBRL(item.total_cost) }}
+                <p v-if="item.status === 'completed'" class="mt-0.5">
+                  <span class="text-[13px] text-muted">Custo </span>
+                  <MoneyDisplay :value="item.total_cost" />
                 </p>
               </div>
               <div class="flex flex-wrap gap-2">

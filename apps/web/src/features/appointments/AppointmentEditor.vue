@@ -101,6 +101,14 @@ function onCancel() {
     </SurfaceCard>
 
     <Banner
+      v-else-if="treatmentsQuery.isError"
+      variant="danger"
+      title="Não foi possível carregar tratamentos"
+    >
+      Tente de novo. Sem a lista de tratamentos abertos não dá para agendar.
+    </Banner>
+
+    <Banner
       v-else-if="openTreatments.length === 0"
       variant="warning"
       title="Nenhum tratamento aberto"

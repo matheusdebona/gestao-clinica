@@ -84,7 +84,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhum tratamento encontrado' : 'N
     <template v-else>
       <ClientSearchBar
         v-model="searchInput"
-        placeholder="Nome ou WhatsApp do cliente"
+        placeholder="Nome ou WhatsApp do paciente"
         @search="onSearch"
       />
 
@@ -107,7 +107,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhum tratamento encontrado' : 'N
       <SurfaceCard v-else-if="treatments.length === 0" :padding="false">
         <EmptyState
           :title="emptyTitle"
-          :description="q || status ? 'Tente outro cliente ou situação.' : 'Abra um tratamento a partir de uma venda confirmada.'"
+          :description="q || status ? 'Tente outro paciente ou situação.' : 'Abra um tratamento a partir de uma venda confirmada.'"
         />
       </SurfaceCard>
 
@@ -116,7 +116,7 @@ const emptyTitle = computed(() => (q.value ? 'Nenhum tratamento encontrado' : 'N
           <ListCard
             v-for="treatment in treatments"
             :key="treatment.id"
-            :title="treatment.client?.name ?? `Cliente #${treatment.client_id}`"
+            :title="treatment.client?.name ?? `Paciente #${treatment.client_id}`"
             :meta="treatmentMeta(treatment)"
             :badge="TREATMENT_STATUS_LABELS[treatment.status]"
             :badge-variant="TREATMENT_STATUS_BADGE[treatment.status]"

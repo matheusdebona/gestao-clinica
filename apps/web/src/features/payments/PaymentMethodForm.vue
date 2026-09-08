@@ -38,7 +38,7 @@ const [name, nameAttrs] = defineField('name')
 const [code, codeAttrs] = defineField('code')
 const [kind] = defineField('kind')
 const [feePercent, feePercentAttrs] = defineField('fee_percent')
-const [feeFixed] = defineField('fee_fixed')
+const [feeFixed, feeFixedAttrs] = defineField('fee_fixed')
 const [isActive] = defineField('is_active')
 
 const isCardKind = computed(() => CARD_KINDS.has(kind.value ?? ''))
@@ -131,7 +131,12 @@ defineExpose({ setErrors })
         html-for="method-fee-fixed"
       >
         <template #default="{ invalid }">
-          <MoneyInput id="method-fee-fixed" v-model="feeFixed" :invalid="invalid" />
+          <MoneyInput
+            id="method-fee-fixed"
+            v-model="feeFixed"
+            v-bind="feeFixedAttrs"
+            :invalid="invalid"
+          />
         </template>
       </FormField>
     </template>

@@ -2,6 +2,7 @@
 import { useForm } from 'vee-validate'
 import { computed, ref, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
+import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
 import FormField from '@/components/ui/FormField.vue'
@@ -192,6 +193,9 @@ defineExpose({
       hint="Cada papel é um pacote de permissões. O e-mail precisa ser único na plataforma."
     >
       <div class="glass-clear flex flex-col gap-3 rounded-[12px] px-3 py-3">
+        <Banner v-if="rolesQuery.isError" variant="danger" title="Não foi possível carregar os papéis">
+          Tente de novo. Sem a lista de papéis não dá para atribuir permissões.
+        </Banner>
         <p v-if="rolesLocked" class="text-[13px] text-muted">
           O administrador da clínica não pode ter os papéis alterados.
         </p>
@@ -231,7 +235,7 @@ defineExpose({
               </li>
             </ul>
           </div>
-          <p v-if="!assignableRoles.length && !rolesQuery.isPending" class="text-[13px] text-muted">
+          <p v-if="!assignableRoles.length && !rolesQuery.isPending && !rolesQuery.isError" class="text-[13px] text-muted">
             Nenhum papel disponível.
           </p>
         </template>

@@ -51,7 +51,7 @@ function goNew() {
 function userMeta(user: ClinicUser) {
   const roles = (user.roles ?? [])
     .filter((role) => role !== 'super-admin')
-    .map((role) => (role === 'admin' ? 'Admin' : roleLabel(role)))
+    .map((role) => roleLabel(role))
     .join(', ')
   return [user.email, roles || 'Sem papel'].join(' · ')
 }

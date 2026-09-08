@@ -85,7 +85,7 @@ function goBack() {
 function displayRoles(roles: string[] = []) {
   return roles
     .filter((role) => role !== 'super-admin')
-    .map((role) => (role === 'admin' ? 'Admin' : roleLabel(role)))
+    .map((role) => roleLabel(role))
     .join(', ')
 }
 

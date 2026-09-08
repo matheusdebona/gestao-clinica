@@ -72,7 +72,7 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
     </PageHeader>
 
     <Banner v-if="campaign && !campaign.is_active" variant="warning" title="Inativa">
-      Esta campanha está desativada. Clientes já atribuídos continuam com o vínculo.
+      Esta campanha está desativada. Pacientes já atribuídos continuam com o vínculo.
     </Banner>
     <Banner v-if="isError" variant="danger" title="Não encontrado">Campanha indisponível.</Banner>
     <SurfaceCard v-else-if="isPending">
@@ -98,7 +98,7 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
     <ConfirmDialog
       v-model:open="confirmOpen"
       title="Desativar esta campanha?"
-      description="Clientes já atribuídos não perdem o vínculo. A campanha some das listas ativas."
+      description="Pacientes já atribuídos não perdem o vínculo. A campanha some das listas ativas."
       confirm-label="Desativar"
       @confirm="deactivateMutation.mutate()"
     />

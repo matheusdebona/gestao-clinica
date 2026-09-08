@@ -20,7 +20,7 @@ import Textarea from '@/components/ui/Textarea.vue'
 import { listClients } from '@/features/clients/api'
 import { listCardBrands, listCardOperators, listPaymentMethods } from '@/features/payments/api'
 import { applyProtocolToSale, createSale, getSale, syncSaleItems, syncSalePayments, updateSale, confirmSale } from '@/features/sales/api'
-import { SALE_WIZARD_LAST_INDEX, SALE_WIZARD_STEP, SALE_WIZARD_STEPS } from '@/features/sales/labels'
+import { SALE_WIZARD_LAST_INDEX, SALE_WIZARD_STEP, SALE_WIZARD_STEPS, salePaymentSummary } from '@/features/sales/labels'
 import SaleBudgetsPanel from '@/features/sales/SaleBudgetsPanel.vue'
 import SaleItemsStep from '@/features/sales/SaleItemsStep.vue'
 import SalePaymentsStep from '@/features/sales/SalePaymentsStep.vue'
@@ -71,6 +71,8 @@ const belowMinOpen = ref(false)
 const currentSale = ref<Sale | null>(null)
 const hasAcceptedBudget = ref(false)
 
+const wizardHydrated = ref(false)
+
 const canCreate = computed(() => auth.can('sales.create'))
 const canUpdate = computed(() => auth.can('sales.update'))
 const allowed = computed(() => (props.saleId ? canUpdate.value : canCreate.value))
@@ -95,7 +97,11 @@ watch(
       void router.replace({ name: 'sales-show', params: { id: String(sale.id) } })
       return
     }
+    if (wizardHydrated.value && currentSale.value?.id === sale.id) {
+      return
+    }
     hydrate(sale)
+    wizardHydrated.value = true
   },
   { immediate: true },
 )
@@ -103,6 +109,7 @@ watch(
 const {
   data: clientListData,
   isPending: clientsPending,
+  isError: clientsError,
 } = useQuery({
   queryKey: ['clients', 'sale-pick', clientQ],
   queryFn: () => listClients({ q: clientQ.value, page: 1, is_active: true }),
@@ -134,6 +141,9 @@ const brandsQuery = useQuery({
 const paymentMethods = computed(() => methodsQuery.data.value ?? [])
 const cardOperators = computed(() => operatorsQuery.data.value ?? [])
 const cardBrands = computed(() => brandsQuery.data.value ?? [])
+const methodsError = computed(() => methodsQuery.isError.value)
+const operatorsError = computed(() => operatorsQuery.isError.value)
+const brandsError = computed(() => brandsQuery.isError.value)
 
 const expectedLocal = computed(() => money2(expectedFromDrafts(items.value)))
 const minLocal = computed(() => {
@@ -175,7 +185,13 @@ function apiError(error: unknown, fallback: string) {
 }
 
 async function persistItems(saleId: number) {
-  return syncSaleItems(saleId, draftsToItemPayloads(items.value))
+  const sale = await syncSaleItems(saleId, draftsToItemPayloads(items.value))
+  currentSale.value = sale
+  items.value = saleItemsToDrafts(sale.items)
+  if (!effectiveDirty.value) {
+    effectiveAmount.value = sale.effective_amount
+  }
+  return sale
 }
 
 async function persistValues(saleId: number) {
@@ -185,7 +201,12 @@ async function persistValues(saleId: number) {
   if (effectiveDirty.value) {
     payload.effective_amount = emptyEffective()
   }
-  return updateSale(saleId, payload)
+  const sale = await updateSale(saleId, payload)
+  currentSale.value = sale
+  notes.value = sale.notes ?? ''
+  effectiveAmount.value = sale.effective_amount
+  effectiveDirty.value = sale.effective_amount_is_manual
+  return sale
 }
 
 function emptyEffective() {
@@ -197,7 +218,31 @@ function emptyEffective() {
 }
 
 async function persistPayments(saleId: number) {
-  return syncSalePayments(saleId, draftsToPaymentPayloads(payments.value))
+  const sale = await syncSalePayments(saleId, draftsToPaymentPayloads(payments.value))
+  currentSale.value = sale
+  payments.value = paymentsToDrafts(sale.payments)
+  if (payments.value.length === 0 && Number(sale.effective_amount) > 0) {
+    payments.value = [emptyPaymentDraft(sale.effective_amount)]
+  }
+  return sale
+}
+
+async function persistLeavingStep() {
+  const saleId = currentSale.value?.id ?? props.saleId
+  if (!saleId) {
+    return
+  }
+  if (step.value === SALE_WIZARD_STEP.client || step.value === SALE_WIZARD_STEP.values) {
+    await persistValues(saleId)
+    return
+  }
+  if (step.value === SALE_WIZARD_STEP.items && items.value.length > 0 && validateItems()) {
+    await persistItems(saleId)
+    return
+  }
+  if (step.value === SALE_WIZARD_STEP.payments && validatePayments()) {
+    await persistPayments(saleId)
+  }
 }
 
 function validateItems(): boolean {
@@ -252,7 +297,7 @@ function validatePayments(): boolean {
 async function goNext() {
   if (step.value === 0) {
     if (!selectedClient.value) {
-      toast.error('Selecione o cliente.')
+      toast.error('Selecione o paciente.')
       return
     }
     saving.value = true
@@ -276,6 +321,7 @@ async function goNext() {
         })
         return
       }
+      await persistValues(currentSale.value.id)
       step.value = SALE_WIZARD_STEP.items
     } catch (error) {
       apiError(error, 'Não foi possível criar a venda.')
@@ -296,7 +342,7 @@ async function goNext() {
     }
     saving.value = true
     try {
-      hydrate(await persistItems(saleId))
+      await persistItems(saleId)
       if (!effectiveDirty.value) {
         effectiveAmount.value = currentSale.value?.effective_amount ?? expectedLocal.value
       }
@@ -312,7 +358,7 @@ async function goNext() {
   if (step.value === SALE_WIZARD_STEP.values) {
     saving.value = true
     try {
-      hydrate(await persistValues(saleId))
+      await persistValues(saleId)
       if (payments.value.length === 0) {
         payments.value = [emptyPaymentDraft(emptyEffective())]
       }
@@ -331,7 +377,7 @@ async function goNext() {
     }
     saving.value = true
     try {
-      hydrate(await persistPayments(saleId))
+      await persistPayments(saleId)
       step.value = SALE_WIZARD_STEP.review
     } catch (error) {
       apiError(error, 'Não foi possível salvar os pagamentos.')
@@ -350,12 +396,35 @@ async function goNext() {
   }
 }
 
-function goBack() {
+async function goBack() {
   if (step.value === 0) {
     onCancel()
     return
   }
+  saving.value = true
+  try {
+    await persistLeavingStep()
+  } catch (error) {
+    apiError(error, 'Não foi possível salvar o rascunho.')
+  } finally {
+    saving.value = false
+  }
   step.value -= 1
+}
+
+async function onSelectStep(index: number) {
+  if (index >= step.value) {
+    return
+  }
+  saving.value = true
+  try {
+    await persistLeavingStep()
+  } catch (error) {
+    apiError(error, 'Não foi possível salvar o rascunho.')
+  } finally {
+    saving.value = false
+  }
+  step.value = index
 }
 
 function onCancel() {
@@ -372,7 +441,7 @@ function onCancel() {
 async function onApplyProtocol(protocolId: number) {
   const saleId = currentSale.value?.id ?? props.saleId
   if (!saleId) {
-    toast.error('Salve o cliente antes de adicionar protocolo.')
+    toast.error('Salve o paciente antes de adicionar protocolo.')
     return
   }
   saving.value = true
@@ -444,6 +513,19 @@ function methodName(id: string) {
   return methodsQuery.data.value?.find((method) => String(method.id) === id)?.name ?? 'Pagamento'
 }
 
+function paymentReviewLine(payment: SalePaymentDraft) {
+  const method = methodsQuery.data.value?.find((entry) => String(entry.id) === payment.payment_method_id)
+  const operator = cardOperators.value.find((entry) => String(entry.id) === payment.card_operator_id)
+  const brand = cardBrands.value.find((entry) => String(entry.id) === payment.card_brand_id)
+  const summary = salePaymentSummary({
+    payment_method: { name: method?.name ?? methodName(payment.payment_method_id) },
+    card_operator: operator ? { name: operator.name } : null,
+    card_brand: brand ? { name: brand.name } : null,
+    installments: payment.installments || null,
+  })
+  return `${summary} · ${formatBRL(payment.amount)}`
+}
+
 function pickClient(client: Client) {
   selectedClient.value = client
   clientSearch.value = ''
@@ -453,7 +535,7 @@ function pickClient(client: Client) {
 
 <template>
   <div class="flex flex-col gap-6">
-    <WizardStepper :steps="[...SALE_WIZARD_STEPS]" :current="step" @select="step = $event" />
+    <WizardStepper :steps="[...SALE_WIZARD_STEPS]" :current="step" @select="onSelectStep" />
 
     <Banner v-if="!allowed" variant="danger" title="Sem permissão">
       Você não pode {{ saleId ? 'editar' : 'criar' }} vendas.
@@ -468,20 +550,27 @@ function pickClient(client: Client) {
 
     <template v-else>
       <div v-if="step === SALE_WIZARD_STEP.client" class="flex flex-col gap-4">
-        <Banner v-if="currentSale" variant="info" title="Cliente definido">
-          O cliente não muda depois que a venda é criada.
+        <Banner v-if="currentSale" variant="info" title="Paciente definido">
+          O paciente não muda depois que a venda é criada.
         </Banner>
         <p v-if="selectedClient" class="text-[15px] font-medium text-title">
           {{ selectedClient.name }}
           <span class="mt-0.5 block text-[13px] font-normal text-muted">{{ formatPhoneBR(selectedClient.whatsapp) || selectedClient.whatsapp }}</span>
         </p>
         <template v-if="!currentSale">
-          <ClientSearchBar v-model="clientSearch" @search="clientQ = $event" />
-          <SurfaceCard v-if="clientQ && clientsPending" :padding="false">
+          <ClientSearchBar
+            v-model="clientSearch"
+            placeholder="Nome ou WhatsApp do paciente"
+            @search="clientQ = $event"
+          />
+          <Banner v-if="clientQ && clientsError" variant="danger" title="Não foi possível buscar pacientes">
+            Tente de novo. Se continuar, confira se você pode ver o cadastro.
+          </Banner>
+          <SurfaceCard v-else-if="clientQ && clientsPending" :padding="false">
             <div class="p-5"><Skeleton class="h-12" /></div>
           </SurfaceCard>
           <SurfaceCard v-else-if="clientQ && clients.length === 0" :padding="false">
-            <p class="px-5 py-4 text-[15px] text-muted">Nenhum cliente encontrado.</p>
+            <p class="px-5 py-4 text-[15px] text-muted">Nenhum paciente encontrado.</p>
           </SurfaceCard>
           <SurfaceCard v-else-if="clientQ && clients.length > 0" :padding="false">
             <div class="divide-y divide-border-divider px-5 py-2">
@@ -538,6 +627,9 @@ function pickClient(client: Client) {
         :methods="paymentMethods"
         :operators="cardOperators"
         :brands="cardBrands"
+        :methods-error="methodsError"
+        :operators-error="operatorsError"
+        :brands-error="brandsError"
         :error="paymentsError"
       />
 
@@ -545,7 +637,7 @@ function pickClient(client: Client) {
         <SurfaceCard>
           <dl class="flex flex-col gap-4">
             <div>
-              <dt class="text-[13px] text-muted">Cliente</dt>
+              <dt class="text-[13px] text-muted">Paciente</dt>
               <dd class="mt-0.5 text-[15px] text-title">
                 {{ selectedClient?.name ?? currentSale?.client?.name }}
               </dd>
@@ -562,7 +654,7 @@ function pickClient(client: Client) {
               <dt class="text-[13px] text-muted">Pagamentos</dt>
               <dd class="mt-0.5 text-[15px] text-title">
                 <p v-for="payment in payments" :key="payment.key">
-                  {{ methodName(payment.payment_method_id) }} · {{ formatBRL(payment.amount) }}
+                  {{ paymentReviewLine(payment) }}
                 </p>
               </dd>
             </div>
