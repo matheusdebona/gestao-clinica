@@ -77,7 +77,7 @@ Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[-]` deferred
 
 - [x] Strong password validation rules (`Password::defaults`)
 - [x] Never commit secrets; `.env` gitignored
-- [ ] CORS config aligned with known PWA origin(s) once frontend URL is fixed
+- [ ] Produção: `CORS_ALLOWED_ORIGINS=https://app.hofpay.com.br` (ver [`hofpay-architecture.md`](./hofpay-architecture.md) §4)
 - [x] HTTPS assumed in non-local environments (document only)
 
 ---

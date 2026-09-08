@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import authClinic from '@/assets/auth-clinic.jpg'
 import Button from '@/components/ui/Button.vue'
@@ -7,6 +7,7 @@ import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
@@ -17,6 +18,14 @@ const toast = useToastStore()
 
 const mode = ref<'login' | 'register'>('login')
 const loading = ref(false)
+
+watch(
+  mode,
+  (value) => {
+    document.title = `${value === 'register' ? 'Cadastrar' : 'Entrar'} — ${APP_NAME}`
+  },
+  { immediate: true },
+)
 
 const loginForm = reactive({
   email: '',
@@ -107,12 +116,13 @@ async function submitRegister() {
         >
         <div class="absolute inset-0 bg-sidebar/40" />
         <p class="absolute bottom-5 left-5 right-5 text-[15px] font-medium tracking-[-0.02em] text-inverse">
-          Gestão da clínica, com calma.
+          {{ APP_NAME }}. Gestão da clínica, com calma.
         </p>
       </div>
 
       <section class="auth-login flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-8 md:px-10">
-        <h1 class="text-[28px] font-semibold tracking-[-0.03em] text-title">Entrar</h1>
+        <p class="text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">{{ APP_NAME }}</p>
+        <h1 class="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-title">Entrar</h1>
         <p class="mt-1 text-[15px] text-muted">Use o e-mail da clínica.</p>
         <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitLogin">
           <FormField label="E-mail" :error="loginErrors.email" html-for="login-email">
@@ -149,7 +159,8 @@ async function submitRegister() {
       </section>
 
       <section class="auth-register flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-8 md:px-10">
-        <h1 class="text-[28px] font-semibold tracking-[-0.03em] text-title">Cadastrar</h1>
+        <p class="text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">{{ APP_NAME }}</p>
+        <h1 class="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-title">Cadastrar</h1>
         <p class="mt-1 text-[15px] text-muted">Abre a clínica e o primeiro acesso.</p>
         <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitRegister">
           <FormField label="Nome da clínica" :error="registerErrors.clinic_name" html-for="reg-clinic">

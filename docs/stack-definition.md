@@ -1,6 +1,8 @@
-# Clinical Management — Stack Definition
+# HOF Pay — Stack Definition
 
-Initial architecture decisions for **gestao-clinica**: an API-first clinical management platform with a **mobile-first** product constraint for clinic day-to-day use.
+Initial architecture decisions for **HOF Pay** (GitHub repo `gestao-clinica`): an API-first clinical management platform with a **mobile-first** product constraint for clinic day-to-day use.
+
+Surfaces, production domains, and VPS deploy: [`hofpay-architecture.md`](./hofpay-architecture.md).
 
 This document freezes the construction stack for Phase 1. Implementation follows the checklist in [`phase-1-todo.md`](./phase-1-todo.md).
 
@@ -271,7 +273,7 @@ Phase 1 already follows this for auth and users; Phases 2+ must keep the same pa
 
 ### Platform / auth / UX
 
-1. **Frontend repo** — Spec em [`frontend-vue-spec.md`](./frontend-vue-spec.md); código futuro default `apps/web/` neste monorepo (repo separado ainda ok).
+1. **Frontend repo** — **Travado:** monorepo. App em `apps/web`; site de marketing em `apps/site` (ainda não scaffoldado). Detalhe: [`hofpay-architecture.md`](./hofpay-architecture.md).
 2. **Frontend stack** — **Vue 3 + Vite + TypeScript**, web responsiva mobile-first primeiro; PWA numa fase posterior (ver spec).
 3. **Locale / i18n** — Portuguese (BR) primary for API messages and seeds?
 4. **User identity** — Email-only login, or also CPF / employee code?

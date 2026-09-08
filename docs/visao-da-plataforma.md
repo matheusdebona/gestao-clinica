@@ -1,9 +1,12 @@
-# Visão da plataforma — Gestão Clínica
+# Visão da plataforma — HOF Pay
+
+**HOF Pay** é a plataforma de gestão clínica (multi-tenant) descrita neste documento. O repositório GitHub continua `gestao-clinica`.
 
 Documento em português para você validar se o entendimento da plataforma está alinhado.
 
 Os detalhes técnicos (Laravel, Docker, permissões em inglês de código) continuam em:
 
+- [`hofpay-architecture.md`](./hofpay-architecture.md) — marca, domínios, monorepo e deploy
 - [`stack-definition.md`](./stack-definition.md)
 - [`domain-model.md`](./domain-model.md)
 - [`domain-roadmap.md`](./domain-roadmap.md)
@@ -15,7 +18,7 @@ Os detalhes técnicos (Laravel, Docker, permissões em inglês de código) conti
 
 ## 1. O que é a plataforma
 
-A **gestão-clinica** é um sistema para clínicas controlarem:
+A **HOF Pay** é um sistema para clínicas controlarem:
 
 - o **estoque de produtos** (botox, preenchimento, toxina, ácidos, etc.);
 - os **protocolos** (procedimentos montados com combinação de produtos);

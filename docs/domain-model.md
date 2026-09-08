@@ -1,6 +1,6 @@
 # Domain model — clinical + commercial core
 
-Business domain aligned for **gestao-clinica**. Complements the technical stack in [`stack-definition.md`](./stack-definition.md).
+Business domain aligned for **HOF Pay** (GitHub repo `gestao-clinica`). Complements the technical stack in [`stack-definition.md`](./stack-definition.md). Surfaces and deploy: [`hofpay-architecture.md`](./hofpay-architecture.md).
 
 **Visão em português (para validação):** [`visao-da-plataforma.md`](./visao-da-plataforma.md)
 

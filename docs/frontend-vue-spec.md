@@ -1,8 +1,8 @@
 # Frontend Vue — especificação
 
-Documento de referência para a UI da clínica. **Congela stack, pastas, design system e ordem de implementação.**
+Documento de referência para a UI da clínica no produto **HOF Pay**. **Congela stack, pastas, design system e ordem de implementação.** Domínios, monorepo e site de marketing: [`hofpay-architecture.md`](./hofpay-architecture.md).
 
-Código Vue **não** faz parte deste PR. Scaffold futuro: default sugerido `apps/web/` neste monorepo (alternativa: repo separado).
+Código Vue está em [`apps/web`](../apps/web). Site de marketing ainda **não** está scaffoldado (`apps/site`). Monorepo e hosts: [`hofpay-architecture.md`](./hofpay-architecture.md).
 
 API consumida: Laravel Sanctum Bearer em `/api/v1/...` (ver [`stack-definition.md`](./stack-definition.md)).
 
