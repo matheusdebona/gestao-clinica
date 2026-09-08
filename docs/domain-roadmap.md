@@ -71,6 +71,8 @@ See pricing model: [`protocolo.md`](./protocolo.md).
 - [x] CRUD `CardBrand` + seed principais bandeiras
 - [x] CRUD `CardFeeRule` (method + operator + brand + installments → fee % and/or fixed)
 - [x] Permissions `*.manage` + feature tests + default catalog seed
+- [x] Seed on register / `POST /clinics` / demo (`EnsureDefaultPaymentCatalog`) + artisan backfill
+- [x] Vue catalog UI (métodos + bandeiras) — Fase 4.5b; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.5b
 
 **DoD:** sales can reference methods; card sales can attach operator/fee metadata and compute net received.
 
@@ -171,6 +173,7 @@ See [`frontend-vue-spec.md`](./frontend-vue-spec.md) for stack, folder layout, d
 - [x] **Produtos** (+ marcas/tipos/unidades, cascata marca→tipo, `?q=`, ajuste estoque) — Fase 4.3; ver detalhe em [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3
 - [x] **Protocolos** (pacote de produtos, itens no form, preços editáveis, `?q=`) — Fase 4.4; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.4
 - [x] **Vendas / orçamentos** (wizard, protocolo+itens, soft min, pagamentos fechados, orçamento+PDF, nav inbox) — Fase 4.5; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.5
+- [x] **Métodos de pagamento e bandeiras** (catálogo UI, seed na clínica nova, backfill artisan) — Fase **4.5b**; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.5b
 - [x] **Agendamentos** (agenda dia/semana, `appointments.*`, overlap por profissional, start sem estoque) — Fase 4.6; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.6
 - [x] **Tratamento — consumo clínico** (`treatments.consume`, checklist sessão, extras, stock no complete) — Fase 4.7; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.7
 - [x] **Métricas** (página única A–D, hero faturamento/ticket/conversão/margem, charts) — Fase 4.8; ver [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.8

@@ -72,6 +72,21 @@ export interface CardBrand {
   is_active: boolean
 }
 
+export interface PaymentMethodPayload {
+  name: string
+  code: string
+  kind: string
+  fee_percent?: string | null
+  fee_fixed?: string | null
+  is_active?: boolean
+}
+
+export interface CardBrandPayload {
+  name: string
+  code: string
+  is_active?: boolean
+}
+
 export interface Sale {
   id: number
   clinic_id: number

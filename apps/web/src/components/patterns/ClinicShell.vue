@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { computed } from 'vue'
+import { computed, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Bell,
   CalendarDays,
   ClipboardList,
+  CreditCard,
   FileText,
   LayoutDashboard,
   LogOut,
@@ -29,14 +30,24 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
+type ShellNavItem = {
+  to: string
+  label: string
+  icon: Component
+  permission?: string
+  pinMobile?: boolean
+  aliases?: string[]
+}
+
 const items = computed(() => {
-  const all = [
+  const all: ShellNavItem[] = [
     { to: '/', label: 'Início', icon: LayoutDashboard, pinMobile: true },
     { to: '/clients', label: 'Clientes', icon: Users, permission: 'clients.view', pinMobile: true },
     { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view' },
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', pinMobile: true },
     { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', pinMobile: true },
+    { to: '/payment-methods', label: 'Pagamentos', icon: CreditCard, permission: 'payment_methods.manage', aliases: ['/card-brands'] },
     { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view' },
     { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', pinMobile: true },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
@@ -63,11 +74,14 @@ const { data: unreadCount } = useQuery({
 
 const alertCount = computed(() => unreadCount.value ?? 0)
 
-function isNavActive(to: string) {
-  if (to === '/') {
-    return route.path === '/'
-  }
-  return route.path === to || route.path.startsWith(`${to}/`)
+function isNavActive(to: string, aliases: string[] = []) {
+  const paths = [to, ...aliases]
+  return paths.some((path) => {
+    if (path === '/') {
+      return route.path === '/'
+    }
+    return route.path === path || route.path.startsWith(`${path}/`)
+  })
 }
 
 function openAlerts() {
@@ -112,7 +126,7 @@ async function onLogout() {
           <SidebarNavItem
             :label="item.label"
             :icon="item.icon"
-            :active="isNavActive(item.to)"
+            :active="isNavActive(item.to, item.aliases ?? [])"
           >
             <template v-if="item.to === '/notifications'" #badge>
               <NavBadge :count="alertCount" />
@@ -160,7 +174,7 @@ async function onLogout() {
           :key="item.to"
           :to="item.to"
           class="relative flex flex-col items-center gap-1 rounded-full px-2 py-1 text-[11px]"
-          :class="isNavActive(item.to) ? 'text-brand' : 'text-muted'"
+          :class="isNavActive(item.to, item.aliases ?? []) ? 'text-brand' : 'text-muted'"
         >
           <component :is="item.icon" class="size-5" :stroke-width="1.75" />
           <span

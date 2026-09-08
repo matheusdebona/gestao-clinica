@@ -7,6 +7,7 @@ use App\Http\Resources\Api\V1\ClinicResource;
 use App\Models\Clinic;
 use App\Support\CurrentClinic;
 use App\Support\EnsureDefaultClientOrigins;
+use App\Support\EnsureDefaultPaymentCatalog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -53,6 +54,7 @@ class ClinicController extends Controller
 
         $clinic = Clinic::query()->create($data);
         EnsureDefaultClientOrigins::run($clinic);
+        EnsureDefaultPaymentCatalog::run($clinic);
 
         return (new ClinicResource($clinic))
             ->response()
