@@ -67,9 +67,32 @@ export async function generateBudgetPdf(id: number): Promise<DocumentRecord> {
   return payload.data
 }
 
+/**
+ * ofetch 1.5 already consumes application/pdf as a Blob into `_data`.
+ * Calling Response.blob() afterwards throws "body stream already read".
+ */
+export function blobFromFetchData(data: unknown, type = 'application/octet-stream'): Blob {
+  if (data instanceof Blob) {
+    return data
+  }
+  if (data instanceof ArrayBuffer || ArrayBuffer.isView(data)) {
+    return new Blob([data as BlobPart], { type })
+  }
+  if (typeof data === 'string') {
+    return new Blob([data], { type })
+  }
+  throw new Error('Empty download body')
+}
+
 export async function downloadDocument(id: number, filename: string): Promise<void> {
-  const response = await api.raw(`/documents/${id}/download`)
-  const blob = await response.blob()
+  const response = await api.raw(`/documents/${id}/download`, {
+    responseType: 'blob',
+    headers: {
+      Accept: 'application/pdf',
+    },
+  })
+  const mime = response.headers.get('content-type') || 'application/pdf'
+  const blob = blobFromFetchData(response._data, mime)
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
