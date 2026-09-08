@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { cn } from '@/lib/cn'
+import { omitNativeValueAttr } from '@/lib/masks'
 import { computed, useAttrs } from 'vue'
 
 defineOptions({ inheritAttrs: false })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     modelValue?: string | number
     type?: 'text' | 'number' | 'password' | 'email' | 'search' | 'tel'
@@ -28,6 +29,8 @@ const emit = defineEmits<{
 
 const attrs = useAttrs()
 
+const nativeAttrs = computed(() => omitNativeValueAttr(attrs as Record<string, unknown>))
+
 const classes = computed(() =>
   cn(
     'glass-field sv-field-control h-11 w-full rounded-[12px] px-3.5 text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
@@ -45,11 +48,11 @@ function onInput(event: Event) {
     :id="id"
     :type="type"
     :class="classes"
-    :value="modelValue"
     :placeholder="placeholder"
     :disabled="disabled"
     :aria-invalid="invalid || undefined"
-    v-bind="{ ...attrs, class: undefined }"
+    v-bind="nativeAttrs"
+    :value="props.modelValue"
     @input="onInput"
   />
 </template>

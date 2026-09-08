@@ -26,7 +26,7 @@ const emit = defineEmits<{
 }>()
 
 const attrs = useAttrs()
-const forwarded = computed(() => omitValueListeners(attrs as Record<string, unknown>))
+const forwarded = computed(() => omitValueListeners({ ...(attrs as Record<string, unknown>) }))
 const display = computed(() => formatMoneyAmount(props.modelValue))
 
 function onTyped(raw: string) {
