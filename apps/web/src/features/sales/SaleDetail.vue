@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
+import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -12,9 +13,8 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { cancelSale, getSale } from '@/features/sales/api'
-import { SALE_STATUS_LABELS } from '@/features/sales/labels'
+import { SALE_STATUS_BADGE, SALE_STATUS_LABELS } from '@/features/sales/labels'
 import SaleBudgetsPanel from '@/features/sales/SaleBudgetsPanel.vue'
-import { qtyInput } from '@/features/sales/schema'
 import { startTreatment } from '@/features/treatments/api'
 import { formatDateTime, formatQty } from '@/lib/formatters'
 import { useToastStore } from '@/stores/toast'
@@ -119,18 +119,26 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
       </Banner>
 
       <SurfaceCard>
-        <dl class="flex flex-col gap-4">
-          <div>
-            <dt class="text-[13px] text-muted">Situação</dt>
-            <dd class="mt-0.5 text-[15px] text-title">{{ SALE_STATUS_LABELS[sale.status] }}</dd>
-          </div>
+        <dl class="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
           <div>
             <dt class="text-[13px] text-muted">Cliente</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ sale.client?.name }}</dd>
           </div>
           <div>
+            <dt class="text-[13px] text-muted">Situação</dt>
+            <dd class="mt-0.5">
+              <Badge :variant="SALE_STATUS_BADGE[sale.status]">
+                {{ SALE_STATUS_LABELS[sale.status] }}
+              </Badge>
+            </dd>
+          </div>
+          <div>
             <dt class="text-[13px] text-muted">Data</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ formatDateTime(sale.sold_at ?? sale.created_at) }}</dd>
+          </div>
+          <div>
+            <dt class="text-[13px] text-muted">Atualizado</dt>
+            <dd class="mt-0.5 text-[15px] text-title">{{ formatDateTime(sale.updated_at) }}</dd>
           </div>
           <div>
             <dt class="text-[13px] text-muted">Valor esperado</dt>
@@ -145,6 +153,10 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
             <dd class="mt-0.5"><MoneyDisplay :value="sale.min_amount" /></dd>
           </div>
           <div>
+            <dt class="text-[13px] text-muted">Custo</dt>
+            <dd class="mt-0.5"><MoneyDisplay :value="sale.cost_total" /></dd>
+          </div>
+          <div class="sm:col-span-2">
             <dt class="text-[13px] text-muted">Notas</dt>
             <dd class="mt-0.5 whitespace-pre-wrap text-[15px] text-title">{{ sale.notes || '—' }}</dd>
           </div>
@@ -165,7 +177,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
               :unit="itemUnit(item)"
               :line-sale="item.line_total"
               :quantity="formatQty(item.quantity)"
-              :unit-price="qtyInput(item.unit_price)"
+              :unit-price="item.unit_price"
               show-unit-price
               readonly
             />

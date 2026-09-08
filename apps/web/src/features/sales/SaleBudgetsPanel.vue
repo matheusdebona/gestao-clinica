@@ -211,12 +211,13 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
             :badge-variant="BUDGET_STATUS_BADGE[budget.status]"
           />
           <div class="mt-2 flex flex-wrap gap-2">
-            <PermissionGate v-if="canActOn(budget.status)" permission="budgets.convert">
+            <PermissionGate permission="documents.generate">
               <Button
-                :loading="accepting"
-                @click="acceptMutation.mutate(budget.id)"
+                variant="secondary"
+                :loading="pdfLoading"
+                @click="pdfMutation.mutate(budget)"
               >
-                Aceitar
+                PDF
               </Button>
             </PermissionGate>
             <PermissionGate v-if="budget.status === 'draft'" permission="budgets.update">
@@ -232,20 +233,24 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
               v-if="canActOn(budget.status)"
               permission="budgets.update"
             >
-              <Button variant="ghost" @click="pendingAction = { id: budget.id, kind: 'reject' }">
-                Recusar
-              </Button>
               <Button variant="ghost" @click="pendingAction = { id: budget.id, kind: 'expire' }">
                 Expirar
               </Button>
             </PermissionGate>
-            <PermissionGate permission="documents.generate">
+            <PermissionGate
+              v-if="canActOn(budget.status)"
+              permission="budgets.update"
+            >
+              <Button variant="ghost" @click="pendingAction = { id: budget.id, kind: 'reject' }">
+                Recusar
+              </Button>
+            </PermissionGate>
+            <PermissionGate v-if="canActOn(budget.status)" permission="budgets.convert">
               <Button
-                variant="secondary"
-                :loading="pdfLoading"
-                @click="pdfMutation.mutate(budget)"
+                :loading="accepting"
+                @click="acceptMutation.mutate(budget.id)"
               >
-                Enviar PDF
+                Aceitar
               </Button>
             </PermissionGate>
           </div>

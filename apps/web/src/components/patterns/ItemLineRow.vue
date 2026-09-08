@@ -6,6 +6,7 @@ import IconButton from '@/components/ui/IconButton.vue'
 import Input from '@/components/ui/Input.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
 import MoneyInput from '@/components/ui/MoneyInput.vue'
+import { formatBRL } from '@/lib/formatters'
 
 const quantity = defineModel<string>('quantity', { required: true })
 const unitPrice = defineModel<string>('unitPrice')
@@ -37,17 +38,22 @@ withDefaults(
 const emit = defineEmits<{
   remove: []
 }>()
+
+const hasLineSale = (value: string | number | null | undefined) =>
+  value !== null && value !== undefined && value !== ''
 </script>
 
 <template>
   <div class="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
-    <div class="min-w-0 flex-1">
-      <p class="truncate text-[15px] font-medium text-title">{{ title }}</p>
-      <p v-if="unit" class="mt-0.5 truncate text-[13px] text-muted">{{ unit }}</p>
-      <p v-if="lineSale !== null && lineSale !== undefined && lineSale !== ''" class="mt-0.5">
-        <MoneyDisplay :value="lineSale" />
-      </p>
-      <div class="mt-3 flex flex-wrap gap-3">
+    <div class="flex min-w-0 flex-1 flex-col gap-3 sm:flex-row sm:items-start">
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-[15px] font-medium text-title">{{ title }}</p>
+        <p v-if="unit" class="mt-0.5 truncate text-[13px] text-muted">{{ unit }}</p>
+        <p v-if="showUnitPrice && hasLineSale(lineSale)" class="mt-0.5">
+          <MoneyDisplay :value="lineSale" />
+        </p>
+      </div>
+      <div class="flex shrink-0 flex-wrap items-start gap-3">
         <div class="w-24 shrink-0">
           <FormField v-if="!readonly" label="Qtd" :html-for="quantityId">
             <template #default="{ invalid: fieldInvalid }">
@@ -77,12 +83,17 @@ const emit = defineEmits<{
             </template>
           </FormField>
           <FormField v-else label="Preço">
-            <MaskedBox :value="unitPrice || '—'" />
+            <MaskedBox :value="formatBRL(unitPrice)" />
+          </FormField>
+        </div>
+        <div v-else-if="hasLineSale(lineSale)" class="w-40 shrink-0">
+          <FormField label="Valor">
+            <MaskedBox :value="formatBRL(lineSale)" />
           </FormField>
         </div>
       </div>
     </div>
-    <div v-if="!readonly" class="mt-1">
+    <div v-if="!readonly" class="shrink-0">
       <IconButton label="Remover item" @click="emit('remove')">
         <X class="size-4" :stroke-width="1.75" />
       </IconButton>
