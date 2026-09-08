@@ -15,20 +15,30 @@ const {
   onDark = false,
   sectionCta = true,
 } = Astro.props
+
+const pair = secondary !== false
 ---
 
-<div class="mt-6 flex flex-wrap items-center gap-3">
+<div
+  class:list={[
+    'mt-6 grid w-full justify-center gap-3 md:flex md:w-auto md:flex-wrap md:items-center md:justify-start',
+    pair ? 'grid-cols-2' : 'grid-cols-1',
+  ]}
+>
   <a
-    class="site-cta-primary"
+    class="site-cta-primary w-full min-w-0 md:w-auto md:flex-none"
     href={APP_REGISTER_URL}
     data-section-cta={sectionCta ? '' : undefined}
   >
     {primary}
   </a>
   {
-    secondary !== false && (
+    pair && (
       <a
-        class:list={['site-cta-secondary', onDark && 'site-cta-on-dark']}
+        class:list={[
+          'site-cta-secondary w-full min-w-0 md:w-auto md:flex-none',
+          onDark && 'site-cta-on-dark',
+        ]}
         href={APP_LOGIN_URL}
       >
         {secondary}

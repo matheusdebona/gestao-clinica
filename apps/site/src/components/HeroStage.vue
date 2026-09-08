@@ -73,11 +73,20 @@ useGsapIsland(root, ({ gsap, reduceMotion }) => {
           Orçamento aceito vira venda. O estoque só baixa no tratamento. Pensado para
           profissionais de harmonização e a equipe.
         </p>
-        <div class="mt-8 flex flex-wrap items-center gap-3">
-          <a class="site-cta-primary" :href="APP_REGISTER_URL" data-section-cta>
+        <div
+          class="mt-8 grid w-full grid-cols-2 justify-center gap-3 md:flex md:w-auto md:flex-wrap md:items-center md:justify-start"
+        >
+          <a
+            class="site-cta-primary w-full min-w-0 md:w-auto md:flex-none"
+            :href="APP_REGISTER_URL"
+            data-section-cta
+          >
             {{ CTA_REGISTER_STRONG_LABEL }}
           </a>
-          <a class="site-cta-secondary site-cta-on-dark" :href="APP_LOGIN_URL">
+          <a
+            class="site-cta-secondary site-cta-on-dark w-full min-w-0 md:w-auto md:flex-none"
+            :href="APP_LOGIN_URL"
+          >
             {{ CTA_LOGIN_LABEL }}
           </a>
         </div>
