@@ -121,6 +121,9 @@ const productHits = computed(() => productQuery.data.value?.data ?? [])
 const methods = computed(() => paymentsQuery.data.value ?? [])
 const operators = computed(() => operatorsQuery.data.value ?? [])
 const brands = computed(() => brandsQuery.data.value ?? [])
+const methodsError = computed(() => paymentsQuery.isError.value)
+const operatorsError = computed(() => operatorsQuery.isError.value)
+const brandsError = computed(() => brandsQuery.isError.value)
 const isInProgress = computed(() => appointment.value?.status === 'in_progress')
 const stockWarnings = computed(() => stockWarningsFromAppointment(appointment.value))
 const suggestedLines = computed(() => drafts.value.filter((line) => line.source === 'suggested'))
@@ -353,9 +356,9 @@ const completePending = computed(() => completeMutation.isPending.value)
                   :methods="methods"
                   :operators="operators"
                   :brands="brands"
-                  :methods-error="paymentsQuery.isError"
-                  :operators-error="operatorsQuery.isError"
-                  :brands-error="brandsQuery.isError"
+                  :methods-error="methodsError"
+                  :operators-error="operatorsError"
+                  :brands-error="brandsError"
                 />
               </div>
             </div>

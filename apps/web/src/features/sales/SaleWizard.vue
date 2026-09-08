@@ -141,6 +141,9 @@ const brandsQuery = useQuery({
 const paymentMethods = computed(() => methodsQuery.data.value ?? [])
 const cardOperators = computed(() => operatorsQuery.data.value ?? [])
 const cardBrands = computed(() => brandsQuery.data.value ?? [])
+const methodsError = computed(() => methodsQuery.isError.value)
+const operatorsError = computed(() => operatorsQuery.isError.value)
+const brandsError = computed(() => brandsQuery.isError.value)
 
 const expectedLocal = computed(() => money2(expectedFromDrafts(items.value)))
 const minLocal = computed(() => {
@@ -624,9 +627,9 @@ function pickClient(client: Client) {
         :methods="paymentMethods"
         :operators="cardOperators"
         :brands="cardBrands"
-        :methods-error="methodsQuery.isError"
-        :operators-error="operatorsQuery.isError"
-        :brands-error="brandsQuery.isError"
+        :methods-error="methodsError"
+        :operators-error="operatorsError"
+        :brands-error="brandsError"
         :error="paymentsError"
       />
 
