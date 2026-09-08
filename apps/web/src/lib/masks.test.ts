@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { emptyToMoney } from '@/lib/formatters'
-import { decimalFromMoneyInput, formatMoneyAmount, formatPhoneBR, phoneDigits } from '@/lib/masks'
+import {
+  decimalFromMoneyInput,
+  formatMoneyAmount,
+  formatPhoneBR,
+  omitNativeValueAttr,
+  omitValueListeners,
+  phoneDigits,
+} from '@/lib/masks'
 
 describe('phoneDigits', () => {
   it('keeps Brazilian mobile and landline digits', () => {
@@ -53,6 +60,45 @@ describe('formatMoneyAmount', () => {
     expect(formatMoneyAmount('80.00')).toBe('80,00')
     expect(formatMoneyAmount('1234.56')).toBe('1.234,56')
     expect(formatMoneyAmount('1280,00')).toBe('1.280,00')
+  })
+})
+
+describe('omitValueListeners', () => {
+  it('strips every value-control key that vee-validate defineField may leak', () => {
+    const onBlur = () => undefined
+    const rest = omitValueListeners({
+      name: 'whatsapp',
+      onBlur,
+      value: '11987654321',
+      modelValue: '11987654321',
+      'model-value': '000',
+      onInput: () => undefined,
+      onChange: () => undefined,
+      'onUpdate:modelValue': () => undefined,
+      'onUpdate:model-value': () => undefined,
+    })
+
+    expect(rest).toEqual({ name: 'whatsapp', onBlur })
+  })
+})
+
+describe('omitNativeValueAttr', () => {
+  it('keeps listeners but never lets value override a controlled input', () => {
+    const onInput = () => undefined
+    const rest = omitNativeValueAttr({
+      class: 'extra',
+      value: '11987654321',
+      modelValue: '11987654321',
+      'model-value': '000',
+      onInput,
+      onBlur: () => undefined,
+    })
+
+    expect(rest).not.toHaveProperty('value')
+    expect(rest).not.toHaveProperty('modelValue')
+    expect(rest).not.toHaveProperty('class')
+    expect(rest.onInput).toBe(onInput)
+    expect(rest).toHaveProperty('onBlur')
   })
 })
 

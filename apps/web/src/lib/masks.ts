@@ -58,7 +58,35 @@ export function formatMoneyAmount(value: string | number | null | undefined): st
   }).format(amount)
 }
 
-export function omitValueListeners(attrs: Record<string, unknown>): Record<string, unknown> {
-  const { onInput: _onInput, onChange: _onChange, value: _value, ...rest } = attrs
+const VALUE_CONTROL_KEYS = new Set([
+  'value',
+  'modelValue',
+  'model-value',
+  'onInput',
+  'onChange',
+  'onUpdate:modelValue',
+  'onUpdate:model-value',
+])
+
+function omitKeys(attrs: Record<string, unknown>, keys: Set<string>): Record<string, unknown> {
+  const rest: Record<string, unknown> = {}
+  for (const key of Object.keys(attrs)) {
+    if (keys.has(key)) {
+      continue
+    }
+    rest[key] = attrs[key]
+  }
   return rest
+}
+
+/** Drop v-model / native value bindings so a mask can own the displayed value. */
+export function omitValueListeners(attrs: Record<string, unknown>): Record<string, unknown> {
+  return omitKeys(attrs, VALUE_CONTROL_KEYS)
+}
+
+const NATIVE_VALUE_KEYS = new Set(['class', 'value', 'modelValue', 'model-value'])
+
+/** Attrs safe to spread onto a native <input> without overriding the controlled value. */
+export function omitNativeValueAttr(attrs: Record<string, unknown>): Record<string, unknown> {
+  return omitKeys(attrs, NATIVE_VALUE_KEYS)
 }
