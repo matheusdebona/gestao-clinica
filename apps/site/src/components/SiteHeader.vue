@@ -39,7 +39,7 @@ onMounted(() => {
       }
       sectionCtaInView.value = visibleCtas.size > 0
     },
-    { threshold: 0.45, rootMargin: '0px 0px -18% 0px' },
+    { threshold: 0, rootMargin: '0px' },
   )
   document.querySelectorAll('[data-section-cta]').forEach((el) => ctaIo?.observe(el))
 
