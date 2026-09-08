@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
 use App\Support\EnsureDefaultPaymentCatalog;
+use App\Support\EnsureDefaultUnitsOfMeasure;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -47,6 +48,7 @@ class DemoClinicSeeder extends Seeder
 
         EnsureDefaultClientOrigins::run($clinic);
         EnsureDefaultPaymentCatalog::run($clinic);
+        EnsureDefaultUnitsOfMeasure::run($clinic);
 
         $superEmail = env('SUPER_ADMIN_EMAIL');
         $superPassword = env('SUPER_ADMIN_PASSWORD');

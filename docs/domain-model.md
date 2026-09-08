@@ -99,7 +99,7 @@ UI Phase 4.3 detail: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.3.
 | --- | --- | --- |
 | `Brand` | `clinic_id`, `name`, `is_active` | Clinic-scoped |
 | `ProductType` | `clinic_id`, **`brand_id`**, `name`, `slug`, `is_active` | **Belongs to a brand**; list filter `?brand_id=` |
-| `UnitOfMeasure` | `clinic_id`, `name`, `symbol`, `is_active` | Independent of brand |
+| `UnitOfMeasure` | `clinic_id`, `name`, `symbol`, `is_active` | Independent of brand; unique `(clinic_id, symbol)`. New clinics get 10 defaults (`un`, `ml`, `mg`, `g`, `kg`, `cx`, `frasco`, `seringa`, `ampola`, `par`) |
 
 Product form cascade: choose brand → types of that brand → product fields + unit.
 

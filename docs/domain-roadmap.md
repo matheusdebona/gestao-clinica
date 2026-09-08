@@ -27,6 +27,7 @@ See financial field evaluation: [`produto-financeiro.md`](./produto-financeiro.m
 - [x] CRUD `ProductType` (clinic-scoped)
 - [x] CRUD `Brand`
 - [x] CRUD `UnitOfMeasure`
+- [x] Seed default units of measure on every new clinic (`EnsureDefaultUnitsOfMeasure`; backfill `units:seed-defaults`)
 - [x] CRUD `Product` (cost médio, sale_price, min_sale_price, stock, purpose, FKs + margem no Resource)
 - [x] Stock movement endpoint (`in`/`out`, weighted average on inbound)
 - [x] Low-stock listing (`?low_stock=1`)
