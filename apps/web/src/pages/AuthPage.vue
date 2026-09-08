@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import authClinic from '@/assets/auth-clinic.jpg'
 import Button from '@/components/ui/Button.vue'
@@ -18,6 +18,14 @@ const toast = useToastStore()
 
 const mode = ref<'login' | 'register'>('login')
 const loading = ref(false)
+
+watch(
+  mode,
+  (value) => {
+    document.title = `${value === 'register' ? 'Cadastrar' : 'Entrar'} — ${APP_NAME}`
+  },
+  { immediate: true },
+)
 
 const loginForm = reactive({
   email: '',
