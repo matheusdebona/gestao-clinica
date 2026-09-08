@@ -7,6 +7,7 @@ import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import { localizeAuthFailedMessage } from '@/lib/auth-errors'
 import { authPathForMode, resolveAuthMode, type AuthMode } from '@/lib/auth-mode'
 import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
@@ -75,10 +76,10 @@ function applyErrors(bag: Record<string, string>, error: unknown) {
   }
   if (error.status === 422) {
     for (const [field, messages] of Object.entries(error.errors)) {
-      bag[field] = messages[0] ?? error.message
+      bag[field] = localizeAuthFailedMessage(messages[0] ?? error.message)
     }
     if (!Object.keys(error.errors).length) {
-      toast.error(error.message)
+      toast.error(localizeAuthFailedMessage(error.message))
     }
     return
   }

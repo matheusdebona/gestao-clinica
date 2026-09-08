@@ -57,10 +57,34 @@ class AuthTest extends TestCase
 
     public function test_login_fails_with_invalid_credentials(): void
     {
-        $this->postJson('/api/v1/auth/login', [
+        $response = $this->postJson('/api/v1/auth/login', [
             'email' => 'nobody@clinica.test',
             'password' => 'wrong',
-        ])->assertStatus(422);
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+
+        $this->assertLoginFailedInPortuguese($response->json('errors.email.0'));
+    }
+
+    public function test_login_fails_with_wrong_password_in_portuguese(): void
+    {
+        $clinic = Clinic::factory()->create();
+        User::factory()->forClinic($clinic)->create([
+            'email' => 'admin@clinica.test',
+            'password' => 'password',
+        ]);
+
+        $response = $this->postJson('/api/v1/auth/login', [
+            'email' => 'admin@clinica.test',
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['email']);
+
+        $this->assertLoginFailedInPortuguese($response->json('errors.email.0'));
     }
 
     public function test_login_validation_errors_are_in_portuguese(): void
@@ -352,5 +376,13 @@ class AuthTest extends TestCase
         $this->withToken($token)
             ->getJson('/api/v1/auth/me')
             ->assertUnauthorized();
+    }
+
+    private function assertLoginFailedInPortuguese(mixed $message): void
+    {
+        $this->assertIsString($message);
+        $this->assertSame(__('auth.failed'), $message);
+        $this->assertSame('E-mail ou senha incorretos.', $message);
+        $this->assertStringNotContainsString('These credentials do not match our records.', $message);
     }
 }
