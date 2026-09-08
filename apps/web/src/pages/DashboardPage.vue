@@ -16,6 +16,10 @@ function openMetrics() {
 function openAlerts() {
   void router.push({ name: 'notifications' })
 }
+
+function openPayments() {
+  void router.push({ name: 'payment-methods' })
+}
 </script>
 
 <template>
@@ -31,6 +35,17 @@ function openAlerts() {
             title="Alertas"
             meta="Estoque baixo e avisos da agenda"
             @action="openAlerts"
+          />
+        </div>
+      </SurfaceCard>
+    </PermissionGate>
+    <PermissionGate permission="payment_methods.manage">
+      <SurfaceCard :padding="false">
+        <div class="px-5 py-2">
+          <ListCard
+            title="Métodos de pagamento"
+            meta="Dinheiro, PIX, cartão e bandeiras"
+            @action="openPayments"
           />
         </div>
       </SurfaceCard>

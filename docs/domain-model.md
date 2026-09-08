@@ -267,7 +267,7 @@ When `kind` is `credit_card` or `debit_card`:
 | Entity | Purpose |
 | --- | --- |
 | `CardOperator` | Maquininha / acquirer (Cielo, Stone, Rede…). `auto_anticipate` marks machines that settle/anticipate installments automatically vs D+N |
-| `CardBrand` | Visa, Mastercard, Elo, Amex, … (required on fee rules; seeded defaults) |
+| `CardBrand` | Visa, Mastercard, Elo, Amex, Hipercard, Cabal, Diners (required on fee rules; seeded defaults via `EnsureDefaultPaymentCatalog`) |
 | `CardFeeRule` | `payment_method` + operator + **required** brand + exact installment count → `fee_percent` and/or `fee_fixed` |
 
 Debit rules use `installments = 1`. Multiple operators per clinic allow different MDR tables (e.g. one anticipating machine vs one without).

@@ -14,6 +14,7 @@ import Pagination from '@/components/ui/Pagination.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import PaymentCatalogShortcuts from '@/features/payments/PaymentCatalogShortcuts.vue'
 import { listSales } from '@/features/sales/api'
 import { SALE_STATUS_BADGE, SALE_STATUS_LABELS } from '@/features/sales/labels'
 import { formatBRL, formatDateTime } from '@/lib/formatters'
@@ -95,6 +96,8 @@ const emptyTitle = computed(() => (q.value ? 'Nenhuma venda encontrada' : 'Nenhu
     </Banner>
 
     <template v-else>
+      <PaymentCatalogShortcuts />
+
       <ClientSearchBar
         v-model="searchInput"
         placeholder="Nome ou WhatsApp do cliente"

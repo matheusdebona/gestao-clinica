@@ -466,6 +466,7 @@ Ordem acordada (UI). Protocolo ≠ agendamento ≠ tratamento (consumo).
 | **4.3** | **Produtos** (+ marcas, tipos, unidades) | feito |
 | **4.4** | **Protocolos** (pacote de produtos) | feito |
 | **4.5** | **Vendas / orçamentos** | feito |
+| **4.5b** | **Métodos de pagamento e bandeiras** (catálogo) | **feito** |
 | **4.6** | **Agendamentos** (agenda completa) | feito |
 | **4.7** | **Tratamento — consumo clínico** (baixa estoque) | feito |
 | **4.8** | **Métricas** | feito |
@@ -769,6 +770,44 @@ Confirmada: read-only (notas opcionais) + cancelar + **Abrir tratamento** (`trea
 - [x] Nav Vendas + Orçamentos (inbox)
 - [x] Pós-confirm: link abrir tratamento; estoque inalterado
 - [x] Testes API dos gaps (`q` se novo); smoke Vue do wizard
+
+#### 4.5b — Métodos de pagamento e bandeiras (catálogo)
+
+Objetivo: o usuário **encontra e cadastra** meios de pagamento (Dinheiro, PIX, débito, crédito, boleto, cheque) e **bandeiras** no mesmo padrão de Marcas / Origens. O wizard de venda (4.5) já consome `GET /payment-methods` e `GET /card-brands`; esta fase entrega as telas de CRUD e o seed nas clínicas novas.
+
+Domínio: [`domain-model.md`](./domain-model.md) §7. Seed: `EnsureDefaultPaymentCatalog` (idempotente por `(clinic_id, code)`).
+
+##### Decisões fechadas
+
+| Tema | Decisão |
+| --- | --- |
+| Escopo | Lista + detalhe + criar/editar + desativar **métodos** e **bandeiras**. Matriz de taxas (`CardFeeRule`) fica fora |
+| Desativar | DELETE soft (`is_active=false`). Lista com switch “somente ativos” (padrão ligado) |
+| Visual | Soft Violet Liquid Glass **heavy** — só `components/ui` + `patterns` |
+| Nav | Item **Pagamentos** no `ClinicShell` (sem pin na tab bar). Atalhos na lista de vendas e cruzados métodos ↔ bandeiras |
+| Permissão | Telas e CRUD = `payment_methods.manage` / `card_brands.manage` (admin e vendedor). GET index já aceita `sales.view` / `treatments.consume` no wizard |
+| Catálogo inicial | Nova clínica (register, `POST /clinics`, demo seed) recebe métodos (Dinheiro, PIX, Cartão de débito, Cartão de crédito, Boleto, Cheque, Outros) e bandeiras (Visa, Mastercard, Elo, American Express, Hipercard, Cabal, Diners). Ativos. Cartão com `requires_card_meta`. Backfill: `php artisan payment-catalog:seed-defaults` e `PaymentCatalogSeeder` |
+| Fora desta fase | UI de operadoras / regras de taxa; mudança no wizard além de usar a API existente |
+
+##### Telas / rotas
+
+| Rota | Página | Permission |
+| --- | --- | --- |
+| `/payment-methods` | Lista (somente ativos, paginação) | `payment_methods.manage` |
+| `/payment-methods/new` | Criar método | `payment_methods.manage` |
+| `/payment-methods/:id` | Detalhe + editar / desativar | `payment_methods.manage` |
+| `/payment-methods/:id/edit` | Editar | `payment_methods.manage` |
+| `/card-brands` | Lista de bandeiras | `card_brands.manage` |
+| `/card-brands/new` | Criar bandeira | `card_brands.manage` |
+| `/card-brands/:id` | Detalhe + editar / desativar | `card_brands.manage` |
+| `/card-brands/:id/edit` | Editar | `card_brands.manage` |
+
+##### DoD 4.5b
+
+- [x] Secretária/admin abre **Pagamentos** no menu, vê métodos seedados, cria/edita/desativa
+- [x] Bandeiras no mesmo padrão, atalho a partir dos métodos
+- [x] Nova clínica (register) recebe defaults; `payment-catalog:seed-defaults` cobre clínicas antigas
+- [x] `PermissionGate` + testes de seed-on-register e papéis (seller vs recepção)
 
 #### 4.6 — Agendamentos (especificação de UI)
 
@@ -1107,6 +1146,8 @@ Nav label: **Alertas** (já no shell) — ocultar sem `products.view`.
 | `/units` | Unidades | `units.manage` |
 | `/protocols` | Protocolos | `protocols.view` |
 | `/sales` | Vendas | `sales.view` |
+| `/payment-methods` | Métodos de pagamento | `payment_methods.manage` |
+| `/card-brands` | Bandeiras | `card_brands.manage` |
 | `/budgets` | Orçamentos (inbox) | `budgets.view` |
 | `/appointments` | Agenda | `appointments.view` |
 | `/treatments` | Tratamentos (consumo) | `treatments.view` |

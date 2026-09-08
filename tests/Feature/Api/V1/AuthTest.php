@@ -3,10 +3,13 @@
 namespace Tests\Feature\Api\V1;
 
 use App\Models\Campaign;
+use App\Models\CardBrand;
 use App\Models\ClientOrigin;
 use App\Models\Clinic;
+use App\Models\PaymentMethod;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
+use App\Support\EnsureDefaultPaymentCatalog;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
@@ -161,6 +164,61 @@ class AuthTest extends TestCase
                 ->doesntExist()
         );
         $this->assertSame(0, Campaign::query()->where('clinic_id', $clinic->id)->count());
+    }
+
+    public function test_register_seeds_default_payment_catalog(): void
+    {
+        $this->postJson('/api/v1/auth/register', [
+            'clinic_name' => 'Clínica Pagamentos',
+            'name' => 'Eva Nunes',
+            'email' => 'eva@pagamentos.test',
+            'password' => 'ChangeMe!123',
+            'password_confirmation' => 'ChangeMe!123',
+        ])->assertCreated();
+
+        $clinic = Clinic::query()->where('name', 'Clínica Pagamentos')->first();
+        $this->assertNotNull($clinic);
+
+        $methodCodes = PaymentMethod::query()
+            ->where('clinic_id', $clinic->id)
+            ->pluck('code')
+            ->all();
+        $brandCodes = CardBrand::query()
+            ->where('clinic_id', $clinic->id)
+            ->pluck('code')
+            ->all();
+
+        $this->assertEqualsCanonicalizing(
+            array_column(EnsureDefaultPaymentCatalog::METHODS, 'code'),
+            $methodCodes
+        );
+        $this->assertEqualsCanonicalizing(
+            array_column(EnsureDefaultPaymentCatalog::BRANDS, 'code'),
+            $brandCodes
+        );
+        $this->assertTrue(
+            PaymentMethod::query()
+                ->where('clinic_id', $clinic->id)
+                ->where('is_active', false)
+                ->doesntExist()
+        );
+        $this->assertTrue(
+            CardBrand::query()
+                ->where('clinic_id', $clinic->id)
+                ->where('is_active', false)
+                ->doesntExist()
+        );
+        $this->assertDatabaseHas('payment_methods', [
+            'clinic_id' => $clinic->id,
+            'code' => 'cartao_credito',
+            'requires_card_meta' => true,
+            'kind' => PaymentMethod::KIND_CREDIT_CARD,
+        ]);
+        $this->assertDatabaseHas('payment_methods', [
+            'clinic_id' => $clinic->id,
+            'code' => 'cartao_debito',
+            'requires_card_meta' => true,
+        ]);
     }
 
     public function test_register_bootstraps_roles_when_catalog_is_missing(): void

@@ -9,6 +9,7 @@ use App\Models\Clinic;
 use App\Models\PaymentMethod;
 use App\Models\User;
 use App\Support\CurrentClinic;
+use App\Support\EnsureDefaultPaymentCatalog;
 use App\Support\PaymentFeeCalculator;
 use Database\Seeders\PaymentCatalogSeeder;
 use Database\Seeders\RolesAndPermissionsSeeder;
@@ -219,5 +220,156 @@ class PaymentCatalogTest extends TestCase
             'clinic_id' => $this->clinic->id,
             'code' => 'mastercard',
         ]);
+        $this->assertDatabaseHas('card_brands', [
+            'clinic_id' => $this->clinic->id,
+            'code' => 'diners',
+        ]);
+        $this->assertCatalogForClinic($this->clinic->id);
+    }
+
+    public function test_creating_clinic_seeds_default_payment_catalog(): void
+    {
+        $manager = User::factory()->forClinic($this->clinic)->create();
+        $manager->givePermissionTo('clinics.manage');
+        Sanctum::actingAs($manager);
+
+        $id = $this->postJson('/api/v1/clinics', [
+            'name' => 'Clínica Recém-aberta',
+        ])->assertCreated()
+            ->json('data.id');
+
+        $this->assertCatalogForClinic((int) $id);
+    }
+
+    public function test_default_payment_catalog_is_idempotent_by_code(): void
+    {
+        PaymentMethod::factory()->forClinic($this->clinic)->create([
+            'name' => 'PIX da casa',
+            'code' => 'pix',
+            'kind' => PaymentMethod::KIND_PIX,
+        ]);
+        CardBrand::factory()->forClinic($this->clinic)->create([
+            'name' => 'Visa Local',
+            'code' => 'visa',
+        ]);
+
+        EnsureDefaultPaymentCatalog::run($this->clinic);
+        EnsureDefaultPaymentCatalog::run($this->clinic);
+
+        $this->assertCatalogForClinic($this->clinic->id);
+        $this->assertSame(
+            1,
+            PaymentMethod::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->where('code', 'pix')
+                ->count()
+        );
+        $this->assertSame(
+            1,
+            CardBrand::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->where('code', 'visa')
+                ->count()
+        );
+        $this->assertDatabaseHas('payment_methods', [
+            'clinic_id' => $this->clinic->id,
+            'code' => 'pix',
+            'name' => 'PIX da casa',
+        ]);
+    }
+
+    public function test_artisan_backfill_seeds_clinics_missing_defaults(): void
+    {
+        $other = Clinic::factory()->create();
+
+        $this->artisan('payment-catalog:seed-defaults')
+            ->assertSuccessful();
+
+        $this->assertCatalogForClinic($this->clinic->id);
+        $this->assertCatalogForClinic($other->id);
+
+        $this->artisan('payment-catalog:seed-defaults')
+            ->assertSuccessful();
+
+        $this->assertSame(
+            count(EnsureDefaultPaymentCatalog::METHODS),
+            PaymentMethod::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->count()
+        );
+        $this->assertSame(
+            count(EnsureDefaultPaymentCatalog::BRANDS),
+            CardBrand::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $other->id)
+                ->count()
+        );
+    }
+
+    public function test_seller_can_manage_payment_methods_and_brands(): void
+    {
+        $seller = User::factory()->forClinic($this->clinic)->create();
+        $seller->assignRole('seller');
+        Sanctum::actingAs($seller);
+
+        $this->postJson('/api/v1/payment-methods', [
+            'name' => 'Transferência',
+            'code' => 'transferencia',
+            'kind' => PaymentMethod::KIND_OTHER,
+        ])->assertCreated();
+
+        $this->postJson('/api/v1/card-brands', [
+            'name' => 'Banescard',
+            'code' => 'banescard',
+        ])->assertCreated();
+    }
+
+    public function test_receptionist_cannot_manage_payment_catalog(): void
+    {
+        $receptionist = User::factory()->forClinic($this->clinic)->create();
+        $receptionist->assignRole('receptionist');
+        Sanctum::actingAs($receptionist);
+
+        $this->postJson('/api/v1/payment-methods', [
+            'name' => 'PIX',
+            'code' => 'pix',
+            'kind' => PaymentMethod::KIND_PIX,
+        ])->assertForbidden();
+
+        $this->postJson('/api/v1/card-brands', [
+            'name' => 'Visa',
+            'code' => 'visa',
+        ])->assertForbidden();
+    }
+
+    protected function assertCatalogForClinic(int $clinicId): void
+    {
+        $methods = PaymentMethod::query()
+            ->withoutGlobalScopes()
+            ->where('clinic_id', $clinicId)
+            ->get();
+        $brands = CardBrand::query()
+            ->withoutGlobalScopes()
+            ->where('clinic_id', $clinicId)
+            ->get();
+
+        $this->assertEqualsCanonicalizing(
+            array_column(EnsureDefaultPaymentCatalog::METHODS, 'code'),
+            $methods->pluck('code')->all()
+        );
+        $this->assertEqualsCanonicalizing(
+            array_column(EnsureDefaultPaymentCatalog::BRANDS, 'code'),
+            $brands->pluck('code')->all()
+        );
+        $this->assertTrue($methods->every(fn (PaymentMethod $method) => $method->is_active));
+        $this->assertTrue($brands->every(fn (CardBrand $brand) => $brand->is_active));
+        $this->assertTrue(
+            $methods
+                ->whereIn('kind', PaymentMethod::CARD_KINDS)
+                ->every(fn (PaymentMethod $method) => $method->requires_card_meta)
+        );
     }
 }
