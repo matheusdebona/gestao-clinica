@@ -7,9 +7,11 @@ use App\Models\CardBrand;
 use App\Models\ClientOrigin;
 use App\Models\Clinic;
 use App\Models\PaymentMethod;
+use App\Models\UnitOfMeasure;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
 use App\Support\EnsureDefaultPaymentCatalog;
+use App\Support\EnsureDefaultUnitsOfMeasure;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Routing\Middleware\ThrottleRequests;
@@ -219,6 +221,51 @@ class AuthTest extends TestCase
             'code' => 'cartao_debito',
             'requires_card_meta' => true,
         ]);
+    }
+
+    public function test_register_seeds_default_units_of_measure(): void
+    {
+        $this->postJson('/api/v1/auth/register', [
+            'clinic_name' => 'Clínica Unidades',
+            'name' => 'Lia Costa',
+            'email' => 'lia@unidades.test',
+            'password' => 'ChangeMe!123',
+            'password_confirmation' => 'ChangeMe!123',
+        ])->assertCreated();
+
+        $clinic = Clinic::query()->where('name', 'Clínica Unidades')->first();
+        $this->assertNotNull($clinic);
+
+        $symbols = UnitOfMeasure::query()
+            ->where('clinic_id', $clinic->id)
+            ->pluck('symbol')
+            ->all();
+
+        $this->assertEqualsCanonicalizing(
+            array_column(EnsureDefaultUnitsOfMeasure::UNITS, 'symbol'),
+            $symbols
+        );
+        $this->assertTrue(
+            UnitOfMeasure::query()
+                ->where('clinic_id', $clinic->id)
+                ->where('is_active', false)
+                ->doesntExist()
+        );
+        $this->assertDatabaseHas('units_of_measure', [
+            'clinic_id' => $clinic->id,
+            'symbol' => 'un',
+            'name' => 'Unidade',
+            'is_active' => true,
+        ]);
+        $this->assertDatabaseHas('units_of_measure', [
+            'clinic_id' => $clinic->id,
+            'symbol' => 'seringa',
+            'name' => 'Seringa',
+        ]);
+        $this->assertSame(
+            count(EnsureDefaultUnitsOfMeasure::UNITS),
+            UnitOfMeasure::query()->where('clinic_id', $clinic->id)->count()
+        );
     }
 
     public function test_register_bootstraps_roles_when_catalog_is_missing(): void

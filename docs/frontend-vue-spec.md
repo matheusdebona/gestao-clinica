@@ -593,6 +593,7 @@ Objetivo: cadastro operacional do catálogo e estoque. API Phase 2 já existe; e
 | Form — campos | nome, marca, tipo, unidade, SKU, `purpose`, custo (criação / entrada), `sale_price`, `min_sale_price`, estoque inicial (criar), `min_stock`, `lead_time_days`, ativo |
 | Estoque | Ação **Ajustar estoque**: `in`/`out`, qty, `unit_cost` obrigatório na entrada, motivo/notas |
 | Desativar | DELETE soft (`is_active=false`); lista com filtro “somente ativos” (padrão ligado, como Clientes) |
+| Catálogo inicial | Nova clínica (register, `POST /clinics`, demo seed) recebe **10 unidades ativas** — un, ml, mg, g, kg, cx, frasco, seringa, ampola, par. Idempotente por `clinic_id`+`symbol` (`EnsureDefaultUnitsOfMeasure`). Backfill: `php artisan units:seed-defaults` e `ProductCatalogSeeder` |
 
 ##### Mudança de modelo / API (obrigatória nesta fase)
 
@@ -642,6 +643,7 @@ Nav: manter **Produtos**; catálogos podem ficar como subtela/atalhos no detalhe
 - [x] Desativar produto e ocultar com “somente ativos”
 - [x] Outra clínica não vê o catálogo (já garantido na API; cobrir na UI só por escopo de sessão)
 - [x] Testes API da cascata marca/tipo + `?q=`; smoke manual das telas Vue
+- [x] Nova clínica (register) recebe 10 unidades padrão; `units:seed-defaults` cobre clínicas antigas
 
 #### 4.4 — Protocolos (especificação de UI)
 

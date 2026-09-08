@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
 use App\Support\EnsureDefaultPaymentCatalog;
+use App\Support\EnsureDefaultUnitsOfMeasure;
 use App\Support\EnsureRolesAndPermissions;
 use Illuminate\Support\Facades\DB;
 
@@ -31,6 +32,7 @@ class RegisterClinicAdminService
 
             EnsureDefaultClientOrigins::run($clinic);
             EnsureDefaultPaymentCatalog::run($clinic);
+            EnsureDefaultUnitsOfMeasure::run($clinic);
 
             $user = User::query()->create([
                 'name' => $payload['name'],
