@@ -1,0 +1,27 @@
+---
+import AccessSection from '../components/AccessSection.astro'
+import ClinicsSection from '../components/ClinicsSection.astro'
+import FaqSection from '../components/FaqSection.astro'
+import FeatureSection from '../components/FeatureSection.astro'
+import HeroStage from '../components/HeroStage.vue'
+import RhythmSection from '../components/RhythmSection.astro'
+import ScrollReveal from '../components/ScrollReveal.vue'
+import SiteFooter from '../components/SiteFooter.astro'
+import SiteHeader from '../components/SiteHeader.vue'
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout>
+  <SiteHeader client:load />
+  <main>
+    <HeroStage client:load />
+    <ScrollReveal client:visible>
+      <FeatureSection />
+      <RhythmSection />
+      <ClinicsSection />
+      <AccessSection />
+      <FaqSection />
+    </ScrollReveal>
+  </main>
+  <SiteFooter />
+</BaseLayout>

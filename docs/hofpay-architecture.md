@@ -2,7 +2,7 @@
 
 Documento **travado** de marca, superfícies, monorepo e publicação no VPS. Complementa a stack da API ([`stack-definition.md`](./stack-definition.md)) e a visão de negócio ([`visao-da-plataforma.md`](./visao-da-plataforma.md)).
 
-Não cria código do site de marketing neste momento: `apps/site` ainda **não** está scaffoldado.
+**Status:** `apps/site` existe — Astro (SSG) + ilhas Vue 3 + Tailwind 4 + GSAP/ScrollTrigger. Landing em português, CTA para `app.hofpay.com.br`. **Ainda não há deploy no VPS.**
 
 ---
 
@@ -27,7 +27,7 @@ Produção: **um VPS**, três hosts, TLS em todos.
 
 | Host | Superfície | Código | O que o nginx entrega |
 | --- | --- | --- | --- |
-| `hofpay.com.br` | Marketing / vendas | futuro `apps/site` | Site **estático** (HTML/CSS/JS) |
+| `hofpay.com.br` | Marketing / vendas | `apps/site` | Site **estático** (HTML/CSS/JS) |
 | `app.hofpay.com.br` | App da clínica | `apps/web` | SPA Vue (arquivos estáticos + `try_files` → `index.html`) |
 | `api.hofpay.com.br` | API | raiz Laravel | PHP / container Docker (JSON `/api/v1`) |
 
@@ -50,34 +50,35 @@ gestao-clinica/                 # repo GitHub (nome técnico)
   app/, config/, routes/, …     # Laravel API  →  api.hofpay.com.br
   apps/
     web/                        # Vue SPA      →  app.hofpay.com.br   (já existe)
-    site/                       # marketing    →  hofpay.com.br       (ainda NÃO existe)
+    site/                       # marketing    →  hofpay.com.br       (Astro SSG)
   docs/
   docker-compose.yml
-  ./dev                         # API + web hoje; no futuro também o site
+  ./dev                         # API + web; `./dev site` sobe o marketing em :4321
 ```
 
-### Site de marketing (`apps/site`) — stack recomendada
+### Site de marketing (`apps/site`)
 
-Quando for scaffoldar (PR seguinte, não este):
+Scaffold em [`apps/site`](../apps/site). Stack:
 
 | Camada | Escolha |
 | --- | --- |
 | Framework | **Astro (SSG)** |
-| Interatividade | **Ilhas Vue 3** (só onde precisar de JS) |
-| CSS | **Tailwind 4**, alinhado ao visual **Soft Violet / Liquid Glass** de `apps/web` |
+| Interatividade | **Ilhas Vue 3** (header, hero, ScrollTrigger) |
+| CSS | **Tailwind 4**, tokens Soft Violet / Liquid Glass (cópia de `apps/web`) |
 | Motion | **GSAP** + **ScrollTrigger** |
-| Build | Arquivos estáticos (`dist/`) atrás do nginx |
+| Build | Arquivos estáticos (`dist/`) atrás do nginx (deploy VPS ainda não) |
 
-Por quê Astro: HTML estático rápido para vendas/SEO; Vue só nas ilhas (hero, FAQ, CTA); o mesmo mental model Vue do app operacional, sem SSR autenticado.
+Por quê Astro: HTML estático rápido para vendas/SEO; Vue só nas ilhas (header, hero, motion); o mesmo mental model Vue do app operacional, sem SSR autenticado.
 
 **Alternativa aceitável:** **Nuxt (SSG)** + GSAP + ScrollTrigger, se no momento do scaffold preferirem um único mental model Vue/Nuxt em vez de Astro. Continua deployável como estático no VPS.
 
 Regras do site:
 
 - Linguagem visual: Soft Violet / Liquid Glass (heavy), claro — sem segundo design system.
-- GSAP: registrar `ScrollTrigger` uma vez; nas ilhas Vue, criar tweens em `onMounted` com `gsap.context` no root da ilha e `ctx.revert()` no unmount; respeitar `prefers-reduced-motion` (`gsap.matchMedia`).
+- GSAP: registrar `ScrollTrigger` uma vez; nas ilhas Vue, tweens em `gsap.context` + `gsap.matchMedia` (`prefers-reduced-motion`) e `ctx.revert()` no unmount.
 - Sem login, sem Bearer, sem chamada à API da clínica.
 - CTA principal: `https://app.hofpay.com.br/register`.
+- SEO (Google + IAs): HTML semântico, title/description/canonical, Open Graph, JSON-LD (Organization, WebSite, SoftwareApplication, FAQPage, sem ratings inventados), sitemap/robots, conteúdo crawlable no HTML, [`/llms.txt`](../apps/site) e `/llms-full.txt`. Sem bloquear crawlers de assistentes.
 
 ---
 
@@ -168,20 +169,20 @@ DNS (quando for a fase de DNS):
 | --- | --- | --- |
 | API Laravel | **8000** | `./dev up` (Docker Compose) |
 | App Vue | **5173** | `./dev up` (Vite) |
-| Site Astro | **4321** | **Ainda não.** Intenção: estender `./dev` quando `apps/site` existir |
+| Site Astro | **4321** | `./dev site` (`astro dev`) |
 
-`./dev` hoje sobe API + `apps/web`. **Não** incluir o site neste PR. Quando o scaffold existir: `apps/site` no default Astro (`astro dev` → `:4321`) e um `start_site` análogo ao `start_web` no `./dev`.
+`./dev up` sobe API + `apps/web`. O marketing sobe à parte: `./dev site` (ou `cd apps/site && npm run dev`). `./dev down` encerra web e site.
 
 ---
 
 ## 7. Rollout em fases
 
-| Fase | O quê | Este PR? |
+| Fase | O quê | Status |
 | --- | --- | --- |
-| **1** | Documento de arquitetura + rebrand de nome (**HOF Pay**) na UI/docs/`APP_NAME` | **Sim** |
-| **2** | Scaffold `apps/site` (Astro + Vue 3 + Tailwind 4 + GSAP) | Não |
+| **1** | Documento de arquitetura + rebrand de nome (**HOF Pay**) na UI/docs/`APP_NAME` | Feito |
+| **2** | Scaffold `apps/site` (Astro + Vue 3 + Tailwind 4 + GSAP) | Feito (landing; sem VPS) |
 | **3** | DNS + nginx + TLS nos três hosts; `CORS_ALLOWED_ORIGINS` / `APP_URL` / `VITE_API_URL` de produção | Não |
-| **4** | Polir animações do marketing (ScrollTrigger, reduced motion, performance) | Não |
+| **4** | Polir animações do marketing (ScrollTrigger, reduced motion, performance) | Incremental no site |
 
 Ordem: docs e marca primeiro (para o app já nascer com o nome certo) → site no monorepo → expor hosts no VPS → motion fino no site. Não inverter 2 e 3 se o `dist` do site ainda não existir.
 
@@ -192,6 +193,6 @@ Ordem: docs e marca primeiro (para o app já nascer com o nome certo) → site n
 - Processador de pagamentos (gateway, split, conciliação). Formas de pagamento da clínica já existem no domínio; isso **não** é “HOF Pay” como adquirente.
 - Renomear o repositório GitHub `gestao-clinica`.
 - Migrations ou rename de banco/usuário/bucket por causa da marca.
-- Scaffold de `apps/site`.
+- Deploy nginx/Caddy/TLS no VPS.
 - Mudança de rotas ou regras de negócio da API.
 - Segundo design system no site (Soft Violet / Liquid Glass permanece).
