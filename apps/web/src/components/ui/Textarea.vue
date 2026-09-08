@@ -30,7 +30,7 @@ const attrs = useAttrs()
 
 const classes = computed(() =>
   cn(
-    'glass-field w-full resize-y rounded-[12px] px-3.5 py-2.5 text-[15px] text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
+    'glass-field sv-field-control w-full resize-y rounded-[12px] px-3.5 py-2.5 text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
     typeof attrs.class === 'string' ? attrs.class : undefined,
   ),
 )

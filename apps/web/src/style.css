@@ -62,7 +62,20 @@
   input,
   textarea,
   select {
-    font: inherit;
+    font-family: inherit;
+    font-weight: inherit;
+    letter-spacing: inherit;
+  }
+
+  input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='hidden']):not(
+      [type='button']
+    ):not([type='submit']):not([type='reset']):not([type='file']):not([type='color']):not(
+      [type='image']
+    ),
+  textarea,
+  select {
+    font-size: var(--sv-text-field);
+    line-height: var(--sv-leading-field);
   }
 
   *:focus-visible {

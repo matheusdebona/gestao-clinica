@@ -28,7 +28,7 @@ export const features = [
   },
   {
     title: 'Agenda',
-    copy: 'Sessões, retornos e o dia do médico em um olhar. Pensada para o celular, não só para o desktop.',
+    copy: 'Sessões, retornos e o dia do profissional de harmonização em um olhar. Pensada para o celular, não só para o desktop.',
   },
   {
     title: 'Métricas',
@@ -55,7 +55,7 @@ export const rhythmSteps = [
   {
     n: '04',
     title: 'Tratar e baixar o que foi usado',
-    copy: 'Na sessão, o médico informa o que foi aplicado. Aí sim o estoque e a margem fecham.',
+    copy: 'Na sessão, o profissional de harmonização informa o que foi aplicado. Aí sim o estoque e a margem fecham.',
   },
 ] as const
 
@@ -79,12 +79,12 @@ export const faqs = [
   {
     id: 'celular',
     q: 'Funciona no celular?',
-    a: 'O app da clínica é mobile-first. Médico e secretária usam no dia a dia, não só no computador da recepção.',
+    a: 'O app da clínica é mobile-first. Profissionais de harmonização e a equipe usam no dia a dia, não só no computador da recepção.',
   },
   {
     id: 'estoque',
     q: 'A venda já baixa o estoque?',
-    a: 'Não. A venda e o contrato acontecem primeiro. A baixa é no tratamento, quando o médico informa o que foi de fato aplicado.',
+    a: 'Não. A venda e o contrato acontecem primeiro. A baixa é no tratamento, quando o profissional de harmonização informa o que foi de fato aplicado.',
   },
   {
     id: 'preco',
@@ -158,7 +158,7 @@ Idioma: pt-BR.
 
 ## Para quem
 
-Clínicas (estética, dermatologia, harmonização, odontologia, procedimentos injetáveis, medicina integrativa, multiunidade). Médico e secretária, no celular e no consultório.
+Clínicas (estética, dermatologia, harmonização, odontologia, procedimentos injetáveis, medicina integrativa, multiunidade). Profissionais de harmonização e a equipe, no celular e no consultório.
 
 ## Produto
 

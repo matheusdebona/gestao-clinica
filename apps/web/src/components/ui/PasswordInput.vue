@@ -35,7 +35,7 @@ const inputType = computed(() => (visible.value ? 'text' : 'password'))
 
 const classes = computed(() =>
   cn(
-    'glass-field h-11 w-full rounded-[12px] py-0 pr-11 pl-3.5 text-[15px] text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
+    'glass-field sv-field-control h-11 w-full rounded-[12px] py-0 pr-11 pl-3.5 text-title placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50',
     typeof attrs.class === 'string' ? attrs.class : undefined,
   ),
 )

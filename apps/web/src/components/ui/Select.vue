@@ -65,7 +65,7 @@ function onRootUpdate(value: unknown) {
 
 const triggerClass = computed(() =>
   cn(
-    'glass-field inline-flex h-11 w-full items-center justify-between gap-2 rounded-[12px] px-3.5 text-[15px] text-title outline-none disabled:cursor-not-allowed disabled:opacity-50',
+    'glass-field sv-field-control inline-flex h-11 w-full items-center justify-between gap-2 rounded-[12px] px-3.5 text-title outline-none disabled:cursor-not-allowed disabled:opacity-50',
   ),
 )
 </script>

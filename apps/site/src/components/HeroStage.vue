@@ -59,7 +59,7 @@ useGsapIsland(root, ({ gsap, reduceMotion }) => {
           HOF Pay é a plataforma de gestão para clínicas: estoque, protocolos, clientes, agenda e métricas.
         </p>
         <p class="mt-3 max-w-[34rem] text-[16px] leading-7 text-inverse/70">
-          Pensado para o médico e a secretária, no celular e no consultório.
+          Pensado para profissionais de harmonização e a equipe, no celular e no consultório.
         </p>
         <div class="mt-8 flex flex-wrap items-center gap-3">
           <a class="site-cta-primary" :href="APP_REGISTER_URL">Criar clínica</a>

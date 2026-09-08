@@ -247,6 +247,7 @@ Implementar em `design-tokens/tokens.css` (Tailwind 4 `@theme inline`).
 | H2 | 17px / 600 / 22px |
 | H3 | 15px / 500 / 20px |
 | Body | 15px / 400 / 20px |
+| Field | 16px / 400 / 22px (`--sv-text-field`, classe `sv-field-control`) — mínimo 16px para o Safari iOS não dar zoom no foco |
 | Caption | 13px / 400 / 18px |
 | Badge | 12px / 500, sentence case |
 
@@ -326,7 +327,7 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 | --- | --- | --- |
 | `Button` | primary / secondary / ghost / destructive | Primary: brand **sólido**; secondary/ghost hover em glass; loading / disabled |
 | `ButtonAccent` | CTA raro (outline glass, sem gradient) | Só destaques explícitos |
-| `Input` | Texto / number / password / email / search / tel | `glass-field`, radius 12; invalid via `aria-invalid`. **Não** usar `type="date"` nem `type="datetime-local"`. Telefone BR: `PhoneInput`. Moeda: `MoneyInput`. |
+| `Input` | Texto / number / password / email / search / tel | `glass-field` + `sv-field-control` (16px), radius 12; invalid via `aria-invalid`. **Não** usar `type="date"` nem `type="datetime-local"`. Telefone BR: `PhoneInput`. Moeda: `MoneyInput`. |
 | `PhoneInput` | WhatsApp / telefone BR | Máscara `(00) 0000-0000` / `(00) 00000-0000`; `v-model` dígitos; placeholder `(11) 99999-9999`; `glass-field` |
 | `DatePicker` | Data civil (não nativo) | `v-model` ISO `YYYY-MM-DD`; trigger `glass-field`; calendário `glass-menu`; PT-BR (Seg–Dom); `id` / `invalid` / `disabled`; Limpar / Hoje |
 | `DateTimePicker` | Data e hora (não nativo) | `v-model` `YYYY-MM-DDTHH:mm`; mesmo trigger/menu; hora 0–23 + minutos (passo 5); Limpar / Agora |
