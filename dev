@@ -7,6 +7,8 @@ cd "$ROOT"
 DEV_DIR="$ROOT/.dev"
 WEB_PID_FILE="$DEV_DIR/web.pid"
 WEB_LOG_FILE="$DEV_DIR/web.log"
+SITE_PID_FILE="$DEV_DIR/site.pid"
+SITE_LOG_FILE="$DEV_DIR/site.log"
 API_URL="http://127.0.0.1:8000"
 
 usage() {
@@ -14,13 +16,15 @@ usage() {
 Uso: ./dev <comando>
 
   up      Sobe a API (Docker) e o frontend (Vite)
-  down    Para API e frontend
+  down    Para API, frontend e site de marketing
+  site    Sobe o site de marketing (Astro)
   fresh   Apaga o banco local e roda só as migrations
           Use -y para não perguntar
   seed    Roda os seeders
 
 API:        http://localhost:8000
 Frontend:   http://localhost:5173  (ou a próxima porta livre)
+Site:       http://localhost:4321
 MinIO:      http://localhost:9001  (minio / minioSecret)
 
 Login demo: admin@clinica-demo.test / ChangeMe!123
@@ -90,6 +94,31 @@ stop_web() {
   rm -f "$WEB_PID_FILE"
 }
 
+site_pid() {
+  if [[ -f "$SITE_PID_FILE" ]]; then
+    cat "$SITE_PID_FILE"
+  fi
+}
+
+site_running() {
+  local pid
+  pid="$(site_pid || true)"
+  [[ -n "${pid:-}" ]] && kill -0 "$pid" 2>/dev/null
+}
+
+stop_site() {
+  local pid
+  pid="$(site_pid || true)"
+  if [[ -n "${pid:-}" ]]; then
+    if kill -0 "$pid" 2>/dev/null; then
+      pkill -P "$pid" 2>/dev/null || true
+      kill "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+    fi
+  fi
+  rm -f "$SITE_PID_FILE"
+}
+
 wait_for_api() {
   local i
   for i in $(seq 1 90); do
@@ -112,6 +141,13 @@ ensure_web_deps() {
   if [[ ! -d "$ROOT/apps/web/node_modules/vite" ]]; then
     say "Instalando dependências do frontend..."
     (cd "$ROOT/apps/web" && npm install)
+  fi
+}
+
+ensure_site_deps() {
+  if [[ ! -d "$ROOT/apps/site/node_modules/astro" ]]; then
+    say "Instalando dependências do site..."
+    (cd "$ROOT/apps/site" && npm install)
   fi
 }
 
@@ -153,6 +189,34 @@ start_web() {
   say "Frontend: ${url:-http://localhost:5173}"
 }
 
+start_site() {
+  mkdir -p "$DEV_DIR"
+  ensure_site_deps
+  if site_running; then
+    say "Site já está no ar (pid $(site_pid))."
+    return
+  fi
+  say "Subindo o site de marketing..."
+  (
+    cd "$ROOT/apps/site"
+    exec npm run dev
+  ) >"$SITE_LOG_FILE" 2>&1 &
+  echo $! >"$SITE_PID_FILE"
+  local i url=""
+  for i in $(seq 1 40); do
+    if grep -q 'localhost:' "$SITE_LOG_FILE" 2>/dev/null; then
+      url="$(grep -E 'localhost:[0-9]+' "$SITE_LOG_FILE" | tail -n 1 | grep -Eo 'https?://[^ ]+' | head -n 1)"
+      break
+    fi
+    if ! site_running; then
+      cat "$SITE_LOG_FILE" >&2 || true
+      die "O site encerrou ao iniciar. Veja $SITE_LOG_FILE"
+    fi
+    sleep 0.25
+  done
+  say "Site: ${url:-http://localhost:4321}"
+}
+
 cmd_up() {
   start_api
   start_web
@@ -163,6 +227,7 @@ cmd_up() {
 
 cmd_down() {
   stop_web
+  stop_site
   if docker info >/dev/null 2>&1; then
     docker compose down
   fi
@@ -199,6 +264,7 @@ cmd_seed() {
 case "${1:-}" in
   up) cmd_up ;;
   down) cmd_down ;;
+  site) start_site ;;
   fresh) cmd_fresh "${2:-}" ;;
   seed) cmd_seed ;;
   -h | --help | help | "") usage ;;

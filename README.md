@@ -26,6 +26,7 @@ Arquitetura, domínios de produção e plano de deploy: [`docs/hofpay-architectu
 - Sanctum (Bearer) · Spatie Permission
 - PostgreSQL 18 · Redis · MinIO (S3)
 - Clinic multi-tenant · Vue SPA em [`apps/web`](./apps/web) (PWA later)
+- Marketing em [`apps/site`](./apps/site) (Astro; `./dev site` → `:4321`)
 
 ## Quick start
 

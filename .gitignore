@@ -19,6 +19,8 @@
 /node_modules
 /apps/web/node_modules
 /apps/web/dist
+/apps/site/node_modules
+/apps/site/dist
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot

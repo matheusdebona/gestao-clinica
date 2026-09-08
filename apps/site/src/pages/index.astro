@@ -1,0 +1,24 @@
+---
+import AccessBand from '../components/AccessBand.vue'
+import ClinicRhythm from '../components/ClinicRhythm.vue'
+import FaqAccordion from '../components/FaqAccordion.vue'
+import FeatureShowcase from '../components/FeatureShowcase.vue'
+import HeroStage from '../components/HeroStage.vue'
+import ProofStrip from '../components/ProofStrip.vue'
+import SiteFooter from '../components/SiteFooter.astro'
+import SiteHeader from '../components/SiteHeader.vue'
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout>
+  <SiteHeader client:load />
+  <main>
+    <HeroStage client:load />
+    <FeatureShowcase client:visible />
+    <ClinicRhythm client:visible />
+    <ProofStrip client:visible />
+    <AccessBand client:visible />
+    <FaqAccordion client:visible />
+  </main>
+  <SiteFooter />
+</BaseLayout>
