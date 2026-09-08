@@ -711,7 +711,7 @@ Objetivo: fluxo comercial mobile-first — montar venda (protocolo + produtos), 
 | Tema | Decisão |
 | --- | --- |
 | Escopo | Vendas **completas** (lista, draft, itens, pagamentos, confirm/cancel) **e** orçamentos (gerar / enviar / aceitar / rejeitar / expirar / **PDF**) |
-| Fluxo mobile | **Wizard**: Cliente → Itens → Valores → Pagamentos → Revisar / Confirmar |
+| Fluxo mobile | **Wizard**: Cliente → Itens → Valores → Pagamentos → Revisar → **Orçamento** (confirmar só após aceitar) |
 | Itens | Aplicar **protocolo** (explode/mescla) + produtos avulsos (busca) + editar qty/preço das linhas |
 | Valor efetivo | Editável (manual); se &lt; mínimo → aviso + confirmação `confirm_below_minimum` (soft gate) |
 | Pagamentos | Soma **deve fechar** o efetivo (sem parcial nesta fase); N métodos + meta de cartão quando `requires_card_meta` |
@@ -752,7 +752,8 @@ Passos do wizard (draft):
 2. **Itens** — adicionar protocolo + produtos; editar qty/preços de linha; ver `expected_amount` / mínimos.
 3. **Valores** — `effective_amount` editável; indicar se abaixo do mínimo.
 4. **Pagamentos** — linhas método/valor (+ cartão); saldo até zerar.
-5. **Revisar** — confirmar (dialog se below-min) ou caminho orçamento (gerar versão → enviar → PDF → aceitar/rejeitar).
+5. **Revisar** — conferir cliente, itens, efetivo e pagamentos. Sem confirmar nesta etapa.
+6. **Orçamento** — validade, notas e **Gerar orçamento**. Depois: Aceitar, Recusar, Enviar PDF (e Enviar). **Confirmar venda** só habilita com orçamento **aceito**.
 
 Orçamento aceito: venda permanece `draft` para pagamentos/confirm (comportamento atual da API).
 
@@ -783,13 +784,13 @@ Domínio: [`domain-model.md`](./domain-model.md) §7. Seed: `EnsureDefaultPaymen
 
 | Tema | Decisão |
 | --- | --- |
-| Escopo | Lista + detalhe + criar/editar + desativar **métodos** e **bandeiras**. Matriz de taxas (`CardFeeRule`) fica fora |
+| Escopo | Lista + detalhe + criar/editar + desativar **métodos**, **bandeiras** e **operadoras**. Matriz de taxas (`CardFeeRule`) fica fora |
 | Desativar | DELETE soft (`is_active=false`). Lista com switch “somente ativos” (padrão ligado) |
 | Visual | Soft Violet Liquid Glass **heavy** — só `components/ui` + `patterns` |
-| Nav | Item **Pagamentos** no `ClinicShell` (sem pin na tab bar). Atalhos na lista de vendas e cruzados métodos ↔ bandeiras |
-| Permissão | Telas e CRUD = `payment_methods.manage` / `card_brands.manage` (admin e vendedor). GET index já aceita `sales.view` / `treatments.consume` no wizard |
+| Nav | Item **Pagamentos** no `ClinicShell` (sem pin na tab bar). Atalhos cruzados métodos ↔ bandeiras ↔ operadoras |
+| Permissão | Telas e CRUD = `payment_methods.manage` / `card_brands.manage` / `card_operators.manage` (admin e vendedor). GET index já aceita `sales.view` / `treatments.consume` no wizard |
 | Catálogo inicial | Nova clínica (register, `POST /clinics`, demo seed) recebe métodos (Dinheiro, PIX, Cartão de débito, Cartão de crédito, Boleto, Cheque, Outros) e bandeiras (Visa, Mastercard, Elo, American Express, Hipercard, Cabal, Diners). Ativos. Cartão com `requires_card_meta`. Backfill: `php artisan payment-catalog:seed-defaults` e `PaymentCatalogSeeder` |
-| Fora desta fase | UI de operadoras / regras de taxa; mudança no wizard além de usar a API existente |
+| Fora desta fase | UI de regras de taxa; mudança no wizard além de usar a API existente |
 
 ##### Telas / rotas
 
@@ -803,6 +804,10 @@ Domínio: [`domain-model.md`](./domain-model.md) §7. Seed: `EnsureDefaultPaymen
 | `/card-brands/new` | Criar bandeira | `card_brands.manage` |
 | `/card-brands/:id` | Detalhe + editar / desativar | `card_brands.manage` |
 | `/card-brands/:id/edit` | Editar | `card_brands.manage` |
+| `/card-operators` | Lista de operadoras | `card_operators.manage` |
+| `/card-operators/new` | Criar operadora | `card_operators.manage` |
+| `/card-operators/:id` | Detalhe + editar / desativar | `card_operators.manage` |
+| `/card-operators/:id/edit` | Editar | `card_operators.manage` |
 
 ##### DoD 4.5b
 

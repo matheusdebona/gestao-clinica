@@ -15,3 +15,19 @@ describe('auth guest routes', () => {
     expect(login?.meta).toMatchObject({ guest: true, title: 'Entrar' })
   })
 })
+
+describe('payment catalog routes', () => {
+  it('registers card operator CRUD under the clinic shell', () => {
+    const shell = routes.find((route) => route.path === '/')
+    const children = shell?.children ?? []
+    const names = children.map((route) => route.name)
+    expect(names).toEqual(
+      expect.arrayContaining([
+        'card-operators',
+        'card-operators-new',
+        'card-operators-edit',
+        'card-operators-show',
+      ]),
+    )
+  })
+})

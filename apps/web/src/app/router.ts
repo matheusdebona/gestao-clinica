@@ -286,6 +286,30 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/CardBrandDetailPage.vue'),
         },
         {
+          path: 'card-operators',
+          name: 'card-operators',
+          meta: { title: 'Operadoras' },
+          component: () => import('@/pages/CardOperatorsPage.vue'),
+        },
+        {
+          path: 'card-operators/new',
+          name: 'card-operators-new',
+          meta: { title: 'Nova operadora' },
+          component: () => import('@/pages/CardOperatorFormPage.vue'),
+        },
+        {
+          path: 'card-operators/:id/edit',
+          name: 'card-operators-edit',
+          meta: { title: 'Editar operadora' },
+          component: () => import('@/pages/CardOperatorFormPage.vue'),
+        },
+        {
+          path: 'card-operators/:id',
+          name: 'card-operators-show',
+          meta: { title: 'Operadora' },
+          component: () => import('@/pages/CardOperatorDetailPage.vue'),
+        },
+        {
           path: 'budgets',
           name: 'budgets',
           meta: { title: 'Orçamentos' },

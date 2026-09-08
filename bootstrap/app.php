@@ -1,5 +1,6 @@
 <?php
 
+use App\Exceptions\PdfRenderException;
 use App\Http\Middleware\ResolveCurrentClinic;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -28,4 +29,17 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        $exceptions->render(function (PdfRenderException $exception, Request $request) {
+            if (! $request->is('api/*') && ! $request->expectsJson()) {
+                return null;
+            }
+
+            return response()->json([
+                'message' => $exception->getMessage(),
+                'errors' => [
+                    'pdf' => [$exception->getMessage()],
+                ],
+            ], 503);
+        });
     })->create();

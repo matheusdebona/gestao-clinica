@@ -44,7 +44,7 @@ function openPayments() {
         <div class="px-5 py-2">
           <ListCard
             title="Métodos de pagamento"
-            meta="Dinheiro, PIX, cartão e bandeiras"
+            meta="Dinheiro, PIX, cartão, bandeiras e operadoras"
             @action="openPayments"
           />
         </div>

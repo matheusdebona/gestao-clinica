@@ -2,7 +2,7 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { CARD_KINDS } from '@/features/payments/labels'
 import { emptyToMoney } from '@/lib/formatters'
-import type { CardBrandPayload, PaymentMethod, PaymentMethodPayload } from '@/types/sale'
+import type { CardBrandPayload, CardOperatorPayload, PaymentMethod, PaymentMethodPayload } from '@/types/sale'
 
 const KINDS = ['cash', 'pix', 'check', 'credit_card', 'debit_card', 'boleto', 'other'] as const
 
@@ -99,6 +99,34 @@ export function toCardBrandPayload(values: { name: string; code: string; is_acti
   return {
     name: values.name.trim(),
     code: values.code.trim(),
+    is_active: values.is_active,
+  }
+}
+
+export const cardOperatorFormSchema = toTypedSchema(
+  z.object({
+    name: z.string().trim().min(1, 'Informe o nome.').max(255, 'Nome muito longo.'),
+    code: z
+      .string()
+      .trim()
+      .max(50, 'Código muito longo.')
+      .regex(/^$|^[A-Za-z0-9_-]+$/, 'Use letras, números, hífen ou underline.'),
+    auto_anticipate: z.boolean(),
+    is_active: z.boolean(),
+  }),
+)
+
+export function toCardOperatorPayload(values: {
+  name: string
+  code: string
+  auto_anticipate: boolean
+  is_active: boolean
+}): CardOperatorPayload {
+  const code = values.code.trim()
+  return {
+    name: values.name.trim(),
+    code: code === '' ? null : code,
+    auto_anticipate: values.auto_anticipate,
     is_active: values.is_active,
   }
 }

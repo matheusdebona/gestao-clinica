@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Budget;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\Protocol;
@@ -174,6 +175,17 @@ class SalePricingService
         if (abs($paymentsTotal - $effective) > 0.001) {
             throw ValidationException::withMessages([
                 'payments' => ['Payment amounts must equal the effective sale amount.'],
+            ]);
+        }
+
+        $hasAcceptedBudget = Budget::query()
+            ->where('sale_id', $sale->id)
+            ->where('status', Budget::STATUS_ACCEPTED)
+            ->exists();
+
+        if (! $hasAcceptedBudget) {
+            throw ValidationException::withMessages([
+                'budget' => ['Aceite o orçamento antes de confirmar a venda.'],
             ]);
         }
 

@@ -40,4 +40,16 @@ export const SALE_WIZARD_STEPS = [
   { id: 'values', label: 'Valores' },
   { id: 'payments', label: 'Pagamentos' },
   { id: 'review', label: 'Revisar' },
+  { id: 'budget', label: 'Orçamento' },
 ] as const
+
+export const SALE_WIZARD_STEP = {
+  client: 0,
+  items: 1,
+  values: 2,
+  payments: 3,
+  review: 4,
+  budget: 5,
+} as const
+
+export const SALE_WIZARD_LAST_INDEX = SALE_WIZARD_STEPS.length - 1

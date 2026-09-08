@@ -97,6 +97,8 @@ class AppointmentTest extends TestCase
             ],
         ])->assertOk();
 
+        $this->acceptBudgetForSale($saleId);
+
         $this->postJson("/api/v1/sales/{$saleId}/confirm")->assertOk();
 
         $treatmentId = $this->postJson("/api/v1/sales/{$saleId}/treatments")

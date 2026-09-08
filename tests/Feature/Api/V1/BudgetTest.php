@@ -160,7 +160,7 @@ class BudgetTest extends TestCase
             ->assertJsonPath('data.items.0.quantity', '1.0000');
     }
 
-    public function test_accept_requires_sent_and_allows_only_one_accepted(): void
+    public function test_accept_allows_draft_or_sent_and_allows_only_one_accepted(): void
     {
         Sanctum::actingAs($this->admin);
         $product = $this->makeProduct('Item', '10.0000', '100.00', '80.00');
@@ -169,10 +169,6 @@ class BudgetTest extends TestCase
             ->assertCreated()
             ->json('data.id');
 
-        $this->postJson("/api/v1/budgets/{$budgetId}/accept")
-            ->assertStatus(422);
-
-        $this->postJson("/api/v1/budgets/{$budgetId}/send")->assertOk();
         $this->postJson("/api/v1/budgets/{$budgetId}/accept")
             ->assertOk()
             ->assertJsonPath('data.status', 'accepted');

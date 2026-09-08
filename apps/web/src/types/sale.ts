@@ -87,6 +87,13 @@ export interface CardBrandPayload {
   is_active?: boolean
 }
 
+export interface CardOperatorPayload {
+  name: string
+  code?: string | null
+  auto_anticipate?: boolean
+  is_active?: boolean
+}
+
 export interface Sale {
   id: number
   clinic_id: number

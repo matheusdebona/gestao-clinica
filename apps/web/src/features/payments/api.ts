@@ -1,6 +1,13 @@
 import { api } from '@/lib/api'
 import type { DataEnvelope, Paginated } from '@/types/pagination'
-import type { CardBrand, CardBrandPayload, CardOperator, PaymentMethod, PaymentMethodPayload } from '@/types/sale'
+import type {
+  CardBrand,
+  CardBrandPayload,
+  CardOperator,
+  CardOperatorPayload,
+  PaymentMethod,
+  PaymentMethodPayload,
+} from '@/types/sale'
 
 export interface PaymentCatalogListParams {
   page?: number
@@ -103,4 +110,35 @@ export async function updateCardBrand(
 
 export async function deactivateCardBrand(id: number): Promise<void> {
   await api(`/card-brands/${id}`, { method: 'DELETE' })
+}
+
+export async function listCardOperatorsPage(
+  params: PaymentCatalogListParams = {},
+): Promise<Paginated<CardOperator>> {
+  return api<Paginated<CardOperator>>('/card-operators', { query: catalogQuery(params) })
+}
+
+export async function getCardOperator(id: number): Promise<CardOperator> {
+  const payload = await api<DataEnvelope<CardOperator>>(`/card-operators/${id}`)
+  return payload.data
+}
+
+export async function createCardOperator(body: CardOperatorPayload): Promise<CardOperator> {
+  const payload = await api<DataEnvelope<CardOperator>>('/card-operators', { method: 'POST', body })
+  return payload.data
+}
+
+export async function updateCardOperator(
+  id: number,
+  body: Partial<CardOperatorPayload>,
+): Promise<CardOperator> {
+  const payload = await api<DataEnvelope<CardOperator>>(`/card-operators/${id}`, {
+    method: 'PUT',
+    body,
+  })
+  return payload.data
+}
+
+export async function deactivateCardOperator(id: number): Promise<void> {
+  await api(`/card-operators/${id}`, { method: 'DELETE' })
 }

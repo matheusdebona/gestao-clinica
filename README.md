@@ -94,6 +94,66 @@ php artisan key:generate
 php artisan test
 ```
 
+## PDF de orçamento (Browsershot)
+
+A API gera PDF com Spatie Browsershot (Chromium + Node + Puppeteer). Testes usam `FakePdfRenderer` (`APP_ENV=testing`). Em produção o renderer real precisa dos binários no host da API.
+
+Diagnóstico:
+
+```bash
+php artisan pdf:diagnose
+```
+
+### Docker (já no `Dockerfile`)
+
+A imagem instala `chromium`, `nodejs`, `npm`, fontes e `puppeteer` global. O container define `BROWSERSHOT_CHROME_PATH=/usr/bin/chromium`. Rebuild da imagem da API depois do merge se o VPS usa Compose.
+
+### VPS com PHP-FPM (Debian/Ubuntu)
+
+Rodar como root no servidor da API (ajuste o nome do pacote se a distro usar `chromium-browser`):
+
+```bash
+sudo apt-get update
+sudo apt-get install -y chromium fonts-liberation fonts-dejavu-core nodejs npm
+sudo npm install -g puppeteer
+```
+
+Se `chromium` não existir no apt:
+
+```bash
+sudo apt-get install -y chromium-browser
+# ou Google Chrome:
+# curl -fsSL https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -o /tmp/chrome.deb
+# sudo apt-get install -y /tmp/chrome.deb
+```
+
+No `.env` da API (caminhos reais: `which chromium`, `which node`, `npm root -g`):
+
+```env
+BROWSERSHOT_CHROME_PATH=/usr/bin/chromium
+BROWSERSHOT_NODE_BINARY=/usr/bin/node
+BROWSERSHOT_NPM_BINARY=/usr/bin/npm
+BROWSERSHOT_NODE_MODULE_PATH=/usr/lib/node_modules
+```
+
+O PHP-FPM **não** herda o PATH do seu shell. No pool (`/etc/php/8.5/fpm/pool.d/www.conf` ou equivalente):
+
+```ini
+env[PATH] = /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/bin
+env[BROWSERSHOT_CHROME_PATH] = /usr/bin/chromium
+env[PUPPETEER_EXECUTABLE_PATH] = /usr/bin/chromium
+```
+
+O usuário do PHP-FPM (`www-data`) precisa executar o Chromium (`--no-sandbox` já está no renderer). Depois:
+
+```bash
+sudo systemctl restart php8.5-fpm
+php artisan config:clear
+php artisan pdf:diagnose
+```
+
+Se `POST /api/v1/budgets/{id}/pdf` ainda falhar, a API agora responde **503** com mensagem em português (Chromium/Node ausente ou erro do Puppeteer), em vez de um 500 genérico.
+
 ## Build order
 
 Follow `docs/domain-roadmap.md` in sequence. Do not start Phase 2 until Phase 1 DoD in `docs/phase-1-todo.md` is complete.
