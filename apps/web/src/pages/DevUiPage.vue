@@ -5,7 +5,6 @@ import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import MetricCard from '@/components/patterns/MetricCard.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
-import MoneyInput from '@/components/patterns/MoneyInput.vue'
 import NotificationInboxItem from '@/components/patterns/NotificationInboxItem.vue'
 import RankBar from '@/components/patterns/RankBar.vue'
 import StockStatusBadge from '@/components/patterns/StockStatusBadge.vue'
@@ -29,10 +28,12 @@ import Input from '@/components/ui/Input.vue'
 import LineChart from '@/components/ui/LineChart.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 import NavBadge from '@/components/ui/NavBadge.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
+import PhoneInput from '@/components/ui/PhoneInput.vue'
 import Radio from '@/components/ui/Radio.vue'
 import SearchField from '@/components/ui/SearchField.vue'
 import Select from '@/components/ui/Select.vue'
@@ -57,6 +58,7 @@ const passwordValue = ref('senha123')
 const passwordConfirmValue = ref('senha123')
 const emailValue = ref('maria@clinica.test')
 const telValue = ref('11999990000')
+const phoneEmpty = ref('')
 const dateValue = ref('2026-09-05')
 const dateEmpty = ref('')
 const datePickerOpen = ref(true)
@@ -67,7 +69,8 @@ const notesValue = ref('Observações da consulta')
 const selectValue = ref('protocolo-a')
 const filterSelectValue = ref('')
 const searchValue = ref('')
-const moneyValue = ref('1280,00')
+const moneyValue = ref('1280.00')
+const moneyEmpty = ref('')
 const radioValue = ref('presencial')
 const checked = ref(true)
 const enabled = ref(false)
@@ -311,10 +314,22 @@ function simulateLoading() {
                 <Input id="ok-email" v-model="emailValue" type="email" />
               </FormField>
               <FormField label="WhatsApp" html-for="ok-tel">
-                <Input id="ok-tel" v-model="telValue" type="tel" />
+                <PhoneInput id="ok-tel" v-model="telValue" />
+              </FormField>
+              <FormField label="WhatsApp (vazio)" html-for="ok-tel-empty">
+                <PhoneInput id="ok-tel-empty" v-model="phoneEmpty" />
+              </FormField>
+              <FormField label="WhatsApp (desabilitado)" html-for="ok-tel-disabled">
+                <PhoneInput id="ok-tel-disabled" model-value="11988887777" disabled />
               </FormField>
               <FormField label="Valor" html-for="ok-money">
                 <MoneyInput id="ok-money" v-model="moneyValue" />
+              </FormField>
+              <FormField label="Valor (vazio)" html-for="ok-money-empty">
+                <MoneyInput id="ok-money-empty" v-model="moneyEmpty" />
+              </FormField>
+              <FormField label="Valor (desabilitado)" html-for="ok-money-disabled">
+                <MoneyInput id="ok-money-disabled" model-value="80.00" disabled />
               </FormField>
               <FormField label="Data" html-for="ok-date">
                 <DatePicker id="ok-date" v-model="dateValue" />
@@ -387,6 +402,11 @@ function simulateLoading() {
               <FormField label="E-mail" error="E-mail inválido." html-for="err-email">
                 <template #default="{ invalid }">
                   <Input id="err-email" v-model="emailValue" type="email" :invalid="invalid" />
+                </template>
+              </FormField>
+              <FormField label="WhatsApp" error="Informe DDD e número." html-for="err-tel">
+                <template #default="{ invalid }">
+                  <PhoneInput id="err-tel" v-model="telValue" :invalid="invalid" />
                 </template>
               </FormField>
               <FormField label="Valor" error="Informe um valor." html-for="err-money">

@@ -5,6 +5,7 @@ import FormField from '@/components/ui/FormField.vue'
 import IconButton from '@/components/ui/IconButton.vue'
 import Input from '@/components/ui/Input.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 
 const quantity = defineModel<string>('quantity', { required: true })
 const unitPrice = defineModel<string>('unitPrice')
@@ -64,14 +65,12 @@ const emit = defineEmits<{
             <MaskedBox :value="quantity" />
           </FormField>
         </div>
-        <div v-if="showUnitPrice" class="w-32 shrink-0">
+        <div v-if="showUnitPrice" class="w-40 shrink-0">
           <FormField v-if="!readonly" label="Preço" :html-for="priceId">
             <template #default="{ invalid: fieldInvalid }">
-              <Input
+              <MoneyInput
                 :id="priceId"
                 v-model="unitPrice"
-                type="text"
-                inputmode="decimal"
                 :invalid="priceInvalid || fieldInvalid"
                 aria-label="Preço unitário"
               />

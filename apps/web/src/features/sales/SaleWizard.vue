@@ -11,9 +11,9 @@ import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormField from '@/components/ui/FormField.vue'
 import InlineAlert from '@/components/ui/InlineAlert.vue'
-import Input from '@/components/ui/Input.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import MaskedBox from '@/components/ui/MaskedBox.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Textarea from '@/components/ui/Textarea.vue'
@@ -40,6 +40,7 @@ import {
   type SalePaymentDraft,
 } from '@/features/sales/schema'
 import { formatBRL } from '@/lib/formatters'
+import { formatPhoneBR } from '@/lib/masks'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import type { Client } from '@/types/client'
@@ -440,7 +441,7 @@ function methodName(id: string) {
         </Banner>
         <p v-if="selectedClient" class="text-[15px] font-medium text-title">
           {{ selectedClient.name }}
-          <span class="mt-0.5 block text-[13px] font-normal text-muted">{{ selectedClient.whatsapp }}</span>
+          <span class="mt-0.5 block text-[13px] font-normal text-muted">{{ formatPhoneBR(selectedClient.whatsapp) || selectedClient.whatsapp }}</span>
         </p>
         <template v-if="!currentSale">
           <ClientSearchBar v-model="clientSearch" @search="clientQ = $event" />
@@ -456,7 +457,7 @@ function methodName(id: string) {
                 v-for="client in clients"
                 :key="client.id"
                 :title="client.name"
-                :meta="client.whatsapp"
+                :meta="formatPhoneBR(client.whatsapp) || client.whatsapp"
                 @action="selectedClient = client"
               />
             </div>
@@ -487,11 +488,9 @@ function methodName(id: string) {
           hint="Valor cobrado. Pode editar."
           html-for="sale-effective"
         >
-          <Input
+          <MoneyInput
             id="sale-effective"
             v-model="effectiveAmount"
-            type="text"
-            inputmode="decimal"
             @update:model-value="effectiveDirty = true"
           />
         </FormField>

@@ -73,9 +73,9 @@ flowchart TD
 ```
 
 1. **Tokens** — cores, tipografia, spacing, radii, z-index (CSS variables + Tailwind theme).
-2. **Primitives** — Button, Input, DatePicker, DateTimePicker, Select, Textarea, Checkbox, Switch, Badge, Avatar, Spinner, Icon.
+2. **Primitives** — Button, Input, PhoneInput, MoneyInput, DatePicker, DateTimePicker, Select, Textarea, Checkbox, Switch, Badge, Avatar, Spinner, Icon.
 3. **Compostos** — FormField, Dialog/Sheet, Toast, Tabs, ListRow/Table, EmptyState, PageHeader, Skeleton, Banner.
-4. **Patterns de domínio** — ClientSearchBar, MoneyInput/Display, StockStatusBadge, PermissionGate, ClinicShell.
+4. **Patterns de domínio** — ClientSearchBar, MoneyDisplay, StockStatusBadge, PermissionGate, ClinicShell.
 5. **Páginas/features** — só depois do kitchen sink `/dev/ui` estar estável.
 
 **Regra:** feature não monta HTML “cru” de controle; só importa `components/ui` e `components/patterns`.
@@ -326,7 +326,8 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 | --- | --- | --- |
 | `Button` | primary / secondary / ghost / destructive | Primary: brand **sólido**; secondary/ghost hover em glass; loading / disabled |
 | `ButtonAccent` | CTA raro (outline glass, sem gradient) | Só destaques explícitos |
-| `Input` | Texto / number / password / email / search / tel | `glass-field`, radius 12; invalid via `aria-invalid`. **Não** usar `type="date"` nem `type="datetime-local"`. |
+| `Input` | Texto / number / password / email / search / tel | `glass-field`, radius 12; invalid via `aria-invalid`. **Não** usar `type="date"` nem `type="datetime-local"`. Telefone BR: `PhoneInput`. Moeda: `MoneyInput`. |
+| `PhoneInput` | WhatsApp / telefone BR | Máscara `(00) 0000-0000` / `(00) 00000-0000`; `v-model` dígitos; placeholder `(11) 99999-9999`; `glass-field` |
 | `DatePicker` | Data civil (não nativo) | `v-model` ISO `YYYY-MM-DD`; trigger `glass-field`; calendário `glass-menu`; PT-BR (Seg–Dom); `id` / `invalid` / `disabled`; Limpar / Hoje |
 | `DateTimePicker` | Data e hora (não nativo) | `v-model` `YYYY-MM-DDTHH:mm`; mesmo trigger/menu; hora 0–23 + minutos (passo 5); Limpar / Agora |
 | `Textarea` | Texto longo | idem |
@@ -334,7 +335,8 @@ Usar cards como **superfície operacional** (agrupar conteúdo), não como marke
 | `Radio` | Escolha única (grupo) | unchecked glass; checked brand sólido |
 | `Checkbox` / `Switch` | Boolean | unchecked glass; checked brand / success sólido |
 | `FormField` | Label + control + hint + **erro 422** | label sobre vidro; caption muted |
-| `MoneyInput` / `MoneyDisplay` | BRL | `MoneyInput` prefixa R$ sobre `Input` glass; parsing pt-BR |
+| `MoneyInput` | BRL editável | Máscara `R$ 1.234,56` ao digitar (centavos); `v-model` decimal `1234.56`; prefixo R$ + `Input` `glass-field`; `id` / `invalid` / `disabled` |
+| `MoneyDisplay` | BRL somente leitura | `formatBRL`; `size` `md` \| `lg` |
 | `MaskedBox` | Valor mascarado / read-only | `glass-field`, radius 12, padding `10×14` |
 
 Validação: Zod no client + exibir `errors.field` do Laravel `422`.
@@ -363,6 +365,7 @@ Validação: Zod no client + exibir `errors.field` do Laravel `422`.
 | --- | --- |
 | `PermissionGate` | Renderiza slot só se `/auth/me` tiver a permission Spatie |
 | `ClientSearchBar` | Busca clientes (`?q=`) — usa `SearchField` |
+| `MoneyDisplay` | BRL somente leitura (`formatBRL`) |
 | `StockStatusBadge` | Normal / low / reorder / negativo (success / warning / danger / purple) |
 | `NotificationInboxItem` | Linha do inbox (`low_stock`, `projected_low_stock`, `appointment_stock_warning`, …) |
 | `NavBadge` | Contador numérico de não lidas no item Alertas |
@@ -444,7 +447,8 @@ Rota **`/dev/ui`** (protegida ou só em `import.meta.env.DEV`):
 - [x] Página `/dev/ui` com swatches + materiais + estados (default / erro / snack)
 - [x] `ClinicShell` flutuante (`glass-dark` desktop; tab bar cápsula no phone)
 - [x] Patterns: `PermissionGate`, `ClientSearchBar`
-- [x] Patterns: `MoneyDisplay`, `MoneyInput`, `StockStatusBadge`
+- [x] Patterns: `MoneyDisplay`, `StockStatusBadge`
+- [x] `PhoneInput` / `MoneyInput` mascarados (`glass-field`, `/dev/ui`)
 
 **DoD Fase 3 (parcial):** kitchen sink revisável no visual Soft Violet Liquid Glass (heavy); features de negócio ainda não.
 

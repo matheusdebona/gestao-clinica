@@ -7,6 +7,8 @@ import AppDialog from '@/components/ui/AppDialog.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
+import PhoneInput from '@/components/ui/PhoneInput.vue'
 import Select from '@/components/ui/Select.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import AttributionShortcuts from '@/features/clients/AttributionShortcuts.vue'
@@ -295,12 +297,10 @@ defineExpose({ setErrors })
 
     <FormField label="WhatsApp" :error="errors.whatsapp" html-for="client-whatsapp">
       <template #default="{ invalid }">
-        <Input
+        <PhoneInput
           id="client-whatsapp"
           v-model="whatsapp"
           v-bind="whatsappAttrs"
-          type="tel"
-          autocomplete="tel"
           :invalid="invalid"
         />
       </template>
@@ -348,17 +348,15 @@ defineExpose({ setErrors })
 
     <FormField
       label="Valor da avaliação"
-      hint="Opcional. Use ponto ou vírgula decimal."
+      hint="Opcional."
       :error="errors.initial_consultation_amount"
       html-for="client-consultation"
     >
       <template #default="{ invalid }">
-        <Input
+        <MoneyInput
           id="client-consultation"
           v-model="consultation"
           v-bind="consultationAttrs"
-          type="text"
-          inputmode="decimal"
           :invalid="invalid"
         />
       </template>
