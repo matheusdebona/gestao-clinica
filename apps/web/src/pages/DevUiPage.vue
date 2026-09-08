@@ -289,6 +289,7 @@ function simulateLoading() {
       <section class="grid gap-8 md:grid-cols-2 md:gap-5">
         <div class="flex flex-col gap-2">
           <p class="section-label">Campos</p>
+          <p class="text-[13px] text-muted">Texto dos campos em 16px para o Safari não dar zoom no foco.</p>
           <SurfaceCard>
             <div class="flex flex-col gap-4">
               <FormField label="Nome" hint="Como aparece na agenda" html-for="ok-text">

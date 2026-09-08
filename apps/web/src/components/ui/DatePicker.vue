@@ -39,7 +39,7 @@ const display = computed(() => (model.value ? formatIsoDate(model.value) : props
 
 const triggerClass = computed(() =>
   cn(
-    'glass-field inline-flex h-11 w-full items-center justify-between gap-2 rounded-[12px] px-3.5 text-left text-[15px] outline-none disabled:cursor-not-allowed disabled:opacity-50',
+    'glass-field sv-field-control inline-flex h-11 w-full items-center justify-between gap-2 rounded-[12px] px-3.5 text-left outline-none disabled:cursor-not-allowed disabled:opacity-50',
   ),
 )
 

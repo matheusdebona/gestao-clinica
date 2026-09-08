@@ -50,7 +50,7 @@ function onTyped(raw: string) {
       @update:model-value="onTyped"
     />
     <span
-      class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-[15px] text-muted"
+      class="sv-field-control pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-muted"
       :class="disabled ? 'opacity-50' : undefined"
     >
       R$
