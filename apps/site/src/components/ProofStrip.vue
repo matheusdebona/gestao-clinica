@@ -49,7 +49,7 @@ useGsapIsland(root, ({ gsap, reduceMotion }) => {
           <h2 class="section-title mt-4 text-title">Feito para quem aplica, não só para quem administra.</h2>
         </div>
         <p class="max-w-sm text-[15px] leading-6 text-body">
-          Cada clínica é um tenant. Seus produtos, clientes e números não se misturam com os de outra.
+          Os dados de cada clínica ficam separados: produtos, clientes e números não se misturam.
         </p>
       </div>
 

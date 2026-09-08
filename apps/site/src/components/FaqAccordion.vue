@@ -18,9 +18,9 @@ const items = [
     a: 'O app da clínica é mobile-first. Médico e secretária usam no dia a dia, não só no computador da recepção.',
   },
   {
-    id: 'tenant',
+    id: 'dados',
     q: 'Os dados da minha clínica se misturam com os de outra?',
-    a: 'Não. Cada clínica é um tenant. Produtos, clientes, agenda e números são só daquela clínica.',
+    a: 'Não. Os dados de cada clínica ficam separados: produtos, clientes, agenda e números não se misturam.',
   },
   {
     id: 'estoque',
