@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Api\V1;
 
+use App\Contracts\PdfRenderer;
+use App\Exceptions\PdfRenderException;
 use App\Models\Brand;
 use App\Models\Budget;
 use App\Models\Client;
@@ -186,5 +188,24 @@ class BudgetPdfDocumentTest extends TestCase
 
         $this->postJson("/api/v1/budgets/{$budget->id}/pdf")->assertForbidden();
         $this->getJson('/api/v1/documents')->assertForbidden();
+    }
+
+    public function test_pdf_renderer_failure_returns_portuguese_503(): void
+    {
+        $this->app->bind(PdfRenderer::class, fn () => new class implements PdfRenderer
+        {
+            public function fromHtml(string $html): string
+            {
+                throw PdfRenderException::chromeMissing(['/usr/bin/chromium']);
+            }
+        });
+
+        $budgetId = $this->createBudgetWithDiscount();
+
+        $response = $this->postJson("/api/v1/budgets/{$budgetId}/pdf")
+            ->assertStatus(503);
+
+        $this->assertStringContainsString('Chromium/Chrome', (string) $response->json('message'));
+        $this->assertStringContainsString('Chromium/Chrome', (string) $response->json('errors.pdf.0'));
     }
 }

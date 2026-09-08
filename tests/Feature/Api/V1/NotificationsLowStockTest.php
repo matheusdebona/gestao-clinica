@@ -110,6 +110,8 @@ class NotificationsLowStockTest extends TestCase
             ],
         ])->assertOk();
 
+        $this->acceptBudgetForSale($saleId);
+
         $this->postJson("/api/v1/sales/{$saleId}/confirm")->assertOk();
 
         return Sale::query()->findOrFail($saleId);

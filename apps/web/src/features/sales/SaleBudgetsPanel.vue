@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
@@ -29,6 +29,11 @@ import { ApiError } from '@/types/user'
 const props = defineProps<{
   saleId: number
   canCreate: boolean
+  focus?: 'panel' | 'wizard'
+}>()
+
+const emit = defineEmits<{
+  'accepted-change': [accepted: boolean]
 }>()
 
 const toast = useToastStore()
@@ -54,6 +59,16 @@ const { data, isPending, isError } = useQuery({
 })
 
 const budgets = computed(() => data.value?.data ?? [])
+const hasAccepted = computed(() => budgets.value.some((budget) => budget.status === 'accepted'))
+const canActOn = (status: Budget['status']) => status === 'draft' || status === 'sent'
+
+watch(
+  hasAccepted,
+  (accepted) => {
+    emit('accepted-change', accepted)
+  },
+  { immediate: true },
+)
 
 function invalidate() {
   return queryClient.invalidateQueries({ queryKey: ['budgets'] })
@@ -149,9 +164,15 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
 
 <template>
   <div class="flex flex-col gap-4">
-    <h2>Orçamentos</h2>
+    <h2>{{ focus === 'wizard' ? 'Orçamento' : 'Orçamentos' }}</h2>
     <p class="text-[13px] text-muted">
-      A timeline fica nesta venda. Gerar só a partir de rascunho com itens.
+      <template v-if="focus === 'wizard'">
+        Neste passo você trata só o orçamento: validade, notas e gerar. Depois de gerado, aceite, recuse ou envie o PDF.
+        Confirmar a venda só libera com o orçamento aceito.
+      </template>
+      <template v-else>
+        A timeline fica nesta venda. Gerar só a partir de rascunho com itens.
+      </template>
     </p>
 
     <PermissionGate v-if="canCreate" permission="budgets.create">
@@ -190,6 +211,14 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
             :badge-variant="BUDGET_STATUS_BADGE[budget.status]"
           />
           <div class="mt-2 flex flex-wrap gap-2">
+            <PermissionGate v-if="canActOn(budget.status)" permission="budgets.convert">
+              <Button
+                :loading="accepting"
+                @click="acceptMutation.mutate(budget.id)"
+              >
+                Aceitar
+              </Button>
+            </PermissionGate>
             <PermissionGate v-if="budget.status === 'draft'" permission="budgets.update">
               <Button
                 variant="secondary"
@@ -199,16 +228,8 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
                 Enviar
               </Button>
             </PermissionGate>
-            <PermissionGate v-if="budget.status === 'sent'" permission="budgets.convert">
-              <Button
-                :loading="accepting"
-                @click="acceptMutation.mutate(budget.id)"
-              >
-                Aceitar
-              </Button>
-            </PermissionGate>
             <PermissionGate
-              v-if="budget.status === 'draft' || budget.status === 'sent'"
+              v-if="canActOn(budget.status)"
               permission="budgets.update"
             >
               <Button variant="ghost" @click="pendingAction = { id: budget.id, kind: 'reject' }">
@@ -224,7 +245,7 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
                 :loading="pdfLoading"
                 @click="pdfMutation.mutate(budget)"
               >
-                PDF
+                Enviar PDF
               </Button>
             </PermissionGate>
           </div>

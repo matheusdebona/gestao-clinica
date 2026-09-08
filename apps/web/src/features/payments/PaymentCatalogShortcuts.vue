@@ -4,7 +4,7 @@ import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Button from '@/components/ui/Button.vue'
 
 const props = defineProps<{
-  current?: 'methods' | 'brands'
+  current?: 'methods' | 'brands' | 'operators'
 }>()
 
 const router = useRouter()
@@ -19,6 +19,9 @@ const router = useRouter()
     </PermissionGate>
     <PermissionGate v-if="props.current !== 'brands'" permission="card_brands.manage">
       <Button variant="secondary" @click="router.push({ name: 'card-brands' })">Bandeiras</Button>
+    </PermissionGate>
+    <PermissionGate v-if="props.current !== 'operators'" permission="card_operators.manage">
+      <Button variant="secondary" @click="router.push({ name: 'card-operators' })">Operadoras</Button>
     </PermissionGate>
     <PermissionGate v-if="props.current" permission="sales.view">
       <Button variant="ghost" @click="router.push({ name: 'sales' })">Vendas</Button>

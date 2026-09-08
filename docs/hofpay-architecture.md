@@ -148,6 +148,8 @@ Dois caminhos válidos no mesmo VPS:
 1. **Docker** (já existe `Dockerfile` + Compose): nginx faz `proxy_pass` para `127.0.0.1:8000` (ou a porta publicada do container).
 2. **PHP-FPM** clássico: `root` em `public/`, `fastcgi_pass` para o socket PHP 8.5.
 
+PDF de orçamento (Browsershot) no mesmo host da API: instalar Chromium + Node + Puppeteer, configurar `BROWSERSHOT_*` e o PATH do PHP-FPM. Passos reproduzíveis: [README.md](../README.md) seção **PDF de orçamento (Browsershot)**. Diagnóstico: `php artisan pdf:diagnose`.
+
 Além do HTTP: PostgreSQL, Redis, MinIO (ou S3 na nuvem depois). Filas: `queue:work` + `schedule:run`.
 
 TLS: `certbot --nginx` nos três `server_name`. HTTP 80 só para redirect → HTTPS e challenge ACME.

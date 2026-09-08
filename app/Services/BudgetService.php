@@ -103,9 +103,9 @@ class BudgetService
 
     public function accept(Budget $budget): Budget
     {
-        if (! $budget->isSent()) {
+        if (! $budget->isDraft() && ! $budget->isSent()) {
             throw ValidationException::withMessages([
-                'status' => ['Only sent budgets can be accepted.'],
+                'status' => ['Only draft or sent budgets can be accepted.'],
             ]);
         }
 

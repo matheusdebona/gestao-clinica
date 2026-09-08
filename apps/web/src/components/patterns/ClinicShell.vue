@@ -47,7 +47,7 @@ const items = computed(() => {
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', pinMobile: true },
     { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', pinMobile: true },
-    { to: '/payment-methods', label: 'Pagamentos', icon: CreditCard, permission: 'payment_methods.manage', aliases: ['/card-brands'] },
+    { to: '/payment-methods', label: 'Pagamentos', icon: CreditCard, permission: 'payment_methods.manage', aliases: ['/card-brands', '/card-operators'] },
     { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view' },
     { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', pinMobile: true },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },

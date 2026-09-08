@@ -142,6 +142,8 @@ class SaleTest extends TestCase
             ],
         ])->assertOk();
 
+        $this->acceptBudgetForSale($saleId);
+
         $this->postJson("/api/v1/sales/{$saleId}/confirm")
             ->assertStatus(422)
             ->assertJsonValidationErrors(['confirm_below_minimum']);
@@ -185,6 +187,12 @@ class SaleTest extends TestCase
         ])->assertOk();
 
         $this->postJson("/api/v1/sales/{$saleId}/confirm")
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['budget']);
+
+        $this->acceptBudgetForSale($saleId);
+
+        $this->postJson("/api/v1/sales/{$saleId}/confirm")
             ->assertOk()
             ->assertJsonPath('data.status', 'confirmed');
     }
@@ -211,9 +219,38 @@ class SaleTest extends TestCase
             ],
         ])->assertOk();
 
+        $this->acceptBudgetForSale($saleId);
+
         $this->postJson("/api/v1/sales/{$saleId}/confirm")->assertOk();
 
         $this->assertSame('55.0000', $product->fresh()->stock_quantity);
+    }
+
+    public function test_confirm_requires_accepted_budget(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $product = $this->makeProduct('Item', '10.0000', '100.00', '80.00');
+        $pix = PaymentMethod::factory()->forClinic($this->clinic)->create([
+            'code' => 'pix_budget_gate',
+            'kind' => PaymentMethod::KIND_PIX,
+        ]);
+        $saleId = $this->createDraftSale();
+
+        $this->putJson("/api/v1/sales/{$saleId}/items", [
+            'items' => [
+                ['product_id' => $product->id, 'quantity' => 1],
+            ],
+        ])->assertOk();
+
+        $this->putJson("/api/v1/sales/{$saleId}/payments", [
+            'payments' => [
+                ['payment_method_id' => $pix->id, 'amount' => 100],
+            ],
+        ])->assertOk();
+
+        $this->postJson("/api/v1/sales/{$saleId}/confirm")
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['budget']);
     }
 
     public function test_card_payment_requires_meta(): void
@@ -301,6 +338,7 @@ class SaleTest extends TestCase
         $this->putJson("/api/v1/sales/{$saleId}/payments", [
             'payments' => [['payment_method_id' => $pix->id, 'amount' => 100]],
         ])->assertOk();
+        $this->acceptBudgetForSale($saleId);
         $this->postJson("/api/v1/sales/{$saleId}/confirm")->assertOk();
 
         $this->patchJson("/api/v1/sales/{$saleId}", [
@@ -421,6 +459,7 @@ class SaleTest extends TestCase
         $this->putJson("/api/v1/sales/{$confirmedId}/payments", [
             'payments' => [['payment_method_id' => $pix->id, 'amount' => 100]],
         ])->assertOk();
+        $this->acceptBudgetForSale($confirmedId);
         $this->postJson("/api/v1/sales/{$confirmedId}/confirm")->assertOk();
 
         $otherClient = Client::factory()->forClinic($this->clinic)->create();

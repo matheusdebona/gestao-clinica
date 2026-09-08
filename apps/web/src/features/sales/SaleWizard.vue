@@ -20,7 +20,7 @@ import Textarea from '@/components/ui/Textarea.vue'
 import { listClients } from '@/features/clients/api'
 import { listCardBrands, listCardOperators, listPaymentMethods } from '@/features/payments/api'
 import { applyProtocolToSale, createSale, getSale, syncSaleItems, syncSalePayments, updateSale, confirmSale } from '@/features/sales/api'
-import { SALE_WIZARD_STEPS } from '@/features/sales/labels'
+import { SALE_WIZARD_LAST_INDEX, SALE_WIZARD_STEP, SALE_WIZARD_STEPS } from '@/features/sales/labels'
 import SaleBudgetsPanel from '@/features/sales/SaleBudgetsPanel.vue'
 import SaleItemsStep from '@/features/sales/SaleItemsStep.vue'
 import SalePaymentsStep from '@/features/sales/SalePaymentsStep.vue'
@@ -55,7 +55,7 @@ const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 
-const step = ref(props.saleId ? 1 : 0)
+const step = ref<number>(props.saleId ? SALE_WIZARD_STEP.items : SALE_WIZARD_STEP.client)
 const saving = ref(false)
 const clientSearch = ref('')
 const clientQ = ref('')
@@ -69,6 +69,7 @@ const payments = ref<SalePaymentDraft[]>([])
 const paymentsError = ref('')
 const belowMinOpen = ref(false)
 const currentSale = ref<Sale | null>(null)
+const hasAcceptedBudget = ref(false)
 
 const canCreate = computed(() => auth.can('sales.create'))
 const canUpdate = computed(() => auth.can('sales.update'))
@@ -105,12 +106,14 @@ const {
 } = useQuery({
   queryKey: ['clients', 'sale-pick', clientQ],
   queryFn: () => listClients({ q: clientQ.value, page: 1, is_active: true }),
-  enabled: computed(() => step.value === 0 && auth.can('clients.view') && clientQ.value.length > 0),
+  enabled: computed(() => step.value === SALE_WIZARD_STEP.client && auth.can('clients.view') && clientQ.value.length > 0),
 })
 
 const clients = computed(() => clientListData.value?.data ?? [])
 
-const catalogsEnabled = computed(() => Boolean(props.saleId || currentSale.value) && step.value >= 2)
+const catalogsEnabled = computed(
+  () => Boolean(props.saleId || currentSale.value) && step.value >= SALE_WIZARD_STEP.values,
+)
 
 const methodsQuery = useQuery({
   queryKey: ['payment-methods'],
@@ -273,7 +276,7 @@ async function goNext() {
         })
         return
       }
-      step.value = 1
+      step.value = SALE_WIZARD_STEP.items
     } catch (error) {
       apiError(error, 'Não foi possível criar a venda.')
     } finally {
@@ -287,7 +290,7 @@ async function goNext() {
     return
   }
 
-  if (step.value === 1) {
+  if (step.value === SALE_WIZARD_STEP.items) {
     if (!validateItems()) {
       return
     }
@@ -297,7 +300,7 @@ async function goNext() {
       if (!effectiveDirty.value) {
         effectiveAmount.value = currentSale.value?.effective_amount ?? expectedLocal.value
       }
-      step.value = 2
+      step.value = SALE_WIZARD_STEP.values
     } catch (error) {
       apiError(error, 'Não foi possível salvar os itens.')
     } finally {
@@ -306,14 +309,14 @@ async function goNext() {
     return
   }
 
-  if (step.value === 2) {
+  if (step.value === SALE_WIZARD_STEP.values) {
     saving.value = true
     try {
       hydrate(await persistValues(saleId))
       if (payments.value.length === 0) {
         payments.value = [emptyPaymentDraft(emptyEffective())]
       }
-      step.value = 3
+      step.value = SALE_WIZARD_STEP.payments
     } catch (error) {
       apiError(error, 'Não foi possível salvar o valor efetivo.')
     } finally {
@@ -322,19 +325,28 @@ async function goNext() {
     return
   }
 
-  if (step.value === 3) {
+  if (step.value === SALE_WIZARD_STEP.payments) {
     if (!validatePayments()) {
       return
     }
     saving.value = true
     try {
       hydrate(await persistPayments(saleId))
-      step.value = 4
+      step.value = SALE_WIZARD_STEP.review
     } catch (error) {
       apiError(error, 'Não foi possível salvar os pagamentos.')
     } finally {
       saving.value = false
     }
+    return
+  }
+
+  if (step.value === SALE_WIZARD_STEP.review) {
+    if (!validatePayments()) {
+      step.value = SALE_WIZARD_STEP.payments
+      return
+    }
+    step.value = SALE_WIZARD_STEP.budget
   }
 }
 
@@ -387,8 +399,13 @@ async function doConfirm(belowMin: boolean) {
   }
   saving.value = true
   try {
+    if (!hasAcceptedBudget.value) {
+      toast.error('Aceite o orçamento para confirmar a venda.')
+      step.value = SALE_WIZARD_STEP.budget
+      return
+    }
     if (!validatePayments()) {
-      step.value = 3
+      step.value = SALE_WIZARD_STEP.payments
       return
     }
     await persistPayments(saleId)
@@ -400,6 +417,11 @@ async function doConfirm(belowMin: boolean) {
       belowMinOpen.value = true
       return
     }
+    if (error instanceof ApiError && error.errors.budget) {
+      toast.error(error.first('budget') || 'Aceite o orçamento para confirmar a venda.')
+      step.value = SALE_WIZARD_STEP.budget
+      return
+    }
     apiError(error, 'Não foi possível confirmar a venda.')
   } finally {
     saving.value = false
@@ -407,6 +429,10 @@ async function doConfirm(belowMin: boolean) {
 }
 
 function onConfirmClick() {
+  if (!hasAcceptedBudget.value) {
+    toast.error('Aceite o orçamento para confirmar a venda.')
+    return
+  }
   if (belowMinimum.value) {
     belowMinOpen.value = true
     return
@@ -435,7 +461,7 @@ function methodName(id: string) {
     </SurfaceCard>
 
     <template v-else>
-      <div v-if="step === 0" class="flex flex-col gap-4">
+      <div v-if="step === SALE_WIZARD_STEP.client" class="flex flex-col gap-4">
         <Banner v-if="currentSale" variant="info" title="Cliente definido">
           O cliente não muda depois que a venda é criada.
         </Banner>
@@ -469,14 +495,14 @@ function methodName(id: string) {
       </div>
 
       <SaleItemsStep
-        v-else-if="step === 1"
+        v-else-if="step === SALE_WIZARD_STEP.items"
         v-model:items="items"
         :protocol-references="currentSale?.protocol_references"
         :error="itemsError"
         @apply-protocol="onApplyProtocol"
       />
 
-      <div v-else-if="step === 2" class="flex flex-col gap-4">
+      <div v-else-if="step === SALE_WIZARD_STEP.values" class="flex flex-col gap-4">
         <FormField label="Valor esperado" hint="Soma das linhas. Somente leitura.">
           <MaskedBox :value="formatBRL(expectedLocal)" />
         </FormField>
@@ -500,7 +526,7 @@ function methodName(id: string) {
       </div>
 
       <SalePaymentsStep
-        v-else-if="step === 3"
+        v-else-if="step === SALE_WIZARD_STEP.payments"
         v-model:payments="payments"
         :effective-amount="emptyEffective()"
         :methods="paymentMethods"
@@ -509,7 +535,7 @@ function methodName(id: string) {
         :error="paymentsError"
       />
 
-      <div v-else class="flex flex-col gap-4">
+      <div v-else-if="step === SALE_WIZARD_STEP.review" class="flex flex-col gap-4">
         <SurfaceCard>
           <dl class="flex flex-col gap-4">
             <div>
@@ -539,21 +565,34 @@ function methodName(id: string) {
         <InlineAlert v-if="belowMinimum" variant="warning">
           O valor efetivo está abaixo do mínimo {{ formatBRL(minLocal) }}.
         </InlineAlert>
-        <PermissionGate permission="sales.confirm">
-          <Button :loading="saving" @click="onConfirmClick">Confirmar venda</Button>
-        </PermissionGate>
+        <Banner variant="info" title="Próximo passo: orçamento">
+          Confirmar a venda só fica disponível depois que o orçamento for aceito.
+        </Banner>
+      </div>
+
+      <div v-else-if="step === SALE_WIZARD_STEP.budget" class="flex flex-col gap-4">
         <SaleBudgetsPanel
           v-if="currentSale?.id || saleId"
           :sale-id="(currentSale?.id ?? saleId) as number"
           :can-create="items.length > 0"
+          focus="wizard"
+          @accepted-change="hasAcceptedBudget = $event"
         />
+        <InlineAlert v-if="!hasAcceptedBudget" variant="warning">
+          Aceite o orçamento para confirmar a venda.
+        </InlineAlert>
+        <PermissionGate permission="sales.confirm">
+          <Button :loading="saving" :disabled="!hasAcceptedBudget" @click="onConfirmClick">
+            Confirmar venda
+          </Button>
+        </PermissionGate>
       </div>
 
       <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button variant="ghost" type="button" :disabled="saving" @click="goBack">
-          {{ step === 0 ? 'Cancelar' : 'Voltar' }}
+          {{ step === SALE_WIZARD_STEP.client ? 'Cancelar' : 'Voltar' }}
         </Button>
-        <Button v-if="step < 4" :loading="saving" @click="goNext">
+        <Button v-if="step < SALE_WIZARD_LAST_INDEX" :loading="saving" @click="goNext">
           Continuar
         </Button>
       </div>
