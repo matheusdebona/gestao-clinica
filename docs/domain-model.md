@@ -266,7 +266,7 @@ When `kind` is `credit_card` or `debit_card`:
 
 | Entity | Purpose |
 | --- | --- |
-| `CardOperator` | Maquininha / acquirer (Cielo, Stone, Rede…). `auto_anticipate` marks machines that settle/anticipate installments automatically vs D+N |
+| `CardOperator` | Maquininha / acquirer. Unique per clinic by `name` (`code` optional). Seeded BR defaults via `EnsureDefaultPaymentCatalog` (Cielo, Rede, Getnet, Stone, PagBank, Mercado Pago, SafraPay, Sipag, SumUp, InfinitePay, PicPay, Zoop, Bin, Vero, Granito, Adyen, Pagar.me). `auto_anticipate` marks machines that settle/anticipate installments automatically vs D+N |
 | `CardBrand` | Visa, Mastercard, Elo, Amex, Hipercard, Cabal, Diners (required on fee rules; seeded defaults via `EnsureDefaultPaymentCatalog`) |
 | `CardFeeRule` | `payment_method` + operator + **required** brand + exact installment count → `fee_percent` and/or `fee_fixed` |
 
