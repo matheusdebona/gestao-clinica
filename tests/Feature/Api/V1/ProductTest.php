@@ -379,6 +379,34 @@ class ProductTest extends TestCase
         $this->assertSame(['Botox 100U'], collect($picker->json('data'))->pluck('name')->all());
     }
 
+    public function test_can_search_products_by_name_accent_insensitively(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $catalog = $this->catalog();
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Toxína',
+            'sku' => 'TOX-INA',
+        ]);
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Ácido hialurônico',
+            'sku' => 'ACD-SK',
+        ]);
+
+        $byToxin = $this->getJson('/api/v1/products?q=toxina')->assertOk();
+        $this->assertSame(['Toxína'], collect($byToxin->json('data'))->pluck('name')->all());
+
+        $byAcid = $this->getJson('/api/v1/products?q=acido')->assertOk();
+        $this->assertSame(['Ácido hialurônico'], collect($byAcid->json('data'))->pluck('name')->all());
+    }
+
     public function test_can_filter_products_by_active_flag(): void
     {
         Sanctum::actingAs($this->admin);

@@ -25,6 +25,7 @@ Arquitetura, domínios de produção e plano de deploy: [`docs/hofpay-architectu
 - Laravel 13 · PHP 8.5
 - Sanctum (Bearer) · Spatie Permission
 - PostgreSQL 18 · Redis · MinIO (S3)
+- Accent-insensitive `?q=` search (clients, products, protocols, sales/treatments/appointments client filters) uses the Postgres **`unaccent`** extension. The migration runs `CREATE EXTENSION IF NOT EXISTS unaccent` when the role is allowed; on managed Postgres enable `unaccent` in the provider dashboard if that statement is forbidden. SQLite tests register a PHP `unaccent()` fallback.
 - Clinic multi-tenant · Vue SPA em [`apps/web`](./apps/web) (PWA later)
 - Marketing em [`apps/site`](./apps/site) (Astro; `./dev site` → `:4321`)
 
