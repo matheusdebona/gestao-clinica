@@ -1,0 +1,38 @@
+---
+import { APP_LOGIN_URL, APP_REGISTER_URL } from '../lib/urls'
+import { CTA_REGISTER_LABEL } from '../content/site'
+
+interface Props {
+  primary?: string
+  secondary?: string | false
+  onDark?: boolean
+  sectionCta?: boolean
+}
+
+const {
+  primary = CTA_REGISTER_LABEL,
+  secondary = false,
+  onDark = false,
+  sectionCta = true,
+} = Astro.props
+---
+
+<div class="mt-6 flex flex-wrap items-center gap-3">
+  <a
+    class="site-cta-primary"
+    href={APP_REGISTER_URL}
+    data-section-cta={sectionCta ? '' : undefined}
+  >
+    {primary}
+  </a>
+  {
+    secondary !== false && (
+      <a
+        class:list={['site-cta-secondary', onDark && 'site-cta-on-dark']}
+        href={APP_LOGIN_URL}
+      >
+        {secondary}
+      </a>
+    )
+  }
+</div>

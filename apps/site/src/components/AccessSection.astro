@@ -1,24 +1,26 @@
 ---
-import { APP_REGISTER_URL } from '../lib/urls'
+import { CTA_LOGIN_LABEL, CTA_REGISTER_STRONG_LABEL } from '../content/site'
+import CtaRow from './CtaRow.astro'
 ---
 
-<section id="acesso" class="py-10 sm:py-16">
+<section id="acesso" class="site-anchor py-10 sm:py-16">
   <div class="site-wrap">
     <div
       class="relative overflow-hidden rounded-chrome hero-mesh px-6 py-12 text-inverse sm:px-12 sm:py-16"
       data-reveal
     >
       <div class="relative max-w-2xl">
-        <p class="eyebrow glass-dark text-inverse/80">Acesso</p>
-        <h2 class="section-title mt-4 text-inverse">Comece pela clínica. Planos comerciais, em breve.</h2>
+        <p class="eyebrow glass-dark text-inverse/80">Comece agora</p>
+        <h2 class="section-title mt-4 text-inverse">Crie a clínica. Planos em breve.</h2>
         <p class="mt-4 max-w-xl text-[16px] leading-7 text-inverse/75">
-          Ainda não publicamos tabela de preços. Não inventamos valores: quando a comercialização
-          estiver pronta, ela aparece aqui. Enquanto isso, você já pode criar a clínica e usar o produto.
+          Ainda não há tabela pública — e não inventamos valores. Enquanto os planos não
+          entram, você já pode criar a clínica e usar o produto no celular e no consultório.
         </p>
-        <p class="mt-3 text-[15px] text-inverse/70">Preço: consultar. Comece pelo cadastro no app.</p>
-        <div class="mt-8">
-          <a class="site-cta-primary" href={APP_REGISTER_URL}>Criar clínica agora</a>
-        </div>
+        <CtaRow
+          primary={CTA_REGISTER_STRONG_LABEL}
+          secondary={CTA_LOGIN_LABEL}
+          onDark
+        />
       </div>
     </div>
   </div>

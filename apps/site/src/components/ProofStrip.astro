@@ -1,0 +1,18 @@
+---
+import { proofPoints } from '../content/site'
+---
+
+<section class="relative -mt-8 pb-4 sm:-mt-10 sm:pb-6" aria-label="O que o HOF Pay resolve">
+  <div class="site-wrap">
+    <div class="grid gap-3 sm:grid-cols-3" data-reveal-stagger>
+      {
+        proofPoints.map((item) => (
+          <article class="glass-regular rounded-xl px-4 py-4 sm:px-5 sm:py-5" data-reveal-item>
+            <p class="text-[15px] font-semibold tracking-[-0.02em] text-title">{item.title}</p>
+            <p class="mt-1.5 text-[14px] leading-6 text-body">{item.copy}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

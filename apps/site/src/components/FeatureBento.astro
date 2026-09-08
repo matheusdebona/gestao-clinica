@@ -1,0 +1,48 @@
+---
+import { features } from '../content/site'
+import ModuleIcon from './ModuleIcon.astro'
+
+const spanClass = (index: number) => (index < 2 ? 'lg:col-span-3' : 'lg:col-span-2')
+---
+
+<section id="produto" class="site-anchor relative py-16 sm:py-24">
+  <div class="site-wrap">
+    <div class="max-w-2xl" data-reveal>
+      <p class="eyebrow glass-chip glass-chip-brand text-brand">O produto</p>
+      <h2 class="section-title mt-4 text-title">Cinco módulos. Um ritmo só.</h2>
+      <p class="mt-4 max-w-xl text-[16px] leading-7 text-body">
+        Do estoque na geladeira à sessão na poltrona: orçamento aceito, venda confirmada,
+        baixa só no tratamento — com a margem visível no fim do dia.
+      </p>
+    </div>
+
+    <div class="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-6" data-reveal-stagger>
+      {
+        features.map((feature, index) => (
+          <a
+            href={`#${feature.id}`}
+            class:list={[
+              'group glass-regular rounded-xl p-5 transition-[transform,background-color] duration-200 hover:-translate-y-0.5',
+              spanClass(index),
+            ]}
+            data-reveal-item
+          >
+            <span
+              class="grid size-10 place-items-center rounded-[12px] bg-brand text-inverse"
+              aria-hidden="true"
+            >
+              <ModuleIcon name={feature.id} class="size-5" />
+            </span>
+            <h3 class="mt-5 text-[20px] font-semibold tracking-[-0.03em] text-title">
+              {feature.title}
+            </h3>
+            <p class="mt-2 text-[15px] leading-6 text-body">{feature.teaser}</p>
+            <p class="mt-4 text-[13px] font-medium text-brand">
+              Ver {feature.title.toLowerCase()}
+            </p>
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
