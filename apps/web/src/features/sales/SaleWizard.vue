@@ -443,6 +443,12 @@ function onConfirmClick() {
 function methodName(id: string) {
   return methodsQuery.data.value?.find((method) => String(method.id) === id)?.name ?? 'Pagamento'
 }
+
+function pickClient(client: Client) {
+  selectedClient.value = client
+  clientSearch.value = ''
+  clientQ.value = ''
+}
 </script>
 
 <template>
@@ -477,14 +483,14 @@ function methodName(id: string) {
           <SurfaceCard v-else-if="clientQ && clients.length === 0" :padding="false">
             <p class="px-5 py-4 text-[15px] text-muted">Nenhum cliente encontrado.</p>
           </SurfaceCard>
-          <SurfaceCard v-else-if="clients.length > 0" :padding="false">
+          <SurfaceCard v-else-if="clientQ && clients.length > 0" :padding="false">
             <div class="divide-y divide-border-divider px-5 py-2">
               <ListCard
                 v-for="client in clients"
                 :key="client.id"
                 :title="client.name"
                 :meta="formatPhoneBR(client.whatsapp) || client.whatsapp"
-                @action="selectedClient = client"
+                @action="pickClient(client)"
               />
             </div>
           </SurfaceCard>
