@@ -8,6 +8,7 @@ use App\Models\ClientOrigin;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Support\CurrentClinic;
+use App\Support\EnsureDefaultClientOrigins;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -175,12 +176,163 @@ class ClientAttributionTest extends TestCase
             ->assertJsonCount(0, 'data');
     }
 
-    public function test_forbidden_without_catalog_permission(): void
+    public function test_forbidden_without_catalog_or_client_write_permission(): void
     {
         $user = User::factory()->forClinic($this->clinic)->create();
         Sanctum::actingAs($user);
 
         $this->getJson('/api/v1/client-origins')->assertForbidden();
         $this->getJson('/api/v1/campaigns')->assertForbidden();
+    }
+
+    public function test_clients_create_can_index_and_show_catalog_but_not_mutate(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Instagram']);
+        $campaign = Campaign::factory()->forOrigin($origin)->create(['name' => 'Reels']);
+
+        $creator = User::factory()->forClinic($this->clinic)->create();
+        $creator->givePermissionTo('clients.create');
+        Sanctum::actingAs($creator);
+
+        $this->getJson('/api/v1/client-origins')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Instagram');
+        $this->getJson("/api/v1/client-origins/{$origin->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $origin->id);
+
+        $this->getJson('/api/v1/campaigns?client_origin_id='.$origin->id)
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Reels');
+        $this->getJson("/api/v1/campaigns/{$campaign->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $campaign->id);
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'Google'])->assertForbidden();
+        $this->putJson("/api/v1/client-origins/{$origin->id}", ['name' => 'IG'])->assertForbidden();
+        $this->deleteJson("/api/v1/client-origins/{$origin->id}")->assertForbidden();
+
+        $this->postJson('/api/v1/campaigns', [
+            'client_origin_id' => $origin->id,
+            'name' => 'Stories',
+        ])->assertForbidden();
+        $this->putJson("/api/v1/campaigns/{$campaign->id}", ['name' => 'Reels 2'])->assertForbidden();
+        $this->deleteJson("/api/v1/campaigns/{$campaign->id}")->assertForbidden();
+    }
+
+    public function test_clients_update_can_index_catalog(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Facebook']);
+        Campaign::factory()->forOrigin($origin)->create(['name' => 'FB Ads']);
+
+        $editor = User::factory()->forClinic($this->clinic)->create();
+        $editor->givePermissionTo('clients.update');
+        Sanctum::actingAs($editor);
+
+        $this->getJson('/api/v1/client-origins?active_only=1')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Facebook');
+        $this->getJson('/api/v1/campaigns?active_only=1&client_origin_id='.$origin->id)
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'FB Ads');
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'Indicação'])->assertForbidden();
+        $this->postJson('/api/v1/campaigns', [
+            'client_origin_id' => $origin->id,
+            'name' => 'Nova',
+        ])->assertForbidden();
+    }
+
+    public function test_receptionist_can_list_origins_and_campaigns_for_client_form(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Indicação']);
+        Campaign::factory()->forOrigin($origin)->create(['name' => 'Amigos']);
+
+        $receptionist = User::factory()->forClinic($this->clinic)->create();
+        $receptionist->assignRole('receptionist');
+        Sanctum::actingAs($receptionist);
+
+        $this->getJson('/api/v1/client-origins?active_only=1')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Indicação');
+        $this->getJson('/api/v1/campaigns?active_only=1&client_origin_id='.$origin->id)
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Amigos');
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'TikTok'])->assertForbidden();
+        $this->postJson('/api/v1/campaigns', [
+            'client_origin_id' => $origin->id,
+            'name' => 'Setembro',
+        ])->assertForbidden();
+    }
+
+    public function test_creating_clinic_seeds_default_origins_without_campaigns(): void
+    {
+        $manager = User::factory()->forClinic($this->clinic)->create();
+        $manager->givePermissionTo('clinics.manage');
+        Sanctum::actingAs($manager);
+
+        $id = $this->postJson('/api/v1/clinics', [
+            'name' => 'Clínica Recém-aberta',
+        ])->assertCreated()
+            ->json('data.id');
+
+        $this->assertDefaultOriginsForClinic((int) $id);
+    }
+
+    public function test_default_origins_are_idempotent_by_name(): void
+    {
+        ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Instagram']);
+
+        EnsureDefaultClientOrigins::run($this->clinic);
+        EnsureDefaultClientOrigins::run($this->clinic);
+
+        $this->assertDefaultOriginsForClinic($this->clinic->id);
+        $this->assertSame(
+            1,
+            ClientOrigin::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->where('name', 'Instagram')
+                ->count()
+        );
+    }
+
+    protected function assertDefaultOriginsForClinic(int $clinicId): void
+    {
+        $origins = ClientOrigin::query()
+            ->withoutGlobalScopes()
+            ->where('clinic_id', $clinicId)
+            ->get();
+
+        $this->assertEqualsCanonicalizing(
+            EnsureDefaultClientOrigins::NAMES,
+            $origins->pluck('name')->all()
+        );
+        $this->assertTrue($origins->every(fn (ClientOrigin $origin) => $origin->is_active));
+        $this->assertSame(
+            0,
+            Campaign::query()->withoutGlobalScopes()->where('clinic_id', $clinicId)->count()
+        );
+    }
+
+    public function test_campaigns_manage_can_list_origins_for_campaign_form(): void
+    {
+        $origin = ClientOrigin::factory()->forClinic($this->clinic)->create(['name' => 'Google']);
+
+        $manager = User::factory()->forClinic($this->clinic)->create();
+        $manager->givePermissionTo('campaigns.manage');
+        Sanctum::actingAs($manager);
+
+        $this->getJson('/api/v1/client-origins?active_only=1')
+            ->assertOk()
+            ->assertJsonPath('data.0.name', 'Google');
+        $this->getJson("/api/v1/client-origins/{$origin->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $origin->id);
+
+        $this->postJson('/api/v1/client-origins', ['name' => 'TikTok'])->assertForbidden();
+        $this->putJson("/api/v1/client-origins/{$origin->id}", ['name' => 'G'])->assertForbidden();
+        $this->deleteJson("/api/v1/client-origins/{$origin->id}")->assertForbidden();
     }
 }

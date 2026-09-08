@@ -13,6 +13,7 @@ import Pagination from '@/components/ui/Pagination.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
+import AttributionShortcuts from '@/features/clients/AttributionShortcuts.vue'
 import { listClients } from '@/features/clients/api'
 import { formatPhoneBR } from '@/lib/masks'
 import { useAuthStore } from '@/stores/auth'
@@ -90,6 +91,8 @@ function clientMeta(client: Client) {
     </Banner>
 
     <template v-else>
+      <AttributionShortcuts />
+
       <ClientSearchBar v-model="searchInput" @search="onSearch" />
 
       <Switch v-model="activeOnly" label="Somente ativos" />

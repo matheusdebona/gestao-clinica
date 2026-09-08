@@ -221,6 +221,8 @@ A **protocol** is a reusable **set of products that forms a complete service**. 
 | `name` | Unique per clinic (e.g. Instagram) |
 | `is_active` | Soft deactivate; historical client links kept |
 
+New clinics (auth register, `POST /clinics`, demo seed) get a default active catalog of 10 origins (Google, Instagram, Facebook, TikTok, Indicação, WhatsApp, Outros, Site, YouTube, Fachada). No default campaigns. Seed is idempotent by `(clinic_id, name)`.
+
 ### Campaign (clinic catalog)
 
 | Field | Notes |
@@ -236,6 +238,8 @@ Attribution fields on the client are optional. When `campaign_id` is set, `clien
 
 `clients.view`, `clients.create`, `clients.update`, `clients.delete`  
 `client_origins.manage`, `campaigns.manage`
+
+GET index/show de origens e campanhas também aceita `clients.create` ou `clients.update` (permissão **A**, Fase 4.2b) para popular os selects no cadastro do cliente. GET origens também aceita `campaigns.manage` (form de campanha). CRUD do catálogo permanece `*.manage`. UI: [`frontend-vue-spec.md`](./frontend-vue-spec.md) §4.2b.
 
 ---
 

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Clinic;
 use App\Models\User;
+use App\Support\EnsureDefaultClientOrigins;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -42,6 +43,8 @@ class DemoClinicSeeder extends Seeder
         }
 
         $admin->syncRoles(['admin']);
+
+        EnsureDefaultClientOrigins::run($clinic);
 
         $superEmail = env('SUPER_ADMIN_EMAIL');
         $superPassword = env('SUPER_ADMIN_PASSWORD');

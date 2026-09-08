@@ -3,6 +3,8 @@ export interface ClientOrigin {
   clinic_id: number
   name: string
   is_active: boolean
+  created_at?: string
+  updated_at?: string
 }
 
 export interface Campaign {
@@ -12,6 +14,19 @@ export interface Campaign {
   name: string
   is_active: boolean
   client_origin?: ClientOrigin | null
+  created_at?: string
+  updated_at?: string
+}
+
+export interface ClientOriginPayload {
+  name: string
+  is_active?: boolean
+}
+
+export interface CampaignPayload {
+  client_origin_id: number
+  name: string
+  is_active?: boolean
 }
 
 export interface Client {

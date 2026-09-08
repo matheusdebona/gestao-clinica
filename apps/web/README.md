@@ -4,7 +4,13 @@ SPA Vue 3 + TypeScript + Tailwind 4 no visual **Soft Violet / Apple Liquid Glass
 
 ## Subir
 
-Na API (Docker ou `php artisan serve` em `:8000`), depois:
+Na raiz do repo, API + frontend juntos:
+
+```bash
+./dev up
+```
+
+Ou só o Vite, com a API já no ar (`:8000`):
 
 ```bash
 cd apps/web

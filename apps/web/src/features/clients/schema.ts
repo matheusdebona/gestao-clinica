@@ -6,6 +6,21 @@ import type { ClientPayload } from '@/types/client'
 
 export const NONE_VALUE = '__none__'
 
+export const clientOriginFormSchema = toTypedSchema(
+  z.object({
+    name: z.string().trim().min(1, 'Informe o nome.').max(255, 'Nome muito longo.'),
+    is_active: z.boolean(),
+  }),
+)
+
+export const campaignFormSchema = toTypedSchema(
+  z.object({
+    client_origin_id: z.string().min(1, 'Selecione a origem.'),
+    name: z.string().trim().min(1, 'Informe o nome.').max(255, 'Nome muito longo.'),
+    is_active: z.boolean(),
+  }),
+)
+
 export const clientFormSchema = toTypedSchema(
   z.object({
     name: z.string().trim().min(1, 'Informe o nome.').max(255, 'Nome muito longo.'),
