@@ -19,7 +19,8 @@ npm install
 npm run dev
 ```
 
-- Login / cadastro: `http://localhost:5173/login`
+- Login: `http://localhost:5173/login`
+- Cadastro: `http://localhost:5173/register`
 - App: `http://localhost:5173/`
 - Kitchen sink: `http://localhost:5173/dev/ui`
 
@@ -31,7 +32,7 @@ Token fica em `sessionStorage` (`gc_token`).
 
 `POST /api/v1/auth/register` cria a clínica e o primeiro usuário `admin`. Senha: mínimo 10 caracteres, com maiúscula, número e símbolo.
 
-Foto do painel de auth: `src/assets/auth-clinic.jpg` (Unsplash, interior de clínica). Troque o arquivo para usar outra imagem.
+Foto do painel de auth: `src/assets/auth-clinic.jpg` (recepção da clínica). Troque o arquivo para usar outra imagem.
 
 ## Scripts
 

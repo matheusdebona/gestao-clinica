@@ -1,17 +1,21 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { getToken } from '@/lib/auth-storage'
 import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
 
-const router = createRouter({
-  history: createWebHistory(),
-  routes: [
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/pages/AuthPage.vue'),
-      meta: { guest: true, title: 'Entrar' },
-    },
+export const routes: RouteRecordRaw[] = [
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/pages/AuthPage.vue'),
+    meta: { guest: true, title: 'Entrar' },
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('@/pages/AuthPage.vue'),
+    meta: { guest: true, title: 'Cadastrar' },
+  },
     {
       path: '/',
       component: () => import('@/components/patterns/ClinicShell.vue'),
@@ -340,7 +344,11 @@ const router = createRouter({
       component: () => import('@/pages/DevUiPage.vue'),
       meta: { title: 'Soft Violet' },
     },
-  ],
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
 })
 
 router.beforeEach(async (to) => {

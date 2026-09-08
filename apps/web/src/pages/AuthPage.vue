@@ -1,23 +1,32 @@
 <script setup lang="ts">
 import { reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import authClinic from '@/assets/auth-clinic.jpg'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import { authPathForMode, resolveAuthMode, type AuthMode } from '@/lib/auth-mode'
 import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
 
+const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 
-const mode = ref<'login' | 'register'>('login')
+const mode = ref<AuthMode>(resolveAuthMode(route))
 const loading = ref(false)
+
+watch(
+  () => [route.name, route.path, route.query.mode] as const,
+  () => {
+    mode.value = resolveAuthMode(route)
+  },
+)
 
 watch(
   mode,
@@ -26,6 +35,15 @@ watch(
   },
   { immediate: true },
 )
+
+function setMode(next: AuthMode) {
+  const target = authPathForMode(next)
+  if (route.path !== target || route.query.mode) {
+    void router.replace(target)
+    return
+  }
+  mode.value = next
+}
 
 const loginForm = reactive({
   email: '',
@@ -152,7 +170,7 @@ async function submitRegister() {
         </form>
         <p class="mt-5 text-[13px] text-muted">
           Ainda sem clínica?
-          <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="mode = 'register'">
+          <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="setMode('register')">
             Cadastrar-se
           </Button>
         </p>
@@ -219,7 +237,7 @@ async function submitRegister() {
         </form>
         <p class="mt-5 text-[13px] text-muted">
           Já tem acesso?
-          <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="mode = 'login'">
+          <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="setMode('login')">
             Entrar
           </Button>
         </p>
