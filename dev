@@ -1,0 +1,209 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$ROOT"
+
+DEV_DIR="$ROOT/.dev"
+WEB_PID_FILE="$DEV_DIR/web.pid"
+WEB_LOG_FILE="$DEV_DIR/web.log"
+API_URL="http://127.0.0.1:8000"
+
+usage() {
+  cat <<'EOF'
+Uso: ./dev <comando>
+
+  up      Sobe a API (Docker) e o frontend (Vite)
+  down    Para API e frontend
+  fresh   Apaga o banco local e roda só as migrations
+          Use -y para não perguntar
+  seed    Roda os seeders
+
+API:        http://localhost:8000
+Frontend:   http://localhost:5173  (ou a próxima porta livre)
+MinIO:      http://localhost:9001  (minio / minioSecret)
+
+Login demo: admin@clinica-demo.test / ChangeMe!123
+EOF
+}
+
+say() {
+  printf '%s\n' "$*"
+}
+
+die() {
+  printf 'erro: %s\n' "$*" >&2
+  exit 1
+}
+
+ensure_env() {
+  if [[ ! -f "$ROOT/.env" ]]; then
+    cp "$ROOT/.env.example" "$ROOT/.env"
+    say "Criado .env a partir de .env.example"
+  fi
+  if [[ ! -f "$ROOT/apps/web/.env" ]]; then
+    cp "$ROOT/apps/web/.env.example" "$ROOT/apps/web/.env"
+    say "Criado apps/web/.env a partir de .env.example"
+  fi
+}
+
+ensure_docker() {
+  if docker info >/dev/null 2>&1; then
+    return
+  fi
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    say "Docker parado. Abrindo o Docker Desktop..."
+    open -a Docker
+    local i
+    for i in $(seq 1 60); do
+      if docker info >/dev/null 2>&1; then
+        return
+      fi
+      sleep 2
+    done
+  fi
+  die "Docker não está rodando. Abra o Docker Desktop e tente de novo."
+}
+
+web_pid() {
+  if [[ -f "$WEB_PID_FILE" ]]; then
+    cat "$WEB_PID_FILE"
+  fi
+}
+
+web_running() {
+  local pid
+  pid="$(web_pid || true)"
+  [[ -n "${pid:-}" ]] && kill -0 "$pid" 2>/dev/null
+}
+
+stop_web() {
+  local pid
+  pid="$(web_pid || true)"
+  if [[ -n "${pid:-}" ]]; then
+    if kill -0 "$pid" 2>/dev/null; then
+      pkill -P "$pid" 2>/dev/null || true
+      kill "$pid" 2>/dev/null || true
+      wait "$pid" 2>/dev/null || true
+    fi
+  fi
+  rm -f "$WEB_PID_FILE"
+}
+
+wait_for_api() {
+  local i
+  for i in $(seq 1 90); do
+    if curl -sf -o /dev/null "$API_URL"; then
+      return
+    fi
+    sleep 1
+  done
+  die "A API não respondeu em $API_URL. Veja: docker compose logs app"
+}
+
+ensure_app_key() {
+  if grep -Eq '^APP_KEY=.+' "$ROOT/.env"; then
+    return
+  fi
+  docker compose exec -T app php artisan key:generate --force
+}
+
+ensure_web_deps() {
+  if [[ ! -d "$ROOT/apps/web/node_modules/vite" ]]; then
+    say "Instalando dependências do frontend..."
+    (cd "$ROOT/apps/web" && npm install)
+  fi
+}
+
+start_api() {
+  ensure_env
+  ensure_docker
+  say "Subindo a API..."
+  docker compose up -d
+  wait_for_api
+  ensure_app_key
+  say "API: $API_URL"
+}
+
+start_web() {
+  mkdir -p "$DEV_DIR"
+  ensure_web_deps
+  if web_running; then
+    say "Frontend já está no ar (pid $(web_pid))."
+    return
+  fi
+  say "Subindo o frontend..."
+  (
+    cd "$ROOT/apps/web"
+    exec npm run dev
+  ) >"$WEB_LOG_FILE" 2>&1 &
+  echo $! >"$WEB_PID_FILE"
+  local i url=""
+  for i in $(seq 1 40); do
+    if grep -q 'Local:' "$WEB_LOG_FILE" 2>/dev/null; then
+      url="$(grep -E 'Local:' "$WEB_LOG_FILE" | tail -n 1 | sed -E 's/.*Local:[[:space:]]+//')"
+      break
+    fi
+    if ! web_running; then
+      cat "$WEB_LOG_FILE" >&2 || true
+      die "O frontend encerrou ao iniciar. Veja $WEB_LOG_FILE"
+    fi
+    sleep 0.25
+  done
+  say "Frontend: ${url:-http://localhost:5173}"
+}
+
+cmd_up() {
+  start_api
+  start_web
+  say ""
+  say "Pronto. Login demo: admin@clinica-demo.test / ChangeMe!123"
+  say "Para parar: ./dev down"
+}
+
+cmd_down() {
+  stop_web
+  if docker info >/dev/null 2>&1; then
+    docker compose down
+  fi
+  say "Ambiente parado."
+}
+
+cmd_fresh() {
+  local yes=0
+  if [[ "${1:-}" == "-y" || "${1:-}" == "--yes" ]]; then
+    yes=1
+  fi
+  if [[ "$yes" -ne 1 ]]; then
+    printf 'Isso apaga todos os dados do banco local. Continuar? [y/N] '
+    local answer
+    read -r answer
+    if [[ ! "$answer" =~ ^[yY]([eE][sS])?$ ]]; then
+      say "Cancelado."
+      exit 0
+    fi
+  fi
+  start_api
+  say "Limpando o banco..."
+  docker compose exec -T app php artisan migrate:fresh --force
+  say "Banco recriado, sem seed. Rode ./dev seed se quiser os dados demo."
+}
+
+cmd_seed() {
+  start_api
+  say "Rodando seed..."
+  docker compose exec -T app php artisan db:seed --force
+  say "Seed ok. Login demo: admin@clinica-demo.test / ChangeMe!123"
+}
+
+case "${1:-}" in
+  up) cmd_up ;;
+  down) cmd_down ;;
+  fresh) cmd_fresh "${2:-}" ;;
+  seed) cmd_seed ;;
+  -h | --help | help | "") usage ;;
+  *)
+    usage >&2
+    die "comando desconhecido: $1"
+    ;;
+esac

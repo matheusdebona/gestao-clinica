@@ -24,18 +24,22 @@ Multi-tenant clinical + commercial management platform — API-first, **mobile-f
 - PostgreSQL 18 · Redis · MinIO (S3)
 - Clinic multi-tenant · Vue SPA em [`apps/web`](./apps/web) (PWA later)
 
-## Quick start (Docker)
+## Quick start
 
 ```bash
-cp .env.example .env
-# APP_KEY will be generated on first artisan run inside the container if empty
-docker compose up -d --build
-docker compose exec app php artisan key:generate
-docker compose exec app php artisan migrate --seed
+./dev up
 ```
 
 API: `http://localhost:8000`  
+Frontend: `http://localhost:5173` (ou a próxima porta livre)  
 MinIO console: `http://localhost:9001` (minio / minioSecret)
+
+```bash
+./dev down          # para API e frontend
+./dev fresh         # zera o banco local (só migrations)
+./dev fresh -y      # a mesma coisa, sem confirmação
+./dev seed          # roda os seeders
+```
 
 Demo admin (from seed):
 
@@ -53,6 +57,8 @@ make artisan CMD="route:list"
 ## Frontend Vue (design system)
 
 Kitchen sink Soft Violet em `/dev/ui` — validar cores, inputs e feedback antes das features.
+
+O `./dev up` já sobe o Vite. Para rodar só o frontend:
 
 ```bash
 cd apps/web
