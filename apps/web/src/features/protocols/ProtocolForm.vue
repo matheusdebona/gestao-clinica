@@ -325,7 +325,9 @@ defineExpose({
     <Switch v-model="isActive" label="Ativo" />
 
     <h2>Itens</h2>
-    <p class="text-[13px] text-muted">Busque um produto e informe a quantidade na unidade dele.</p>
+    <p class="text-[13px] text-muted">
+      Busque um produto ativo por nome ou SKU e informe a quantidade na unidade dele.
+    </p>
 
     <SearchField
       v-model="searchInput"
@@ -347,8 +349,9 @@ defineExpose({
       <Button variant="ghost" type="button" @click="goCreateProduct">Novo produto</Button>
     </PermissionGate>
 
-    <Banner v-if="!canSearchProducts" variant="warning" title="Sem busca de produtos">
-      Você pode cadastrar um produto e voltar para incluí-lo no protocolo.
+    <Banner v-if="!canSearchProducts" variant="warning" title="Sem permissão para buscar produtos">
+      É preciso ver o catálogo para buscar itens. Se puder cadastrar, crie o produto e volte para
+      incluí-lo no protocolo.
     </Banner>
 
     <SurfaceCard v-else-if="q && searchQuery.isPending" :padding="false">
@@ -360,8 +363,11 @@ defineExpose({
 
     <SurfaceCard v-else-if="q && searchHits.length === 0" :padding="false">
       <div class="px-5 py-4">
-        <p class="text-[15px] text-title">Nenhum produto encontrado</p>
-        <p class="mt-1 text-[13px] text-muted">Cadastre o produto e volte para adicioná-lo.</p>
+        <p class="text-[15px] text-title">Nenhum produto ativo encontrado</p>
+        <p class="mt-1 text-[13px] text-muted">
+          Confira o nome ou o SKU. Produtos inativos não entram no protocolo — reative-os em
+          Produtos, ou cadastre um novo.
+        </p>
         <PermissionGate permission="products.create">
           <Button class="mt-3" variant="secondary" type="button" @click="goCreateProduct">
             Novo produto

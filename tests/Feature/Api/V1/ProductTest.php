@@ -365,6 +365,18 @@ class ProductTest extends TestCase
 
         $bySku = $this->getJson('/api/v1/products?q=acd-sk')->assertOk();
         $this->assertSame(['Ácido hialurônico'], collect($bySku->json('data'))->pluck('name')->all());
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Botox 50U inativo',
+            'sku' => 'BTX-050',
+            'is_active' => false,
+        ]);
+
+        $picker = $this->getJson('/api/v1/products?q=botox&is_active=1')->assertOk();
+        $this->assertSame(['Botox 100U'], collect($picker->json('data'))->pluck('name')->all());
     }
 
     public function test_can_filter_products_by_active_flag(): void
