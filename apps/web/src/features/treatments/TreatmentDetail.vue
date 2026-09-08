@@ -186,7 +186,7 @@ function sessionMeta(item: TreatmentSessionSummary) {
       </SurfaceCard>
 
       <div>
-        <h2 class="mb-3">Fulfillment</h2>
+        <h2 class="mb-3">Consumo</h2>
         <SurfaceCard v-if="fulfillmentQuery.isPending">
           <Skeleton class="h-5 w-48" />
         </SurfaceCard>
