@@ -107,15 +107,19 @@ onUnmounted(() => {
         <a class="rounded-[12px] px-3 py-2.5 text-title" href="#acesso" @click="open = false">Acesso</a>
         <a class="rounded-[12px] px-3 py-2.5 text-title" href="#faq" @click="open = false">Perguntas</a>
       </nav>
-      <div class="mt-3 grid gap-2">
-        <a class="site-cta-secondary" :href="APP_LOGIN_URL">{{ CTA_LOGIN_SHORT_LABEL }}</a>
-        <a class="site-cta-primary site-cta-block" :href="APP_REGISTER_URL">{{ CTA_REGISTER_LABEL }}</a>
+      <div class="mt-3 grid w-full grid-cols-2 justify-center gap-2">
+        <a class="site-cta-secondary w-full min-w-0" :href="APP_LOGIN_URL">{{
+          CTA_LOGIN_SHORT_LABEL
+        }}</a>
+        <a class="site-cta-primary w-full min-w-0" :href="APP_REGISTER_URL">{{
+          CTA_REGISTER_LABEL
+        }}</a>
       </div>
     </div>
   </header>
 
   <div
-    class="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 transition-transform duration-200 md:hidden"
+    class="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 transition-transform duration-200 motion-reduce:transition-none md:hidden"
     :class="showSticky ? 'translate-y-0' : 'translate-y-[140%]'"
     :aria-hidden="!showSticky"
     style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom))"
