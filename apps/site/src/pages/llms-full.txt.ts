@@ -2,7 +2,7 @@ import type { APIRoute } from 'astro'
 import { llmsFullTxt } from '../content/site'
 
 export const GET: APIRoute = () =>
-  new Response(llmsFullTxt, {
+  new Response(`\uFEFF${llmsFullTxt}`, {
     headers: {
       'Content-Type': 'text/plain; charset=utf-8',
     },
