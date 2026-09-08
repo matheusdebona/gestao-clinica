@@ -14,6 +14,7 @@ import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
 import { listClients } from '@/features/clients/api'
+import { formatPhoneBR } from '@/lib/masks'
 import { useAuthStore } from '@/stores/auth'
 import type { Client } from '@/types/client'
 
@@ -66,7 +67,7 @@ function goNew() {
 }
 
 function clientMeta(client: Client) {
-  const bits = [client.whatsapp]
+  const bits = [formatPhoneBR(client.whatsapp) || client.whatsapp]
   if (client.client_origin?.name) {
     bits.push(client.client_origin.name)
   }

@@ -24,7 +24,10 @@ export function emptyToInt(value: string): number | null {
 }
 
 export function emptyToMoney(value: string): string | null {
-  const trimmed = value.trim().replace(/\s/g, '')
+  const trimmed = value
+    .replace(/R\$/gi, '')
+    .trim()
+    .replace(/\s/g, '')
   if (!trimmed) {
     return null
   }

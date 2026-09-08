@@ -1,6 +1,7 @@
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { emptyToInt, emptyToMoney, emptyToNull } from '@/lib/formatters'
+import { phoneDigits } from '@/lib/masks'
 import type { ClientPayload } from '@/types/client'
 
 export const NONE_VALUE = '__none__'
@@ -8,7 +9,15 @@ export const NONE_VALUE = '__none__'
 export const clientFormSchema = toTypedSchema(
   z.object({
     name: z.string().trim().min(1, 'Informe o nome.').max(255, 'Nome muito longo.'),
-    whatsapp: z.string().trim().min(1, 'Informe o WhatsApp.').max(30, 'WhatsApp muito longo.'),
+    whatsapp: z
+      .string()
+      .trim()
+      .min(1, 'Informe o WhatsApp.')
+      .max(30, 'WhatsApp muito longo.')
+      .refine((value) => {
+        const digits = phoneDigits(value)
+        return digits.length === 10 || digits.length === 11
+      }, 'Informe DDD e número.'),
     notes: z.string(),
     main_pains: z.string(),
     service_duration_minutes: z
@@ -55,7 +64,7 @@ export function toClientPayload(values: ClientFormValues): ClientPayload {
 
   return {
     name: values.name.trim(),
-    whatsapp: values.whatsapp.trim(),
+    whatsapp: phoneDigits(values.whatsapp),
     notes: emptyToNull(values.notes),
     main_pains: emptyToNull(values.main_pains),
     service_duration_minutes: emptyToInt(values.service_duration_minutes),

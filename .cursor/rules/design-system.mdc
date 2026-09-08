@@ -8,7 +8,7 @@ alwaysApply: true
 Any Vue/UI work in `apps/web` **must** use existing design-system components. Do not invent controls, colors, or chrome.
 
 - Import from `@/components/ui` (and `@/components/patterns` when they exist).
-- Features and pages compose those components. They do not ship raw `<button>`, `<input>`, `<select>`, `<textarea>`, native `type="date"` / `type="datetime-local"`, or one-off styled divs that look like controls. Date-only fields use `DatePicker`. Date+time fields use `DateTimePicker`.
+- Features and pages compose those components. They do not ship raw `<button>`, `<input>`, `<select>`, `<textarea>`, native `type="date"` / `type="datetime-local"`, or one-off styled divs that look like controls. Date-only fields use `DatePicker`. Date+time fields use `DateTimePicker`. Phone/WhatsApp fields use `PhoneInput`. Money/currency fields use `MoneyInput`.
 - Visual source of truth: `apps/web/src/design-tokens/tokens.css` + kitchen sink `/dev/ui`.
 - Spec: `docs/frontend-vue-spec.md` §3 and §5 (Soft Violet Liquid Glass, heavy, light + dark).
 - Surfaces use `GlassSurface` or tokenized glass classes (`glass-regular`, `glass-clear`, `glass-dark`, `glass-field`, `glass-menu`). Never add a one-off `backdrop-filter` in a feature.

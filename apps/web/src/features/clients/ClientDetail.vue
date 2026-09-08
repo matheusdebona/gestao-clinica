@@ -11,6 +11,7 @@ import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { deactivateClient, getClient, updateClient } from '@/features/clients/api'
 import { formatBRL } from '@/lib/formatters'
+import { formatPhoneBR } from '@/lib/masks'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
 
@@ -117,7 +118,7 @@ function onConfirmDeactivate() {
       <dl class="flex flex-col gap-4">
         <div>
           <dt class="text-[13px] text-muted">WhatsApp</dt>
-          <dd class="mt-0.5 text-[15px] text-title">{{ client.whatsapp }}</dd>
+          <dd class="mt-0.5 text-[15px] text-title">{{ formatPhoneBR(client.whatsapp) || client.whatsapp }}</dd>
         </div>
         <div>
           <dt class="text-[13px] text-muted">Origem</dt>

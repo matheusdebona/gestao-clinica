@@ -7,6 +7,7 @@ import AppDialog from '@/components/ui/AppDialog.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
+import MoneyInput from '@/components/ui/MoneyInput.vue'
 import Select from '@/components/ui/Select.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import { emptyToMoney, emptyToNull } from '@/lib/formatters'
@@ -132,12 +133,10 @@ defineExpose({ setErrors })
         html-for="stock-cost"
       >
         <template #default="{ invalid }">
-          <Input
+          <MoneyInput
             id="stock-cost"
             v-model="unitCost"
             v-bind="unitCostAttrs"
-            type="text"
-            inputmode="decimal"
             :invalid="invalid"
           />
         </template>
