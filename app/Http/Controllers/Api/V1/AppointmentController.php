@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\AppointmentResource;
 use App\Models\Appointment;
 use App\Models\Treatment;
 use App\Services\AppointmentService;
+use App\Support\CaseInsensitiveSearch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
@@ -52,12 +53,9 @@ class AppointmentController extends Controller
         }
 
         if ($request->filled('q')) {
-            $term = '%'.$request->string('q')->toString().'%';
+            $term = $request->string('q')->toString();
             $query->whereHas('client', function ($builder) use ($term): void {
-                $builder->where(function ($inner) use ($term): void {
-                    $inner->where('name', 'like', $term)
-                        ->orWhere('whatsapp', 'like', $term);
-                });
+                CaseInsensitiveSearch::whereContains($builder, ['name', 'whatsapp'], $term);
             });
         }
 

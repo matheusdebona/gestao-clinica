@@ -10,6 +10,7 @@ use App\Models\Clinic;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\ProductType;
+use App\Models\Sale;
 use App\Models\UnitOfMeasure;
 use App\Models\User;
 use App\Support\CurrentClinic;
@@ -270,7 +271,7 @@ class SaleTest extends TestCase
         $otherUser = User::factory()->forClinic($other)->create();
         $otherUser->assignRole('admin');
 
-        \App\Models\Sale::query()->create([
+        Sale::query()->create([
             'clinic_id' => $other->id,
             'client_id' => $otherClient->id,
             'sold_by_user_id' => $otherUser->id,
@@ -369,6 +370,9 @@ class SaleTest extends TestCase
 
         $byName = $this->getJson('/api/v1/sales?q=Beatriz')->assertOk();
         $this->assertSame([$namedSaleId], collect($byName->json('data'))->pluck('id')->all());
+
+        $byNameCase = $this->getJson('/api/v1/sales?q=beatriz')->assertOk();
+        $this->assertSame([$namedSaleId], collect($byNameCase->json('data'))->pluck('id')->all());
 
         $byWhatsapp = $this->getJson('/api/v1/sales?q=11988887777')->assertOk();
         $this->assertSame([$namedSaleId], collect($byWhatsapp->json('data'))->pluck('id')->all());

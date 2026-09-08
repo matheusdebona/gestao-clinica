@@ -357,6 +357,11 @@ class TreatmentAppointmentTest extends TestCase
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.client_id', $otherClient->id);
 
+        $this->getJson('/api/v1/treatments?q=joao')
+            ->assertOk()
+            ->assertJsonCount(1, 'data')
+            ->assertJsonPath('data.0.client_id', $otherClient->id);
+
         $this->getJson('/api/v1/treatments?q=11988887777')
             ->assertOk()
             ->assertJsonCount(1, 'data');

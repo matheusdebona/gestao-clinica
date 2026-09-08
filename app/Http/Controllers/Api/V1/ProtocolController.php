@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\Protocols\UpdateProtocolRequest;
 use App\Http\Resources\Api\V1\ProtocolResource;
 use App\Models\Protocol;
 use App\Services\ProtocolPricingService;
+use App\Support\CaseInsensitiveSearch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -24,8 +25,11 @@ class ProtocolController extends Controller
             ->orderBy('name');
 
         if ($request->filled('q')) {
-            $term = '%'.$request->string('q')->toString().'%';
-            $query->where('name', 'like', $term);
+            CaseInsensitiveSearch::whereContains(
+                $query,
+                ['name'],
+                $request->string('q')->toString(),
+            );
         }
 
         if ($request->has('is_active')) {

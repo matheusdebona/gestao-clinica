@@ -339,6 +339,46 @@ class ProductTest extends TestCase
         $this->assertSame(['Ácido hialurônico'], collect($bySku->json('data'))->pluck('name')->all());
     }
 
+    public function test_can_search_products_by_name_or_sku_case_insensitively(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $catalog = $this->catalog();
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Botox 100U',
+            'sku' => 'BTX-100',
+        ]);
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Ácido hialurônico',
+            'sku' => 'ACD-SK',
+        ]);
+
+        $byName = $this->getJson('/api/v1/products?q=botox')->assertOk();
+        $this->assertSame(['Botox 100U'], collect($byName->json('data'))->pluck('name')->all());
+
+        $bySku = $this->getJson('/api/v1/products?q=acd-sk')->assertOk();
+        $this->assertSame(['Ácido hialurônico'], collect($bySku->json('data'))->pluck('name')->all());
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Botox 50U inativo',
+            'sku' => 'BTX-050',
+            'is_active' => false,
+        ]);
+
+        $picker = $this->getJson('/api/v1/products?q=botox&is_active=1')->assertOk();
+        $this->assertSame(['Botox 100U'], collect($picker->json('data'))->pluck('name')->all());
+    }
+
     public function test_can_filter_products_by_active_flag(): void
     {
         Sanctum::actingAs($this->admin);

@@ -13,6 +13,7 @@ use App\Http\Resources\Api\V1\SaleResource;
 use App\Models\Protocol;
 use App\Models\Sale;
 use App\Services\SalePricingService;
+use App\Support\CaseInsensitiveSearch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -34,10 +35,9 @@ class SaleController extends Controller
             ->orderByDesc('id');
 
         if ($request->filled('q')) {
-            $term = '%'.$request->string('q')->toString().'%';
+            $term = $request->string('q')->toString();
             $query->whereHas('client', function ($builder) use ($term): void {
-                $builder->where('name', 'like', $term)
-                    ->orWhere('whatsapp', 'like', $term);
+                CaseInsensitiveSearch::whereContains($builder, ['name', 'whatsapp'], $term);
             });
         }
 
