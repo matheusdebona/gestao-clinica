@@ -22,6 +22,7 @@ import NavBadge from '@/components/ui/NavBadge.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 import { getUnreadNotificationCount } from '@/features/notifications/api'
+import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
@@ -96,9 +97,10 @@ async function onLogout() {
       }"
     >
       <div class="px-3 pb-5">
-        <p class="text-[13px] text-inverse/50">Clínica</p>
+        <p class="text-[11px] font-semibold tracking-[0.16em] uppercase text-inverse/45">{{ APP_NAME }}</p>
+        <p class="mt-3 text-[13px] text-inverse/50">Clínica</p>
         <p class="mt-0.5 truncate text-[15px] font-semibold tracking-[-0.02em]">
-          {{ auth.clinicName || 'Gestão' }}
+          {{ auth.clinicName || APP_NAME }}
         </p>
       </div>
       <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto">
@@ -131,7 +133,7 @@ async function onLogout() {
         class="glass-regular sticky top-3 z-20 mx-3 mt-3 flex items-center justify-between rounded-full px-4 py-2 md:hidden"
       >
         <p class="truncate text-[15px] font-medium text-title">
-          {{ auth.clinicName || 'Gestão' }}
+          {{ auth.clinicName || APP_NAME }}
         </p>
         <div class="flex items-center gap-1">
           <ThemeToggle />

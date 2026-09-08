@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { getToken } from '@/lib/auth-storage'
+import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
 
 const router = createRouter({
@@ -9,7 +10,7 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/pages/AuthPage.vue'),
-      meta: { guest: true },
+      meta: { guest: true, title: 'Entrar' },
     },
     {
       path: '/',
@@ -19,6 +20,7 @@ const router = createRouter({
         {
           path: '',
           name: 'home',
+          meta: { title: 'Início' },
           component: () => import('@/pages/DashboardPage.vue'),
         },
         {
@@ -288,6 +290,7 @@ const router = createRouter({
       path: '/dev/ui',
       name: 'dev-ui',
       component: () => import('@/pages/DevUiPage.vue'),
+      meta: { title: 'Soft Violet' },
     },
   ],
 })
@@ -309,6 +312,11 @@ router.beforeEach(async (to) => {
   }
 
   return true
+})
+
+router.afterEach((to) => {
+  const page = typeof to.meta.title === 'string' ? to.meta.title : undefined
+  document.title = page ? `${page} — ${APP_NAME}` : APP_NAME
 })
 
 export default router

@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "gestao-clinica/api",
     "type": "project",
-    "description": "Gest\u00e3o cl\u00ednica \u2014 API multi-tenant (Laravel 13)",
+    "description": "HOF Pay \u2014 API multi-tenant de gest\u00e3o cl\u00ednica (Laravel 13)",
     "keywords": [
         "laravel",
         "framework"

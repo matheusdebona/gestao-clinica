@@ -1,6 +1,8 @@
-# gestao-clinica
+# HOF Pay
 
-Multi-tenant clinical + commercial management platform — API-first, **mobile-first PWA** for clinic staff.
+Plataforma de gestão clínica + comercial, multi-tenant — API-first, **mobile-first**. O repositório GitHub permanece [`gestao-clinica`](https://github.com/matheusdebona/gestao-clinica).
+
+Arquitetura, domínios de produção e plano de deploy: [`docs/hofpay-architecture.md`](./docs/hofpay-architecture.md).
 
 ## Current status
 
@@ -8,6 +10,7 @@ Multi-tenant clinical + commercial management platform — API-first, **mobile-f
 
 | Document | Purpose |
 | --- | --- |
+| [docs/hofpay-architecture.md](./docs/hofpay-architecture.md) | Marca HOF Pay, hosts, monorepo e deploy (VPS) |
 | [docs/visao-da-plataforma.md](./docs/visao-da-plataforma.md) | Visão completa em português |
 | [docs/produto-financeiro.md](./docs/produto-financeiro.md) | Dados do produto para custo, receita e margem |
 | [docs/protocolo.md](./docs/protocolo.md) | Protocolo = serviço completo + preços (custo/sugerido/mínimo/especial) |
