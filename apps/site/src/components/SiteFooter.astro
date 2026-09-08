@@ -1,5 +1,4 @@
 ---
-import BrandMark from './BrandMark.astro'
 import { API_HOST, APP_HOST, APP_LOGIN_URL, APP_NAME, APP_REGISTER_URL, MARKETING_HOST } from '../lib/urls'
 ---
 
@@ -7,13 +6,11 @@ import { API_HOST, APP_HOST, APP_LOGIN_URL, APP_NAME, APP_REGISTER_URL, MARKETIN
   <div class="site-wrap grid gap-10 sm:grid-cols-[1.2fr_0.8fr]">
     <div>
       <a href="#topo" class="inline-flex items-center gap-2.5 text-title">
-        <span class="size-8 overflow-hidden rounded-[9px]">
-          <BrandMark />
-        </span>
+        <img src="/favicon.svg" alt="HOF Pay" width="32" height="32" class="size-8 rounded-[9px]" loading="lazy" />
         <span class="text-[15px] font-semibold tracking-[-0.03em]">{APP_NAME}</span>
       </a>
       <p class="mt-4 max-w-sm text-[15px] leading-6 text-body">
-        Gestão clínica com calma. O site de marketing não pede login e não fala com a API —
+        HOF Pay é a plataforma de gestão para clínicas. O site de marketing não pede login e não fala com a API —
         o produto vive no app.
       </p>
     </div>

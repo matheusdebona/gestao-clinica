@@ -1,10 +1,11 @@
 ---
-import AccessBand from '../components/AccessBand.vue'
-import ClinicRhythm from '../components/ClinicRhythm.vue'
-import FaqAccordion from '../components/FaqAccordion.vue'
-import FeatureShowcase from '../components/FeatureShowcase.vue'
+import AccessSection from '../components/AccessSection.astro'
+import ClinicsSection from '../components/ClinicsSection.astro'
+import FaqSection from '../components/FaqSection.astro'
+import FeatureSection from '../components/FeatureSection.astro'
 import HeroStage from '../components/HeroStage.vue'
-import ProofStrip from '../components/ProofStrip.vue'
+import RhythmSection from '../components/RhythmSection.astro'
+import ScrollReveal from '../components/ScrollReveal.vue'
 import SiteFooter from '../components/SiteFooter.astro'
 import SiteHeader from '../components/SiteHeader.vue'
 import BaseLayout from '../layouts/BaseLayout.astro'
@@ -14,11 +15,13 @@ import BaseLayout from '../layouts/BaseLayout.astro'
   <SiteHeader client:load />
   <main>
     <HeroStage client:load />
-    <FeatureShowcase client:visible />
-    <ClinicRhythm client:visible />
-    <ProofStrip client:visible />
-    <AccessBand client:visible />
-    <FaqAccordion client:visible />
+    <ScrollReveal client:visible>
+      <FeatureSection />
+      <RhythmSection />
+      <ClinicsSection />
+      <AccessSection />
+      <FaqSection />
+    </ScrollReveal>
   </main>
   <SiteFooter />
 </BaseLayout>

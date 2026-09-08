@@ -1,0 +1,7 @@
+---
+import { jsonLdGraph } from '../content/site'
+
+const payload = JSON.stringify(jsonLdGraph())
+---
+
+<script type="application/ld+json" set:html={payload} />

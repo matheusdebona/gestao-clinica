@@ -33,9 +33,7 @@ onUnmounted(() => {
       :class="condensed ? 'glass-regular' : 'glass-clear'"
     >
       <a href="#topo" class="flex items-center gap-2.5 rounded-[10px] px-1 py-1 text-title">
-        <span class="grid size-8 place-items-center rounded-[9px] bg-brand text-[15px] font-semibold text-inverse">
-          H
-        </span>
+        <img src="/favicon.svg" alt="HOF Pay" width="32" height="32" class="size-8 rounded-[9px]" />
         <span class="text-[15px] font-semibold tracking-[-0.03em]">{{ APP_NAME }}</span>
       </a>
 

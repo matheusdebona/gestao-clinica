@@ -1,0 +1,30 @@
+---
+import { clinicLabels } from '../content/site'
+---
+
+<section id="clinicas" class="py-16 sm:py-20">
+  <div class="site-wrap">
+    <div class="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-end" data-reveal>
+      <div class="max-w-xl">
+        <p class="eyebrow glass-chip text-muted">Para clínicas</p>
+        <h2 class="section-title mt-4 text-title">Feito para quem aplica, não só para quem administra.</h2>
+      </div>
+      <p class="max-w-sm text-[15px] leading-6 text-body">
+        Os dados de cada clínica ficam separados: produtos, clientes e números não se misturam.
+      </p>
+    </div>
+
+    <ul class="mt-8 flex list-none flex-wrap gap-2 p-0" data-reveal-stagger>
+      {
+        clinicLabels.map((label) => (
+          <li
+            class="glass-chip glass-chip-brand rounded-full px-3.5 py-2 text-[13px] font-medium text-brand"
+            data-reveal-item
+          >
+            {label}
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>

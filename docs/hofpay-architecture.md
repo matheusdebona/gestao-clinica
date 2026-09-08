@@ -63,12 +63,12 @@ Scaffold em [`apps/site`](../apps/site). Stack:
 | Camada | Escolha |
 | --- | --- |
 | Framework | **Astro (SSG)** |
-| Interatividade | **Ilhas Vue 3** (hero, FAQ, revelações) |
+| Interatividade | **Ilhas Vue 3** (header, hero, ScrollTrigger) |
 | CSS | **Tailwind 4**, tokens Soft Violet / Liquid Glass (cópia de `apps/web`) |
 | Motion | **GSAP** + **ScrollTrigger** |
 | Build | Arquivos estáticos (`dist/`) atrás do nginx (deploy VPS ainda não) |
 
-Por quê Astro: HTML estático rápido para vendas/SEO; Vue só nas ilhas (hero, FAQ, CTA); o mesmo mental model Vue do app operacional, sem SSR autenticado.
+Por quê Astro: HTML estático rápido para vendas/SEO; Vue só nas ilhas (header, hero, motion); o mesmo mental model Vue do app operacional, sem SSR autenticado.
 
 **Alternativa aceitável:** **Nuxt (SSG)** + GSAP + ScrollTrigger, se no momento do scaffold preferirem um único mental model Vue/Nuxt em vez de Astro. Continua deployável como estático no VPS.
 
@@ -78,6 +78,7 @@ Regras do site:
 - GSAP: registrar `ScrollTrigger` uma vez; nas ilhas Vue, tweens em `gsap.context` + `gsap.matchMedia` (`prefers-reduced-motion`) e `ctx.revert()` no unmount.
 - Sem login, sem Bearer, sem chamada à API da clínica.
 - CTA principal: `https://app.hofpay.com.br/register`.
+- SEO (Google + IAs): HTML semântico, title/description/canonical, Open Graph, JSON-LD (Organization, WebSite, SoftwareApplication, FAQPage, sem ratings inventados), sitemap/robots, conteúdo crawlable no HTML, [`/llms.txt`](../apps/site) e `/llms-full.txt`. Sem bloquear crawlers de assistentes.
 
 ---
 

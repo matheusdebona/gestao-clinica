@@ -46,6 +46,29 @@
     outline: 2px solid color-mix(in srgb, var(--sv-brand-primary) 55%, transparent);
     outline-offset: 2px;
   }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -3rem;
+    z-index: 60;
+    border-radius: 12px;
+    padding: 0.5rem 0.75rem;
+    background: var(--sv-brand-primary);
+    color: var(--sv-text-inverse);
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  .faq-item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-item summary::marker {
+    content: "";
+  }
 }
 
 @layer components {

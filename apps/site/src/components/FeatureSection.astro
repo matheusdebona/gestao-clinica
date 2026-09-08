@@ -1,0 +1,36 @@
+---
+import { features } from '../content/site'
+---
+
+<section id="produto" class="relative py-20 sm:py-28">
+  <div class="site-wrap">
+    <div class="max-w-2xl" data-reveal>
+      <p class="eyebrow glass-chip glass-chip-brand text-brand">O produto</p>
+      <h2 class="section-title mt-4 text-title">Cinco frentes. Um ritmo só.</h2>
+      <p class="mt-4 max-w-xl text-[16px] leading-7 text-body">
+        HOF Pay não é um amontoado de telas. É o percurso da clínica: do estoque na geladeira
+        à sessão na poltrona, com a margem visível no fim do dia.
+      </p>
+    </div>
+
+    <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-6" data-reveal-stagger>
+      {
+        features.map((feature, index) => (
+          <article
+            class:list={[
+              'glass-regular rounded-xl p-5',
+              index < 2 ? 'lg:col-span-3' : 'lg:col-span-2',
+            ]}
+            data-reveal-item
+          >
+            <span class="grid size-10 place-items-center rounded-[12px] bg-brand text-[15px] font-semibold text-inverse" aria-hidden="true">
+              {feature.title.slice(0, 1)}
+            </span>
+            <h3 class="mt-5 text-[20px] font-semibold tracking-[-0.03em] text-title">{feature.title}</h3>
+            <p class="mt-2 text-[15px] leading-6 text-body">{feature.copy}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>

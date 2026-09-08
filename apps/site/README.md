@@ -39,3 +39,16 @@ CTA do site aponta para o app de produção (`https://app.hofpay.com.br/register
 ## Motion
 
 GSAP registra `ScrollTrigger` uma vez (`src/lib/gsap.ts`). Ilhas Vue usam `gsap.matchMedia` com `prefers-reduced-motion` e fazem `revert()` no unmount.
+
+## SEO e IAs
+
+A landing é SSG (HTML no `dist/`). Copy crítica (H1, “HOF Pay é …”, features, FAQ em `<details>`) vive em componentes Astro, não só em ilhas Vue.
+
+| Superfície | Onde |
+| --- | --- |
+| Title, description, canonical `https://hofpay.com.br/`, Open Graph, Twitter | `src/layouts/BaseLayout.astro` |
+| JSON-LD (Organization, WebSite, SoftwareApplication, FAQPage) | `src/components/JsonLd.astro` — sem ratings nem preços inventados |
+| Sitemap / robots | `@astrojs/sitemap` + `public/robots.txt` (`Allow: /`, sem bloquear GPTBot/ClaudeBot) |
+| Assistentes | `/llms.txt` e `/llms-full.txt` (texto factual, pt-BR) |
+
+Não inventar logos de clientes, estrelas ou tabela de preços.

@@ -1,14 +1,16 @@
 ---
 import '../styles/global.css'
-import { APP_NAME, SITE_DESCRIPTION } from '../lib/urls'
+import JsonLd from '../components/JsonLd.astro'
+import { SITE_DESCRIPTION } from '../lib/urls'
+import { SITE_TITLE, SITE_URL } from '../content/site'
 
 interface Props {
   title?: string
   description?: string
 }
 
-const { title = `${APP_NAME} — gestão da clínica, com calma.`, description = SITE_DESCRIPTION } = Astro.props
-const canonical = new URL(Astro.url.pathname, Astro.site)
+const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props
+const canonical = `${SITE_URL}/`
 ---
 
 <!doctype html>
@@ -20,19 +22,23 @@ const canonical = new URL(Astro.url.pathname, Astro.site)
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="text/plain" href={`${SITE_URL}/llms.txt`} title="llms.txt" />
     <meta name="theme-color" content="#5956A6" />
+    <meta name="robots" content="index,follow" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="pt_BR" />
-    <meta property="og:site_name" content={APP_NAME} />
+    <meta property="og:site_name" content="HOF Pay" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <JsonLd />
     <slot name="head" />
   </head>
   <body>
+    <a class="skip-link" href="#topo">Ir para o conteúdo</a>
     <slot />
   </body>
 </html>
