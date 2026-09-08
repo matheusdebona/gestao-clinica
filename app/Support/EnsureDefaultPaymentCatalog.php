@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\CardBrand;
+use App\Models\CardOperator;
 use App\Models\Clinic;
 use App\Models\PaymentMethod;
 
@@ -90,6 +91,31 @@ class EnsureDefaultPaymentCatalog
         ['name' => 'Diners', 'code' => 'diners'],
     ];
 
+    /**
+     * Default Brazilian acquirers / maquininhas (curated market set).
+     *
+     * @var list<array{name: string, code: string}>
+     */
+    public const OPERATORS = [
+        ['name' => 'Cielo', 'code' => 'cielo'],
+        ['name' => 'Rede', 'code' => 'rede'],
+        ['name' => 'Getnet', 'code' => 'getnet'],
+        ['name' => 'Stone', 'code' => 'stone'],
+        ['name' => 'PagBank', 'code' => 'pagbank'],
+        ['name' => 'Mercado Pago', 'code' => 'mercado_pago'],
+        ['name' => 'SafraPay', 'code' => 'safrapay'],
+        ['name' => 'Sipag', 'code' => 'sipag'],
+        ['name' => 'SumUp', 'code' => 'sumup'],
+        ['name' => 'InfinitePay', 'code' => 'infinitepay'],
+        ['name' => 'PicPay', 'code' => 'picpay'],
+        ['name' => 'Zoop', 'code' => 'zoop'],
+        ['name' => 'Bin', 'code' => 'bin'],
+        ['name' => 'Vero', 'code' => 'vero'],
+        ['name' => 'Granito', 'code' => 'granito'],
+        ['name' => 'Adyen', 'code' => 'adyen'],
+        ['name' => 'Pagar.me', 'code' => 'pagarme'],
+    ];
+
     public static function run(Clinic $clinic): void
     {
         $previous = CurrentClinic::id();
@@ -124,6 +150,28 @@ class EnsureDefaultPaymentCatalog
                         'is_active' => true,
                     ]
                 );
+            }
+
+            foreach (self::OPERATORS as $operator) {
+                $exists = CardOperator::query()
+                    ->where('clinic_id', $clinic->id)
+                    ->where(function ($query) use ($operator) {
+                        $query->where('code', $operator['code'])
+                            ->orWhere('name', $operator['name']);
+                    })
+                    ->exists();
+
+                if ($exists) {
+                    continue;
+                }
+
+                CardOperator::query()->create([
+                    'clinic_id' => $clinic->id,
+                    'name' => $operator['name'],
+                    'code' => $operator['code'],
+                    'auto_anticipate' => false,
+                    'is_active' => true,
+                ]);
             }
         } finally {
             CurrentClinic::setId($previous);

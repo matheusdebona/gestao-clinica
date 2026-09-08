@@ -224,6 +224,22 @@ class PaymentCatalogTest extends TestCase
             'clinic_id' => $this->clinic->id,
             'code' => 'diners',
         ]);
+        $this->assertDatabaseHas('card_operators', [
+            'clinic_id' => $this->clinic->id,
+            'code' => 'cielo',
+            'name' => 'Cielo',
+            'is_active' => true,
+        ]);
+        $this->assertDatabaseHas('card_operators', [
+            'clinic_id' => $this->clinic->id,
+            'code' => 'pagbank',
+            'name' => 'PagBank',
+        ]);
+        $this->assertDatabaseHas('card_operators', [
+            'clinic_id' => $this->clinic->id,
+            'code' => 'mercado_pago',
+            'name' => 'Mercado Pago',
+        ]);
         $this->assertCatalogForClinic($this->clinic->id);
     }
 
@@ -252,6 +268,10 @@ class PaymentCatalogTest extends TestCase
             'name' => 'Visa Local',
             'code' => 'visa',
         ]);
+        CardOperator::factory()->forClinic($this->clinic)->create([
+            'name' => 'Cielo da casa',
+            'code' => 'cielo',
+        ]);
 
         EnsureDefaultPaymentCatalog::run($this->clinic);
         EnsureDefaultPaymentCatalog::run($this->clinic);
@@ -273,10 +293,60 @@ class PaymentCatalogTest extends TestCase
                 ->where('code', 'visa')
                 ->count()
         );
+        $this->assertSame(
+            1,
+            CardOperator::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->where('code', 'cielo')
+                ->count()
+        );
         $this->assertDatabaseHas('payment_methods', [
             'clinic_id' => $this->clinic->id,
             'code' => 'pix',
             'name' => 'PIX da casa',
+        ]);
+        $this->assertDatabaseHas('card_operators', [
+            'clinic_id' => $this->clinic->id,
+            'code' => 'cielo',
+            'name' => 'Cielo da casa',
+        ]);
+    }
+
+    public function test_default_operators_are_idempotent_by_name_when_code_is_missing(): void
+    {
+        CardOperator::factory()->forClinic($this->clinic)->create([
+            'name' => 'Stone',
+            'code' => null,
+        ]);
+
+        EnsureDefaultPaymentCatalog::run($this->clinic);
+        EnsureDefaultPaymentCatalog::run($this->clinic);
+
+        $this->assertSame(
+            1,
+            CardOperator::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->where('name', 'Stone')
+                ->count()
+        );
+        $this->assertDatabaseHas('card_operators', [
+            'clinic_id' => $this->clinic->id,
+            'name' => 'Stone',
+            'code' => null,
+        ]);
+        $this->assertSame(
+            count(EnsureDefaultPaymentCatalog::OPERATORS),
+            CardOperator::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->count()
+        );
+        $this->assertDatabaseHas('card_operators', [
+            'clinic_id' => $this->clinic->id,
+            'code' => 'cielo',
+            'name' => 'Cielo',
         ]);
     }
 
@@ -303,6 +373,20 @@ class PaymentCatalogTest extends TestCase
         $this->assertSame(
             count(EnsureDefaultPaymentCatalog::BRANDS),
             CardBrand::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $other->id)
+                ->count()
+        );
+        $this->assertSame(
+            count(EnsureDefaultPaymentCatalog::OPERATORS),
+            CardOperator::query()
+                ->withoutGlobalScopes()
+                ->where('clinic_id', $this->clinic->id)
+                ->count()
+        );
+        $this->assertSame(
+            count(EnsureDefaultPaymentCatalog::OPERATORS),
+            CardOperator::query()
                 ->withoutGlobalScopes()
                 ->where('clinic_id', $other->id)
                 ->count()
@@ -355,6 +439,10 @@ class PaymentCatalogTest extends TestCase
             ->withoutGlobalScopes()
             ->where('clinic_id', $clinicId)
             ->get();
+        $operators = CardOperator::query()
+            ->withoutGlobalScopes()
+            ->where('clinic_id', $clinicId)
+            ->get();
 
         $this->assertEqualsCanonicalizing(
             array_column(EnsureDefaultPaymentCatalog::METHODS, 'code'),
@@ -364,8 +452,14 @@ class PaymentCatalogTest extends TestCase
             array_column(EnsureDefaultPaymentCatalog::BRANDS, 'code'),
             $brands->pluck('code')->all()
         );
+        $this->assertEqualsCanonicalizing(
+            array_column(EnsureDefaultPaymentCatalog::OPERATORS, 'code'),
+            $operators->pluck('code')->all()
+        );
         $this->assertTrue($methods->every(fn (PaymentMethod $method) => $method->is_active));
         $this->assertTrue($brands->every(fn (CardBrand $brand) => $brand->is_active));
+        $this->assertTrue($operators->every(fn (CardOperator $operator) => $operator->is_active));
+        $this->assertTrue($operators->every(fn (CardOperator $operator) => $operator->auto_anticipate === false));
         $this->assertTrue(
             $methods
                 ->whereIn('kind', PaymentMethod::CARD_KINDS)

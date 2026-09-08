@@ -4,6 +4,7 @@ namespace Tests\Feature\Api\V1;
 
 use App\Models\Campaign;
 use App\Models\CardBrand;
+use App\Models\CardOperator;
 use App\Models\ClientOrigin;
 use App\Models\Clinic;
 use App\Models\PaymentMethod;
@@ -213,6 +214,10 @@ class AuthTest extends TestCase
             ->where('clinic_id', $clinic->id)
             ->pluck('code')
             ->all();
+        $operatorCodes = CardOperator::query()
+            ->where('clinic_id', $clinic->id)
+            ->pluck('code')
+            ->all();
 
         $this->assertEqualsCanonicalizing(
             array_column(EnsureDefaultPaymentCatalog::METHODS, 'code'),
@@ -221,6 +226,10 @@ class AuthTest extends TestCase
         $this->assertEqualsCanonicalizing(
             array_column(EnsureDefaultPaymentCatalog::BRANDS, 'code'),
             $brandCodes
+        );
+        $this->assertEqualsCanonicalizing(
+            array_column(EnsureDefaultPaymentCatalog::OPERATORS, 'code'),
+            $operatorCodes
         );
         $this->assertTrue(
             PaymentMethod::query()
@@ -234,6 +243,18 @@ class AuthTest extends TestCase
                 ->where('is_active', false)
                 ->doesntExist()
         );
+        $this->assertTrue(
+            CardOperator::query()
+                ->where('clinic_id', $clinic->id)
+                ->where('is_active', false)
+                ->doesntExist()
+        );
+        $this->assertDatabaseHas('card_operators', [
+            'clinic_id' => $clinic->id,
+            'code' => 'stone',
+            'name' => 'Stone',
+            'auto_anticipate' => false,
+        ]);
         $this->assertDatabaseHas('payment_methods', [
             'clinic_id' => $clinic->id,
             'code' => 'cartao_credito',

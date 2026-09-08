@@ -9,7 +9,7 @@ class SeedDefaultPaymentCatalogCommand extends Command
 {
     protected $signature = 'payment-catalog:seed-defaults';
 
-    protected $description = 'Seed default payment methods and card brands for every clinic missing them.';
+    protected $description = 'Seed default payment methods, card brands, and card operators for every clinic missing them.';
 
     public function handle(): int
     {

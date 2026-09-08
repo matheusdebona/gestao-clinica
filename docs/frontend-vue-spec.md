@@ -789,7 +789,7 @@ Domínio: [`domain-model.md`](./domain-model.md) §7. Seed: `EnsureDefaultPaymen
 | Visual | Soft Violet Liquid Glass **heavy** — só `components/ui` + `patterns` |
 | Nav | Item **Pagamentos** no `ClinicShell` (sem pin na tab bar). Atalhos cruzados métodos ↔ bandeiras ↔ operadoras |
 | Permissão | Telas e CRUD = `payment_methods.manage` / `card_brands.manage` / `card_operators.manage` (admin e vendedor). GET index já aceita `sales.view` / `treatments.consume` no wizard |
-| Catálogo inicial | Nova clínica (register, `POST /clinics`, demo seed) recebe métodos (Dinheiro, PIX, Cartão de débito, Cartão de crédito, Boleto, Cheque, Outros) e bandeiras (Visa, Mastercard, Elo, American Express, Hipercard, Cabal, Diners). Ativos. Cartão com `requires_card_meta`. Backfill: `php artisan payment-catalog:seed-defaults` e `PaymentCatalogSeeder` |
+| Catálogo inicial | Nova clínica (register, `POST /clinics`, demo seed) recebe métodos (Dinheiro, PIX, Cartão de débito, Cartão de crédito, Boleto, Cheque, Outros), bandeiras (Visa, Mastercard, Elo, American Express, Hipercard, Cabal, Diners) e operadoras BR (Cielo, Rede, Getnet, Stone, PagBank, Mercado Pago, SafraPay, Sipag, SumUp, InfinitePay, PicPay, Zoop, Bin, Vero, Granito, Adyen, Pagar.me). Ativos. Cartão com `requires_card_meta`. Backfill: `php artisan payment-catalog:seed-defaults` e `PaymentCatalogSeeder` |
 | Fora desta fase | UI de regras de taxa; mudança no wizard além de usar a API existente |
 
 ##### Telas / rotas
