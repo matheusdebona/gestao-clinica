@@ -38,6 +38,9 @@ withDefaults(
 const emit = defineEmits<{
   remove: []
 }>()
+
+const hasLineSale = (value: string | number | null | undefined) =>
+  value !== null && value !== undefined && value !== ''
 </script>
 
 <template>
@@ -46,7 +49,7 @@ const emit = defineEmits<{
       <div class="min-w-0 flex-1">
         <p class="truncate text-[15px] font-medium text-title">{{ title }}</p>
         <p v-if="unit" class="mt-0.5 truncate text-[13px] text-muted">{{ unit }}</p>
-        <p v-if="lineSale !== null && lineSale !== undefined && lineSale !== ''" class="mt-0.5">
+        <p v-if="showUnitPrice && hasLineSale(lineSale)" class="mt-0.5">
           <MoneyDisplay :value="lineSale" />
         </p>
       </div>
@@ -81,6 +84,11 @@ const emit = defineEmits<{
           </FormField>
           <FormField v-else label="Preço">
             <MaskedBox :value="formatBRL(unitPrice)" />
+          </FormField>
+        </div>
+        <div v-else-if="hasLineSale(lineSale)" class="w-40 shrink-0">
+          <FormField label="Valor">
+            <MaskedBox :value="formatBRL(lineSale)" />
           </FormField>
         </div>
       </div>

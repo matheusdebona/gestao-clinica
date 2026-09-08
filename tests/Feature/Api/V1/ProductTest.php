@@ -407,6 +407,36 @@ class ProductTest extends TestCase
         $this->assertSame(['Ácido hialurônico'], collect($byAcid->json('data'))->pluck('name')->all());
     }
 
+    public function test_can_search_products_by_name_substring(): void
+    {
+        Sanctum::actingAs($this->admin);
+        $catalog = $this->catalog();
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Luvas',
+            'sku' => 'LV-001',
+            'is_active' => true,
+        ]);
+
+        Product::factory()->forClinic($this->clinic)->create([
+            'product_type_id' => $catalog['type']->id,
+            'brand_id' => $catalog['brand']->id,
+            'unit_of_measure_id' => $catalog['unit']->id,
+            'name' => 'Toxina',
+            'sku' => 'TX-001',
+            'is_active' => true,
+        ]);
+
+        $byStem = $this->getJson('/api/v1/products?q=luva&is_active=1')->assertOk();
+        $this->assertSame(['Luvas'], collect($byStem->json('data'))->pluck('name')->all());
+
+        $byFull = $this->getJson('/api/v1/products?q=luvas&is_active=1')->assertOk();
+        $this->assertSame(['Luvas'], collect($byFull->json('data'))->pluck('name')->all());
+    }
+
     public function test_can_filter_products_by_active_flag(): void
     {
         Sanctum::actingAs($this->admin);

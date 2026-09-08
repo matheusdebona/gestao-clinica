@@ -96,7 +96,7 @@ onUnmounted(() => {
   window.clearTimeout(searchTimer)
 })
 
-const canSearchProducts = computed(() => auth.can('products.view'))
+const canSearchProducts = computed(() => auth.can('products.view') || auth.can('sales.view'))
 
 const searchQuery = useQuery({
   queryKey: ['products', 'protocol-pick', q],
@@ -107,12 +107,12 @@ const searchQuery = useQuery({
       is_active: true,
     }),
   enabled: computed(() => canSearchProducts.value && q.value.length > 0),
+  staleTime: 0,
 })
 
-const searchHits = computed(() => {
-  const ids = new Set(items.value.map((item) => item.product_id))
-  return (searchQuery.data.value?.data ?? []).filter((product) => !ids.has(product.id))
-})
+const addedProductIds = computed(() => new Set(items.value.map((item) => item.product_id)))
+const searchHits = computed(() => searchQuery.data.value?.data ?? [])
+const alreadyInProtocol = (productId: number) => addedProductIds.value.has(productId)
 
 function applyDraft(draft: ProtocolDraft) {
   resetForm({
@@ -258,7 +258,11 @@ function itemUnit(item: ProtocolItemDraft) {
 }
 
 function productMeta(product: Product) {
-  return [product.sku, product.brand?.name, product.unit_of_measure?.symbol].filter(Boolean).join(' · ')
+  const parts = [product.sku, product.brand?.name, product.unit_of_measure?.symbol].filter(Boolean)
+  if (alreadyInProtocol(product.id)) {
+    parts.push('já no protocolo')
+  }
+  return parts.join(' · ')
 }
 
 const onSubmit = handleSubmit((formValues: ProtocolFormValues) => {
@@ -354,6 +358,10 @@ defineExpose({
       incluí-lo no protocolo.
     </Banner>
 
+    <Banner v-else-if="q && searchQuery.isError" variant="danger" title="Não foi possível buscar produtos">
+      Tente de novo. Se continuar, confira se você pode ver o catálogo.
+    </Banner>
+
     <SurfaceCard v-else-if="q && searchQuery.isPending" :padding="false">
       <div class="flex flex-col gap-3 p-5">
         <Skeleton class="h-12" />
@@ -376,7 +384,7 @@ defineExpose({
       </div>
     </SurfaceCard>
 
-    <SurfaceCard v-else-if="searchHits.length > 0" :padding="false">
+    <SurfaceCard v-else-if="q && searchHits.length > 0" :padding="false">
       <div class="divide-y divide-border-divider px-5 py-2">
         <ListCard
           v-for="product in searchHits"
