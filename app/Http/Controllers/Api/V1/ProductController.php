@@ -11,6 +11,7 @@ use App\Http\Resources\Api\V1\ProductResource;
 use App\Http\Resources\Api\V1\StockMovementResource;
 use App\Models\Product;
 use App\Services\StockService;
+use App\Support\CaseInsensitiveSearch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -27,11 +28,11 @@ class ProductController extends Controller
             ->orderBy('name');
 
         if ($request->filled('q')) {
-            $term = '%'.$request->string('q')->toString().'%';
-            $query->where(function ($builder) use ($term): void {
-                $builder->where('name', 'like', $term)
-                    ->orWhere('sku', 'like', $term);
-            });
+            CaseInsensitiveSearch::whereContains(
+                $query,
+                ['name', 'sku'],
+                $request->string('q')->toString(),
+            );
         }
 
         if ($request->boolean('low_stock')) {

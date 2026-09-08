@@ -157,6 +157,11 @@ class AppointmentTest extends TestCase
         $this->getJson('/api/v1/appointments?from=2026-09-08&to=2026-09-11&status=cancelled')
             ->assertOk()
             ->assertJsonCount(0, 'data');
+
+        $this->client->update(['name' => 'Maria Santos']);
+        $this->getJson('/api/v1/appointments?from=2026-09-08&to=2026-09-11&q=maria')
+            ->assertOk()
+            ->assertJsonCount(2, 'data');
     }
 
     public function test_create_requires_professional(): void

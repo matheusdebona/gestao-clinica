@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\Clients\StoreClientRequest;
 use App\Http\Requests\Api\V1\Clients\UpdateClientRequest;
 use App\Http\Resources\Api\V1\ClientResource;
 use App\Models\Client;
+use App\Support\CaseInsensitiveSearch;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -18,11 +19,11 @@ class ClientController extends Controller
         $query = Client::query()->orderBy('name');
 
         if ($request->filled('q')) {
-            $term = '%'.$request->string('q')->toString().'%';
-            $query->where(function ($builder) use ($term): void {
-                $builder->where('name', 'like', $term)
-                    ->orWhere('whatsapp', 'like', $term);
-            });
+            CaseInsensitiveSearch::whereContains(
+                $query,
+                ['name', 'whatsapp'],
+                $request->string('q')->toString(),
+            );
         }
 
         if ($request->has('is_active')) {

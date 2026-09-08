@@ -172,6 +172,26 @@ class ProtocolTest extends TestCase
         $this->assertSame(['Full face toxina'], collect($byName->json('data'))->pluck('name')->all());
     }
 
+    public function test_can_search_protocols_by_name_case_insensitively(): void
+    {
+        Sanctum::actingAs($this->admin);
+
+        Protocol::factory()->create([
+            'clinic_id' => $this->clinic->id,
+            'name' => 'Full Face Toxina',
+        ]);
+        Protocol::factory()->create([
+            'clinic_id' => $this->clinic->id,
+            'name' => 'Bioestimulador',
+        ]);
+
+        $byLower = $this->getJson('/api/v1/protocols?q=full')->assertOk();
+        $this->assertSame(['Full Face Toxina'], collect($byLower->json('data'))->pluck('name')->all());
+
+        $byUpper = $this->getJson('/api/v1/protocols?q=TOXINA')->assertOk();
+        $this->assertSame(['Full Face Toxina'], collect($byUpper->json('data'))->pluck('name')->all());
+    }
+
     public function test_can_filter_protocols_by_active_flag(): void
     {
         Sanctum::actingAs($this->admin);

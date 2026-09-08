@@ -86,6 +86,27 @@ class ClientTest extends TestCase
         $this->assertSame('Bruno Lima', $byWhatsapp->json('data.0.name'));
     }
 
+    public function test_can_search_clients_by_name_case_insensitively(): void
+    {
+        Sanctum::actingAs($this->admin);
+        CurrentClinic::setId($this->clinic->id);
+
+        Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'Ana Souza',
+            'whatsapp' => '11911112222',
+        ]);
+        Client::factory()->forClinic($this->clinic)->create([
+            'name' => 'Bruno Lima',
+            'whatsapp' => '11933334444',
+        ]);
+
+        $byLower = $this->getJson('/api/v1/clients?q=ana')->assertOk();
+        $this->assertSame(['Ana Souza'], collect($byLower->json('data'))->pluck('name')->all());
+
+        $byUpper = $this->getJson('/api/v1/clients?q=SOUZA')->assertOk();
+        $this->assertSame(['Ana Souza'], collect($byUpper->json('data'))->pluck('name')->all());
+    }
+
     public function test_can_update_and_deactivate_client(): void
     {
         Sanctum::actingAs($this->admin);
