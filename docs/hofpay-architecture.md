@@ -133,6 +133,10 @@ server {
     root /var/www/hofpay-app;
     index index.html;
 
+    # $uri first: Vite copies public/ into dist, so /apple-touch-icon.png,
+    # /icon-192.png, /icon-512.png, /icon-512-maskable.png and
+    # /manifest.webmanifest must be real files (otherwise the SPA fallback
+    # serves HTML and iOS “Add to Home Screen” shows a generic letter).
     location / {
         try_files $uri $uri/ /index.html;
     }
