@@ -24,7 +24,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.campaignId)
 
 const { data: campaign, isPending, isError } = useQuery({
-  queryKey: ['campaigns', idRef],
+  queryKey: ['campaigns', 'detail', idRef],
   queryFn: () => getCampaign(idRef.value),
 })
 

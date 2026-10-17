@@ -24,7 +24,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.brandId)
 
 const { data: brand, isPending, isError } = useQuery({
-  queryKey: ['card-brands', idRef],
+  queryKey: ['card-brands', 'detail', idRef],
   queryFn: () => getCardBrand(idRef.value),
 })
 

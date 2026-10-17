@@ -30,7 +30,7 @@ const isEdit = computed(() => Boolean(props.originId))
 const allowed = computed(() => auth.can('client_origins.manage'))
 
 const { data: origin, isPending, isError } = useQuery({
-  queryKey: ['client-origins', computed(() => props.originId)],
+  queryKey: ['client-origins', 'detail', computed(() => props.originId)],
   queryFn: () => getClientOrigin(props.originId as number),
   enabled: computed(() => Boolean(props.originId) && allowed.value),
 })

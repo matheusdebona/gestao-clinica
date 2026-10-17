@@ -41,7 +41,7 @@ const {
   isPending: protocolPending,
   isError: protocolError,
 } = useQuery({
-  queryKey: ['protocols', computed(() => props.protocolId)],
+  queryKey: ['protocols', 'detail', computed(() => props.protocolId)],
   queryFn: () => getProtocol(props.protocolId as number),
   enabled: computed(() => Boolean(props.protocolId) && allowed.value),
 })

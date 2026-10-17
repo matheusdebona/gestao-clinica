@@ -45,7 +45,7 @@ const {
   isError,
   isFetching,
 } = useQuery({
-  queryKey: ['budgets', page, status, includeSuperseded],
+  queryKey: ['budgets', 'list', page, status, includeSuperseded],
   queryFn: () =>
     listBudgets({
       page: page.value,

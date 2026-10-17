@@ -42,7 +42,7 @@ const idRef = computed(() => props.appointmentId)
 const canView = computed(() => auth.can('appointments.view'))
 
 const { data: appointment, isPending, isError } = useQuery({
-  queryKey: ['appointments', idRef],
+  queryKey: ['appointments', 'detail', idRef],
   queryFn: () => getAppointment(idRef.value),
   enabled: canView,
 })

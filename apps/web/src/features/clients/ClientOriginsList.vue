@@ -25,7 +25,7 @@ watch(activeOnly, () => {
 })
 
 const { data: listData, isPending, isError, isFetching } = useQuery({
-  queryKey: ['client-origins', page, activeOnly],
+  queryKey: ['client-origins', 'list', page, activeOnly],
   queryFn: () =>
     listClientOrigins({
       page: page.value,

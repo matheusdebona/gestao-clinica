@@ -72,7 +72,7 @@ const {
   isError,
   isFetching,
 } = useQuery({
-  queryKey: ['products', q, page, activeOnly, lowStock, typeFilter],
+  queryKey: ['products', 'list', q, page, activeOnly, lowStock, typeFilter],
   queryFn: () =>
     listProducts({
       q: q.value || undefined,

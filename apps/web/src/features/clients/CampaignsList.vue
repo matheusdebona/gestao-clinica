@@ -68,7 +68,7 @@ const originOptions = computed(() => [
 ])
 
 const { data: listData, isPending, isError, isFetching } = useQuery({
-  queryKey: ['campaigns', page, activeOnly, originFilter],
+  queryKey: ['campaigns', 'list', page, activeOnly, originFilter],
   queryFn: () =>
     listCampaigns({
       page: page.value,

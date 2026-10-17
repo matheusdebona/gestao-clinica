@@ -25,7 +25,7 @@ watch(activeOnly, () => {
 })
 
 const { data: listData, isPending, isError, isFetching } = useQuery({
-  queryKey: ['brands', page, activeOnly],
+  queryKey: ['brands', 'list', page, activeOnly],
   queryFn: () =>
     listBrands({
       page: page.value,

@@ -106,7 +106,7 @@ const {
   isPending,
   isError,
 } = useQuery({
-  queryKey: ['appointments', range, status, professionalId, q],
+  queryKey: ['appointments', 'list', range, status, professionalId, q],
   queryFn: () =>
     listAppointments({
       from: range.value.from,

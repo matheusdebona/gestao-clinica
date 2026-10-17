@@ -71,7 +71,7 @@ const canConsume = computed(() => auth.can('treatments.consume'))
 const canSearchProducts = computed(() => auth.can('products.view') || auth.can('treatments.consume'))
 
 const { data: appointment, isPending, isError } = useQuery({
-  queryKey: ['appointments', idRef],
+  queryKey: ['appointments', 'detail', idRef],
   queryFn: () => getAppointment(idRef.value),
   enabled: computed(() => auth.can('appointments.view') || auth.can('treatments.view')),
 })
@@ -79,7 +79,7 @@ const { data: appointment, isPending, isError } = useQuery({
 const treatmentId = computed(() => appointment.value?.treatment_id)
 
 const fulfillmentQuery = useQuery({
-  queryKey: ['treatments', treatmentId, 'fulfillment'],
+  queryKey: ['treatments', 'detail', treatmentId, 'fulfillment'],
   queryFn: () => getTreatmentFulfillment(treatmentId.value as number),
   enabled: computed(() => Boolean(treatmentId.value)),
 })

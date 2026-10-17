@@ -26,7 +26,7 @@ const isEdit = computed(() => Boolean(props.operatorId))
 const allowed = computed(() => auth.can('card_operators.manage'))
 
 const { data: operator, isPending, isError } = useQuery({
-  queryKey: ['card-operators', computed(() => props.operatorId)],
+  queryKey: ['card-operators', 'detail', computed(() => props.operatorId)],
   queryFn: () => getCardOperator(props.operatorId as number),
   enabled: computed(() => Boolean(props.operatorId) && allowed.value),
 })

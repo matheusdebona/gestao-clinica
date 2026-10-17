@@ -33,7 +33,7 @@ const adjustFormRef = ref<{ setErrors: (errors: Record<string, string>) => void 
 const idRef = computed(() => props.productId)
 
 const { data: product, isPending, isError } = useQuery({
-  queryKey: ['products', idRef],
+  queryKey: ['products', 'detail', idRef],
   queryFn: () => getProduct(idRef.value),
 })
 

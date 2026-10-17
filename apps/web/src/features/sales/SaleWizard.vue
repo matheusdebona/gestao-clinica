@@ -82,7 +82,7 @@ const {
   isPending: salePending,
   isError: saleError,
 } = useQuery({
-  queryKey: ['sales', computed(() => props.saleId)],
+  queryKey: ['sales', 'detail', computed(() => props.saleId)],
   queryFn: () => getSale(props.saleId as number),
   enabled: computed(() => Boolean(props.saleId) && allowed.value),
 })

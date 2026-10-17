@@ -24,7 +24,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.originId)
 
 const { data: origin, isPending, isError } = useQuery({
-  queryKey: ['client-origins', idRef],
+  queryKey: ['client-origins', 'detail', idRef],
   queryFn: () => getClientOrigin(idRef.value),
 })
 

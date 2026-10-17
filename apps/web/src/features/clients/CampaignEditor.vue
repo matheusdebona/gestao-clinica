@@ -32,7 +32,7 @@ const initialOriginId = computed(() => {
 })
 
 const { data: campaign, isPending, isError } = useQuery({
-  queryKey: ['campaigns', computed(() => props.campaignId)],
+  queryKey: ['campaigns', 'detail', computed(() => props.campaignId)],
   queryFn: () => getCampaign(props.campaignId as number),
   enabled: computed(() => Boolean(props.campaignId) && allowed.value),
 })

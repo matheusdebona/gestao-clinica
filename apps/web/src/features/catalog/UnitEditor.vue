@@ -26,7 +26,7 @@ const isEdit = computed(() => Boolean(props.unitId))
 const allowed = computed(() => auth.can('units.manage'))
 
 const { data: unit, isPending, isError } = useQuery({
-  queryKey: ['units', computed(() => props.unitId)],
+  queryKey: ['units', 'detail', computed(() => props.unitId)],
   queryFn: () => getUnit(props.unitId as number),
   enabled: computed(() => Boolean(props.unitId) && allowed.value),
 })

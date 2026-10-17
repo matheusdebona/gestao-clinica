@@ -24,7 +24,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.brandId)
 
 const { data: brand, isPending, isError } = useQuery({
-  queryKey: ['brands', idRef],
+  queryKey: ['brands', 'detail', idRef],
   queryFn: () => getBrand(idRef.value),
 })
 

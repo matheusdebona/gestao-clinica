@@ -27,7 +27,7 @@ const {
   isError,
   isFetching,
 } = useQuery({
-  queryKey: ['users', page],
+  queryKey: ['users', 'list', page],
   queryFn: () => listUsers({ page: page.value }),
   enabled: computed(() => auth.can('users.view')),
 })

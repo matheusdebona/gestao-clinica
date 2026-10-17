@@ -24,7 +24,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.unitId)
 
 const { data: unit, isPending, isError } = useQuery({
-  queryKey: ['units', idRef],
+  queryKey: ['units', 'detail', idRef],
   queryFn: () => getUnit(idRef.value),
 })
 
