@@ -562,9 +562,10 @@ function simulateLoading() {
             <Banner variant="danger" title="Falha">
               Não foi possível concluir.
             </Banner>
-            <div class="flex items-center gap-3 pt-1">
+            <div class="flex items-center gap-6 pt-1">
               <Spinner size="sm" />
               <Spinner />
+              <BrandMark size="lg" motion="draw" />
             </div>
             <div class="grid gap-2 sm:grid-cols-3">
               <Skeleton class="h-9" />

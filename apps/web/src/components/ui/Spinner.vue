@@ -16,7 +16,7 @@ withDefaults(
 <template>
   <span role="status" class="inline-flex">
     <BrandMark
-      class="animate-spin"
+      motion="draw"
       :size="size"
       tone="brand"
       :decorative="false"

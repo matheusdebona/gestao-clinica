@@ -11,3 +11,5 @@ Source raster: [`logo-hopay-clean.png`](./logo-hopay-clean.png).
 | `BrandMark` (`apps/web` UI + `apps/site` Astro) | Inline logo; `Spinner` / button loading spin this mark |
 
 Prefer the Vue/Astro `BrandMark` when the mark must inherit text color. Use the static SVG/`favicon` when you need a file URL (meta, OG, `<link rel="icon">`).
+
+Loading uses `BrandMark` with `motion="draw"` (stroke dash animation), not spin — see `Spinner` and buttons with `loading`.

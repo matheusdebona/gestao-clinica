@@ -42,7 +42,7 @@ const classes = computed(() =>
     :class="classes"
     :disabled="disabled || loading"
   >
-    <BrandMark v-if="loading" size="sm" tone="current" class="animate-spin" />
+    <BrandMark v-if="loading" size="sm" tone="current" motion="draw" />
     <slot />
   </button>
 </template>
