@@ -48,7 +48,7 @@ const {
   isError,
   isFetching,
 } = useQuery({
-  queryKey: ['protocols', q, page, activeOnly],
+  queryKey: ['protocols', 'list', q, page, activeOnly],
   queryFn: () =>
     listProtocols({
       q: q.value || undefined,

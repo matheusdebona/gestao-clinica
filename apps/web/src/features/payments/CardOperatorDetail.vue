@@ -24,7 +24,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.operatorId)
 
 const { data: operator, isPending, isError } = useQuery({
-  queryKey: ['card-operators', idRef],
+  queryKey: ['card-operators', 'detail', idRef],
   queryFn: () => getCardOperator(idRef.value),
 })
 

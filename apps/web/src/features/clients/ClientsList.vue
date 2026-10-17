@@ -41,7 +41,7 @@ const {
   isError,
   isFetching,
 } = useQuery({
-  queryKey: ['clients', q, page, activeOnly],
+  queryKey: ['clients', 'list', q, page, activeOnly],
   queryFn: () =>
     listClients({
       q: q.value || undefined,

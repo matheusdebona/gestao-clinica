@@ -41,13 +41,13 @@ const idRef = computed(() => props.treatmentId)
 const canView = computed(() => auth.can('treatments.view'))
 
 const { data: treatment, isPending, isError } = useQuery({
-  queryKey: ['treatments', idRef],
+  queryKey: ['treatments', 'detail', idRef],
   queryFn: () => getTreatment(idRef.value),
   enabled: canView,
 })
 
 const fulfillmentQuery = useQuery({
-  queryKey: ['treatments', idRef, 'fulfillment'],
+  queryKey: ['treatments', 'detail', idRef, 'fulfillment'],
   queryFn: () => getTreatmentFulfillment(idRef.value),
   enabled: canView,
 })

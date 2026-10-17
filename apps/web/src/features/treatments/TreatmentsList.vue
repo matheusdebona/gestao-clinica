@@ -42,7 +42,7 @@ const {
   isPending,
   isError,
 } = useQuery({
-  queryKey: ['treatments', q, page, status],
+  queryKey: ['treatments', 'list', q, page, status],
   queryFn: () =>
     listTreatments({
       q: q.value || undefined,

@@ -30,7 +30,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.methodId)
 
 const { data: method, isPending, isError } = useQuery({
-  queryKey: ['payment-methods', idRef],
+  queryKey: ['payment-methods', 'detail', idRef],
   queryFn: () => getPaymentMethod(idRef.value),
 })
 

@@ -46,7 +46,7 @@ const {
   isError,
   isFetching,
 } = useQuery({
-  queryKey: ['sales', q, page, status],
+  queryKey: ['sales', 'list', q, page, status],
   queryFn: () =>
     listSales({
       q: q.value || undefined,

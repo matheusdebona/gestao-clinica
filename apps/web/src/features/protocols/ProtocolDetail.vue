@@ -28,7 +28,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.protocolId)
 
 const { data: protocol, isPending, isError } = useQuery({
-  queryKey: ['protocols', idRef],
+  queryKey: ['protocols', 'detail', idRef],
   queryFn: () => getProtocol(idRef.value),
 })
 

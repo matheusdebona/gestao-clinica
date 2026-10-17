@@ -28,9 +28,20 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.userId)
 
 const { data: user, isPending, isError } = useQuery({
-  queryKey: ['users', idRef],
+  queryKey: ['users', 'detail', idRef],
   queryFn: () => getUser(idRef.value),
   enabled: computed(() => auth.can('users.view')),
+})
+
+const isInactive = computed(() => user.value?.is_active === false)
+const activityLabel = computed(() => {
+  if (user.value?.is_active === false) {
+    return 'Inativo'
+  }
+  if (user.value?.is_active === true) {
+    return 'Ativo'
+  }
+  return '—'
 })
 
 const isClinicAdmin = computed(() => Boolean(user.value?.roles?.includes('admin')))
@@ -107,7 +118,7 @@ const permissionList = computed(() =>
         <PermissionGate v-if="canDeactivate" permission="users.delete">
           <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
         </PermissionGate>
-        <PermissionGate v-else-if="user && !user.is_active" permission="users.update">
+        <PermissionGate v-else-if="isInactive" permission="users.update">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()">
             Reativar
           </Button>
@@ -130,7 +141,7 @@ const permissionList = computed(() =>
     </SurfaceCard>
 
     <template v-else-if="user">
-      <Banner v-if="!user.is_active" variant="warning" title="Inativo">
+      <Banner v-if="isInactive" variant="warning" title="Inativo">
         Este usuário não acessa a clínica.
       </Banner>
 
@@ -146,7 +157,7 @@ const permissionList = computed(() =>
           </div>
           <div>
             <dt class="text-[13px] text-muted">Situação</dt>
-            <dd class="mt-0.5 text-title">{{ user.is_active ? 'Ativo' : 'Inativo' }}</dd>
+            <dd class="mt-0.5 text-title">{{ activityLabel }}</dd>
           </div>
           <div v-if="permissionList.length">
             <dt class="text-[13px] text-muted">Permissões efetivas</dt>

@@ -32,7 +32,7 @@ const cancelOpen = ref(false)
 const idRef = computed(() => props.saleId)
 
 const { data: sale, isPending, isError } = useQuery({
-  queryKey: ['sales', idRef],
+  queryKey: ['sales', 'detail', idRef],
   queryFn: () => getSale(idRef.value),
 })
 

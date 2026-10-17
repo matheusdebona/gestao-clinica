@@ -41,7 +41,7 @@ const brandOptions = computed(() => [
 ])
 
 const { data: listData, isPending, isError, isFetching } = useQuery({
-  queryKey: ['product-types', page, activeOnly, brandFilter],
+  queryKey: ['product-types', 'list', page, activeOnly, brandFilter],
   queryFn: () =>
     listProductTypes({
       page: page.value,

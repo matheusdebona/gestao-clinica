@@ -27,7 +27,7 @@ watch(activeOnly, () => {
 })
 
 const { data: listData, isPending, isError, isFetching } = useQuery({
-  queryKey: ['payment-methods', 'catalog', page, activeOnly],
+  queryKey: ['payment-methods', 'list', page, activeOnly],
   queryFn: () =>
     listPaymentMethodsPage({
       page: page.value,

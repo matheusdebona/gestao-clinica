@@ -24,7 +24,7 @@ const confirmOpen = ref(false)
 const idRef = computed(() => props.productTypeId)
 
 const { data: productType, isPending, isError } = useQuery({
-  queryKey: ['product-types', idRef],
+  queryKey: ['product-types', 'detail', idRef],
   queryFn: () => getProductType(idRef.value),
 })
 

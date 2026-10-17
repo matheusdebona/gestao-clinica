@@ -32,7 +32,7 @@ const {
   isPending: userPending,
   isError: userError,
 } = useQuery({
-  queryKey: ['users', computed(() => props.userId)],
+  queryKey: ['users', 'detail', computed(() => props.userId)],
   queryFn: () => getUser(props.userId as number),
   enabled: computed(() => Boolean(props.userId) && allowed.value),
 })

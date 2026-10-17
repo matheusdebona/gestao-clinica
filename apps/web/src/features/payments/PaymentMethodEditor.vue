@@ -26,7 +26,7 @@ const isEdit = computed(() => Boolean(props.methodId))
 const allowed = computed(() => auth.can('payment_methods.manage'))
 
 const { data: method, isPending, isError } = useQuery({
-  queryKey: ['payment-methods', computed(() => props.methodId)],
+  queryKey: ['payment-methods', 'detail', computed(() => props.methodId)],
   queryFn: () => getPaymentMethod(props.methodId as number),
   enabled: computed(() => Boolean(props.methodId) && allowed.value),
 })

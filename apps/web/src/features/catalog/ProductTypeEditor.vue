@@ -26,7 +26,7 @@ const isEdit = computed(() => Boolean(props.productTypeId))
 const allowed = computed(() => auth.can('product_types.manage'))
 
 const { data: productType, isPending, isError } = useQuery({
-  queryKey: ['product-types', computed(() => props.productTypeId)],
+  queryKey: ['product-types', 'detail', computed(() => props.productTypeId)],
   queryFn: () => getProductType(props.productTypeId as number),
   enabled: computed(() => Boolean(props.productTypeId) && allowed.value),
 })

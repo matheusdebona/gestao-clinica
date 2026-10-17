@@ -36,7 +36,7 @@ const {
   isPending: productPending,
   isError: productError,
 } = useQuery({
-  queryKey: ['products', computed(() => props.productId)],
+  queryKey: ['products', 'detail', computed(() => props.productId)],
   queryFn: () => getProduct(props.productId as number),
   enabled: computed(() => Boolean(props.productId) && allowed.value),
 })
