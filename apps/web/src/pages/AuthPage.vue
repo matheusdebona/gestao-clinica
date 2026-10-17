@@ -2,6 +2,7 @@
 import { reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import authClinic from '@/assets/auth-clinic.jpg'
+import BrandMark from '@/components/ui/BrandMark.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
@@ -139,109 +140,127 @@ async function submitRegister() {
         </p>
       </div>
 
-      <section class="auth-login flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-8 md:px-10">
-        <p class="text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">{{ APP_NAME }}</p>
-        <h1 class="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-title">Entrar</h1>
-        <p class="mt-1 text-[15px] text-muted">Use o e-mail da clínica.</p>
-        <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitLogin">
-          <FormField label="E-mail" :error="loginErrors.email" html-for="login-email">
-            <template #default="{ invalid }">
-              <Input
-                id="login-email"
-                v-model="loginForm.email"
-                type="email"
-                autocomplete="email"
-                :invalid="invalid"
-              />
-            </template>
-          </FormField>
-          <FormField label="Senha" :error="loginErrors.password" html-for="login-password">
-            <template #default="{ invalid }">
-              <PasswordInput
-                id="login-password"
-                v-model="loginForm.password"
-                autocomplete="current-password"
-                :invalid="invalid"
-              />
-            </template>
-          </FormField>
-          <Button type="submit" block :loading="loading && mode === 'login'">
-            Continuar
-          </Button>
-        </form>
-        <p class="mt-5 text-[13px] text-muted">
-          Ainda sem clínica?
-          <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="setMode('register')">
-            Cadastrar-se
-          </Button>
-        </p>
+      <section class="auth-login flex min-h-0 flex-col overflow-y-auto px-6 py-8 md:px-10 md:py-10">
+        <div class="my-auto flex w-full flex-col">
+          <div class="mb-8 flex justify-center">
+            <BrandMark size="3xl" :decorative="false" />
+          </div>
+          <div class="mx-auto w-full max-w-[360px]">
+            <p class="text-center text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">
+              {{ APP_NAME }}
+            </p>
+            <h1 class="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-title">Entrar</h1>
+            <p class="mt-1 text-[15px] text-muted">Use o e-mail da clínica.</p>
+            <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitLogin">
+              <FormField label="E-mail" :error="loginErrors.email" html-for="login-email">
+                <template #default="{ invalid }">
+                  <Input
+                    id="login-email"
+                    v-model="loginForm.email"
+                    type="email"
+                    autocomplete="email"
+                    :invalid="invalid"
+                  />
+                </template>
+              </FormField>
+              <FormField label="Senha" :error="loginErrors.password" html-for="login-password">
+                <template #default="{ invalid }">
+                  <PasswordInput
+                    id="login-password"
+                    v-model="loginForm.password"
+                    autocomplete="current-password"
+                    :invalid="invalid"
+                  />
+                </template>
+              </FormField>
+              <Button type="submit" block :loading="loading && mode === 'login'">
+                Continuar
+              </Button>
+            </form>
+            <p class="mt-5 text-[13px] text-muted">
+              Ainda sem clínica?
+              <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="setMode('register')">
+                Cadastrar-se
+              </Button>
+            </p>
+          </div>
+        </div>
       </section>
 
-      <section class="auth-register flex min-h-0 flex-col justify-center overflow-y-auto px-6 py-8 md:px-10">
-        <p class="text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">{{ APP_NAME }}</p>
-        <h1 class="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-title">Cadastrar</h1>
-        <p class="mt-1 text-[15px] text-muted">Abre a clínica e o primeiro acesso.</p>
-        <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitRegister">
-          <FormField label="Nome da clínica" :error="registerErrors.clinic_name" html-for="reg-clinic">
-            <template #default="{ invalid }">
-              <Input id="reg-clinic" v-model="registerForm.clinic_name" type="text" :invalid="invalid" />
-            </template>
-          </FormField>
-          <FormField label="Seu nome" :error="registerErrors.name" html-for="reg-name">
-            <template #default="{ invalid }">
-              <Input id="reg-name" v-model="registerForm.name" type="text" :invalid="invalid" />
-            </template>
-          </FormField>
-          <FormField label="E-mail" :error="registerErrors.email" html-for="reg-email">
-            <template #default="{ invalid }">
-              <Input
-                id="reg-email"
-                v-model="registerForm.email"
-                type="email"
-                autocomplete="email"
-                :invalid="invalid"
-              />
-            </template>
-          </FormField>
-          <FormField
-            label="Senha"
-            hint="Mínimo 10 caracteres, com maiúscula, número e símbolo."
-            :error="registerErrors.password"
-            html-for="reg-password"
-          >
-            <template #default="{ invalid }">
-              <PasswordInput
-                id="reg-password"
-                v-model="registerForm.password"
-                autocomplete="new-password"
-                :invalid="invalid"
-              />
-            </template>
-          </FormField>
-          <FormField
-            label="Confirmar senha"
-            :error="registerErrors.password_confirmation"
-            html-for="reg-password-2"
-          >
-            <template #default="{ invalid }">
-              <PasswordInput
-                id="reg-password-2"
-                v-model="registerForm.password_confirmation"
-                autocomplete="new-password"
-                :invalid="invalid"
-              />
-            </template>
-          </FormField>
-          <Button type="submit" block :loading="loading && mode === 'register'">
-            Criar clínica
-          </Button>
-        </form>
-        <p class="mt-5 text-[13px] text-muted">
-          Já tem acesso?
-          <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="setMode('login')">
-            Entrar
-          </Button>
-        </p>
+      <section class="auth-register flex min-h-0 flex-col overflow-y-auto px-6 py-8 md:px-10 md:py-10">
+        <div class="my-auto flex w-full flex-col">
+          <div class="mb-8 flex justify-center">
+            <BrandMark size="3xl" :decorative="false" />
+          </div>
+          <div class="mx-auto w-full max-w-[360px]">
+            <p class="text-center text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">
+              {{ APP_NAME }}
+            </p>
+            <h1 class="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-title">Cadastrar</h1>
+            <p class="mt-1 text-[15px] text-muted">Abre a clínica e o primeiro acesso.</p>
+            <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitRegister">
+              <FormField label="Nome da clínica" :error="registerErrors.clinic_name" html-for="reg-clinic">
+                <template #default="{ invalid }">
+                  <Input id="reg-clinic" v-model="registerForm.clinic_name" type="text" :invalid="invalid" />
+                </template>
+              </FormField>
+              <FormField label="Seu nome" :error="registerErrors.name" html-for="reg-name">
+                <template #default="{ invalid }">
+                  <Input id="reg-name" v-model="registerForm.name" type="text" :invalid="invalid" />
+                </template>
+              </FormField>
+              <FormField label="E-mail" :error="registerErrors.email" html-for="reg-email">
+                <template #default="{ invalid }">
+                  <Input
+                    id="reg-email"
+                    v-model="registerForm.email"
+                    type="email"
+                    autocomplete="email"
+                    :invalid="invalid"
+                  />
+                </template>
+              </FormField>
+              <FormField
+                label="Senha"
+                hint="Mínimo 10 caracteres, com maiúscula, número e símbolo."
+                :error="registerErrors.password"
+                html-for="reg-password"
+              >
+                <template #default="{ invalid }">
+                  <PasswordInput
+                    id="reg-password"
+                    v-model="registerForm.password"
+                    autocomplete="new-password"
+                    :invalid="invalid"
+                  />
+                </template>
+              </FormField>
+              <FormField
+                label="Confirmar senha"
+                :error="registerErrors.password_confirmation"
+                html-for="reg-password-2"
+              >
+                <template #default="{ invalid }">
+                  <PasswordInput
+                    id="reg-password-2"
+                    v-model="registerForm.password_confirmation"
+                    autocomplete="new-password"
+                    :invalid="invalid"
+                  />
+                </template>
+              </FormField>
+              <Button type="submit" block :loading="loading && mode === 'register'">
+                Criar clínica
+              </Button>
+            </form>
+            <p class="mt-5 text-[13px] text-muted">
+              Já tem acesso?
+              <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="setMode('login')">
+                Entrar
+              </Button>
+            </p>
+          </div>
+        </div>
       </section>
     </div>
   </div>

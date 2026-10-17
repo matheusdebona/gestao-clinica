@@ -29,7 +29,8 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `SearchField` (`glass-field`, radius 12 like Input/Select — **not** pill), `MaskedBox`
 
 ## Feedback / overlay
-- `Banner`, `InlineAlert`, `Badge` (chips glass), `Spinner`, `Skeleton`
+- `BrandMark` — logo HOF Pay (SVG; `size` `sm`|`md`|`lg`|`xl`|`2xl`|`3xl`; `tone` `brand`|`title`|`inverse`|`current`; ponto ouro fixo). Assets: `src/assets/brand/hofpay-mark.svg`, ícone quadrado `hofpay-mark-icon.svg`, favicon em `public/favicon.svg`
+- `Banner`, `InlineAlert`, `Badge` (chips glass), `Spinner` (BrandMark girando), `Skeleton`
 - Toasts: `useToastStore()` (`success` / `error` / `info`) — host is already in `App.vue` (`glass-toast`)
 - `AppDialog`, `AppSheet`, `ConfirmDialog` — painéis `glass-regular` + scrim
 - `EmptyState` — título + descrição + slot `action`

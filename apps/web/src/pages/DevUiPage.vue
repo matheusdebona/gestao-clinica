@@ -13,6 +13,7 @@ import AppDialog from '@/components/ui/AppDialog.vue'
 import AppSheet from '@/components/ui/AppSheet.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
+import BrandMark from '@/components/ui/BrandMark.vue'
 import Button from '@/components/ui/Button.vue'
 import ButtonAccent from '@/components/ui/ButtonAccent.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
@@ -524,6 +525,23 @@ function simulateLoading() {
             <FormField label="Desabilitado" html-for="dtp-disabled">
               <DateTimePicker id="dtp-disabled" model-value="2026-09-08T14:30" disabled />
             </FormField>
+          </div>
+        </SurfaceCard>
+      </section>
+
+      <section class="flex flex-col gap-2">
+        <p class="section-label">Marca</p>
+        <SurfaceCard>
+          <div class="flex flex-wrap items-center gap-6">
+            <BrandMark size="sm" />
+            <BrandMark />
+            <BrandMark size="lg" />
+            <BrandMark size="xl" tone="title" />
+            <BrandMark size="2xl" />
+            <BrandMark size="3xl" />
+            <div class="rounded-[12px] bg-sidebar px-4 py-3">
+              <BrandMark tone="inverse" />
+            </div>
           </div>
         </SurfaceCard>
       </section>

@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { cn } from '@/lib/cn'
-import { LoaderCircle } from '@lucide/vue'
-import { computed } from 'vue'
+import BrandMark from '@/components/ui/BrandMark.vue'
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     size?: 'sm' | 'md'
     label?: string
@@ -13,15 +11,16 @@ const props = withDefaults(
     label: 'Carregando',
   },
 )
-
-const classes = computed(() =>
-  cn(
-    'animate-spin text-brand',
-    props.size === 'sm' ? 'size-4' : 'size-6',
-  ),
-)
 </script>
 
 <template>
-  <LoaderCircle :class="classes" :aria-label="label" role="status" />
+  <span role="status" class="inline-flex">
+    <BrandMark
+      class="animate-spin"
+      :size="size"
+      tone="brand"
+      :decorative="false"
+      :label="label"
+    />
+  </span>
 </template>
