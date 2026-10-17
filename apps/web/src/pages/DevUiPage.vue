@@ -13,6 +13,7 @@ import AppDialog from '@/components/ui/AppDialog.vue'
 import AppSheet from '@/components/ui/AppSheet.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
+import BrandMark from '@/components/ui/BrandMark.vue'
 import Button from '@/components/ui/Button.vue'
 import ButtonAccent from '@/components/ui/ButtonAccent.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
@@ -529,6 +530,23 @@ function simulateLoading() {
       </section>
 
       <section class="flex flex-col gap-2">
+        <p class="section-label">Marca</p>
+        <SurfaceCard>
+          <div class="flex flex-wrap items-center gap-6">
+            <BrandMark size="sm" />
+            <BrandMark />
+            <BrandMark size="lg" />
+            <BrandMark size="xl" tone="title" />
+            <BrandMark size="2xl" />
+            <BrandMark size="3xl" />
+            <div class="rounded-[12px] bg-sidebar px-4 py-3">
+              <BrandMark tone="inverse" />
+            </div>
+          </div>
+        </SurfaceCard>
+      </section>
+
+      <section class="flex flex-col gap-2">
         <p class="section-label">Feedback</p>
         <SurfaceCard>
           <div class="flex flex-col gap-3">
@@ -544,9 +562,10 @@ function simulateLoading() {
             <Banner variant="danger" title="Falha">
               Não foi possível concluir.
             </Banner>
-            <div class="flex items-center gap-3 pt-1">
+            <div class="flex items-center gap-6 pt-1">
               <Spinner size="sm" />
               <Spinner />
+              <BrandMark size="lg" motion="draw" />
             </div>
             <div class="grid gap-2 sm:grid-cols-3">
               <Skeleton class="h-9" />

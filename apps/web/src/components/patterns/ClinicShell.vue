@@ -17,6 +17,7 @@ import {
   Users,
   ChartNoAxesCombined,
 } from '@lucide/vue'
+import BrandMark from '@/components/ui/BrandMark.vue'
 import Button from '@/components/ui/Button.vue'
 import IconButton from '@/components/ui/IconButton.vue'
 import NavBadge from '@/components/ui/NavBadge.vue'
@@ -128,8 +129,8 @@ async function onLogout() {
       }"
     >
       <div class="px-3 pb-5">
-        <p class="text-[11px] font-semibold tracking-[0.16em] uppercase text-inverse/45">{{ APP_NAME }}</p>
-        <p class="mt-3 text-[13px] text-inverse/50">Clínica</p>
+        <BrandMark size="md" tone="inverse" />
+        <p class="mt-4 text-[13px] text-inverse/50">Clínica</p>
         <p class="mt-0.5 truncate text-[15px] font-semibold tracking-[-0.02em]">
           {{ auth.clinicName || APP_NAME }}
         </p>

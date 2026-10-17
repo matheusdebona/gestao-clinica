@@ -6,6 +6,7 @@ import {
   CTA_REGISTER_LABEL,
 } from '../content/site'
 import { APP_LOGIN_URL, APP_NAME, APP_REGISTER_URL } from '../lib/urls'
+import BrandMark from './BrandMark.vue'
 
 const open = ref(false)
 const condensed = ref(false)
@@ -66,9 +67,8 @@ onUnmounted(() => {
       class="pointer-events-auto mx-auto flex max-w-[1120px] items-center justify-between gap-3 rounded-chrome px-3 py-2 transition-[background-color,box-shadow,border-color] duration-200"
       :class="condensed ? 'glass-regular' : 'glass-clear'"
     >
-      <a href="#topo" class="flex items-center gap-2.5 rounded-[10px] px-1 py-1 text-title">
-        <img src="/favicon.svg" alt="HOF Pay" width="32" height="32" class="size-8 rounded-[9px]" />
-        <span class="text-[15px] font-semibold tracking-[-0.03em]">{{ APP_NAME }}</span>
+      <a href="#topo" class="inline-flex items-center px-1 py-0.5" :aria-label="APP_NAME">
+        <BrandMark class="h-10 w-auto text-brand sm:h-11" />
       </a>
 
       <nav class="hidden items-center gap-1 md:flex" aria-label="Seções">

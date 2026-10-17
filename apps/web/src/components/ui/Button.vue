@@ -1,6 +1,6 @@
 <script setup lang="ts">
+import BrandMark from '@/components/ui/BrandMark.vue'
 import { cn } from '@/lib/cn'
-import { LoaderCircle } from '@lucide/vue'
 import { computed } from 'vue'
 
 const props = withDefaults(
@@ -42,7 +42,7 @@ const classes = computed(() =>
     :class="classes"
     :disabled="disabled || loading"
   >
-    <LoaderCircle v-if="loading" class="size-4 animate-spin" aria-hidden="true" />
+    <BrandMark v-if="loading" size="sm" tone="current" motion="draw" />
     <slot />
   </button>
 </template>
