@@ -169,10 +169,8 @@ start_web() {
     return
   fi
   say "Subindo o frontend..."
-  (
-    cd "$ROOT/apps/web"
-    exec npm run dev
-  ) >"$WEB_LOG_FILE" 2>&1 &
+  # nohup keeps Vite alive after ./dev exits (CI shells, Cursor, etc.)
+  nohup bash -c "cd \"$ROOT/apps/web\" && exec npm run dev" >"$WEB_LOG_FILE" 2>&1 &
   echo $! >"$WEB_PID_FILE"
   local i url=""
   for i in $(seq 1 40); do
@@ -197,10 +195,7 @@ start_site() {
     return
   fi
   say "Subindo o site de marketing..."
-  (
-    cd "$ROOT/apps/site"
-    exec npm run dev
-  ) >"$SITE_LOG_FILE" 2>&1 &
+  nohup bash -c "cd \"$ROOT/apps/site\" && exec npm run dev" >"$SITE_LOG_FILE" 2>&1 &
   echo $! >"$SITE_PID_FILE"
   local i url=""
   for i in $(seq 1 40); do
