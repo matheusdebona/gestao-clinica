@@ -13,6 +13,7 @@ use App\Models\Treatment;
 use App\Services\AppointmentService;
 use App\Support\CaseInsensitiveSearch;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
 
@@ -95,8 +96,22 @@ class AppointmentController extends Controller
                 'client',
                 'treatment',
                 'professionalUser',
+                'confirmationSentBy',
             ])
         );
+    }
+
+    /**
+     * Records that the WhatsApp confirmation (wa.me link) was opened for this appointment.
+     */
+    public function whatsappConfirmation(Request $request, Appointment $appointment): AppointmentResource
+    {
+        $appointment->forceFill([
+            'confirmation_sent_at' => now(),
+            'confirmation_sent_by_user_id' => $request->user()->id,
+        ])->save();
+
+        return new AppointmentResource($appointment->load(['client', 'treatment', 'professionalUser', 'confirmationSentBy']));
     }
 
     public function update(UpdateAppointmentRequest $request, Appointment $appointment): AppointmentResource

@@ -15,12 +15,15 @@ import {
   cancelAppointment,
   completeAppointment,
   getAppointment,
+  logAppointmentWhatsAppConfirmation,
   listProfessionals,
   startAppointment,
   updateAppointment,
 } from '@/features/appointments/api'
 import { APPOINTMENT_STATUS_LABELS } from '@/features/appointments/labels'
+import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
 import { listTreatments } from '@/features/treatments/api'
+import { openWhatsApp } from '@/lib/whatsapp'
 import { formatBRL, formatDateTime } from '@/lib/formatters'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
@@ -40,6 +43,22 @@ const cancelOpen = ref(false)
 const startOpen = ref(false)
 
 const idRef = computed(() => props.appointmentId)
+const { appointmentUrl } = useWhatsAppLinks()
+
+function confirmOnWhatsApp() {
+  const url = appointment.value ? appointmentUrl(appointment.value) : null
+  if (!url) {
+    toast.error('Paciente sem WhatsApp válido.')
+    return
+  }
+  openWhatsApp(url)
+  void logAppointmentWhatsAppConfirmation(props.appointmentId)
+    .then((updated) => {
+      queryClient.setQueryData(['appointments', 'detail', idRef], updated)
+      return queryClient.invalidateQueries({ queryKey: ['appointments'] })
+    })
+    .catch(() => undefined)
+}
 const canView = computed(() => auth.can('appointments.view'))
 
 const { data: appointment, isPending, isError } = useQuery({
@@ -226,6 +245,15 @@ function goBack() {
             <dt class="text-[13px] text-muted">Data e hora</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ formatDateTime(appointment.scheduled_at) }}</dd>
           </div>
+          <div v-if="appointment.confirmation_sent_at">
+            <dt class="text-[13px] text-muted">Confirmação pelo WhatsApp</dt>
+            <dd class="mt-0.5 text-[15px] text-title">
+              Aberta em {{ formatDateTime(appointment.confirmation_sent_at) }}
+              <template v-if="appointment.confirmation_sent_by">
+                por {{ appointment.confirmation_sent_by.name }}
+              </template>
+            </dd>
+          </div>
           <div>
             <dt class="text-[13px] text-muted">Profissional</dt>
             <dd class="mt-0.5 text-[15px] text-title">{{ appointment.professional?.name ?? '—' }}</dd>
@@ -261,25 +289,34 @@ function goBack() {
         </dl>
       </SurfaceCard>
 
-      <div class="flex flex-wrap gap-2">
+      <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <PermissionGate
+          v-if="isScheduled && appointment.client?.whatsapp"
+          :permission="['appointments.manage', 'treatments.manage']"
+          mode="any"
+        >
+          <Button mobile-block variant="secondary" @click="confirmOnWhatsApp">
+            {{ appointment.confirmation_sent_at ? 'Confirmar de novo pelo WhatsApp' : 'Confirmar pelo WhatsApp' }}
+          </Button>
+        </PermissionGate>
         <PermissionGate v-if="isScheduled" permission="appointments.start">
-          <Button @click="startOpen = true">Iniciar atendimento</Button>
+          <Button mobile-block @click="startOpen = true">Iniciar atendimento</Button>
         </PermissionGate>
         <PermissionGate
           v-if="appointment.status === 'in_progress' && isEvaluation"
           permission="treatments.complete"
         >
-          <Button :loading="completeEvaluationMutation.isPending.value" @click="completeEvaluationMutation.mutate()">
+          <Button mobile-block :loading="completeEvaluationMutation.isPending.value" @click="completeEvaluationMutation.mutate()">
             Concluir avaliação
           </Button>
         </PermissionGate>
         <PermissionGate v-if="appointment.status === 'in_progress' && !isEvaluation" permission="treatments.consume">
-          <Button @click="router.push({ name: 'appointments-consume', params: { id: String(appointment.id) } })">
+          <Button mobile-block @click="router.push({ name: 'appointments-consume', params: { id: String(appointment.id) } })">
             Registrar consumo
           </Button>
         </PermissionGate>
         <PermissionGate v-if="canCancelStatus" permission="appointments.cancel">
-          <Button variant="destructive" @click="cancelOpen = true">Cancelar sessão</Button>
+          <Button mobile-block variant="destructive" @click="cancelOpen = true">Cancelar sessão</Button>
         </PermissionGate>
       </div>
 

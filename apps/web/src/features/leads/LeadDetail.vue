@@ -15,7 +15,9 @@ import Textarea from '@/components/ui/Textarea.vue'
 import LeadConvertDialog from '@/features/leads/LeadConvertDialog.vue'
 import LeadHistory from '@/features/leads/LeadHistory.vue'
 import LeadStatusDialog from '@/features/leads/LeadStatusDialog.vue'
-import { addLeadComment, cancelLead, getLead } from '@/features/leads/api'
+import { addLeadComment, cancelLead, getLead, logLeadWhatsApp } from '@/features/leads/api'
+import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
+import { openWhatsApp } from '@/lib/whatsapp'
 import { useLeadCatalogs } from '@/features/leads/useLeadCatalogs'
 import { formatDateTime } from '@/lib/formatters'
 import { formatPhoneBR } from '@/lib/masks'
@@ -85,6 +87,20 @@ const commentMutation = useMutation({
   },
 })
 
+const { leadUrl } = useWhatsAppLinks()
+
+function callOnWhatsApp() {
+  const url = lead.value ? leadUrl(lead.value) : null
+  if (!url) {
+    toast.error('Telefone inválido para WhatsApp.')
+    return
+  }
+  openWhatsApp(url)
+  void logLeadWhatsApp(props.leadId)
+    .then(() => queryClient.invalidateQueries({ queryKey: ['leads'] }))
+    .catch(() => undefined)
+}
+
 function submitComment() {
   if (!comment.value.trim()) {
     commentError.value = 'Escreva o comentário.'
@@ -126,6 +142,11 @@ function onConverted(result: LeadConvertResult) {
     <PageHeader stack-actions :title="lead?.name ?? 'Lead'">
       <template #actions>
         <Button mobile-block variant="ghost" @click="goBack">Voltar</Button>
+        <PermissionGate v-if="lead" permission="leads.manage">
+          <Button mobile-block variant="secondary" @click="callOnWhatsApp">
+            Chamar no WhatsApp
+          </Button>
+        </PermissionGate>
         <PermissionGate v-if="lead && !isCancelled" permission="leads.manage">
           <Button mobile-block variant="secondary" @click="goEdit">Editar</Button>
         </PermissionGate>

@@ -112,3 +112,12 @@ export async function listProfessionals(): Promise<ClinicUser[]> {
   const payload = await api<{ data: ClinicUser[] }>('/professionals')
   return payload.data
 }
+
+/** Records that the WhatsApp confirmation link was opened (the UI opens wa.me itself). */
+export async function logAppointmentWhatsAppConfirmation(id: number): Promise<Appointment> {
+  const payload = await api<DataEnvelope<Appointment>>(`/appointments/${id}/whatsapp-confirmation`, {
+    method: 'POST',
+    body: {},
+  })
+  return payload.data
+}

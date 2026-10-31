@@ -24,6 +24,10 @@ export function activityLabel(activity: LeadActivity): string {
       return 'Lead cancelado'
     case 'comment':
       return 'Comentário'
+    case 'whatsapp':
+      return activity.user
+        ? `Mensagem de WhatsApp aberta por ${activity.user.name}`
+        : 'Mensagem de WhatsApp aberta'
     case 'status_changed':
       if (activity.from_status && activity.to_status) {
         return `${activity.from_status.name} → ${activity.to_status.name}`

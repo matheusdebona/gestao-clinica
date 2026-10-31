@@ -14,7 +14,8 @@ interface SettingsEntry {
   name: string
   title: string
   description: string
-  permission: string
+  /** Any of these permissions shows the entry. */
+  permissions: string[]
 }
 
 const entries: SettingsEntry[] = [
@@ -22,23 +23,29 @@ const entries: SettingsEntry[] = [
     name: 'lead-statuses',
     title: 'Status de leads',
     description: 'Etapas do funil: nome, cor, ordem e status inicial.',
-    permission: 'lead_statuses.manage',
+    permissions: ['lead_statuses.manage'],
   },
   {
     name: 'client-origins',
     title: 'Origens',
     description: 'De onde vêm leads e pacientes (Instagram, indicação…).',
-    permission: 'client_origins.manage',
+    permissions: ['client_origins.manage'],
   },
   {
     name: 'campaigns',
     title: 'Campanhas',
     description: 'Campanhas ligadas a cada origem.',
-    permission: 'campaigns.manage',
+    permissions: ['campaigns.manage'],
+  },
+  {
+    name: 'settings-whatsapp',
+    title: 'Mensagens do WhatsApp',
+    description: 'Textos de confirmação de sessão e de contato com leads.',
+    permissions: ['clinics.branding', 'clinics.manage'],
   },
 ]
 
-const visible = computed(() => entries.filter((entry) => auth.can(entry.permission)))
+const visible = computed(() => entries.filter((entry) => entry.permissions.some((name) => auth.can(name))))
 </script>
 
 <template>
