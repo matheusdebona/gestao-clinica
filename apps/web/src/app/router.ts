@@ -77,10 +77,10 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/WhatsAppSettingsPage.vue'),
         },
         {
-          path: 'settings/leads-parados',
-          name: 'settings-lead-stale',
-          meta: { title: 'Leads parados', permission: 'clinics.branding' },
-          component: () => import('@/pages/LeadStaleSettingsPage.vue'),
+          path: 'settings/alertas-acompanhamento',
+          name: 'settings-follow-up-tiers',
+          meta: { title: 'Alertas de acompanhamento', permission: 'clinics.branding' },
+          component: () => import('@/pages/FollowUpTiersPage.vue'),
         },
         {
           path: 'settings/lead-statuses',

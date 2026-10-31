@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Lead;
-use App\Support\ClinicSettings;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
@@ -48,11 +47,11 @@ class LeadMetricsService
                 'cancelled_rate' => $this->rate($cancelled, $total),
                 // Snapshot (today), not tied to the period.
                 'stale' => app(LeadStaleService::class)->count(CurrentClinic::id()),
-                'stale_days' => ClinicSettings::leadStaleDaysForId(CurrentClinic::id()),
                 'avg_days_to_conversion' => $avgSeconds !== null
                     ? number_format(max(0, $avgSeconds) / 86400, 1, '.', '')
                     : null,
             ],
+            'stale_tiers' => app(LeadStaleService::class)->tierCounts(CurrentClinic::id()),
             'by_origin' => $this->byOrigin($fromStart, $toEnd),
             'by_status' => $this->byStatus($fromStart, $toEnd),
             'by_creator' => $this->byCreator($fromStart, $toEnd),

@@ -20,14 +20,9 @@ const props = defineProps<{
 
 const router = useRouter()
 
-function openStaleLeads() {
-  void router.push({ name: 'leads', query: { parados: '1' } })
+function openStaleTier(days: number) {
+  void router.push({ name: 'leads', query: { parados: String(days) } })
 }
-
-const staleMeta = computed(() => {
-  const days = props.data?.kpis.stale_days ?? 3
-  return `Sem contato há ${days === 1 ? '1 dia' : `${days} dias`} ou mais (situação de hoje)`
-})
 
 function leadsLabel(count: number): string {
   return count === 1 ? '1 lead' : `${count} leads`
@@ -109,14 +104,17 @@ const creatorMax = computed(() =>
         </MetricCard>
       </div>
 
-      <SurfaceCard :padding="false">
-        <div class="px-5 py-2">
+      <SurfaceCard v-if="data.stale_tiers.length">
+        <p class="text-[13px] font-medium text-muted">Leads parados (situação de hoje)</p>
+        <div class="mt-2 divide-y divide-border-divider">
           <ListCard
-            :title="`Leads parados: ${data.kpis.stale}`"
-            :meta="staleMeta"
-            :badge="data.kpis.stale > 0 ? 'Ver lista' : ''"
-            badge-variant="warning"
-            @action="openStaleLeads"
+            v-for="tier in data.stale_tiers"
+            :key="tier.days"
+            :title="tier.label"
+            :meta="tier.count === 1 ? '1 lead em aberto sem contato' : `${tier.count} leads em aberto sem contato`"
+            :badge="String(tier.count)"
+            :badge-variant="tier.count > 0 ? tier.color : 'muted'"
+            @action="openStaleTier(tier.days)"
           />
         </div>
       </SurfaceCard>

@@ -30,7 +30,8 @@ export function notificationHref(item: ClinicNotification): string | null {
   }
 
   if (type === 'stale_leads') {
-    return '/leads?parados=1'
+    const days = numericId(item.data?.days)
+    return days !== null ? `/leads?parados=${days}` : '/leads?parados=todos'
   }
 
   if (type === 'appointment_stock_warning') {

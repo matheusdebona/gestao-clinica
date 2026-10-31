@@ -18,8 +18,8 @@ import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import LeadFiltersSheet from '@/features/leads/LeadFiltersSheet.vue'
 import LeadStatusDialog from '@/features/leads/LeadStatusDialog.vue'
 import { listLeads, logLeadWhatsApp } from '@/features/leads/api'
-import { DEFAULT_LEAD_STALE_DAYS, leadStaleDays, staleLabel } from '@/features/leads/stale'
-import { useClinicSettings } from '@/features/settings/useClinicSettings'
+import { leadStale, staleLabel } from '@/features/leads/stale'
+import { useFollowUpTiers } from '@/features/leads/useFollowUpTiers'
 import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
 import { openWhatsApp } from '@/lib/whatsapp'
 import {
@@ -98,12 +98,11 @@ const hasCriteria = computed(() => Boolean(filters.value.q) || filterCount.value
 
 const queryClient = useQueryClient()
 const { leadUrl } = useWhatsAppLinks()
-const { data: clinicSettings } = useClinicSettings()
-const staleThreshold = computed(() => clinicSettings.value?.lead_stale_days ?? DEFAULT_LEAD_STALE_DAYS)
+const { tiers: followUpTiers } = useFollowUpTiers()
 
-function staleBadge(lead: Lead): string {
-  const days = leadStaleDays(lead, staleThreshold.value)
-  return days === null ? '' : staleLabel(days)
+function staleBadge(lead: Lead) {
+  const stale = leadStale(lead, followUpTiers.value)
+  return stale ? { label: staleLabel(stale.days), color: stale.tier.color } : null
 }
 
 function callOnWhatsApp(lead: Lead) {
@@ -221,7 +220,7 @@ function openStatus(lead: Lead) {
                 @action="openLead(lead.id)"
               >
                 <template v-if="staleBadge(lead)" #status>
-                  <Badge variant="warning">{{ staleBadge(lead) }}</Badge>
+                  <Badge :variant="staleBadge(lead)!.color">{{ staleBadge(lead)!.label }}</Badge>
                 </template>
               </ListCard>
             </div>

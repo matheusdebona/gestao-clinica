@@ -19,9 +19,18 @@ const { data, isPending, isError } = useQuery({
 })
 
 const description = computed(() => {
-  const days = data.value?.days ?? 3
+  const days = data.value?.days
+  if (days === null || days === undefined) {
+    return 'Nenhum prazo de acompanhamento configurado.'
+  }
   return `Em aberto e sem contato há ${days === 1 ? '1 dia' : `${days} dias`} ou mais.`
 })
+
+const tiers = computed(() => [...(data.value?.tiers ?? [])].reverse())
+
+function openTier(days: number) {
+  void router.push({ name: 'leads', query: { parados: String(days) } })
+}
 
 function itemMeta(item: StaleLeadSummaryItem): string {
   return [staleLabel(daysSince(item.last_activity_at)), formatPhoneBR(item.phone)].join(' · ')
@@ -32,7 +41,7 @@ function openLead(id: number) {
 }
 
 function openAll() {
-  void router.push({ name: 'leads', query: { parados: '1' } })
+  void router.push({ name: 'leads', query: { parados: 'todos' } })
 }
 </script>
 
@@ -53,6 +62,18 @@ function openAll() {
       </p>
       <template v-else>
         <div class="mt-2 divide-y divide-border-divider">
+          <ListCard
+            v-for="tier in tiers"
+            :key="tier.days"
+            :title="tier.label"
+            :meta="tier.count === 1 ? '1 lead' : `${tier.count} leads`"
+            :badge="String(tier.count)"
+            :badge-variant="tier.count > 0 ? tier.color : 'muted'"
+            @action="openTier(tier.days)"
+          />
+        </div>
+        <p class="mt-4 text-[13px] font-medium text-muted">Há mais tempo sem contato</p>
+        <div class="mt-1 divide-y divide-border-divider">
           <ListCard
             v-for="item in data.leads"
             :key="item.id"
