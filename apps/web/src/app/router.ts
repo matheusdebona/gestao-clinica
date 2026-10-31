@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { getToken } from '@/lib/auth-storage'
+import { RESET_PASSWORD_PATH } from '@/lib/password-reset'
 import { APP_NAME } from '@/lib/brand'
 import { useAuthStore } from '@/stores/auth'
 
@@ -15,6 +16,18 @@ export const routes: RouteRecordRaw[] = [
     name: 'register',
     component: () => import('@/pages/AuthPage.vue'),
     meta: { guest: true, title: 'Cadastrar' },
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('@/pages/ForgotPasswordPage.vue'),
+    meta: { guest: true, title: 'Esqueceu a senha?' },
+  },
+  {
+    path: RESET_PASSWORD_PATH,
+    name: 'reset-password',
+    component: () => import('@/pages/ResetPasswordPage.vue'),
+    meta: { auth: true, title: 'Redefinir senha' },
   },
     {
       path: '/',
@@ -385,6 +398,15 @@ router.beforeEach(async (to) => {
 
   if (to.meta.auth && !hasToken) {
     return { path: '/login', query: { redirect: to.fullPath } }
+  }
+
+  // Signed in with a temporary password: nothing else until a new one is set.
+  if (hasToken && auth.mustChangePassword && to.name !== 'reset-password') {
+    return { path: RESET_PASSWORD_PATH }
+  }
+
+  if (to.name === 'reset-password' && !auth.mustChangePassword) {
+    return { path: '/' }
   }
 
   if (to.meta.guest && hasToken) {

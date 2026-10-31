@@ -9,6 +9,7 @@ export interface AuthUser {
   name: string
   email: string
   is_active: boolean
+  must_change_password?: boolean
   clinic_id: number | null
   clinic?: Clinic | null
   roles?: string[]

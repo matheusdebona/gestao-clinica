@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = computed(() => Boolean(token.value))
   const clinicName = computed(() => user.value?.clinic?.name ?? '')
   const permissions = computed(() => user.value?.permissions ?? [])
+  const mustChangePassword = computed(() => Boolean(user.value?.must_change_password))
 
   function can(permission: string): boolean {
     return permissions.value.includes(permission)
@@ -43,6 +44,25 @@ export const useAuthStore = defineStore('auth', () => {
       body: input,
     })
     applySession(payload)
+  }
+
+  async function forgotPassword(email: string) {
+    return api<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: { email },
+    })
+  }
+
+  async function changeTemporaryPassword(input: {
+    temporary_password: string
+    password: string
+    password_confirmation: string
+  }) {
+    const payload = await api<{ message: string; user: AuthUser }>('/auth/change-temporary-password', {
+      method: 'POST',
+      body: input,
+    })
+    user.value = payload.user
   }
 
   async function hydrate() {
@@ -83,9 +103,12 @@ export const useAuthStore = defineStore('auth', () => {
     isAuthenticated,
     clinicName,
     permissions,
+    mustChangePassword,
     can,
     login,
     register,
+    forgotPassword,
+    changeTemporaryPassword,
     hydrate,
     logout,
   }

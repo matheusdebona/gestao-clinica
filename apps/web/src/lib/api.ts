@@ -1,6 +1,7 @@
 import { ofetch } from 'ofetch'
 import { ApiError } from '@/types/user'
 import { clearToken, getToken } from './auth-storage'
+import { PASSWORD_CHANGE_REQUIRED_CODE, RESET_PASSWORD_PATH } from './password-reset'
 
 const baseURL = import.meta.env.VITE_API_URL || '/api/v1'
 
@@ -24,7 +25,7 @@ export const api = ofetch.create({
     if (response.status === 401) {
       clearToken()
       const path = window.location.pathname
-      if (path !== '/login' && path !== '/dev/ui') {
+      if (path !== '/login' && path !== '/forgot-password' && path !== '/dev/ui') {
         const redirect = encodeURIComponent(`${path}${window.location.search}`)
         window.location.assign(`/login?redirect=${redirect}`)
       }
@@ -32,8 +33,17 @@ export const api = ofetch.create({
 
     const payload = (await response._data) as {
       message?: string
+      code?: string
       errors?: Record<string, string[]>
     } | undefined
+
+    if (
+      response.status === 403 &&
+      payload?.code === PASSWORD_CHANGE_REQUIRED_CODE &&
+      window.location.pathname !== RESET_PASSWORD_PATH
+    ) {
+      window.location.assign(RESET_PASSWORD_PATH)
+    }
 
     throw new ApiError(
       payload?.message || 'Não foi possível concluir a solicitação.',

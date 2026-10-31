@@ -103,6 +103,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Temporary Passwords ("Esqueceu a senha?")
+    |--------------------------------------------------------------------------
+    |
+    | A forgot-password request e-mails a temporary password stored as a
+    | separate hash. The current password keeps working. Logging in with the
+    | temporary password forces a password change before anything else.
+    |
+    */
+
+    'temporary_password' => [
+        'expire' => (int) env('AUTH_TEMPORARY_PASSWORD_EXPIRE', 60),
+        'per_email_attempts' => 3,
+        'per_email_decay_minutes' => 15,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Password Confirmation Timeout
     |--------------------------------------------------------------------------
     |

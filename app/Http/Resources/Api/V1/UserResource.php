@@ -15,6 +15,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'is_active' => $this->is_active,
+            'must_change_password' => (bool) $this->must_change_password,
             'clinic_id' => $this->clinic_id,
             'clinic' => ClinicResource::make($this->whenLoaded('clinic')),
             'roles' => $this->whenLoaded('roles', fn () => $this->getRoleNames()->values()),

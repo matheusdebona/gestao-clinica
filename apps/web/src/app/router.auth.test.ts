@@ -31,3 +31,17 @@ describe('payment catalog routes', () => {
     )
   })
 })
+
+describe('password reset routes', () => {
+  it('defines /forgot-password as a guest page', () => {
+    const forgot = routes.find((route) => route.path === '/forgot-password')
+    expect(forgot?.name).toBe('forgot-password')
+    expect(forgot?.meta).toMatchObject({ guest: true, title: 'Esqueceu a senha?' })
+  })
+
+  it('defines /reset-password outside the clinic shell and requiring auth', () => {
+    const reset = routes.find((route) => route.path === '/reset-password')
+    expect(reset?.name).toBe('reset-password')
+    expect(reset?.meta).toMatchObject({ auth: true, title: 'Redefinir senha' })
+  })
+})
