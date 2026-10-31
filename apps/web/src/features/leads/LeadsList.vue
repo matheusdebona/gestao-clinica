@@ -60,7 +60,9 @@ function applyFilters(patch: Partial<LeadFilters>) {
 }
 
 function clearFilters() {
-  void router.replace({ query: filtersToQuery({ ...emptyLeadFilters(), q: filters.value.q }) })
+  void router.replace({
+    query: filtersToQuery({ ...emptyLeadFilters(), q: filters.value.q }),
+  })
 }
 
 function onSearch(value: string) {
@@ -72,7 +74,12 @@ function onSearch(value: string) {
 const filterCount = computed(() => activeFilterCount(filters.value))
 const params = computed(() => toLeadListParams(filters.value))
 
-const { data: listData, isPending, isError, isFetching } = useQuery({
+const {
+  data: listData,
+  isPending,
+  isError,
+  isFetching,
+} = useQuery({
   queryKey: ['leads', 'list', params],
   queryFn: () => listLeads(params.value),
   enabled: computed(() => auth.can('leads.view')),
@@ -115,10 +122,14 @@ function openStatus(lead: Lead) {
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader title="Leads" :description="total ? `${total} ${hasCriteria ? 'encontrados' : 'na clínica'}` : undefined">
+    <PageHeader
+      stack-actions
+      title="Leads"
+      :description="total ? `${total} ${hasCriteria ? 'encontrados' : 'na clínica'}` : undefined"
+    >
       <template #actions>
         <PermissionGate permission="leads.manage">
-          <Button @click="goNew">Novo</Button>
+          <Button mobile-block @click="goNew">Novo</Button>
         </PermissionGate>
       </template>
     </PageHeader>
@@ -130,12 +141,14 @@ function openStatus(lead: Lead) {
     <template v-else>
       <ClientSearchBar v-model="searchInput" placeholder="Nome ou telefone" @search="onSearch" />
 
-      <div class="flex flex-wrap items-center gap-2">
-        <Button variant="secondary" @click="filtersOpen = true">
+      <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <Button mobile-block variant="secondary" @click="filtersOpen = true">
           <SlidersHorizontal class="size-4" :stroke-width="1.75" aria-hidden="true" />
           Filtros{{ filterCount ? ` (${filterCount})` : '' }}
         </Button>
-        <Button v-if="filterCount" variant="ghost" @click="clearFilters">Limpar filtros</Button>
+        <Button mobile-block v-if="filterCount" variant="ghost" @click="clearFilters"
+          >Limpar filtros</Button
+        >
       </div>
 
       <Banner v-if="isError" variant="danger" title="Não foi possível carregar">
@@ -160,9 +173,11 @@ function openStatus(lead: Lead) {
           "
         >
           <template #action>
-            <Button v-if="filterCount" variant="secondary" @click="clearFilters">Limpar filtros</Button>
+            <Button mobile-block v-if="filterCount" variant="secondary" @click="clearFilters"
+              >Limpar filtros</Button
+            >
             <PermissionGate v-else-if="!hasCriteria" permission="leads.manage">
-              <Button @click="goNew">Novo lead</Button>
+              <Button mobile-block @click="goNew">Novo lead</Button>
             </PermissionGate>
           </template>
         </EmptyState>

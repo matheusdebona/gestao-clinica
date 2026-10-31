@@ -10,6 +10,8 @@ const props = withDefaults(
     loading?: boolean
     disabled?: boolean
     block?: boolean
+    /** Full width and 48px tall below `sm`; unchanged from `sm` up. */
+    mobileBlock?: boolean
   }>(),
   {
     variant: 'primary',
@@ -17,6 +19,7 @@ const props = withDefaults(
     loading: false,
     disabled: false,
     block: false,
+    mobileBlock: false,
   },
 )
 
@@ -24,6 +27,7 @@ const classes = computed(() =>
   cn(
     'inline-flex h-10 items-center justify-center gap-2 rounded-[12px] px-4 text-[15px] font-medium tracking-[-0.01em] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-40',
     props.block && 'w-full',
+    props.mobileBlock && 'max-sm:h-12 max-sm:w-full',
     props.variant === 'primary' &&
       'bg-brand text-inverse hover:bg-brand-hover active:bg-brand-dark',
     props.variant === 'secondary' &&
@@ -37,11 +41,7 @@ const classes = computed(() =>
 </script>
 
 <template>
-  <button
-    :type="type"
-    :class="classes"
-    :disabled="disabled || loading"
-  >
+  <button :type="type" :class="classes" :disabled="disabled || loading">
     <BrandMark v-if="loading" size="sm" tone="current" motion="draw" />
     <slot />
   </button>

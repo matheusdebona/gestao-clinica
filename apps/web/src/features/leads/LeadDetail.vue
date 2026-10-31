@@ -40,7 +40,11 @@ const comment = ref('')
 const commentError = ref('')
 const idRef = computed(() => props.leadId)
 
-const { data: lead, isPending, isError } = useQuery({
+const {
+  data: lead,
+  isPending,
+  isError,
+} = useQuery({
   queryKey: ['leads', 'detail', idRef],
   queryFn: () => getLead(idRef.value),
 })
@@ -90,7 +94,10 @@ function submitComment() {
 }
 
 function goEdit() {
-  void router.push({ name: 'leads-edit', params: { id: String(props.leadId) } })
+  void router.push({
+    name: 'leads-edit',
+    params: { id: String(props.leadId) },
+  })
 }
 
 function goBack() {
@@ -99,25 +106,31 @@ function goBack() {
 
 function openClient() {
   if (lead.value?.client_id) {
-    void router.push({ name: 'clients-show', params: { id: String(lead.value.client_id) } })
+    void router.push({
+      name: 'clients-show',
+      params: { id: String(lead.value.client_id) },
+    })
   }
 }
 
 function onConverted(result: LeadConvertResult) {
-  void router.push({ name: 'appointments-show', params: { id: String(result.appointment.id) } })
+  void router.push({
+    name: 'appointments-show',
+    params: { id: String(result.appointment.id) },
+  })
 }
 </script>
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader :title="lead?.name ?? 'Lead'">
+    <PageHeader stack-actions :title="lead?.name ?? 'Lead'">
       <template #actions>
-        <Button variant="ghost" @click="goBack">Voltar</Button>
+        <Button mobile-block variant="ghost" @click="goBack">Voltar</Button>
         <PermissionGate v-if="lead && !isCancelled" permission="leads.manage">
-          <Button variant="secondary" @click="goEdit">Editar</Button>
+          <Button mobile-block variant="secondary" @click="goEdit">Editar</Button>
         </PermissionGate>
         <PermissionGate v-if="lead && !isFinal" permission="leads.manage">
-          <Button @click="convertOpen = true">Agendar</Button>
+          <Button mobile-block @click="convertOpen = true">Agendar</Button>
         </PermissionGate>
       </template>
     </PageHeader>
@@ -136,7 +149,8 @@ function onConverted(result: LeadConvertResult) {
 
     <template v-else-if="lead">
       <Banner v-if="isConverted" variant="success" title="Virou paciente">
-        {{ lead.client?.name ?? 'Paciente' }} · desde {{ formatDateTime(lead.converted_at) }}
+        {{ lead.client?.name ?? 'Paciente' }} · desde
+        {{ formatDateTime(lead.converted_at) }}
       </Banner>
       <Banner v-else-if="isCancelled" variant="warning" title="Lead cancelado">
         Cancelado em {{ formatDateTime(lead.cancelled_at) }}. É definitivo: fica no histórico e nas
@@ -156,26 +170,33 @@ function onConverted(result: LeadConvertResult) {
           </div>
           <div>
             <dt class="text-[13px] text-muted">Telefone</dt>
-            <dd class="mt-0.5 text-[15px] text-title">{{ formatPhoneBR(lead.phone) || lead.phone }}</dd>
+            <dd class="mt-0.5 text-[15px] text-title">
+              {{ formatPhoneBR(lead.phone) || lead.phone }}
+            </dd>
           </div>
           <div>
             <dt class="text-[13px] text-muted">Origem</dt>
-            <dd class="mt-0.5 text-[15px] text-title">{{ lead.client_origin?.name ?? '—' }}</dd>
+            <dd class="mt-0.5 text-[15px] text-title">
+              {{ lead.client_origin?.name ?? '—' }}
+            </dd>
           </div>
           <div>
             <dt class="text-[13px] text-muted">Cadastrado por</dt>
             <dd class="mt-0.5 text-[15px] text-title">
-              {{ lead.created_by?.name ?? '—' }} · {{ formatDateTime(lead.created_at) }}
+              {{ lead.created_by?.name ?? '—' }} ·
+              {{ formatDateTime(lead.created_at) }}
             </dd>
           </div>
           <div>
             <dt class="text-[13px] text-muted">Observação</dt>
-            <dd class="mt-0.5 whitespace-pre-wrap text-[15px] text-title">{{ lead.notes || '—' }}</dd>
+            <dd class="mt-0.5 whitespace-pre-wrap text-[15px] text-title">
+              {{ lead.notes || '—' }}
+            </dd>
           </div>
           <div v-if="isConverted">
             <dt class="text-[13px] text-muted">Paciente</dt>
             <dd class="mt-1">
-              <Button variant="secondary" @click="openClient">
+              <Button mobile-block variant="secondary" @click="openClient">
                 Abrir {{ lead.client?.name ?? 'paciente' }}
               </Button>
             </dd>
@@ -203,8 +224,9 @@ function onConverted(result: LeadConvertResult) {
                 />
               </template>
             </FormField>
-            <div class="flex justify-end">
+            <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
               <Button
+                mobile-block
                 type="submit"
                 variant="secondary"
                 :loading="commentMutation.isPending.value"
@@ -220,7 +242,9 @@ function onConverted(result: LeadConvertResult) {
 
       <PermissionGate v-if="!isFinal" permission="leads.manage">
         <div>
-          <Button variant="destructive" @click="cancelOpen = true">Cancelar lead</Button>
+          <Button mobile-block variant="destructive" @click="cancelOpen = true"
+            >Cancelar lead</Button
+          >
         </div>
       </PermissionGate>
 
@@ -228,6 +252,7 @@ function onConverted(result: LeadConvertResult) {
       <LeadConvertDialog v-model:open="convertOpen" :lead="lead" @converted="onConverted" />
       <AppDialog
         v-model:open="cancelOpen"
+        stack-footer
         title="Cancelar este lead?"
         description="É definitivo: o lead fica na lista, no histórico e nas métricas, mas não muda mais de status nem vira paciente. O telefone fica livre para um novo lead."
       >
@@ -235,8 +260,11 @@ function onConverted(result: LeadConvertResult) {
           <Textarea id="lead-cancel-reason" v-model="cancelReason" :rows="3" />
         </FormField>
         <template #footer>
-          <Button variant="ghost" type="button" @click="cancelOpen = false">Voltar</Button>
+          <Button mobile-block variant="ghost" type="button" @click="cancelOpen = false"
+            >Voltar</Button
+          >
           <Button
+            mobile-block
             variant="destructive"
             type="button"
             :loading="cancelMutation.isPending.value"

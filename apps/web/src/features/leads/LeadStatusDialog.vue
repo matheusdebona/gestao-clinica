@@ -68,6 +68,7 @@ const { mutate, isPending } = useMutation({
 
 <template>
   <AppDialog
+    stack-footer
     v-model:open="open"
     title="Mudar status"
     :description="lead ? lead.name : ''"
@@ -75,12 +76,7 @@ const { mutate, isPending } = useMutation({
     <div class="flex flex-col gap-4">
       <FormField label="Status" :error="error" html-for="lead-quick-status">
         <template #default="{ invalid }">
-          <Select
-            id="lead-quick-status"
-            v-model="statusId"
-            :options="options"
-            :invalid="invalid"
-          />
+          <Select id="lead-quick-status" v-model="statusId" :options="options" :invalid="invalid" />
         </template>
       </FormField>
       <FormField
@@ -92,8 +88,14 @@ const { mutate, isPending } = useMutation({
       </FormField>
     </div>
     <template #footer>
-      <Button variant="ghost" type="button" @click="open = false">Cancelar</Button>
-      <Button type="button" :loading="isPending" :disabled="!statusId" @click="mutate()">
+      <Button mobile-block variant="ghost" type="button" @click="open = false">Cancelar</Button>
+      <Button
+        mobile-block
+        type="button"
+        :loading="isPending"
+        :disabled="!statusId"
+        @click="mutate()"
+      >
         Salvar
       </Button>
     </template>
