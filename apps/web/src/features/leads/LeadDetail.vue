@@ -6,14 +6,16 @@ import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
-import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
+import AppDialog from '@/components/ui/AppDialog.vue'
+import FormField from '@/components/ui/FormField.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import Textarea from '@/components/ui/Textarea.vue'
 import LeadConvertDialog from '@/features/leads/LeadConvertDialog.vue'
 import LeadHistory from '@/features/leads/LeadHistory.vue'
 import LeadStatusDialog from '@/features/leads/LeadStatusDialog.vue'
-import { deleteLead, getLead } from '@/features/leads/api'
+import { addLeadComment, cancelLead, getLead } from '@/features/leads/api'
 import { useLeadCatalogs } from '@/features/leads/useLeadCatalogs'
 import { formatDateTime } from '@/lib/formatters'
 import { formatPhoneBR } from '@/lib/masks'
@@ -32,7 +34,10 @@ const { statuses } = useLeadCatalogs()
 
 const statusOpen = ref(false)
 const convertOpen = ref(false)
-const deleteOpen = ref(false)
+const cancelOpen = ref(false)
+const cancelReason = ref('')
+const comment = ref('')
+const commentError = ref('')
 const idRef = computed(() => props.leadId)
 
 const { data: lead, isPending, isError } = useQuery({
@@ -41,18 +46,48 @@ const { data: lead, isPending, isError } = useQuery({
 })
 
 const isConverted = computed(() => Boolean(lead.value?.client_id))
+const isCancelled = computed(() => Boolean(lead.value?.cancelled_at))
+// "Virou paciente" and "Cancelado" are final: no status change, edit or conversion.
+const isFinal = computed(() => isConverted.value || isCancelled.value)
 
-const deleteMutation = useMutation({
-  mutationFn: () => deleteLead(props.leadId),
+const cancelMutation = useMutation({
+  mutationFn: () => cancelLead(props.leadId, { reason: cancelReason.value.trim() || null }),
   onSuccess: async () => {
-    toast.success('Lead excluído')
+    toast.success('Lead cancelado')
+    cancelOpen.value = false
+    cancelReason.value = ''
     await queryClient.invalidateQueries({ queryKey: ['leads'] })
-    await router.push({ name: 'leads' })
   },
   onError: (error) => {
-    toast.error(error instanceof ApiError ? error.message : 'Não foi possível excluir.')
+    toast.error(error instanceof ApiError ? error.message : 'Não foi possível cancelar.')
   },
 })
+
+const commentMutation = useMutation({
+  mutationFn: () => addLeadComment(props.leadId, { body: comment.value.trim() }),
+  onSuccess: async () => {
+    comment.value = ''
+    commentError.value = ''
+    toast.success('Comentário adicionado')
+    await queryClient.invalidateQueries({ queryKey: ['leads'] })
+    await queryClient.invalidateQueries({ queryKey: ['clients'] })
+  },
+  onError: (error) => {
+    if (error instanceof ApiError && error.status === 422) {
+      commentError.value = error.first('body') || error.message
+      return
+    }
+    toast.error(error instanceof ApiError ? error.message : 'Não foi possível comentar.')
+  },
+})
+
+function submitComment() {
+  if (!comment.value.trim()) {
+    commentError.value = 'Escreva o comentário.'
+    return
+  }
+  commentMutation.mutate()
+}
 
 function goEdit() {
   void router.push({ name: 'leads-edit', params: { id: String(props.leadId) } })
@@ -78,17 +113,17 @@ function onConverted(result: LeadConvertResult) {
     <PageHeader :title="lead?.name ?? 'Lead'">
       <template #actions>
         <Button variant="ghost" @click="goBack">Voltar</Button>
-        <PermissionGate permission="leads.manage">
-          <Button v-if="lead" variant="secondary" @click="goEdit">Editar</Button>
+        <PermissionGate v-if="lead && !isCancelled" permission="leads.manage">
+          <Button variant="secondary" @click="goEdit">Editar</Button>
         </PermissionGate>
-        <PermissionGate v-if="lead && !isConverted" permission="leads.manage">
+        <PermissionGate v-if="lead && !isFinal" permission="leads.manage">
           <Button @click="convertOpen = true">Agendar</Button>
         </PermissionGate>
       </template>
     </PageHeader>
 
     <Banner v-if="isError" variant="danger" title="Não foi possível carregar">
-      O lead pode ter sido removido ou você não tem permissão.
+      Você não tem permissão ou o lead não existe.
     </Banner>
 
     <SurfaceCard v-else-if="isPending">
@@ -103,6 +138,10 @@ function onConverted(result: LeadConvertResult) {
       <Banner v-if="isConverted" variant="success" title="Virou paciente">
         {{ lead.client?.name ?? 'Paciente' }} · desde {{ formatDateTime(lead.converted_at) }}
       </Banner>
+      <Banner v-else-if="isCancelled" variant="warning" title="Lead cancelado">
+        Cancelado em {{ formatDateTime(lead.cancelled_at) }}. É definitivo: fica no histórico e nas
+        métricas, mas não muda mais de status.
+      </Banner>
 
       <SurfaceCard>
         <dl class="flex flex-col gap-4">
@@ -110,7 +149,7 @@ function onConverted(result: LeadConvertResult) {
             <dt class="text-[13px] text-muted">Status</dt>
             <dd class="mt-1 flex flex-wrap items-center gap-2">
               <Badge :variant="lead.status?.color ?? 'muted'">{{ lead.status?.name ?? '—' }}</Badge>
-              <PermissionGate v-if="!isConverted" permission="leads.manage">
+              <PermissionGate v-if="!isFinal" permission="leads.manage">
                 <Button variant="ghost" @click="statusOpen = true">Mudar status</Button>
               </PermissionGate>
             </dd>
@@ -144,26 +183,69 @@ function onConverted(result: LeadConvertResult) {
         </dl>
       </SurfaceCard>
 
-      <SurfaceCard v-if="lead.activities?.length">
-        <h2 class="mb-3">Histórico</h2>
-        <LeadHistory :activities="lead.activities" />
+      <SurfaceCard>
+        <h2 class="mb-3">Histórico e comentários</h2>
+        <PermissionGate permission="leads.manage">
+          <form class="mb-4 flex flex-col gap-2" @submit.prevent="submitComment">
+            <FormField
+              label="Novo comentário"
+              hint="Alinhamentos e conversas com o lead. Comentários ficam no histórico."
+              :error="commentError"
+              html-for="lead-comment"
+            >
+              <template #default="{ invalid }">
+                <Textarea
+                  id="lead-comment"
+                  v-model="comment"
+                  :rows="3"
+                  :invalid="invalid"
+                  placeholder="Ex.: falei por WhatsApp, prefere horário à tarde"
+                />
+              </template>
+            </FormField>
+            <div class="flex justify-end">
+              <Button
+                type="submit"
+                variant="secondary"
+                :loading="commentMutation.isPending.value"
+                :disabled="!comment.trim()"
+              >
+                Comentar
+              </Button>
+            </div>
+          </form>
+        </PermissionGate>
+        <LeadHistory v-if="lead.activities?.length" :activities="lead.activities" />
       </SurfaceCard>
 
-      <PermissionGate v-if="!isConverted" permission="leads.manage">
+      <PermissionGate v-if="!isFinal" permission="leads.manage">
         <div>
-          <Button variant="destructive" @click="deleteOpen = true">Excluir lead</Button>
+          <Button variant="destructive" @click="cancelOpen = true">Cancelar lead</Button>
         </div>
       </PermissionGate>
 
       <LeadStatusDialog v-model:open="statusOpen" :lead="lead" :statuses="statuses" />
       <LeadConvertDialog v-model:open="convertOpen" :lead="lead" @converted="onConverted" />
-      <ConfirmDialog
-        v-model:open="deleteOpen"
-        title="Excluir este lead?"
-        description="O lead e o histórico dele serão removidos. Esta ação não pode ser desfeita."
-        confirm-label="Excluir"
-        @confirm="deleteMutation.mutate()"
-      />
+      <AppDialog
+        v-model:open="cancelOpen"
+        title="Cancelar este lead?"
+        description="É definitivo: o lead fica na lista, no histórico e nas métricas, mas não muda mais de status nem vira paciente. O telefone fica livre para um novo lead."
+      >
+        <FormField label="Motivo (opcional)" html-for="lead-cancel-reason">
+          <Textarea id="lead-cancel-reason" v-model="cancelReason" :rows="3" />
+        </FormField>
+        <template #footer>
+          <Button variant="ghost" type="button" @click="cancelOpen = false">Voltar</Button>
+          <Button
+            variant="destructive"
+            type="button"
+            :loading="cancelMutation.isPending.value"
+            @click="cancelMutation.mutate()"
+          >
+            Cancelar lead
+          </Button>
+        </template>
+      </AppDialog>
     </template>
   </div>
 </template>

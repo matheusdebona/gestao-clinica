@@ -15,6 +15,8 @@ class LeadStatus extends Model
 
     public const SYSTEM_CONVERTED = 'converted';
 
+    public const SYSTEM_CANCELLED = 'cancelled';
+
     /**
      * Design-system tones (Badge variants). Never raw hex: see AGENTS.md.
      *

@@ -16,11 +16,12 @@ class EnsureDefaultLeadStatuses
         ['name' => 'Agendado', 'color' => 'purple'],
         ['name' => 'Virou paciente', 'color' => 'success', 'system_key' => LeadStatus::SYSTEM_CONVERTED],
         ['name' => 'Perdido', 'color' => 'danger'],
+        ['name' => 'Cancelado', 'color' => 'muted', 'system_key' => LeadStatus::SYSTEM_CANCELLED],
     ];
 
     /**
      * Seeds defaults only when the clinic has no lead status yet; afterwards only makes
-     * sure a "converted" system status and a default status exist. Never edits names.
+     * sure the system statuses ("converted", "cancelled") and a default status exist. Never edits names.
      */
     public static function run(Clinic|int $clinic): void
     {
@@ -58,6 +59,21 @@ class EnsureDefaultLeadStatuses
                         'color' => 'success',
                         'sort_order' => ((int) $query()->max('sort_order')) + 10,
                         'system_key' => LeadStatus::SYSTEM_CONVERTED,
+                    ]);
+                }
+            }
+
+            if (! $query()->where('system_key', LeadStatus::SYSTEM_CANCELLED)->exists()) {
+                $cancelled = $query()->whereNull('system_key')->where('name', 'Cancelado')->first();
+                if ($cancelled !== null) {
+                    $cancelled->update(['system_key' => LeadStatus::SYSTEM_CANCELLED, 'is_active' => true, 'is_default' => false]);
+                } else {
+                    LeadStatus::query()->create([
+                        'clinic_id' => $clinicId,
+                        'name' => 'Cancelado',
+                        'color' => 'muted',
+                        'sort_order' => ((int) $query()->max('sort_order')) + 10,
+                        'system_key' => LeadStatus::SYSTEM_CANCELLED,
                     ]);
                 }
             }
@@ -102,6 +118,16 @@ class EnsureDefaultLeadStatuses
         return LeadStatus::query()
             ->where('clinic_id', $clinicId)
             ->where('system_key', LeadStatus::SYSTEM_CONVERTED)
+            ->firstOrFail();
+    }
+
+    public static function cancelledFor(int $clinicId): LeadStatus
+    {
+        self::run($clinicId);
+
+        return LeadStatus::query()
+            ->where('clinic_id', $clinicId)
+            ->where('system_key', LeadStatus::SYSTEM_CANCELLED)
             ->firstOrFail();
     }
 }

@@ -157,6 +157,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:leads.view');
         Route::get('leads/creators', [LeadController::class, 'creators'])
             ->middleware('permission:leads.view');
+        Route::get('leads/phone-check', [LeadController::class, 'phoneCheck'])
+            ->middleware('permission:leads.manage');
         Route::post('leads', [LeadController::class, 'store'])
             ->middleware('permission:leads.manage');
         Route::get('leads/{lead}', [LeadController::class, 'show'])
@@ -165,7 +167,9 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:leads.manage');
         Route::patch('leads/{lead}/status', [LeadController::class, 'changeStatus'])
             ->middleware('permission:leads.manage');
-        Route::delete('leads/{lead}', [LeadController::class, 'destroy'])
+        Route::post('leads/{lead}/cancel', [LeadController::class, 'cancel'])
+            ->middleware('permission:leads.manage');
+        Route::post('leads/{lead}/comments', [LeadController::class, 'comment'])
             ->middleware('permission:leads.manage');
         Route::get('leads/{lead}/matching-clients', [LeadController::class, 'matchingClients'])
             ->middleware('permission:leads.manage');
@@ -308,6 +312,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:metrics.view');
         Route::get('metrics/operations', [MetricsController::class, 'operations'])
             ->middleware('permission:metrics.view');
+        Route::get('metrics/leads', [MetricsController::class, 'leads'])
+            ->middleware(['permission:metrics.view', 'permission:leads.view']);
 
         Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
         Route::get('notifications', [NotificationController::class, 'index']);

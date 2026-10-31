@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
+use App\Support\LeadPhone;
 use Database\Factories\LeadFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,12 +25,21 @@ class Lead extends Model
         'created_by_user_id',
         'client_id',
         'converted_at',
+        'cancelled_at',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (Lead $lead): void {
+            $lead->phone_digits = LeadPhone::canonical((string) $lead->phone);
+        });
+    }
 
     protected function casts(): array
     {
         return [
             'converted_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -55,11 +65,21 @@ class Lead extends Model
 
     public function activities(): HasMany
     {
-        return $this->hasMany(LeadActivity::class)->latest('id');
+        return $this->hasMany(LeadActivity::class)->latest('created_at')->latest('id');
+    }
+
+    public function comments(): HasMany
+    {
+        return $this->hasMany(LeadActivity::class)->where('type', LeadActivity::TYPE_COMMENT);
     }
 
     public function isConverted(): bool
     {
         return $this->client_id !== null;
+    }
+
+    public function isCancelled(): bool
+    {
+        return $this->cancelled_at !== null;
     }
 }

@@ -31,7 +31,13 @@ export interface LeadUserRef {
   name: string
 }
 
-export type LeadActivityType = 'created' | 'status_changed' | 'note' | 'converted'
+export type LeadActivityType =
+  | 'created'
+  | 'status_changed'
+  | 'note'
+  | 'converted'
+  | 'cancelled'
+  | 'comment'
 
 export interface LeadActivity {
   id: number
@@ -54,6 +60,8 @@ export interface Lead {
   created_by_user_id: number | null
   client_id: number | null
   converted_at: string | null
+  cancelled_at: string | null
+  comments_count?: number
   client_origin?: ClientOrigin | null
   status?: LeadStatus | null
   created_by?: LeadUserRef | null
@@ -85,4 +93,17 @@ export interface LeadConvertResult {
   client: Client
   appointment: Appointment
   client_created: boolean
+}
+
+export interface LeadPhoneConflict {
+  type: 'lead' | 'patient'
+  message: string
+  lead: {
+    id: number
+    name: string
+    status: Pick<LeadStatus, 'id' | 'name' | 'color' | 'system_key'> | null
+    created_by: LeadUserRef | null
+    created_at: string | null
+  } | null
+  client: { id: number; name: string; is_active: boolean } | null
 }

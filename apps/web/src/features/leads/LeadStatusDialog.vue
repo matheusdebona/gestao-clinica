@@ -7,7 +7,7 @@ import FormField from '@/components/ui/FormField.vue'
 import Select from '@/components/ui/Select.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import { changeLeadStatus } from '@/features/leads/api'
-import { LEAD_CONVERTED_KEY } from '@/features/leads/labels'
+import { LEAD_SYSTEM_KEYS } from '@/features/leads/labels'
 import { useToastStore } from '@/stores/toast'
 import type { Lead, LeadStatus } from '@/types/lead'
 import { ApiError } from '@/types/user'
@@ -37,10 +37,10 @@ watch(open, (isOpen) => {
   }
 })
 
-// "Virou paciente" is only set by Agendar.
+// System statuses ("Virou paciente", "Cancelado") are only set by their flows.
 const options = computed(() =>
   props.statuses
-    .filter((status) => status.is_active && status.system_key !== LEAD_CONVERTED_KEY)
+    .filter((status) => status.is_active && !LEAD_SYSTEM_KEYS.includes(status.system_key ?? ''))
     .map((status) => ({ value: String(status.id), label: status.name })),
 )
 

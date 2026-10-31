@@ -93,6 +93,9 @@ function leadMeta(lead: Lead) {
     bits.push(`por ${lead.created_by.name}`)
   }
   bits.push(formatDate(lead.created_at))
+  if (lead.comments_count) {
+    bits.push(lead.comments_count === 1 ? '1 comentário' : `${lead.comments_count} comentários`)
+  }
   return bits.join(' · ')
 }
 
@@ -177,7 +180,7 @@ function openStatus(lead: Lead) {
                 @action="openLead(lead.id)"
               />
             </div>
-            <PermissionGate v-if="!lead.client_id" permission="leads.manage">
+            <PermissionGate v-if="!lead.client_id && !lead.cancelled_at" permission="leads.manage">
               <IconButton label="Mudar status" @click="openStatus(lead)">
                 <RefreshCw class="size-4" :stroke-width="1.75" />
               </IconButton>

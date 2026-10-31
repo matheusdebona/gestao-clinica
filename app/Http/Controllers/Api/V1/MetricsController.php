@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\Metrics\AcquisitionMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\CommercialMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\InventoryMetricsRequest;
+use App\Http\Requests\Api\V1\Metrics\LeadMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\MarginMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\OperationsMetricsRequest;
 use App\Services\AcquisitionMetricsService;
 use App\Services\CommercialMetricsService;
 use App\Services\InventoryMetricsService;
+use App\Services\LeadMetricsService;
 use App\Services\MarginMetricsService;
 use App\Services\OperationsMetricsService;
 use Carbon\CarbonImmutable;
@@ -24,6 +26,7 @@ class MetricsController extends Controller
         private readonly MarginMetricsService $marginMetrics,
         private readonly InventoryMetricsService $inventoryMetrics,
         private readonly OperationsMetricsService $operationsMetrics,
+        private readonly LeadMetricsService $leadMetrics,
     ) {}
 
     public function commercial(CommercialMetricsRequest $request): JsonResponse
@@ -86,6 +89,16 @@ class MetricsController extends Controller
 
         return response()->json([
             'data' => $this->operationsMetrics->summarize($from, $to),
+        ]);
+    }
+
+    public function leads(LeadMetricsRequest $request): JsonResponse
+    {
+        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
+        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+
+        return response()->json([
+            'data' => $this->leadMetrics->summarize($from, $to),
         ]);
     }
 }

@@ -209,7 +209,6 @@ class EnsureRolesAndPermissions
             'brands.manage',
             'units.manage',
             'files.upload',
-            'leads.view',
         ]);
 
         Role::findOrCreate('professional', self::GUARD)->syncPermissions([
@@ -228,7 +227,6 @@ class EnsureRolesAndPermissions
             'documents.generate',
             'documents.delete',
             'products.view',
-            'leads.view',
         ]);
     }
 

@@ -5,6 +5,7 @@ import type {
   AcquisitionMetrics,
   CommercialMetrics,
   InventoryMetrics,
+  LeadMetrics,
   MarginMetrics,
   MarginMode,
   MetricsGranularity,
@@ -52,6 +53,13 @@ export async function getInventoryMetrics(params: MetricsPeriodParams): Promise<
 
 export async function getOperationsMetrics(params: MetricsPeriodParams): Promise<OperationsMetrics> {
   const payload = await api<DataEnvelope<OperationsMetrics>>('/metrics/operations', {
+    query: params,
+  })
+  return payload.data
+}
+
+export async function getLeadMetrics(params: MetricsPeriodParams): Promise<LeadMetrics> {
+  const payload = await api<DataEnvelope<LeadMetrics>>('/metrics/leads', {
     query: params,
   })
   return payload.data

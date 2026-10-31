@@ -43,25 +43,25 @@ export const routes: RouteRecordRaw[] = [
         {
           path: 'leads',
           name: 'leads',
-          meta: { title: 'Leads' },
+          meta: { title: 'Leads', permission: 'leads.view' },
           component: () => import('@/pages/LeadsPage.vue'),
         },
         {
           path: 'leads/new',
           name: 'leads-new',
-          meta: { title: 'Novo lead' },
+          meta: { title: 'Novo lead', permission: 'leads.manage' },
           component: () => import('@/pages/LeadFormPage.vue'),
         },
         {
           path: 'leads/:id/edit',
           name: 'leads-edit',
-          meta: { title: 'Editar lead' },
+          meta: { title: 'Editar lead', permission: 'leads.manage' },
           component: () => import('@/pages/LeadFormPage.vue'),
         },
         {
           path: 'leads/:id',
           name: 'leads-show',
-          meta: { title: 'Lead' },
+          meta: { title: 'Lead', permission: 'leads.view' },
           component: () => import('@/pages/LeadDetailPage.vue'),
         },
         {
@@ -73,7 +73,7 @@ export const routes: RouteRecordRaw[] = [
         {
           path: 'settings/lead-statuses',
           name: 'lead-statuses',
-          meta: { title: 'Status de leads' },
+          meta: { title: 'Status de leads', permission: 'lead_statuses.manage' },
           component: () => import('@/pages/LeadStatusesPage.vue'),
         },
         {
