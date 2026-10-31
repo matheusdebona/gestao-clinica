@@ -49,6 +49,7 @@ export const api = ofetch.create({
       payload?.message || 'Não foi possível concluir a solicitação.',
       response.status,
       payload?.errors ?? {},
+      (payload ?? {}) as Record<string, unknown>,
     )
   },
 })

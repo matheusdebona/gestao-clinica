@@ -2,9 +2,11 @@ import { api } from '@/lib/api'
 import type { Client } from '@/types/client'
 import type {
   Lead,
+  LeadActivity,
   LeadConvertPayload,
   LeadConvertResult,
   LeadPayload,
+  LeadPhoneConflict,
   LeadStatus,
   LeadStatusPayload,
   LeadUserRef,
@@ -75,8 +77,30 @@ export async function changeLeadStatus(
   return payload.data
 }
 
-export async function deleteLead(id: number): Promise<void> {
-  await api(`/leads/${id}`, { method: 'DELETE' })
+/** Final: the lead stays in the list, history and metrics. */
+export async function cancelLead(id: number, body: { reason?: string | null }): Promise<Lead> {
+  const payload = await api<DataEnvelope<Lead>>(`/leads/${id}/cancel`, { method: 'POST', body })
+  return payload.data
+}
+
+export async function addLeadComment(id: number, body: { body: string }): Promise<LeadActivity> {
+  const payload = await api<DataEnvelope<LeadActivity>>(`/leads/${id}/comments`, {
+    method: 'POST',
+    body,
+  })
+  return payload.data
+}
+
+export async function checkLeadPhone(
+  phone: string,
+  leadId?: number | null,
+): Promise<LeadPhoneConflict | null> {
+  const query: Record<string, string | number> = { phone }
+  if (leadId) {
+    query.lead_id = leadId
+  }
+  const payload = await api<{ data: LeadPhoneConflict | null }>('/leads/phone-check', { query })
+  return payload.data
 }
 
 export async function listLeadMatchingClients(id: number): Promise<Client[]> {

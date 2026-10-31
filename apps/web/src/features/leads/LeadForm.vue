@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useForm } from 'vee-validate'
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
+import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
@@ -11,7 +13,8 @@ import PhoneInput from '@/components/ui/PhoneInput.vue'
 import Select from '@/components/ui/Select.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import { createClientOrigin } from '@/features/clients/api'
-import { LEAD_CONVERTED_KEY } from '@/features/leads/labels'
+import { checkLeadPhone } from '@/features/leads/api'
+import { LEAD_CANCELLED_KEY, LEAD_CONVERTED_KEY } from '@/features/leads/labels'
 import {
   emptyLeadForm,
   leadFormSchema,
@@ -21,7 +24,7 @@ import {
 import { useLeadCatalogs } from '@/features/leads/useLeadCatalogs'
 import { useToastStore } from '@/stores/toast'
 import type { ClientOrigin } from '@/types/client'
-import type { Lead, LeadPayload } from '@/types/lead'
+import type { Lead, LeadPayload, LeadPhoneConflict } from '@/types/lead'
 import { ApiError } from '@/types/user'
 
 const props = defineProps<{
@@ -35,6 +38,7 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
+const router = useRouter()
 const toast = useToastStore()
 const queryClient = useQueryClient()
 const { activeStatuses, activeOrigins } = useLeadCatalogs()
@@ -71,7 +75,9 @@ const originOptions = computed(() => {
 
 const statusOptions = computed(() => {
   const list = activeStatuses.value.filter(
-    (status) => isConverted.value || status.system_key !== LEAD_CONVERTED_KEY,
+    (status) =>
+      status.system_key !== LEAD_CANCELLED_KEY &&
+      (isConverted.value || status.system_key !== LEAD_CONVERTED_KEY),
   )
   const current = props.lead?.status
   if (current && !list.some((status) => status.id === current.id)) {
@@ -123,11 +129,71 @@ const { mutate: createOriginMutate, isPending: creatingOrigin } = useMutation({
   },
 })
 
+// Duplicate phone: checked live (debounced) and again by the API on save.
+const conflict = ref<LeadPhoneConflict | null>(null)
+const checkingPhone = ref(false)
+let phoneTimer: ReturnType<typeof setTimeout> | undefined
+let phoneRequest = 0
+
+function phoneDigits(value: unknown): string {
+  return String(value ?? '').replace(/\D+/g, '')
+}
+
+watch(phone, (value) => {
+  clearTimeout(phoneTimer)
+  const digits = phoneDigits(value)
+  const unchanged = props.lead && digits === phoneDigits(props.lead.phone)
+  if (digits.length < 10 || unchanged) {
+    conflict.value = null
+    checkingPhone.value = false
+    return
+  }
+  checkingPhone.value = true
+  const request = ++phoneRequest
+  phoneTimer = setTimeout(async () => {
+    try {
+      const result = await checkLeadPhone(digits, props.lead?.id)
+      if (request === phoneRequest) {
+        conflict.value = result
+      }
+    } catch {
+      // Network hiccup: the API still validates on save.
+    } finally {
+      if (request === phoneRequest) {
+        checkingPhone.value = false
+      }
+    }
+  }, 400)
+})
+
+onBeforeUnmount(() => clearTimeout(phoneTimer))
+
+function openConflict() {
+  const current = conflict.value
+  if (!current) {
+    return
+  }
+  if (current.client) {
+    void router.push({ name: 'clients-show', params: { id: String(current.client.id) } })
+    return
+  }
+  if (current.lead) {
+    void router.push({ name: 'leads-show', params: { id: String(current.lead.id) } })
+  }
+}
+
+function setDuplicate(value: LeadPhoneConflict | null) {
+  conflict.value = value
+}
+
 const onSubmit = handleSubmit((values) => {
+  if (conflict.value) {
+    return
+  }
   emit('submit', toLeadPayload(values))
 })
 
-defineExpose({ setErrors })
+defineExpose({ setErrors, setDuplicate })
 </script>
 
 <template>
@@ -147,9 +213,27 @@ defineExpose({ setErrors })
 
     <FormField label="Telefone" :error="errors.phone" html-for="lead-phone">
       <template #default="{ invalid }">
-        <PhoneInput id="lead-phone" v-model="phone" v-bind="phoneAttrs" :invalid="invalid" />
+        <PhoneInput
+          id="lead-phone"
+          v-model="phone"
+          v-bind="phoneAttrs"
+          :invalid="invalid || Boolean(conflict)"
+        />
       </template>
     </FormField>
+
+    <Banner
+      v-if="conflict"
+      variant="danger"
+      :title="conflict.type === 'patient' ? 'Já é paciente' : 'Telefone já cadastrado'"
+    >
+      <p>{{ conflict.message }}</p>
+      <div class="mt-2">
+        <Button variant="secondary" type="button" @click="openConflict">
+          {{ conflict.client ? `Abrir ${conflict.client.name}` : `Abrir lead ${conflict.lead?.name ?? ''}` }}
+        </Button>
+      </div>
+    </Banner>
 
     <FormField label="Origem" :error="errors.client_origin_id" html-for="lead-origin">
       <template #default="{ invalid }">
@@ -198,7 +282,7 @@ defineExpose({ setErrors })
       <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
         Cancelar
       </Button>
-      <Button type="submit" :loading="loading">
+      <Button type="submit" :loading="loading" :disabled="Boolean(conflict) || checkingPhone">
         {{ submitLabel ?? 'Salvar' }}
       </Button>
     </div>

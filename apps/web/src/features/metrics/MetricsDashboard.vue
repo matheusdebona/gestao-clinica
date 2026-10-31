@@ -9,12 +9,14 @@ import Skeleton from '@/components/ui/Skeleton.vue'
 import AcquisitionSection from '@/features/metrics/AcquisitionSection.vue'
 import CommercialSection from '@/features/metrics/CommercialSection.vue'
 import InventoryOpsSection from '@/features/metrics/InventoryOpsSection.vue'
+import LeadsSection from '@/features/metrics/LeadsSection.vue'
 import MarginSection from '@/features/metrics/MarginSection.vue'
 import PeriodControl from '@/features/metrics/PeriodControl.vue'
 import {
   getAcquisitionMetrics,
   getCommercialMetrics,
   getInventoryMetrics,
+  getLeadMetrics,
   getMarginMetrics,
   getOperationsMetrics,
 } from '@/features/metrics/api'
@@ -85,6 +87,19 @@ const {
   enabled: canLoad,
 })
 
+const canSeeLeads = computed(() => auth.can('leads.view'))
+const canLoadLeads = computed(() => canLoad.value && canSeeLeads.value)
+
+const {
+  data: leads,
+  isPending: leadsPending,
+  isError: leadsError,
+} = useQuery({
+  queryKey: ['metrics', 'leads', from, to],
+  queryFn: () => getLeadMetrics({ from: from.value, to: to.value }),
+  enabled: canLoadLeads,
+})
+
 const heroPending = computed(
   () => commercialPending.value || acquisitionPending.value || marginPending.value,
 )
@@ -140,6 +155,13 @@ const heroPending = computed(
           :data="acquisition"
           :pending="acquisitionPending"
           :error="acquisitionError"
+        />
+
+        <LeadsSection
+          v-if="canSeeLeads"
+          :data="leads"
+          :pending="leadsPending"
+          :error="leadsError"
         />
 
         <MarginSection

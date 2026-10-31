@@ -65,6 +65,27 @@ export function formatDateTime(value: string | null | undefined): string {
   }).format(parsed)
 }
 
+/** dd/mm/aaaa HH:mm in the clinic timezone (America/Sao_Paulo). */
+export function formatClinicDateTime(value: string | null | undefined): string {
+  if (!value) {
+    return '—'
+  }
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) {
+    return '—'
+  }
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+    .format(parsed)
+    .replace(',', '')
+}
+
 export function formatTime(value: string | null | undefined): string {
   if (!value) {
     return '—'

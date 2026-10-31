@@ -1,6 +1,10 @@
 import type { LeadActivity, LeadStatusColor } from '@/types/lead'
 
 export const LEAD_CONVERTED_KEY = 'converted'
+export const LEAD_CANCELLED_KEY = 'cancelled'
+
+/** System statuses are set only by their flows (Agendar / Cancelar lead). */
+export const LEAD_SYSTEM_KEYS = [LEAD_CONVERTED_KEY, LEAD_CANCELLED_KEY]
 
 export const LEAD_STATUS_COLOR_OPTIONS: { value: LeadStatusColor; label: string }[] = [
   { value: 'muted', label: 'Cinza' },
@@ -16,6 +20,10 @@ export function activityLabel(activity: LeadActivity): string {
       return activity.to_status ? `Cadastrado como ${activity.to_status.name}` : 'Cadastrado'
     case 'converted':
       return 'Virou paciente (avaliação agendada)'
+    case 'cancelled':
+      return 'Lead cancelado'
+    case 'comment':
+      return 'Comentário'
     case 'status_changed':
       if (activity.from_status && activity.to_status) {
         return `${activity.from_status.name} → ${activity.to_status.name}`

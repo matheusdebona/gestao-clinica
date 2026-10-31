@@ -15,6 +15,10 @@ class LeadActivity extends Model
 
     public const TYPE_CONVERTED = 'converted';
 
+    public const TYPE_CANCELLED = 'cancelled';
+
+    public const TYPE_COMMENT = 'comment';
+
     protected $fillable = [
         'lead_id',
         'user_id',

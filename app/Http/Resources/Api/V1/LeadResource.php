@@ -22,6 +22,7 @@ class LeadResource extends JsonResource
             'created_by_user_id' => $this->created_by_user_id,
             'client_id' => $this->client_id,
             'converted_at' => $this->converted_at,
+            'cancelled_at' => $this->cancelled_at,
             'client_origin' => ClientOriginResource::make($this->whenLoaded('clientOrigin')),
             'status' => LeadStatusResource::make($this->whenLoaded('status')),
             'created_by' => $this->whenLoaded('createdBy', fn () => $this->createdBy === null ? null : [
@@ -34,6 +35,7 @@ class LeadResource extends JsonResource
                 'whatsapp' => $this->client->whatsapp,
             ]),
             'activities' => LeadActivityResource::collection($this->whenLoaded('activities')),
+            'comments_count' => $this->whenCounted('comments'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

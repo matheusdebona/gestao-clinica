@@ -20,7 +20,7 @@ class LeadFactory extends Factory
         return [
             'clinic_id' => Clinic::factory(),
             'name' => fake()->name(),
-            'phone' => fake()->numerify('119########'),
+            'phone' => fake()->unique()->numerify('119########'),
             'client_origin_id' => fn (array $attributes) => ClientOrigin::factory()->create(['clinic_id' => $attributes['clinic_id']])->id,
             'lead_status_id' => fn (array $attributes) => LeadStatus::factory()->create(['clinic_id' => $attributes['clinic_id']])->id,
             'notes' => null,

@@ -10,7 +10,7 @@ import LeadForm from '@/features/leads/LeadForm.vue'
 import { createLead, getLead, updateLead } from '@/features/leads/api'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
-import type { LeadPayload } from '@/types/lead'
+import type { LeadPayload, LeadPhoneConflict } from '@/types/lead'
 import { ApiError } from '@/types/user'
 
 const props = defineProps<{
@@ -21,7 +21,10 @@ const router = useRouter()
 const toast = useToastStore()
 const auth = useAuthStore()
 const queryClient = useQueryClient()
-const formRef = ref<{ setErrors: (errors: Record<string, string>) => void } | null>(null)
+const formRef = ref<{
+  setErrors: (errors: Record<string, string>) => void
+  setDuplicate: (conflict: LeadPhoneConflict | null) => void
+} | null>(null)
 
 const isEdit = computed(() => Boolean(props.leadId))
 const allowed = computed(() => auth.can('leads.manage'))
@@ -47,6 +50,10 @@ const { mutate: save, isPending: saving } = useMutation({
         mapped[field] = messages[0] ?? error.message
       }
       formRef.value?.setErrors(mapped)
+      const duplicate = error.body.duplicate as LeadPhoneConflict | undefined
+      if (duplicate) {
+        formRef.value?.setDuplicate(duplicate)
+      }
       if (!Object.keys(mapped).length) {
         toast.error(error.message)
       }
@@ -89,6 +96,10 @@ function onCancel() {
       <Skeleton class="mt-3 h-11" />
       <Skeleton class="mt-3 h-24" />
     </SurfaceCard>
+
+    <Banner v-else-if="isEdit && lead?.cancelled_at" variant="warning" title="Lead cancelado">
+      Lead cancelado é definitivo e não pode ser editado. Você ainda pode comentar no histórico.
+    </Banner>
 
     <SurfaceCard v-else>
       <LeadForm

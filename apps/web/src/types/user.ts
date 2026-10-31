@@ -29,12 +29,20 @@ export interface ApiFieldErrors {
 export class ApiError extends Error {
   status: number
   errors: ApiFieldErrors
+  /** Full JSON body of the error response (structured extras such as `duplicate`). */
+  body: Record<string, unknown>
 
-  constructor(message: string, status: number, errors: ApiFieldErrors = {}) {
+  constructor(
+    message: string,
+    status: number,
+    errors: ApiFieldErrors = {},
+    body: Record<string, unknown> = {},
+  ) {
     super(message)
     this.name = 'ApiError'
     this.status = status
     this.errors = errors
+    this.body = body
   }
 
   first(field: string): string {

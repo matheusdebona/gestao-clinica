@@ -201,7 +201,7 @@ function onConfirmDeactivate() {
         </div>
       </dl>
       <template v-if="client.lead.activities?.length">
-        <h2 class="mt-5 mb-3">Histórico do lead</h2>
+        <h2 class="mt-5 mb-3">Histórico e comentários do lead</h2>
         <LeadHistory :activities="client.lead.activities" />
       </template>
     </SurfaceCard>

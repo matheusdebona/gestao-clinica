@@ -8,8 +8,10 @@ use App\Http\Requests\Api\V1\Leads\ConvertLeadRequest;
 use App\Http\Requests\Api\V1\Leads\LeadRequest;
 use App\Http\Resources\Api\V1\AppointmentResource;
 use App\Http\Resources\Api\V1\ClientResource;
+use App\Http\Resources\Api\V1\LeadActivityResource;
 use App\Http\Resources\Api\V1\LeadResource;
 use App\Models\Lead;
+use App\Models\LeadActivity;
 use App\Models\LeadStatus;
 use App\Models\User;
 use App\Services\LeadService;
@@ -80,7 +82,7 @@ class LeadController extends Controller
 
         $perPage = min(max($request->integer('per_page', 20), 1), 100);
 
-        return LeadResource::collection($query->with(self::LIST_RELATIONS)->paginate($perPage));
+        return LeadResource::collection($query->with(self::LIST_RELATIONS)->withCount('comments')->paginate($perPage));
     }
 
     public function store(LeadRequest $request): JsonResponse
@@ -120,17 +122,64 @@ class LeadController extends Controller
         return new LeadResource($lead->fresh()->load(self::DETAIL_RELATIONS));
     }
 
-    public function destroy(Lead $lead): JsonResponse
+    /**
+     * Leads are never deleted; cancelling is final and keeps them in list, history and metrics.
+     */
+    public function cancel(Request $request, Lead $lead): LeadResource
     {
-        if ($lead->isConverted()) {
-            throw ValidationException::withMessages([
-                'lead' => ['Lead que virou paciente fica no histórico e não pode ser excluído.'],
-            ]);
+        $data = $request->validate([
+            'reason' => ['sometimes', 'nullable', 'string', 'max:2000'],
+        ]);
+
+        $lead = $this->leads->cancel($lead, $data['reason'] ?? null, $request->user());
+
+        return new LeadResource($lead->fresh()->load(self::DETAIL_RELATIONS));
+    }
+
+    /**
+     * Comments are history: immutable, never deleted, allowed on cancelled and converted leads too.
+     */
+    public function comment(Request $request, Lead $lead): JsonResponse
+    {
+        $data = $request->validate([
+            'body' => ['required', 'string', 'max:5000'],
+        ], [
+            'body.required' => 'Escreva o comentário.',
+            'body.max' => 'Comentário muito longo.',
+        ]);
+
+        $body = trim($data['body']);
+        if ($body === '') {
+            throw ValidationException::withMessages(['body' => ['Escreva o comentário.']]);
         }
 
-        $lead->delete();
+        $activity = $lead->activities()->create([
+            'user_id' => $request->user()->id,
+            'type' => LeadActivity::TYPE_COMMENT,
+            'note' => $body,
+        ]);
 
-        return response()->json(['message' => 'Lead excluído.']);
+        return (new LeadActivityResource($activity->load('user')))->response()->setStatusCode(201);
+    }
+
+    /**
+     * Live duplicate check for the form: phone, optional lead_id (the lead being edited).
+     */
+    public function phoneCheck(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'phone' => ['required', 'string', 'max:30'],
+            'lead_id' => ['sometimes', 'nullable', 'integer'],
+        ]);
+
+        $ignore = isset($data['lead_id']) ? Lead::query()->find($data['lead_id']) : null;
+        $digits = preg_replace('/\D+/', '', $data['phone']) ?? '';
+
+        return response()->json([
+            'data' => strlen($digits) >= 10
+                ? $this->leads->phoneConflict((int) $request->user()->clinic_id, $digits, $ignore)
+                : null,
+        ]);
     }
 
     public function matchingClients(Lead $lead): AnonymousResourceCollection
@@ -179,7 +228,7 @@ class LeadController extends Controller
     }
 
     /**
-     * "Virou paciente" is set only by the conversion flow; a converted lead keeps it.
+     * System statuses are set only by their flows ("Agendar", "Cancelar lead") and are final.
      */
     private function assertManualStatusAllowed(?int $statusId, ?Lead $lead): void
     {
@@ -189,6 +238,18 @@ class LeadController extends Controller
 
         $status = LeadStatus::query()->find($statusId);
         $isConvertedStatus = $status?->system_key === LeadStatus::SYSTEM_CONVERTED;
+
+        if ($lead?->isCancelled()) {
+            throw ValidationException::withMessages([
+                'lead_status_id' => ['Lead cancelado é definitivo e não muda de status.'],
+            ]);
+        }
+
+        if ($status?->system_key === LeadStatus::SYSTEM_CANCELLED && (int) $lead?->lead_status_id !== $statusId) {
+            throw ValidationException::withMessages([
+                'lead_status_id' => ['Use “Cancelar lead” para cancelar.'],
+            ]);
+        }
 
         if ($lead?->isConverted()) {
             if ((int) $lead->lead_status_id !== $statusId) {

@@ -157,3 +157,41 @@ export interface OperationsMetrics {
   by_professional: ProfessionalOpsRow[]
   notes: string[]
 }
+
+export interface LeadMetricsKpis {
+  total: number
+  converted: number
+  conversion_rate: string | null
+  cancelled: number
+  cancelled_rate: string | null
+  avg_days_to_conversion: string | null
+}
+
+export interface LeadMetricsRow {
+  id: number | null
+  key: string
+  label: string
+  total: number
+  converted: number
+  conversion_rate: string | null
+  cancelled: number
+}
+
+export interface LeadMetricsStatusRow {
+  id: number
+  key: string
+  label: string
+  color: string
+  system_key: string | null
+  total: number
+}
+
+export interface LeadMetrics {
+  from: string
+  to: string
+  conversion_definition: string
+  kpis: LeadMetricsKpis
+  by_origin: LeadMetricsRow[]
+  by_status: LeadMetricsStatusRow[]
+  by_creator: LeadMetricsRow[]
+}

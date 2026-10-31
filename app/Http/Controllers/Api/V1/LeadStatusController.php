@@ -67,7 +67,7 @@ class LeadStatusController extends Controller
             }
             if (($data['is_default'] ?? false) === true) {
                 throw ValidationException::withMessages([
-                    'is_default' => ['“Virou paciente” não pode ser o status inicial.'],
+                    'is_default' => ['Status do sistema não pode ser o status inicial.'],
                 ]);
             }
         }
