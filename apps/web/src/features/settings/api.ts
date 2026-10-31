@@ -8,10 +8,13 @@ export interface ClinicSettings {
   whatsapp_templates: Record<WhatsAppTemplateKey, string>
   whatsapp_template_defaults: Record<WhatsAppTemplateKey, string>
   whatsapp_placeholders: Record<WhatsAppTemplateKey, string[]>
+  lead_stale_days: number
+  lead_stale_days_default: number
 }
 
 export interface ClinicSettingsPayload {
   whatsapp_templates?: Partial<Record<WhatsAppTemplateKey, string | null>>
+  lead_stale_days?: number | null
 }
 
 export async function getClinicSettings(): Promise<ClinicSettings> {

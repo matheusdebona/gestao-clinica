@@ -67,4 +67,43 @@ class ClinicSettings
         $clinic->settings = $settings;
         $clinic->save();
     }
+
+    public const DEFAULT_LEAD_STALE_DAYS = 3;
+
+    public const MIN_LEAD_STALE_DAYS = 1;
+
+    public const MAX_LEAD_STALE_DAYS = 60;
+
+    /** Days without any lead activity before an open lead counts as "parado". */
+    public static function leadStaleDays(Clinic $clinic): int
+    {
+        $value = $clinic->settings['lead_stale_days'] ?? null;
+
+        if (! is_numeric($value)) {
+            return self::DEFAULT_LEAD_STALE_DAYS;
+        }
+
+        return max(self::MIN_LEAD_STALE_DAYS, min(self::MAX_LEAD_STALE_DAYS, (int) $value));
+    }
+
+    public static function leadStaleDaysForId(?int $clinicId): int
+    {
+        $clinic = $clinicId !== null ? Clinic::query()->find($clinicId) : null;
+
+        return $clinic !== null ? self::leadStaleDays($clinic) : self::DEFAULT_LEAD_STALE_DAYS;
+    }
+
+    public static function updateLeadStaleDays(Clinic $clinic, ?int $days): void
+    {
+        $settings = $clinic->settings ?? [];
+
+        if ($days === null) {
+            unset($settings['lead_stale_days']);
+        } else {
+            $settings['lead_stale_days'] = $days;
+        }
+
+        $clinic->settings = $settings;
+        $clinic->save();
+    }
 }

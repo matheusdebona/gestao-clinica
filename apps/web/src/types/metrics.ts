@@ -164,6 +164,9 @@ export interface LeadMetricsKpis {
   conversion_rate: string | null
   cancelled: number
   cancelled_rate: string | null
+  /** Snapshot (now), independent of the period. */
+  stale: number
+  stale_days: number
   avg_days_to_conversion: string | null
 }
 

@@ -5,6 +5,7 @@ import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
+import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
@@ -17,6 +18,8 @@ import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import LeadFiltersSheet from '@/features/leads/LeadFiltersSheet.vue'
 import LeadStatusDialog from '@/features/leads/LeadStatusDialog.vue'
 import { listLeads, logLeadWhatsApp } from '@/features/leads/api'
+import { DEFAULT_LEAD_STALE_DAYS, leadStaleDays, staleLabel } from '@/features/leads/stale'
+import { useClinicSettings } from '@/features/settings/useClinicSettings'
 import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
 import { openWhatsApp } from '@/lib/whatsapp'
 import {
@@ -95,6 +98,13 @@ const hasCriteria = computed(() => Boolean(filters.value.q) || filterCount.value
 
 const queryClient = useQueryClient()
 const { leadUrl } = useWhatsAppLinks()
+const { data: clinicSettings } = useClinicSettings()
+const staleThreshold = computed(() => clinicSettings.value?.lead_stale_days ?? DEFAULT_LEAD_STALE_DAYS)
+
+function staleBadge(lead: Lead): string {
+  const days = leadStaleDays(lead, staleThreshold.value)
+  return days === null ? '' : staleLabel(days)
+}
 
 function callOnWhatsApp(lead: Lead) {
   const url = leadUrl(lead)
@@ -209,7 +219,11 @@ function openStatus(lead: Lead) {
                 :badge="lead.status?.name ?? ''"
                 :badge-variant="lead.status?.color ?? 'muted'"
                 @action="openLead(lead.id)"
-              />
+              >
+                <template v-if="staleBadge(lead)" #status>
+                  <Badge variant="warning">{{ staleBadge(lead) }}</Badge>
+                </template>
+              </ListCard>
             </div>
             <PermissionGate permission="leads.manage">
               <IconButton label="Chamar no WhatsApp" @click="callOnWhatsApp(lead)">

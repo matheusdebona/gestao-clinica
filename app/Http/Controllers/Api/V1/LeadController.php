@@ -15,7 +15,10 @@ use App\Models\LeadActivity;
 use App\Models\LeadStatus;
 use App\Models\User;
 use App\Services\LeadService;
+use App\Services\LeadStaleService;
 use App\Support\CaseInsensitiveSearch;
+use App\Support\ClinicSettings;
+use App\Support\CurrentClinic;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -73,6 +76,13 @@ class LeadController extends Controller
             $request->boolean('converted') ? $query->whereNotNull('client_id') : $query->whereNull('client_id');
         }
 
+        if ($request->boolean('stale')) {
+            $query->stale(LeadStaleService::cutoff(ClinicSettings::leadStaleDaysForId(CurrentClinic::id())))
+                ->reorder()
+                ->orderBy('activities_max_created_at')
+                ->orderBy('leads.id');
+        }
+
         if ($request->filled('from')) {
             $query->where('created_at', '>=', Carbon::parse($request->input('from'))->startOfDay());
         }
@@ -82,7 +92,13 @@ class LeadController extends Controller
 
         $perPage = min(max($request->integer('per_page', 20), 1), 100);
 
-        return LeadResource::collection($query->with(self::LIST_RELATIONS)->withCount('comments')->paginate($perPage));
+        return LeadResource::collection($query->with(self::LIST_RELATIONS)->withLastActivity()->withCount('comments')->paginate($perPage));
+    }
+
+    /** Home card: how many open leads are "parados" and the ones waiting the longest. */
+    public function staleSummary(LeadStaleService $stale): JsonResponse
+    {
+        return response()->json(['data' => $stale->summary(CurrentClinic::id())]);
     }
 
     public function store(LeadRequest $request): JsonResponse

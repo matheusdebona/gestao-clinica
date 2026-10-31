@@ -93,3 +93,11 @@ describe('notification inbox mapping', () => {
     ).toBeNull()
   })
 })
+
+describe('stale leads digest link', () => {
+  it('opens the parados list', () => {
+    expect(notificationHref(item({ type_key: 'stale_leads', data: { type: 'stale_leads', count: 2 } }))).toBe(
+      '/leads?parados=1',
+    )
+  })
+})

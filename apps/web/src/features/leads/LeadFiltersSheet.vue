@@ -9,8 +9,10 @@ import Select from '@/components/ui/Select.vue'
 import Tabs from '@/components/ui/Tabs.vue'
 import {
   LEAD_CONVERTED_ITEMS,
+  LEAD_STALE_ITEMS,
   LEAD_PERIOD_ITEMS,
   type LeadConvertedFilter,
+  type LeadStaleFilter,
   type LeadFilters,
   type LeadPeriod,
 } from '@/features/leads/filters'
@@ -137,6 +139,15 @@ function toggleStatus(id: number, checked: boolean) {
           :model-value="filters.createdBy"
           :options="creatorOptions"
           @update:model-value="emit('change', { createdBy: $event })"
+        />
+      </FormField>
+
+      <FormField label="Acompanhamento">
+        <Tabs
+          :model-value="filters.stale"
+          block
+          :items="LEAD_STALE_ITEMS"
+          @update:model-value="emit('change', { stale: $event as LeadStaleFilter })"
         />
       </FormField>
 

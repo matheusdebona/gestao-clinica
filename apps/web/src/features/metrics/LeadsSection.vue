@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useRouter } from 'vue-router'
 import MetricCard from '@/components/patterns/MetricCard.vue'
 import RankBar from '@/components/patterns/RankBar.vue'
 import Banner from '@/components/ui/Banner.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
+import ListCard from '@/components/ui/ListCard.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { maxNumeric, rankRatio } from '@/features/metrics/chart'
@@ -15,6 +17,17 @@ const props = defineProps<{
   pending: boolean
   error: boolean
 }>()
+
+const router = useRouter()
+
+function openStaleLeads() {
+  void router.push({ name: 'leads', query: { parados: '1' } })
+}
+
+const staleMeta = computed(() => {
+  const days = props.data?.kpis.stale_days ?? 3
+  return `Sem contato há ${days === 1 ? '1 dia' : `${days} dias`} ou mais (situação de hoje)`
+})
 
 function leadsLabel(count: number): string {
   return count === 1 ? '1 lead' : `${count} leads`
@@ -95,6 +108,18 @@ const creatorMax = computed(() =>
           {{ avgDays }}
         </MetricCard>
       </div>
+
+      <SurfaceCard :padding="false">
+        <div class="px-5 py-2">
+          <ListCard
+            :title="`Leads parados: ${data.kpis.stale}`"
+            :meta="staleMeta"
+            :badge="data.kpis.stale > 0 ? 'Ver lista' : ''"
+            badge-variant="warning"
+            @action="openStaleLeads"
+          />
+        </div>
+      </SurfaceCard>
 
       <EmptyState
         v-if="total === 0"

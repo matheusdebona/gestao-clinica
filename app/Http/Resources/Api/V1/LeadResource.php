@@ -36,6 +36,7 @@ class LeadResource extends JsonResource
             ]),
             'activities' => LeadActivityResource::collection($this->whenLoaded('activities')),
             'comments_count' => $this->whenCounted('comments'),
+            'last_activity_at' => $this->lastActivityAt()?->toISOString(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

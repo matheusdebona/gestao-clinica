@@ -63,6 +63,7 @@ export interface Lead {
   converted_at: string | null
   cancelled_at: string | null
   comments_count?: number
+  last_activity_at?: string | null
   client_origin?: ClientOrigin | null
   status?: LeadStatus | null
   created_by?: LeadUserRef | null

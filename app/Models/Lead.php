@@ -4,7 +4,10 @@ namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
 use App\Support\LeadPhone;
+use Carbon\CarbonImmutable;
+use Carbon\CarbonInterface;
 use Database\Factories\LeadFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -71,6 +74,46 @@ class Lead extends Model
     public function comments(): HasMany
     {
         return $this->hasMany(LeadActivity::class)->where('type', LeadActivity::TYPE_COMMENT);
+    }
+
+    /** Open = not final (not converted into a patient, not cancelled). */
+    public function scopeOpen(Builder $query): Builder
+    {
+        return $query->whereNull('leads.client_id')->whereNull('leads.cancelled_at');
+    }
+
+    /**
+     * "Parado": open lead with no activity (creation, comment, status change, WhatsApp…) since $cutoff.
+     */
+    public function scopeStale(Builder $query, CarbonInterface $cutoff): Builder
+    {
+        return $query->open()
+            ->where('leads.created_at', '<', $cutoff)
+            ->whereDoesntHave('activities', fn (Builder $activities) => $activities->where('created_at', '>=', $cutoff));
+    }
+
+    public function scopeWithLastActivity(Builder $query): Builder
+    {
+        return $query->withMax('activities', 'created_at');
+    }
+
+    /** Latest activity time (falls back to the creation time). */
+    public function lastActivityAt(): ?CarbonImmutable
+    {
+        $max = $this->getAttribute('activities_max_created_at');
+
+        if ($max === null && $this->relationLoaded('activities')) {
+            $max = $this->activities->max('created_at');
+        }
+
+        $value = $max ?? $this->created_at;
+
+        return $value !== null ? CarbonImmutable::parse($value) : null;
+    }
+
+    public function isFinal(): bool
+    {
+        return $this->client_id !== null || $this->cancelled_at !== null;
     }
 
     public function isConverted(): bool

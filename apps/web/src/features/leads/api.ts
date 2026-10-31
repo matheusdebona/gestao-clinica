@@ -8,6 +8,7 @@ import type {
   LeadPayload,
   LeadPhoneConflict,
   LeadStatus,
+  LeadStatusColor,
   LeadStatusPayload,
   LeadUserRef,
 } from '@/types/lead'
@@ -20,6 +21,7 @@ export interface LeadListParams {
   client_origin_id?: number
   created_by_user_id?: number
   converted?: boolean
+  stale?: boolean
   from?: string
   to?: string
 }
@@ -40,6 +42,9 @@ export function leadListQuery(params: LeadListParams = {}): Record<string, strin
   }
   if (params.converted !== undefined) {
     query.converted = params.converted ? 1 : 0
+  }
+  if (params.stale) {
+    query.stale = 1
   }
   if (params.from) {
     query.from = params.from
@@ -151,5 +156,24 @@ export async function deleteLeadStatus(id: number): Promise<{ deleted: boolean; 
 /** Logs a WhatsApp touch in the lead timeline (the wa.me link is opened by the UI). */
 export async function logLeadWhatsApp(id: number): Promise<LeadActivity> {
   const payload = await api<DataEnvelope<LeadActivity>>(`/leads/${id}/whatsapp`, { method: 'POST' })
+  return payload.data
+}
+
+export interface StaleLeadSummaryItem {
+  id: number
+  name: string
+  phone: string
+  status: { id: number; name: string; color: LeadStatusColor } | null
+  last_activity_at: string | null
+}
+
+export interface StaleLeadsSummary {
+  days: number
+  count: number
+  leads: StaleLeadSummaryItem[]
+}
+
+export async function getStaleLeadsSummary(): Promise<StaleLeadsSummary> {
+  const payload = await api<DataEnvelope<StaleLeadsSummary>>('/leads/stale-summary')
   return payload.data
 }
