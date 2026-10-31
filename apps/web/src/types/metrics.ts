@@ -166,7 +166,6 @@ export interface LeadMetricsKpis {
   cancelled_rate: string | null
   /** Snapshot (now), independent of the period. */
   stale: number
-  stale_days: number
   avg_days_to_conversion: string | null
 }
 
@@ -189,7 +188,15 @@ export interface LeadMetricsStatusRow {
   total: number
 }
 
+export interface LeadStaleTierCount {
+  days: number
+  label: string
+  color: 'muted' | 'purple' | 'success' | 'warning' | 'danger'
+  count: number
+}
+
 export interface LeadMetrics {
+  stale_tiers: LeadStaleTierCount[]
   from: string
   to: string
   conversion_definition: string

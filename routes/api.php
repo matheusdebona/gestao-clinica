@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\ClinicSettingsController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\LeadController;
+use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
 use App\Http\Controllers\Api\V1\LeadStatusController;
 use App\Http\Controllers\Api\V1\MetricsController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -162,6 +163,14 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:leads.view');
         Route::get('leads/creators', [LeadController::class, 'creators'])
             ->middleware('permission:leads.view');
+        Route::get('lead-follow-up-tiers', [LeadFollowUpTierController::class, 'index'])
+            ->middleware('permission:leads.view|clinics.branding|clinics.manage');
+        Route::post('lead-follow-up-tiers', [LeadFollowUpTierController::class, 'store'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::put('lead-follow-up-tiers/{tier}', [LeadFollowUpTierController::class, 'update'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::delete('lead-follow-up-tiers/{tier}', [LeadFollowUpTierController::class, 'destroy'])
+            ->middleware('permission:clinics.branding|clinics.manage');
         Route::get('leads/stale-summary', [LeadController::class, 'staleSummary'])
             ->middleware('permission:leads.view');
         Route::get('leads/phone-check', [LeadController::class, 'phoneCheck'])

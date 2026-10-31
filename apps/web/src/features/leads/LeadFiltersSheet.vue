@@ -9,13 +9,13 @@ import Select from '@/components/ui/Select.vue'
 import Tabs from '@/components/ui/Tabs.vue'
 import {
   LEAD_CONVERTED_ITEMS,
-  LEAD_STALE_ITEMS,
   LEAD_PERIOD_ITEMS,
+  staleFilterOptions,
   type LeadConvertedFilter,
-  type LeadStaleFilter,
   type LeadFilters,
   type LeadPeriod,
 } from '@/features/leads/filters'
+import { useFollowUpTiers } from '@/features/leads/useFollowUpTiers'
 import type { ClientOrigin } from '@/types/client'
 import type { LeadStatus, LeadUserRef } from '@/types/lead'
 
@@ -41,6 +41,9 @@ const originOptions = computed(() => [
     label: origin.is_active ? origin.name : `${origin.name} (inativa)`,
   })),
 ])
+
+const { tiers } = useFollowUpTiers()
+const staleOptions = computed(() => staleFilterOptions(tiers.value))
 
 const creatorOptions = computed(() => [
   { value: '', label: 'Todos os usuários' },
@@ -142,12 +145,12 @@ function toggleStatus(id: number, checked: boolean) {
         />
       </FormField>
 
-      <FormField label="Acompanhamento">
-        <Tabs
+      <FormField label="Acompanhamento" html-for="lead-filter-stale">
+        <Select
+          id="lead-filter-stale"
           :model-value="filters.stale"
-          block
-          :items="LEAD_STALE_ITEMS"
-          @update:model-value="emit('change', { stale: $event as LeadStaleFilter })"
+          :options="staleOptions"
+          @update:model-value="emit('change', { stale: $event as LeadFilters['stale'] })"
         />
       </FormField>
 

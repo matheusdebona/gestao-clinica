@@ -13,7 +13,10 @@ class StaleLeadsDigestNotification extends Notification implements ShouldQueue
 
     public const TYPE = 'stale_leads';
 
-    public function __construct(public readonly int $count, public readonly int $days) {}
+    /**
+     * @param  list<array{days: int, label: string, count: int}>  $groups  leads that just crossed each tier
+     */
+    public function __construct(public readonly int $count, public readonly array $groups) {}
 
     /**
      * @return list<string|class-string>
@@ -28,15 +31,20 @@ class StaleLeadsDigestNotification extends Notification implements ShouldQueue
      */
     public function toArray(object $notifiable): array
     {
-        $leads = $this->count === 1 ? '1 lead está parado' : "{$this->count} leads estão parados";
-        $days = $this->days === 1 ? '1 dia' : "{$this->days} dias";
+        $lead = $this->count === 1 ? '1 lead passou' : "{$this->count} leads passaram";
+        $parts = array_map(
+            fn (array $group): string => "{$group['count']} em {$group['days']}+ dias",
+            $this->groups,
+        );
+        $minDays = $this->groups[0]['days'] ?? null;
 
         return [
             'type' => self::TYPE,
             'count' => $this->count,
-            'days' => $this->days,
+            'days' => $minDays,
+            'groups' => $this->groups,
             'title' => 'Leads parados',
-            'message' => "{$leads} há {$days} ou mais sem nenhum contato.",
+            'message' => "{$lead} de um prazo de acompanhamento sem contato: ".implode(', ', $parts).'.',
         ];
     }
 

@@ -7,6 +7,7 @@ use App\Http\Resources\Api\V1\ClinicResource;
 use App\Models\Clinic;
 use App\Support\CurrentClinic;
 use App\Support\EnsureDefaultClientOrigins;
+use App\Support\EnsureDefaultFollowUpTiers;
 use App\Support\EnsureDefaultLeadStatuses;
 use App\Support\EnsureDefaultPaymentCatalog;
 use App\Support\EnsureDefaultUnitsOfMeasure;
@@ -57,6 +58,7 @@ class ClinicController extends Controller
         $clinic = Clinic::query()->create($data);
         EnsureDefaultClientOrigins::run($clinic);
         EnsureDefaultLeadStatuses::run($clinic);
+        EnsureDefaultFollowUpTiers::run($clinic);
         EnsureDefaultPaymentCatalog::run($clinic);
         EnsureDefaultUnitsOfMeasure::run($clinic);
 

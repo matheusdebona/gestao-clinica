@@ -17,7 +17,6 @@ use App\Models\User;
 use App\Services\LeadService;
 use App\Services\LeadStaleService;
 use App\Support\CaseInsensitiveSearch;
-use App\Support\ClinicSettings;
 use App\Support\CurrentClinic;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -76,9 +75,15 @@ class LeadController extends Controller
             $request->boolean('converted') ? $query->whereNotNull('client_id') : $query->whereNull('client_id');
         }
 
-        if ($request->boolean('stale')) {
-            $query->stale(LeadStaleService::cutoff(ClinicSettings::leadStaleDaysForId(CurrentClinic::id())))
-                ->reorder()
+        // stale_days=7 → parados há 7+ dias; stale=1 → any follow-up tier (the smallest one).
+        $staleDays = $request->filled('stale_days')
+            ? max(1, $request->integer('stale_days'))
+            : ($request->boolean('stale') ? app(LeadStaleService::class)->minDays(CurrentClinic::id()) : null);
+        if ($request->filled('stale_days') || $request->boolean('stale')) {
+            $staleDays === null
+                ? $query->whereRaw('1 = 0')
+                : $query->stale(LeadStaleService::cutoff($staleDays));
+            $query->reorder()
                 ->orderBy('activities_max_created_at')
                 ->orderBy('leads.id');
         }

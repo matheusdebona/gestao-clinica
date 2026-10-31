@@ -22,6 +22,7 @@ export interface LeadListParams {
   created_by_user_id?: number
   converted?: boolean
   stale?: boolean
+  stale_days?: number
   from?: string
   to?: string
 }
@@ -43,7 +44,9 @@ export function leadListQuery(params: LeadListParams = {}): Record<string, strin
   if (params.converted !== undefined) {
     query.converted = params.converted ? 1 : 0
   }
-  if (params.stale) {
+  if (params.stale_days) {
+    query.stale_days = params.stale_days
+  } else if (params.stale) {
     query.stale = 1
   }
   if (params.from) {
@@ -168,12 +171,48 @@ export interface StaleLeadSummaryItem {
 }
 
 export interface StaleLeadsSummary {
-  days: number
+  /** Smallest tier (null when the clinic has no follow-up alerts). */
+  days: number | null
   count: number
+  /** Cumulative: "7+" includes 30+ and 60+. */
+  tiers: { days: number; label: string; color: LeadStatusColor; count: number }[]
   leads: StaleLeadSummaryItem[]
 }
 
 export async function getStaleLeadsSummary(): Promise<StaleLeadsSummary> {
   const payload = await api<DataEnvelope<StaleLeadsSummary>>('/leads/stale-summary')
   return payload.data
+}
+
+export interface FollowUpTier {
+  id: number
+  days: number
+  label: string | null
+  display_label: string
+  color: LeadStatusColor
+}
+
+export interface FollowUpTierPayload {
+  days: number
+  label: string | null
+  color: LeadStatusColor
+}
+
+export async function listFollowUpTiers(): Promise<FollowUpTier[]> {
+  const payload = await api<DataEnvelope<FollowUpTier[]>>('/lead-follow-up-tiers')
+  return payload.data
+}
+
+export async function createFollowUpTier(body: FollowUpTierPayload): Promise<FollowUpTier> {
+  const payload = await api<DataEnvelope<FollowUpTier>>('/lead-follow-up-tiers', { method: 'POST', body })
+  return payload.data
+}
+
+export async function updateFollowUpTier(id: number, body: FollowUpTierPayload): Promise<FollowUpTier> {
+  const payload = await api<DataEnvelope<FollowUpTier>>(`/lead-follow-up-tiers/${id}`, { method: 'PUT', body })
+  return payload.data
+}
+
+export async function deleteFollowUpTier(id: number): Promise<void> {
+  await api(`/lead-follow-up-tiers/${id}`, { method: 'DELETE' })
 }

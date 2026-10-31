@@ -51,12 +51,16 @@ describe('lead filters', () => {
 })
 
 describe('lead filters: parados', () => {
-  it('maps parados=1 to the stale API flag and counts it', () => {
-    const filters = filtersFromQuery({ parados: '1' })
-    expect(filters.stale).toBe('stale')
-    expect(filtersToQuery(filters)).toEqual({ parados: '1' })
-    expect(toLeadListParams(filters).stale).toBe(true)
-    expect(activeFilterCount(filters)).toBe(1)
+  it('maps parados=<dias> / parados=todos to the API and counts it', () => {
+    const tier = filtersFromQuery({ parados: '7' })
+    expect(tier.stale).toBe('7')
+    expect(filtersToQuery(tier)).toEqual({ parados: '7' })
+    expect(toLeadListParams(tier).stale_days).toBe(7)
+    expect(activeFilterCount(tier)).toBe(1)
+    const any = filtersFromQuery({ parados: 'todos' })
+    expect(toLeadListParams(any)).toMatchObject({ stale: true, stale_days: undefined })
+    expect(filtersToQuery(any)).toEqual({ parados: 'todos' })
+    expect(filtersFromQuery({ parados: 'x' }).stale).toBe('')
     expect(toLeadListParams(emptyLeadFilters()).stale).toBeUndefined()
   })
 })

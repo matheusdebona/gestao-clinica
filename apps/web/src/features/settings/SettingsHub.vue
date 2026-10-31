@@ -44,9 +44,9 @@ const entries: SettingsEntry[] = [
     permissions: ['clinics.branding', 'clinics.manage'],
   },
   {
-    name: 'settings-lead-stale',
-    title: 'Leads parados',
-    description: 'Dias sem contato para um lead aparecer como parado.',
+    name: 'settings-follow-up-tiers',
+    title: 'Alertas de acompanhamento',
+    description: 'Prazos sem contato (ex.: 3, 7, 30 e 60 dias) para avisar sobre leads parados.',
     permissions: ['clinics.branding', 'clinics.manage'],
   },
 ]
