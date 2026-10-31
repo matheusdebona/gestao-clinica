@@ -20,6 +20,8 @@ import LeadStatusDialog from '@/features/leads/LeadStatusDialog.vue'
 import { listLeads, logLeadWhatsApp } from '@/features/leads/api'
 import { leadStale, staleLabel } from '@/features/leads/stale'
 import { useFollowUpTiers } from '@/features/leads/useFollowUpTiers'
+import { nextQuickMilestone, quickMilestoneLabel } from '@/features/leads/milestones'
+import { useLeadMilestone } from '@/features/leads/useLeadMilestone'
 import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
 import { openWhatsApp } from '@/lib/whatsapp'
 import {
@@ -99,6 +101,7 @@ const hasCriteria = computed(() => Boolean(filters.value.q) || filterCount.value
 const queryClient = useQueryClient()
 const { leadUrl } = useWhatsAppLinks()
 const { tiers: followUpTiers } = useFollowUpTiers()
+const milestone = useLeadMilestone()
 
 function staleBadge(lead: Lead) {
   const stale = leadStale(lead, followUpTiers.value)
@@ -210,7 +213,8 @@ function openStatus(lead: Lead) {
 
       <SurfaceCard v-else :padding="false">
         <div class="divide-y divide-border-divider px-5 py-2">
-          <div v-for="lead in leads" :key="lead.id" class="flex items-center gap-1">
+          <div v-for="lead in leads" :key="lead.id" class="flex flex-col">
+          <div class="flex items-center gap-1">
             <div class="min-w-0 flex-1">
               <ListCard
                 :title="lead.name"
@@ -234,6 +238,19 @@ function openStatus(lead: Lead) {
                 <RefreshCw class="size-4" :stroke-width="1.75" />
               </IconButton>
             </PermissionGate>
+          </div>
+          <PermissionGate v-if="nextQuickMilestone(lead)" permission="leads.manage">
+            <div class="flex gap-2 px-2 pb-3 max-sm:flex-col">
+              <Button
+                mobile-block
+                variant="secondary"
+                :loading="milestone.isPending.value && milestone.variables.value?.id === lead.id"
+                @click="milestone.mutate({ id: lead.id, milestone: nextQuickMilestone(lead)! })"
+              >
+                {{ quickMilestoneLabel(nextQuickMilestone(lead)!) }}
+              </Button>
+            </div>
+          </PermissionGate>
           </div>
         </div>
       </SurfaceCard>

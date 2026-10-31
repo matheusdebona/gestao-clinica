@@ -216,3 +216,14 @@ export async function updateFollowUpTier(id: number, body: FollowUpTierPayload):
 export async function deleteFollowUpTier(id: number): Promise<void> {
   await api(`/lead-follow-up-tiers/${id}`, { method: 'DELETE' })
 }
+
+export type LeadQuickMilestone = 'approached' | 'replied'
+
+/** "Abordado" / "Respondeu": set once, attributed to the current user. */
+export async function markLeadMilestone(id: number, milestone: LeadQuickMilestone): Promise<Lead> {
+  const payload = await api<DataEnvelope<Lead>>(`/leads/${id}/milestones/${milestone}`, {
+    method: 'POST',
+    body: {},
+  })
+  return payload.data
+}

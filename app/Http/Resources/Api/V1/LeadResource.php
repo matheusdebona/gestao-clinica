@@ -23,6 +23,12 @@ class LeadResource extends JsonResource
             'client_id' => $this->client_id,
             'converted_at' => $this->converted_at,
             'cancelled_at' => $this->cancelled_at,
+            'approached_at' => $this->approached_at,
+            'replied_at' => $this->replied_at,
+            'booked_at' => $this->booked_at,
+            'approached_by' => $this->whenLoaded('approachedBy', fn () => $this->userRef($this->approachedBy)),
+            'replied_by' => $this->whenLoaded('repliedBy', fn () => $this->userRef($this->repliedBy)),
+            'booked_by' => $this->whenLoaded('bookedBy', fn () => $this->userRef($this->bookedBy)),
             'client_origin' => ClientOriginResource::make($this->whenLoaded('clientOrigin')),
             'status' => LeadStatusResource::make($this->whenLoaded('status')),
             'created_by' => $this->whenLoaded('createdBy', fn () => $this->createdBy === null ? null : [
@@ -40,5 +46,13 @@ class LeadResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
+    }
+
+    /**
+     * @return array{id: int, name: string}|null
+     */
+    private function userRef(mixed $user): ?array
+    {
+        return $user === null ? null : ['id' => $user->id, 'name' => $user->name];
     }
 }

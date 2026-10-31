@@ -187,6 +187,9 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:leads.manage');
         Route::post('leads/{lead}/comments', [LeadController::class, 'comment'])
             ->middleware('permission:leads.manage');
+        Route::post('leads/{lead}/milestones/{milestone}', [LeadController::class, 'milestone'])
+            ->whereIn('milestone', ['approached', 'replied'])
+            ->middleware('permission:leads.manage');
         Route::post('leads/{lead}/whatsapp', [LeadController::class, 'whatsapp'])
             ->middleware('permission:leads.manage');
         Route::get('leads/{lead}/matching-clients', [LeadController::class, 'matchingClients'])

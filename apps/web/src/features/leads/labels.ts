@@ -28,6 +28,12 @@ export function activityLabel(activity: LeadActivity): string {
       return activity.user
         ? `Mensagem de WhatsApp aberta por ${activity.user.name}`
         : 'Mensagem de WhatsApp aberta'
+    case 'approached':
+      return activity.user ? `Abordado por ${activity.user.name}` : 'Abordado'
+    case 'replied':
+      return activity.user ? `Respondeu (marcado por ${activity.user.name})` : 'Respondeu'
+    case 'booked':
+      return activity.user ? `Agendou (com ${activity.user.name})` : 'Agendou'
     case 'status_changed':
       if (activity.from_status && activity.to_status) {
         return `${activity.from_status.name} → ${activity.to_status.name}`

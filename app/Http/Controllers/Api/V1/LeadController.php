@@ -36,6 +36,9 @@ class LeadController extends Controller
         'activities.user',
         'activities.fromStatus',
         'activities.toStatus',
+        'approachedBy',
+        'repliedBy',
+        'bookedBy',
     ];
 
     public function __construct(private readonly LeadService $leads) {}
@@ -106,6 +109,15 @@ class LeadController extends Controller
         return response()->json(['data' => $stale->summary(CurrentClinic::id())]);
     }
 
+    /** Quick actions: "Abordado" / "Respondeu" (set once, attributed to the user). */
+    public function milestone(Request $request, Lead $lead, string $milestone): LeadResource
+    {
+        abort_unless(in_array($milestone, ['approached', 'replied'], true), 404);
+        $this->leads->markMilestone($lead, $milestone, $request->user());
+
+        return new LeadResource($lead->fresh()->load(self::DETAIL_RELATIONS));
+    }
+
     public function store(LeadRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -162,6 +174,10 @@ class LeadController extends Controller
      */
     public function whatsapp(Request $request, Lead $lead): JsonResponse
     {
+        // First WhatsApp opened = first outreach ("Abordado").
+        if ($lead->approached_at === null && $lead->cancelled_at === null) {
+            $this->leads->markMilestone($lead, 'approached', $request->user());
+        }
         $activity = $lead->activities()->create([
             'user_id' => $request->user()->id,
             'type' => LeadActivity::TYPE_WHATSAPP,

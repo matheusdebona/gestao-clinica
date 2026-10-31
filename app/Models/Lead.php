@@ -29,7 +29,16 @@ class Lead extends Model
         'client_id',
         'converted_at',
         'cancelled_at',
+        'approached_at',
+        'approached_by_user_id',
+        'replied_at',
+        'replied_by_user_id',
+        'booked_at',
+        'booked_by_user_id',
     ];
+
+    /** Funnel milestones in order: Abordado → Respondeu → Agendou. */
+    public const MILESTONES = ['approached', 'replied', 'booked'];
 
     protected static function booted(): void
     {
@@ -43,6 +52,9 @@ class Lead extends Model
         return [
             'converted_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'approached_at' => 'datetime',
+            'replied_at' => 'datetime',
+            'booked_at' => 'datetime',
         ];
     }
 
@@ -59,6 +71,21 @@ class Lead extends Model
     public function createdBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by_user_id');
+    }
+
+    public function approachedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approached_by_user_id');
+    }
+
+    public function repliedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'replied_by_user_id');
+    }
+
+    public function bookedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'booked_by_user_id');
     }
 
     public function client(): BelongsTo
