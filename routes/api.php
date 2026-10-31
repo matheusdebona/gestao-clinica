@@ -30,15 +30,18 @@ Route::prefix('v1')->group(function (): void {
     Route::prefix('auth')->group(function (): void {
         Route::post('login', [AuthController::class, 'login'])->middleware('throttle:10,1');
         Route::post('register', [AuthController::class, 'register'])->middleware('throttle:10,1');
+        Route::post('forgot-password', [AuthController::class, 'forgotPassword'])->middleware('throttle:forgot-password');
 
         Route::middleware('auth:sanctum')->group(function (): void {
             Route::get('me', [AuthController::class, 'me']);
             Route::post('logout', [AuthController::class, 'logout']);
-            Route::post('logout-all', [AuthController::class, 'logoutAll']);
+            Route::post('logout-all', [AuthController::class, 'logoutAll'])->middleware('password.changed');
+            Route::post('change-temporary-password', [AuthController::class, 'changeTemporaryPassword'])
+                ->middleware('throttle:10,1');
         });
     });
 
-    Route::middleware(['auth:sanctum', 'clinic.resolve'])->group(function (): void {
+    Route::middleware(['auth:sanctum', 'password.changed', 'clinic.resolve'])->group(function (): void {
         Route::get('clinics/current', [ClinicController::class, 'current'])
             ->middleware('permission:clinics.view');
 

@@ -1,6 +1,7 @@
 <?php
 
 use App\Exceptions\PdfRenderException;
+use App\Http\Middleware\EnsurePasswordChanged;
 use App\Http\Middleware\ResolveCurrentClinic;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -20,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'clinic.resolve' => ResolveCurrentClinic::class,
+            'password.changed' => EnsurePasswordChanged::class,
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,

@@ -48,7 +48,7 @@ function setMode(next: AuthMode) {
 }
 
 const loginForm = reactive({
-  email: '',
+  email: typeof route.query.email === 'string' ? route.query.email : '',
   password: '',
 })
 
@@ -92,6 +92,10 @@ async function submitLogin() {
   loading.value = true
   try {
     await auth.login(loginForm.email, loginForm.password)
+    if (auth.mustChangePassword) {
+      await router.replace('/reset-password')
+      return
+    }
     await router.push('/')
   } catch (error) {
     applyErrors(loginErrors, error)
@@ -173,6 +177,14 @@ async function submitRegister() {
                   />
                 </template>
               </FormField>
+              <div class="-mt-2 flex justify-end">
+                <RouterLink
+                  :to="{ path: '/forgot-password', query: loginForm.email ? { email: loginForm.email } : {} }"
+                  class="text-[13px] font-medium text-brand hover:underline"
+                >
+                  Esqueceu a senha?
+                </RouterLink>
+              </div>
               <Button type="submit" block :loading="loading && mode === 'login'">
                 Continuar
               </Button>
