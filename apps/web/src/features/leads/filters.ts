@@ -4,6 +4,7 @@ import type { LeadListParams } from '@/features/leads/api'
 
 export type LeadPeriod = 'all' | 'today' | '7d' | '30d' | 'month' | 'custom'
 export type LeadConvertedFilter = 'all' | 'open' | 'converted'
+export type LeadStaleFilter = 'all' | 'stale'
 
 export interface LeadFilters {
   q: string
@@ -14,6 +15,7 @@ export interface LeadFilters {
   originId: string
   createdBy: string
   converted: LeadConvertedFilter
+  stale: LeadStaleFilter
   page: number
 }
 
@@ -32,6 +34,11 @@ export const LEAD_CONVERTED_ITEMS: { value: LeadConvertedFilter; label: string }
   { value: 'converted', label: 'Viraram paciente' },
 ]
 
+export const LEAD_STALE_ITEMS: { value: LeadStaleFilter; label: string }[] = [
+  { value: 'all', label: 'Todos' },
+  { value: 'stale', label: 'Parados' },
+]
+
 const PERIODS = new Set<LeadPeriod>(['all', 'today', '7d', '30d', 'month', 'custom'])
 const ISO = /^\d{4}-\d{2}-\d{2}$/
 
@@ -44,6 +51,7 @@ export const emptyLeadFilters = (): LeadFilters => ({
   originId: '',
   createdBy: '',
   converted: 'all',
+  stale: 'all',
   page: 1,
 })
 
@@ -73,6 +81,7 @@ export function filtersFromQuery(query: LocationQuery): LeadFilters {
   filters.createdBy = positiveInt(str(query.por))
   const converted = str(query.convertidos)
   filters.converted = converted === 'nao' ? 'open' : converted === 'sim' ? 'converted' : 'all'
+  filters.stale = str(query.parados) === '1' ? 'stale' : 'all'
   const page = Number(str(query.pagina))
   filters.page = Number.isInteger(page) && page > 1 ? page : 1
   return filters
@@ -107,6 +116,9 @@ export function filtersToQuery(filters: LeadFilters): LocationQueryRaw {
     query.convertidos = 'nao'
   } else if (filters.converted === 'converted') {
     query.convertidos = 'sim'
+  }
+  if (filters.stale === 'stale') {
+    query.parados = '1'
   }
   if (filters.page > 1) {
     query.pagina = String(filters.page)
@@ -151,6 +163,9 @@ export function activeFilterCount(filters: LeadFilters): number {
   if (filters.converted !== 'all') {
     count++
   }
+  if (filters.stale !== 'all') {
+    count++
+  }
   return count
 }
 
@@ -163,6 +178,7 @@ export function toLeadListParams(filters: LeadFilters, now = new Date()): LeadLi
     client_origin_id: filters.originId ? Number(filters.originId) : undefined,
     created_by_user_id: filters.createdBy ? Number(filters.createdBy) : undefined,
     converted: filters.converted === 'all' ? undefined : filters.converted === 'converted',
+    stale: filters.stale === 'stale' ? true : undefined,
     from: range.from,
     to: range.to,
   }

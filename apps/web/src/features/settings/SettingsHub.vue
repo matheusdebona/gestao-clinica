@@ -43,6 +43,12 @@ const entries: SettingsEntry[] = [
     description: 'Textos de confirmação de sessão e de contato com leads.',
     permissions: ['clinics.branding', 'clinics.manage'],
   },
+  {
+    name: 'settings-lead-stale',
+    title: 'Leads parados',
+    description: 'Dias sem contato para um lead aparecer como parado.',
+    permissions: ['clinics.branding', 'clinics.manage'],
+  },
 ]
 
 const visible = computed(() => entries.filter((entry) => entry.permissions.some((name) => auth.can(name))))

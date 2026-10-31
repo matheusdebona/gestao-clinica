@@ -162,6 +162,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:leads.view');
         Route::get('leads/creators', [LeadController::class, 'creators'])
             ->middleware('permission:leads.view');
+        Route::get('leads/stale-summary', [LeadController::class, 'staleSummary'])
+            ->middleware('permission:leads.view');
         Route::get('leads/phone-check', [LeadController::class, 'phoneCheck'])
             ->middleware('permission:leads.manage');
         Route::post('leads', [LeadController::class, 'store'])

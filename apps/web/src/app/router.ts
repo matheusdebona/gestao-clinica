@@ -77,6 +77,12 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/WhatsAppSettingsPage.vue'),
         },
         {
+          path: 'settings/leads-parados',
+          name: 'settings-lead-stale',
+          meta: { title: 'Leads parados', permission: 'clinics.branding' },
+          component: () => import('@/pages/LeadStaleSettingsPage.vue'),
+        },
+        {
           path: 'settings/lead-statuses',
           name: 'lead-statuses',
           meta: { title: 'Status de leads', permission: 'lead_statuses.manage' },
@@ -406,7 +412,7 @@ export const routes: RouteRecordRaw[] = [
         {
           path: 'notifications',
           name: 'notifications',
-          meta: { title: 'Alertas', permission: 'products.view' },
+          meta: { title: 'Alertas' },
           component: () => import('@/pages/NotificationsPage.vue'),
         },
         {

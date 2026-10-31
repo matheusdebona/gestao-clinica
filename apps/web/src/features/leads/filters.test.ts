@@ -49,3 +49,14 @@ describe('lead filters', () => {
     expect(activeFilterCount(emptyLeadFilters())).toBe(0)
   })
 })
+
+describe('lead filters: parados', () => {
+  it('maps parados=1 to the stale API flag and counts it', () => {
+    const filters = filtersFromQuery({ parados: '1' })
+    expect(filters.stale).toBe('stale')
+    expect(filtersToQuery(filters)).toEqual({ parados: '1' })
+    expect(toLeadListParams(filters).stale).toBe(true)
+    expect(activeFilterCount(filters)).toBe(1)
+    expect(toLeadListParams(emptyLeadFilters()).stale).toBeUndefined()
+  })
+})

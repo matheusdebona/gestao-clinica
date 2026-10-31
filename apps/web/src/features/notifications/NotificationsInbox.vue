@@ -37,23 +37,36 @@ const queryClient = useQueryClient()
 const page = ref(1)
 const filter = ref<NotificationInboxFilter>('all')
 
-const filterItems = [
-  { value: 'all', label: 'Todas' },
-  { value: 'unread', label: 'Não lidas' },
-  { value: 'stock', label: 'Estoque' },
-  { value: 'agenda', label: 'Agenda' },
-]
+const canStock = computed(() => auth.can('products.view'))
+const canLeads = computed(() => auth.can('leads.manage'))
+
+const filterItems = computed(() => {
+  const items: { value: NotificationInboxFilter; label: string }[] = [
+    { value: 'all', label: 'Todas' },
+    { value: 'unread', label: 'Não lidas' },
+  ]
+  if (canStock.value) {
+    items.push({ value: 'stock', label: 'Estoque' }, { value: 'agenda', label: 'Agenda' })
+  }
+  if (canLeads.value) {
+    items.push({ value: 'leads', label: 'Leads' })
+  }
+  return items
+})
 
 watch(filter, () => {
   page.value = 1
 })
 
-const canView = computed(() => auth.can('products.view'))
+const canView = computed(() => canStock.value || canLeads.value)
 
 const listParams = computed(() => ({
   page: page.value,
   unread: filter.value === 'unread' ? true : undefined,
-  category: filter.value === 'stock' || filter.value === 'agenda' ? filter.value : undefined,
+  category:
+    filter.value === 'stock' || filter.value === 'agenda' || filter.value === 'leads'
+      ? filter.value
+      : undefined,
 }))
 
 const {
@@ -84,6 +97,9 @@ const emptyDescription = computed(() => {
   }
   if (filter.value === 'agenda') {
     return 'Nenhum alerta da agenda nesta lista.'
+  }
+  if (filter.value === 'leads') {
+    return 'Nenhum resumo de leads parados nesta lista.'
   }
   return 'Você está em dia'
 })
@@ -143,7 +159,7 @@ async function openNotification(item: ClinicNotification) {
     </PageHeader>
 
     <Banner v-if="!canView" variant="danger" title="Sem permissão">
-      Você não pode ver os alertas de estoque.
+      Você não pode ver os alertas.
     </Banner>
 
     <template v-else>

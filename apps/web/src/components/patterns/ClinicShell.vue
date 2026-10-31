@@ -48,6 +48,9 @@ type ShellNavItem = {
   aliases?: string[]
 }
 
+/** Alertas: estoque (products.view) e resumo de leads parados (leads.manage). */
+const ALERT_PERMISSIONS = ['products.view', 'leads.manage'] as const
+
 const SETTINGS_PERMISSIONS = ['lead_statuses.manage', 'client_origins.manage', 'campaigns.manage']
 
 /** Max items in the mobile tab bar, including "Mais". */
@@ -65,7 +68,13 @@ const items = computed(() => {
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view', group: 'daily' },
     { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view', group: 'daily' },
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', group: 'internal' },
-    { to: '/notifications', label: 'Alertas', icon: Bell, permission: 'products.view', group: 'internal' },
+    {
+      to: '/notifications',
+      label: 'Alertas',
+      icon: Bell,
+      anyPermission: [...ALERT_PERMISSIONS],
+      group: 'internal',
+    },
     { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view', group: 'internal' },
     { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view', group: 'internal' },
     {
@@ -122,7 +131,9 @@ function openFromMore(item: ShellNavItem) {
   void router.push(item.to)
 }
 
-const canAlerts = computed(() => auth.can('products.view') || auth.permissions.length === 0)
+const canAlerts = computed(
+  () => ALERT_PERMISSIONS.some((name) => auth.can(name)) || auth.permissions.length === 0,
+)
 
 const { data: unreadCount } = useQuery({
   queryKey: ['notifications', 'unread-count'],

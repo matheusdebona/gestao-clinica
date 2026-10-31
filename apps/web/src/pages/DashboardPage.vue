@@ -5,6 +5,7 @@ import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import StaleLeadsCard from '@/features/leads/StaleLeadsCard.vue'
 import { PAYMENT_CATALOG_PERMISSIONS, paymentCatalogHome } from '@/features/payments/access'
 import { useAuthStore } from '@/stores/auth'
 
@@ -67,12 +68,15 @@ function openShortcut(to: { name: string }) {
       :title="auth.clinicName ? auth.clinicName : 'Início'"
       :description="auth.user ? `Olá, ${auth.user.name}.` : undefined"
     />
-    <PermissionGate permission="products.view">
+    <PermissionGate permission="leads.view">
+      <StaleLeadsCard />
+    </PermissionGate>
+    <PermissionGate :permission="['products.view', 'leads.manage']" mode="any">
       <SurfaceCard :padding="false">
         <div class="px-5 py-2">
           <ListCard
             title="Alertas"
-            meta="Estoque baixo e avisos da agenda"
+            meta="Estoque baixo, avisos da agenda e leads parados"
             @action="openAlerts"
           />
         </div>

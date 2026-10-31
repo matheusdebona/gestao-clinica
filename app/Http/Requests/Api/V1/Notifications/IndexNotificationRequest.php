@@ -19,7 +19,7 @@ class IndexNotificationRequest extends FormRequest
     {
         return [
             'unread' => ['sometimes', 'nullable', 'boolean'],
-            'category' => ['sometimes', 'nullable', 'string', Rule::in(['stock', 'agenda'])],
+            'category' => ['sometimes', 'nullable', 'string', Rule::in(['stock', 'agenda', 'leads'])],
             'page' => ['sometimes', 'integer', 'min:1'],
         ];
     }

@@ -20,6 +20,6 @@ export interface ClinicNotification {
   updated_at: string
 }
 
-export type NotificationCategory = 'stock' | 'agenda'
+export type NotificationCategory = 'stock' | 'agenda' | 'leads'
 
-export type NotificationInboxFilter = 'all' | 'unread' | 'stock' | 'agenda'
+export type NotificationInboxFilter = 'all' | 'unread' | 'stock' | 'agenda' | 'leads'

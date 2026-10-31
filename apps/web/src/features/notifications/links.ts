@@ -29,6 +29,10 @@ export function notificationHref(item: ClinicNotification): string | null {
     return productId !== null ? `/products/${productId}` : null
   }
 
+  if (type === 'stale_leads') {
+    return '/leads?parados=1'
+  }
+
   if (type === 'appointment_stock_warning') {
     return appointmentId !== null ? `/appointments/${appointmentId}` : null
   }
