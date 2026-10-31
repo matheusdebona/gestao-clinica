@@ -19,6 +19,8 @@ class LeadActivity extends Model
 
     public const TYPE_COMMENT = 'comment';
 
+    public const TYPE_WHATSAPP = 'whatsapp';
+
     protected $fillable = [
         'lead_id',
         'user_id',

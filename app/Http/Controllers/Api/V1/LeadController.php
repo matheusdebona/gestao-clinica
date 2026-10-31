@@ -137,6 +137,19 @@ class LeadController extends Controller
     }
 
     /**
+     * The user opened a WhatsApp conversation (wa.me) with the lead: counts as a touch.
+     */
+    public function whatsapp(Request $request, Lead $lead): JsonResponse
+    {
+        $activity = $lead->activities()->create([
+            'user_id' => $request->user()->id,
+            'type' => LeadActivity::TYPE_WHATSAPP,
+        ]);
+
+        return (new LeadActivityResource($activity->load('user')))->response()->setStatusCode(201);
+    }
+
+    /**
      * Comments are history: immutable, never deleted, allowed on cancelled and converted leads too.
      */
     public function comment(Request $request, Lead $lead): JsonResponse

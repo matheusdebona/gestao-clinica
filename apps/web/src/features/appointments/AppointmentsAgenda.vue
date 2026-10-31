@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
+import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ChevronLeft, ChevronRight } from '@lucide/vue'
+import { ChevronLeft, ChevronRight, MessageCircle } from '@lucide/vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AgendaEventCard from '@/components/patterns/AgendaEventCard.vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
@@ -17,7 +17,13 @@ import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Tabs from '@/components/ui/Tabs.vue'
-import { listAppointments, listProfessionals } from '@/features/appointments/api'
+import {
+  listAppointments,
+  listProfessionals,
+  logAppointmentWhatsAppConfirmation,
+} from '@/features/appointments/api'
+import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
+import { openWhatsApp } from '@/lib/whatsapp'
 import {
   addDays,
   endOfDay,
@@ -136,7 +142,22 @@ function eventMeta(item: Appointment): string {
   const time = formatTime(item.scheduled_at)
   const professional = item.professional?.name ?? 'Profissional'
   const treatment = item.treatment_id ? `Tratamento #${item.treatment_id}` : 'Avaliação'
-  return `${time} · ${professional} · ${treatment}`
+  const confirmed = item.confirmation_sent_at ? ' · WhatsApp enviado' : ''
+  return `${time} · ${professional} · ${treatment}${confirmed}`
+}
+
+const queryClient = useQueryClient()
+const { appointmentUrl } = useWhatsAppLinks()
+
+function confirmOnWhatsApp(item: Appointment) {
+  const url = appointmentUrl(item)
+  if (!url) {
+    return
+  }
+  openWhatsApp(url)
+  void logAppointmentWhatsAppConfirmation(item.id)
+    .then(() => queryClient.invalidateQueries({ queryKey: ['appointments'] }))
+    .catch(() => undefined)
 }
 
 function openAppointment(id: number) {
@@ -232,15 +253,26 @@ function onClientSearch(value: string) {
         </SurfaceCard>
         <SurfaceCard v-else-if="!isPending && !isError" :padding="false">
           <div class="divide-y divide-border-divider px-5 py-2">
-            <AgendaEventCard
-              v-for="item in eventsOn(cursor)"
-              :key="item.id"
-              :title="item.client?.name ?? `Paciente #${item.client_id}`"
-              :meta="eventMeta(item)"
-              :badge="APPOINTMENT_STATUS_LABELS[item.status]"
-              :badge-variant="APPOINTMENT_STATUS_BADGE[item.status]"
-              @action="openAppointment(item.id)"
-            />
+            <div v-for="item in eventsOn(cursor)" :key="item.id" class="flex items-center gap-1">
+              <div class="min-w-0 flex-1">
+                <AgendaEventCard
+                  :title="item.client?.name ?? `Paciente #${item.client_id}`"
+                  :meta="eventMeta(item)"
+                  :badge="APPOINTMENT_STATUS_LABELS[item.status]"
+                  :badge-variant="APPOINTMENT_STATUS_BADGE[item.status]"
+                  @action="openAppointment(item.id)"
+                />
+              </div>
+              <PermissionGate
+                v-if="item.status === 'scheduled' && item.client?.whatsapp"
+                :permission="['appointments.manage', 'treatments.manage']"
+                mode="any"
+              >
+                <IconButton label="Confirmar pelo WhatsApp" @click="confirmOnWhatsApp(item)">
+                  <MessageCircle class="size-4" :stroke-width="1.75" />
+                </IconButton>
+              </PermissionGate>
+            </div>
           </div>
         </SurfaceCard>
       </div>

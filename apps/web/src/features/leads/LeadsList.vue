@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { keepPreviousData, useQuery } from '@tanstack/vue-query'
-import { RefreshCw, SlidersHorizontal } from '@lucide/vue'
+import { keepPreviousData, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { MessageCircle, RefreshCw, SlidersHorizontal } from '@lucide/vue'
 import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
@@ -16,7 +16,9 @@ import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import LeadFiltersSheet from '@/features/leads/LeadFiltersSheet.vue'
 import LeadStatusDialog from '@/features/leads/LeadStatusDialog.vue'
-import { listLeads } from '@/features/leads/api'
+import { listLeads, logLeadWhatsApp } from '@/features/leads/api'
+import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
+import { openWhatsApp } from '@/lib/whatsapp'
 import {
   activeFilterCount,
   emptyLeadFilters,
@@ -90,6 +92,20 @@ const leads = computed(() => listData.value?.data ?? [])
 const lastPage = computed(() => listData.value?.meta.last_page ?? 1)
 const total = computed(() => listData.value?.meta.total ?? 0)
 const hasCriteria = computed(() => Boolean(filters.value.q) || filterCount.value > 0)
+
+const queryClient = useQueryClient()
+const { leadUrl } = useWhatsAppLinks()
+
+function callOnWhatsApp(lead: Lead) {
+  const url = leadUrl(lead)
+  if (!url) {
+    return
+  }
+  openWhatsApp(url)
+  void logLeadWhatsApp(lead.id)
+    .then(() => queryClient.invalidateQueries({ queryKey: ['leads'] }))
+    .catch(() => undefined)
+}
 
 function leadMeta(lead: Lead) {
   const bits = [formatPhoneBR(lead.phone) || lead.phone]
@@ -195,6 +211,11 @@ function openStatus(lead: Lead) {
                 @action="openLead(lead.id)"
               />
             </div>
+            <PermissionGate permission="leads.manage">
+              <IconButton label="Chamar no WhatsApp" @click="callOnWhatsApp(lead)">
+                <MessageCircle class="size-4" :stroke-width="1.75" />
+              </IconButton>
+            </PermissionGate>
             <PermissionGate v-if="!lead.client_id && !lead.cancelled_at" permission="leads.manage">
               <IconButton label="Mudar status" @click="openStatus(lead)">
                 <RefreshCw class="size-4" :stroke-width="1.75" />

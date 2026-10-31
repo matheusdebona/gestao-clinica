@@ -38,6 +38,7 @@ export type LeadActivityType =
   | 'converted'
   | 'cancelled'
   | 'comment'
+  | 'whatsapp'
 
 export interface LeadActivity {
   id: number

@@ -71,6 +71,12 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/SettingsPage.vue'),
         },
         {
+          path: 'settings/whatsapp',
+          name: 'settings-whatsapp',
+          meta: { title: 'Mensagens do WhatsApp', permission: 'clinics.branding' },
+          component: () => import('@/pages/WhatsAppSettingsPage.vue'),
+        },
+        {
           path: 'settings/lead-statuses',
           name: 'lead-statuses',
           meta: { title: 'Status de leads', permission: 'lead_statuses.manage' },

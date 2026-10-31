@@ -69,6 +69,8 @@ export interface Appointment {
   total_charged_on_appointment: string
   stock_warning: StockWarning[] | string[] | null
   notes: string | null
+  confirmation_sent_at?: string | null
+  confirmation_sent_by?: { id: number; name: string } | null
   client?: Client | null
   professional?: AppointmentProfessional | null
   treatment?: AppointmentTreatment | Treatment | null

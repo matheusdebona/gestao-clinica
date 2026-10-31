@@ -39,6 +39,11 @@ class AppointmentResource extends JsonResource
             'total_charged_on_appointment' => $this->total_charged_on_appointment,
             'stock_warning' => $this->stock_warning,
             'notes' => $this->notes,
+            'confirmation_sent_at' => $this->confirmation_sent_at,
+            'confirmation_sent_by' => $this->whenLoaded('confirmationSentBy', fn () => $this->confirmationSentBy === null ? null : [
+                'id' => $this->confirmationSentBy->id,
+                'name' => $this->confirmationSentBy->name,
+            ]),
             'consumptions' => AppointmentConsumptionResource::collection($this->whenLoaded('consumptions')),
             'client' => ClientResource::make($this->whenLoaded('client')),
             'professional' => UserResource::make($this->whenLoaded('professionalUser')),

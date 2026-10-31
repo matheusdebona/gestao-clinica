@@ -45,6 +45,8 @@ class Appointment extends Model
         'total_charged_on_appointment',
         'stock_warning',
         'notes',
+        'confirmation_sent_at',
+        'confirmation_sent_by_user_id',
     ];
 
     /**
@@ -62,6 +64,7 @@ class Appointment extends Model
             'scheduled_at' => 'datetime',
             'started_at' => 'datetime',
             'finished_at' => 'datetime',
+            'confirmation_sent_at' => 'datetime',
             'duration_minutes' => 'integer',
             'total_cost' => 'decimal:4',
             'total_charged_on_appointment' => 'decimal:2',
@@ -82,6 +85,11 @@ class Appointment extends Model
     public function professionalUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'professional_user_id');
+    }
+
+    public function confirmationSentBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'confirmation_sent_by_user_id');
     }
 
     public function consumptions(): HasMany

@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\ClientOriginController;
 use App\Http\Controllers\Api\V1\ClinicBrandingController;
 use App\Http\Controllers\Api\V1\ClinicController;
+use App\Http\Controllers\Api\V1\ClinicSettingsController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadStatusController;
@@ -47,6 +48,10 @@ Route::prefix('v1')->group(function (): void {
         Route::get('clinics/current', [ClinicController::class, 'current'])
             ->middleware('permission:clinics.view');
 
+        Route::get('clinic/settings', [ClinicSettingsController::class, 'show'])
+            ->middleware('permission:leads.view|appointments.view|treatments.view|clinics.branding|clinics.manage');
+        Route::put('clinic/settings', [ClinicSettingsController::class, 'update'])
+            ->middleware('permission:clinics.branding|clinics.manage');
         Route::get('clinic/branding', [ClinicBrandingController::class, 'show'])
             ->middleware('permission:clinics.branding|clinics.manage');
         Route::put('clinic/branding', [ClinicBrandingController::class, 'update'])
@@ -170,6 +175,8 @@ Route::prefix('v1')->group(function (): void {
         Route::post('leads/{lead}/cancel', [LeadController::class, 'cancel'])
             ->middleware('permission:leads.manage');
         Route::post('leads/{lead}/comments', [LeadController::class, 'comment'])
+            ->middleware('permission:leads.manage');
+        Route::post('leads/{lead}/whatsapp', [LeadController::class, 'whatsapp'])
             ->middleware('permission:leads.manage');
         Route::get('leads/{lead}/matching-clients', [LeadController::class, 'matchingClients'])
             ->middleware('permission:leads.manage');
@@ -354,5 +361,7 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:treatments.complete');
         Route::post('appointments/{appointment}/cancel', [AppointmentController::class, 'cancel'])
             ->middleware('permission:appointments.cancel|treatments.cancel');
+        Route::post('appointments/{appointment}/whatsapp-confirmation', [AppointmentController::class, 'whatsappConfirmation'])
+            ->middleware('permission:appointments.manage|treatments.manage');
     });
 });

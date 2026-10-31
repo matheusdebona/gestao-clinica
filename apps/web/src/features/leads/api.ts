@@ -147,3 +147,9 @@ export async function updateLeadStatus(
 export async function deleteLeadStatus(id: number): Promise<{ deleted: boolean; message: string }> {
   return api<{ deleted: boolean; message: string }>(`/lead-statuses/${id}`, { method: 'DELETE' })
 }
+
+/** Logs a WhatsApp touch in the lead timeline (the wa.me link is opened by the UI). */
+export async function logLeadWhatsApp(id: number): Promise<LeadActivity> {
+  const payload = await api<DataEnvelope<LeadActivity>>(`/leads/${id}/whatsapp`, { method: 'POST' })
+  return payload.data
+}
