@@ -39,6 +39,9 @@ export type LeadActivityType =
   | 'cancelled'
   | 'comment'
   | 'whatsapp'
+  | 'approached'
+  | 'replied'
+  | 'booked'
 
 export interface LeadActivity {
   id: number
@@ -62,6 +65,12 @@ export interface Lead {
   client_id: number | null
   converted_at: string | null
   cancelled_at: string | null
+  approached_at?: string | null
+  replied_at?: string | null
+  booked_at?: string | null
+  approached_by?: LeadUserRef | null
+  replied_by?: LeadUserRef | null
+  booked_by?: LeadUserRef | null
   comments_count?: number
   last_activity_at?: string | null
   client_origin?: ClientOrigin | null
@@ -79,6 +88,8 @@ export interface LeadPayload {
   client_origin_id: number
   lead_status_id?: number | null
   notes: string | null
+  /** Only on creation: "Já abordei" counts as first outreach. */
+  already_approached?: boolean
 }
 
 export interface LeadConvertPayload {

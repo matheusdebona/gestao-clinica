@@ -1,3 +1,4 @@
+import type { LeadFunnel } from '@/features/leads/funnel'
 export type MetricsGranularity = 'day' | 'week' | 'month'
 export type AcquisitionGroupBy = 'origin' | 'campaign'
 export type MarginMode = 'period' | 'cohort_sale'
@@ -197,6 +198,7 @@ export interface LeadStaleTierCount {
 
 export interface LeadMetrics {
   stale_tiers: LeadStaleTierCount[]
+  funnel: LeadFunnel
   from: string
   to: string
   conversion_definition: string

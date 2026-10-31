@@ -16,6 +16,7 @@ import LeadConvertDialog from '@/features/leads/LeadConvertDialog.vue'
 import LeadHistory from '@/features/leads/LeadHistory.vue'
 import LeadStatusDialog from '@/features/leads/LeadStatusDialog.vue'
 import { addLeadComment, cancelLead, getLead, logLeadWhatsApp } from '@/features/leads/api'
+import LeadFunnelCard from '@/features/leads/LeadFunnelCard.vue'
 import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
 import { openWhatsApp } from '@/lib/whatsapp'
 import { useLeadCatalogs } from '@/features/leads/useLeadCatalogs'
@@ -224,6 +225,8 @@ function onConverted(result: LeadConvertResult) {
           </div>
         </dl>
       </SurfaceCard>
+
+      <LeadFunnelCard :lead="lead" />
 
       <SurfaceCard>
         <h2 class="mb-3">Histórico e comentários</h2>

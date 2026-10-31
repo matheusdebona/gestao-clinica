@@ -63,6 +63,10 @@ class LeadService
                 'note' => $data['notes'] ?? null,
             ]);
 
+            if (! empty($data['already_approached'])) {
+                $this->markMilestone($lead, 'approached', $user);
+            }
+
             return $lead;
         });
     }
@@ -245,6 +249,8 @@ class LeadService
                 'converted_at' => now(),
             ]);
 
+            $this->markMilestone($locked, 'booked', $user);
+
             $locked->activities()->create([
                 'user_id' => $user->id,
                 'type' => LeadActivity::TYPE_CONVERTED,
@@ -401,6 +407,49 @@ class LeadService
             'errors' => ['phone' => [$conflict['message']]],
             'duplicate' => $conflict,
         ], 422));
+    }
+
+    /**
+     * Sets a funnel milestone once (first time wins) and the earlier ones it implies
+     * (Respondeu implies Abordado; Agendou implies both), each with a timeline activity.
+     *
+     * @return list<string> milestones that were newly set
+     */
+    public function markMilestone(Lead $lead, string $milestone, User $user, bool $allowCancelled = false): array
+    {
+        if (! in_array($milestone, Lead::MILESTONES, true)) {
+            throw new \InvalidArgumentException("Unknown milestone {$milestone}");
+        }
+        if (! $allowCancelled) {
+            $this->assertNotCancelled($lead);
+        }
+
+        $types = [
+            'approached' => LeadActivity::TYPE_APPROACHED,
+            'replied' => LeadActivity::TYPE_REPLIED,
+            'booked' => LeadActivity::TYPE_BOOKED,
+        ];
+        $chain = array_slice(Lead::MILESTONES, 0, array_search($milestone, Lead::MILESTONES, true) + 1);
+
+        return DB::transaction(function () use ($lead, $chain, $types, $user): array {
+            $locked = Lead::query()->whereKey($lead->id)->lockForUpdate()->firstOrFail();
+            $set = [];
+            $now = now();
+            foreach ($chain as $step) {
+                if ($locked->getAttribute("{$step}_at") !== null) {
+                    continue;
+                }
+                $locked->forceFill(["{$step}_at" => $now, "{$step}_by_user_id" => $user->id]);
+                $locked->activities()->create(['user_id' => $user->id, 'type' => $types[$step]]);
+                $set[] = $step;
+            }
+            if ($set !== []) {
+                $locked->save();
+                $lead->setRawAttributes($locked->getAttributes(), true);
+            }
+
+            return $set;
+        });
     }
 
     private function assertNotCancelled(Lead $lead): void

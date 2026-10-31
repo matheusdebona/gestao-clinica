@@ -52,6 +52,7 @@ class LeadMetricsService
                     : null,
             ],
             'stale_tiers' => app(LeadStaleService::class)->tierCounts(CurrentClinic::id()),
+            'funnel' => app(LeadFunnelService::class)->summarize($fromStart, $toEnd),
             'by_origin' => $this->byOrigin($fromStart, $toEnd),
             'by_status' => $this->byStatus($fromStart, $toEnd),
             'by_creator' => $this->byCreator($fromStart, $toEnd),

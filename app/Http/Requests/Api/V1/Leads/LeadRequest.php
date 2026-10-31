@@ -43,6 +43,7 @@ class LeadRequest extends FormRequest
                 ),
             ],
             'notes' => ['sometimes', 'nullable', 'string', 'max:5000'],
+            'already_approached' => ['sometimes', 'boolean'],
         ];
     }
 

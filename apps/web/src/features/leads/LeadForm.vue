@@ -7,6 +7,7 @@ import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
+import Checkbox from '@/components/ui/Checkbox.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
 import PhoneInput from '@/components/ui/PhoneInput.vue'
@@ -55,6 +56,7 @@ const [statusId] = defineField('lead_status_id')
 const [notes, notesAttrs] = defineField('notes')
 
 const isConverted = computed(() => Boolean(props.lead?.client_id))
+const alreadyApproached = ref(false)
 
 const originOptions = computed(() => {
   const list: ClientOrigin[] = [...extraOrigins.value, ...activeOrigins.value]
@@ -194,7 +196,10 @@ const onSubmit = handleSubmit((values) => {
   if (conflict.value) {
     return
   }
-  emit('submit', toLeadPayload(values))
+  emit('submit', {
+    ...toLeadPayload(values),
+    ...(props.lead ? {} : { already_approached: alreadyApproached.value }),
+  })
 })
 
 defineExpose({ setErrors, setDuplicate })
@@ -287,6 +292,13 @@ defineExpose({ setErrors, setDuplicate })
         <Textarea id="lead-notes" v-model="notes" v-bind="notesAttrs" :invalid="invalid" />
       </template>
     </FormField>
+
+    <Checkbox
+      v-if="!lead"
+      id="lead-already-approached"
+      v-model="alreadyApproached"
+      label="Já abordei este lead (conta como primeira abordagem)"
+    />
 
     <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
       <Button

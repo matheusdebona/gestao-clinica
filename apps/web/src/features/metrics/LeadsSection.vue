@@ -6,6 +6,7 @@ import RankBar from '@/components/patterns/RankBar.vue'
 import Banner from '@/components/ui/Banner.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ListCard from '@/components/ui/ListCard.vue'
+import LeadFunnelSection from '@/features/leads/LeadFunnelSection.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { maxNumeric, rankRatio } from '@/features/metrics/chart'
@@ -103,6 +104,8 @@ const creatorMax = computed(() =>
           {{ avgDays }}
         </MetricCard>
       </div>
+
+      <LeadFunnelSection v-if="data.funnel" :funnel="data.funnel" />
 
       <SurfaceCard v-if="data.stale_tiers.length">
         <p class="text-[13px] font-medium text-muted">Leads parados (situação de hoje)</p>
