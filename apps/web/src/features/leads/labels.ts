@@ -1,0 +1,27 @@
+import type { LeadActivity, LeadStatusColor } from '@/types/lead'
+
+export const LEAD_CONVERTED_KEY = 'converted'
+
+export const LEAD_STATUS_COLOR_OPTIONS: { value: LeadStatusColor; label: string }[] = [
+  { value: 'muted', label: 'Cinza' },
+  { value: 'purple', label: 'Violeta' },
+  { value: 'warning', label: 'Laranja' },
+  { value: 'success', label: 'Verde' },
+  { value: 'danger', label: 'Vermelho' },
+]
+
+export function activityLabel(activity: LeadActivity): string {
+  switch (activity.type) {
+    case 'created':
+      return activity.to_status ? `Cadastrado como ${activity.to_status.name}` : 'Cadastrado'
+    case 'converted':
+      return 'Virou paciente (avaliação agendada)'
+    case 'status_changed':
+      if (activity.from_status && activity.to_status) {
+        return `${activity.from_status.name} → ${activity.to_status.name}`
+      }
+      return activity.to_status ? `Status: ${activity.to_status.name}` : 'Status alterado'
+    default:
+      return 'Observação'
+  }
+}

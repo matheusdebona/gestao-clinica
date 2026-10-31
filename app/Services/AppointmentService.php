@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\StockMovementType;
 use App\Models\Appointment;
 use App\Models\AppointmentConsumption;
+use App\Models\Client;
 use App\Models\PaymentMethod;
 use App\Models\Product;
 use App\Models\SaleItem;
@@ -36,15 +37,37 @@ class AppointmentService
         }
 
         $treatment->loadMissing('client');
+
+        return $this->createScheduled($treatment->client, $treatment, $data);
+    }
+
+    /**
+     * First visit (avaliação) without a sale/treatment, e.g. when a lead becomes a patient.
+     * Must run inside the caller transaction when combined with other writes.
+     *
+     * @param  array{scheduled_at?: string|null, professional_user_id: int, duration_minutes?: int|null, notes?: string|null}  $data
+     * @return array{appointment: Appointment, warnings: list<string>}
+     */
+    public function scheduleEvaluation(Client $client, array $data): array
+    {
+        return $this->createScheduled($client, null, $data);
+    }
+
+    /**
+     * @param  array{scheduled_at?: string|null, professional_user_id: int, duration_minutes?: int|null, notes?: string|null}  $data
+     * @return array{appointment: Appointment, warnings: list<string>}
+     */
+    private function createScheduled(Client $client, ?Treatment $treatment, array $data): array
+    {
         $professionalId = (int) $data['professional_user_id'];
         $scheduledAt = $data['scheduled_at'] ?? null;
         $duration = $this->resolveDurationMinutes(
-            clientDuration: $treatment->client?->service_duration_minutes,
+            clientDuration: $client->service_duration_minutes,
             storedDuration: null,
             override: $data['duration_minutes'] ?? null,
         );
 
-        return DB::transaction(function () use ($treatment, $data, $professionalId, $scheduledAt, $duration) {
+        return DB::transaction(function () use ($client, $treatment, $data, $professionalId, $scheduledAt, $duration) {
             $this->assertNoProfessionalOverlap(
                 professionalUserId: $professionalId,
                 scheduledAt: $scheduledAt,
@@ -52,9 +75,9 @@ class AppointmentService
             );
 
             $appointment = Appointment::query()->create([
-                'clinic_id' => $treatment->clinic_id,
-                'treatment_id' => $treatment->id,
-                'client_id' => $treatment->client_id,
+                'clinic_id' => $client->clinic_id,
+                'treatment_id' => $treatment?->id,
+                'client_id' => $client->id,
                 'professional_user_id' => $professionalId,
                 'status' => Appointment::STATUS_SCHEDULED,
                 'scheduled_at' => $scheduledAt,
@@ -62,9 +85,12 @@ class AppointmentService
                 'notes' => $data['notes'] ?? null,
             ]);
 
-            $suggested = $this->treatments->suggestedConsumptions($treatment);
-            $warnings = $this->stockAlerts->warningMessagesForSuggested($suggested);
-            $this->stockAlerts->notifyAppointmentWarnings($appointment, $warnings);
+            $warnings = [];
+            if ($treatment !== null) {
+                $suggested = $this->treatments->suggestedConsumptions($treatment);
+                $warnings = $this->stockAlerts->warningMessagesForSuggested($suggested);
+                $this->stockAlerts->notifyAppointmentWarnings($appointment, $warnings);
+            }
 
             return [
                 'appointment' => $appointment->fresh(['consumptions', 'treatment', 'client', 'professionalUser']),
@@ -138,14 +164,19 @@ class AppointmentService
 
         $appointment->loadMissing('treatment');
 
-        if (! $appointment->treatment->isOpen()) {
-            throw ValidationException::withMessages([
-                'appointment' => ['Cannot start an appointment on a closed treatment.'],
-            ]);
-        }
+        $suggested = [];
+        $warnings = [];
 
-        $suggested = $this->treatments->suggestedConsumptions($appointment->treatment);
-        $warnings = $this->treatments->stockWarningsForSuggested($suggested);
+        if ($appointment->treatment !== null) {
+            if (! $appointment->treatment->isOpen()) {
+                throw ValidationException::withMessages([
+                    'appointment' => ['Cannot start an appointment on a closed treatment.'],
+                ]);
+            }
+
+            $suggested = $this->treatments->suggestedConsumptions($appointment->treatment);
+            $warnings = $this->treatments->stockWarningsForSuggested($suggested);
+        }
 
         $appointment->status = Appointment::STATUS_IN_PROGRESS;
         $appointment->started_at = now();
@@ -171,6 +202,12 @@ class AppointmentService
         }
 
         $appointment->loadMissing('treatment.sale');
+
+        if ($appointment->treatment === null && $lines !== []) {
+            throw ValidationException::withMessages([
+                'consumptions' => ['Avaliação sem tratamento não registra consumo. Abra uma venda/tratamento para o paciente.'],
+            ]);
+        }
 
         return DB::transaction(function () use ($appointment, $lines) {
             $previousPaymentIds = $appointment->consumptions()
@@ -304,7 +341,9 @@ class AppointmentService
             $locked->total_charged_on_appointment = number_format($totalCharged, 2, '.', '');
             $locked->save();
 
-            $this->treatments->recalculateTotalCost($locked->treatment);
+            if ($locked->treatment !== null) {
+                $this->treatments->recalculateTotalCost($locked->treatment);
+            }
 
             return $locked->fresh(['consumptions.product', 'consumptions.salePayment', 'treatment', 'client', 'professionalUser']);
         });

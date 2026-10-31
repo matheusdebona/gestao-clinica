@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { computed, type Component } from 'vue'
+import { computed, ref, watch, type Component } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Bell,
@@ -9,17 +9,22 @@ import {
   CreditCard,
   FileText,
   LayoutDashboard,
+  Ellipsis,
   LogOut,
+  Megaphone,
   Package,
   Receipt,
+  Settings,
   Stethoscope,
   UserCog,
   Users,
   ChartNoAxesCombined,
 } from '@lucide/vue'
+import AppSheet from '@/components/ui/AppSheet.vue'
 import BrandMark from '@/components/ui/BrandMark.vue'
 import Button from '@/components/ui/Button.vue'
 import IconButton from '@/components/ui/IconButton.vue'
+import ListCard from '@/components/ui/ListCard.vue'
 import NavBadge from '@/components/ui/NavBadge.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
@@ -38,31 +43,47 @@ type ShellNavItem = {
   icon: Component
   permission?: string
   anyPermission?: string[]
-  pinMobile?: boolean
+  /** daily = rotina da recepção/atendimento; internal = gestão/equipe (fica embaixo). */
+  group: 'daily' | 'internal'
   aliases?: string[]
 }
+
+const SETTINGS_PERMISSIONS = ['lead_statuses.manage', 'client_origins.manage', 'campaigns.manage']
+
+/** Max items in the mobile tab bar, including "Mais". */
+const MOBILE_SLOTS = 5
 
 const items = computed(() => {
   const paymentsHome = paymentCatalogHome((name) => auth.can(name))
   const all: ShellNavItem[] = [
-    { to: '/', label: 'Início', icon: LayoutDashboard, pinMobile: true },
-    { to: '/clients', label: 'Pacientes', icon: Users, permission: 'clients.view', pinMobile: true },
-    { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view' },
-    { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', pinMobile: true },
-    { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view' },
-    { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', pinMobile: true },
+    { to: '/', label: 'Início', icon: LayoutDashboard, group: 'daily' },
+    { to: '/leads', label: 'Leads', icon: Megaphone, permission: 'leads.view', group: 'daily' },
+    { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', group: 'daily' },
+    { to: '/clients', label: 'Pacientes', icon: Users, permission: 'clients.view', group: 'daily' },
+    { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', group: 'daily' },
+    { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view', group: 'daily' },
+    { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view', group: 'daily' },
+    { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view', group: 'daily' },
+    { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', group: 'internal' },
+    { to: '/notifications', label: 'Alertas', icon: Bell, permission: 'products.view', group: 'internal' },
+    { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view', group: 'internal' },
+    { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view', group: 'internal' },
     {
       to: `/${paymentsHome}`,
       label: 'Pagamentos',
       icon: CreditCard,
       anyPermission: [...PAYMENT_CATALOG_PERMISSIONS],
+      group: 'internal',
       aliases: ['/payment-methods', '/card-brands', '/card-operators'],
     },
-    { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view' },
-    { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', pinMobile: true },
-    { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view' },
-    { to: '/notifications', label: 'Alertas', icon: Bell, permission: 'products.view' },
-    { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view' },
+    {
+      to: '/settings',
+      label: 'Configurações',
+      icon: Settings,
+      anyPermission: SETTINGS_PERMISSIONS,
+      group: 'internal',
+      aliases: ['/client-origins', '/campaigns'],
+    },
   ]
 
   return all.filter((item) => {
@@ -76,11 +97,30 @@ const items = computed(() => {
   })
 })
 
-const mobileItems = computed(() => {
-  const pinned = items.value.filter((item) => item.pinMobile)
-  const rest = items.value.filter((item) => !item.pinMobile)
-  return [...pinned, ...rest].slice(0, 5)
-})
+const dailyItems = computed(() => items.value.filter((item) => item.group === 'daily'))
+const internalItems = computed(() => items.value.filter((item) => item.group === 'internal'))
+
+const needsMore = computed(() => items.value.length > MOBILE_SLOTS)
+const mobileItems = computed(() =>
+  needsMore.value ? items.value.slice(0, MOBILE_SLOTS - 1) : items.value,
+)
+const moreItems = computed(() => (needsMore.value ? items.value.slice(MOBILE_SLOTS - 1) : []))
+const moreOpen = ref(false)
+const moreActive = computed(() =>
+  moreItems.value.some((item) => isNavActive(item.to, item.aliases ?? [])),
+)
+
+watch(
+  () => route.fullPath,
+  () => {
+    moreOpen.value = false
+  },
+)
+
+function openFromMore(item: ShellNavItem) {
+  moreOpen.value = false
+  void router.push(item.to)
+}
 
 const canAlerts = computed(() => auth.can('products.view') || auth.permissions.length === 0)
 
@@ -137,7 +177,19 @@ async function onLogout() {
       </div>
       <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto">
         <RouterLink
-          v-for="item in items"
+          v-for="item in dailyItems"
+          :key="item.to"
+          :to="item.to"
+        >
+          <SidebarNavItem
+            :label="item.label"
+            :icon="item.icon"
+            :active="isNavActive(item.to, item.aliases ?? [])"
+          />
+        </RouterLink>
+        <p v-if="internalItems.length" class="px-3 pt-4 pb-1 text-[13px] text-inverse/50">Gestão</p>
+        <RouterLink
+          v-for="item in internalItems"
           :key="item.to"
           :to="item.to"
         >
@@ -203,7 +255,31 @@ async function onLogout() {
           </span>
           {{ item.label }}
         </RouterLink>
+        <button
+          v-if="needsMore"
+          type="button"
+          class="relative flex flex-col items-center gap-1 rounded-full px-2 py-1 text-[11px]"
+          :class="moreActive || moreOpen ? 'text-brand' : 'text-muted'"
+          :aria-expanded="moreOpen"
+          @click="moreOpen = true"
+        >
+          <Ellipsis class="size-5" :stroke-width="1.75" />
+          Mais
+        </button>
       </nav>
+
+      <AppSheet v-model:open="moreOpen" title="Mais">
+        <div class="divide-y divide-border-divider">
+          <ListCard
+            v-for="item in moreItems"
+            :key="item.to"
+            :title="item.label"
+            :badge="item.to === '/notifications' && alertCount ? String(alertCount) : ''"
+            badge-variant="danger"
+            @action="openFromMore(item)"
+          />
+        </div>
+      </AppSheet>
     </div>
   </div>
 </template>

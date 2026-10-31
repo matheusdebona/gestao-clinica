@@ -41,6 +41,42 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/DashboardPage.vue'),
         },
         {
+          path: 'leads',
+          name: 'leads',
+          meta: { title: 'Leads' },
+          component: () => import('@/pages/LeadsPage.vue'),
+        },
+        {
+          path: 'leads/new',
+          name: 'leads-new',
+          meta: { title: 'Novo lead' },
+          component: () => import('@/pages/LeadFormPage.vue'),
+        },
+        {
+          path: 'leads/:id/edit',
+          name: 'leads-edit',
+          meta: { title: 'Editar lead' },
+          component: () => import('@/pages/LeadFormPage.vue'),
+        },
+        {
+          path: 'leads/:id',
+          name: 'leads-show',
+          meta: { title: 'Lead' },
+          component: () => import('@/pages/LeadDetailPage.vue'),
+        },
+        {
+          path: 'settings',
+          name: 'settings',
+          meta: { title: 'Configurações' },
+          component: () => import('@/pages/SettingsPage.vue'),
+        },
+        {
+          path: 'settings/lead-statuses',
+          name: 'lead-statuses',
+          meta: { title: 'Status de leads' },
+          component: () => import('@/pages/LeadStatusesPage.vue'),
+        },
+        {
           path: 'clients',
           name: 'clients',
           meta: { title: 'Pacientes' },

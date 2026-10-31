@@ -13,6 +13,7 @@ import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import AppointmentForm from '@/features/appointments/AppointmentForm.vue'
 import {
   cancelAppointment,
+  completeAppointment,
   getAppointment,
   listProfessionals,
   startAppointment,
@@ -75,7 +76,7 @@ const stockWarnings = computed((): StockWarning[] => {
 const treatmentsForForm = computed(() => {
   const current = appointment.value
   const open = treatmentsQuery.data.value?.data ?? []
-  if (!current) {
+  if (!current || current.treatment_id === null) {
     return open
   }
   if (open.some((item) => item.id === current.treatment_id)) {
@@ -133,6 +134,19 @@ const startMutation = useMutation({
   },
   onError: (error) => {
     toast.error(error instanceof ApiError ? error.message : 'Não foi possível iniciar.')
+  },
+})
+
+const isEvaluation = computed(() => appointment.value?.treatment_id === null)
+
+const completeEvaluationMutation = useMutation({
+  mutationFn: () => completeAppointment(props.appointmentId),
+  onSuccess: async () => {
+    toast.success('Avaliação concluída')
+    await queryClient.invalidateQueries({ queryKey: ['appointments'] })
+  },
+  onError: (error) => {
+    toast.error(error instanceof ApiError ? error.message : 'Não foi possível concluir.')
   },
 })
 
@@ -218,7 +232,10 @@ function goBack() {
           </div>
           <div>
             <dt class="text-[13px] text-muted">Tratamento</dt>
-            <dd class="mt-0.5 text-[15px] text-title">
+            <dd v-if="isEvaluation" class="mt-0.5 text-[15px] text-title">
+              Avaliação (sem tratamento)
+            </dd>
+            <dd v-else class="mt-0.5 text-[15px] text-title">
               <RouterLink
                 :to="{ name: 'treatments-show', params: { id: String(appointment.treatment_id) } }"
                 class="text-brand"
@@ -248,7 +265,15 @@ function goBack() {
         <PermissionGate v-if="isScheduled" permission="appointments.start">
           <Button @click="startOpen = true">Iniciar atendimento</Button>
         </PermissionGate>
-        <PermissionGate v-if="appointment.status === 'in_progress'" permission="treatments.consume">
+        <PermissionGate
+          v-if="appointment.status === 'in_progress' && isEvaluation"
+          permission="treatments.complete"
+        >
+          <Button :loading="completeEvaluationMutation.isPending.value" @click="completeEvaluationMutation.mutate()">
+            Concluir avaliação
+          </Button>
+        </PermissionGate>
+        <PermissionGate v-if="appointment.status === 'in_progress' && !isEvaluation" permission="treatments.consume">
           <Button @click="router.push({ name: 'appointments-consume', params: { id: String(appointment.id) } })">
             Registrar consumo
           </Button>
@@ -268,6 +293,7 @@ function goBack() {
               :treatments="treatmentsForForm"
               :professionals="professionals"
               lock-treatment
+              :without-treatment="isEvaluation"
               submit-label="Salvar horário"
               :loading="reschedulePending"
               @submit="onReschedule"

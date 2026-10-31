@@ -12,6 +12,8 @@ use App\Http\Controllers\Api\V1\ClientOriginController;
 use App\Http\Controllers\Api\V1\ClinicBrandingController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\LeadController;
+use App\Http\Controllers\Api\V1\LeadStatusController;
 use App\Http\Controllers\Api\V1\MetricsController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\Payments\CardBrandController;
@@ -140,6 +142,36 @@ Route::prefix('v1')->group(function (): void {
         Route::post('protocols/{protocol}/recalculate', [ProtocolController::class, 'recalculate'])
             ->middleware('permission:protocols.update');
 
+        Route::get('lead-statuses', [LeadStatusController::class, 'index'])
+            ->middleware('permission:leads.view|lead_statuses.manage');
+        Route::post('lead-statuses', [LeadStatusController::class, 'store'])
+            ->middleware('permission:lead_statuses.manage');
+        Route::get('lead-statuses/{lead_status}', [LeadStatusController::class, 'show'])
+            ->middleware('permission:leads.view|lead_statuses.manage');
+        Route::put('lead-statuses/{lead_status}', [LeadStatusController::class, 'update'])
+            ->middleware('permission:lead_statuses.manage');
+        Route::delete('lead-statuses/{lead_status}', [LeadStatusController::class, 'destroy'])
+            ->middleware('permission:lead_statuses.manage');
+
+        Route::get('leads', [LeadController::class, 'index'])
+            ->middleware('permission:leads.view');
+        Route::get('leads/creators', [LeadController::class, 'creators'])
+            ->middleware('permission:leads.view');
+        Route::post('leads', [LeadController::class, 'store'])
+            ->middleware('permission:leads.manage');
+        Route::get('leads/{lead}', [LeadController::class, 'show'])
+            ->middleware('permission:leads.view');
+        Route::put('leads/{lead}', [LeadController::class, 'update'])
+            ->middleware('permission:leads.manage');
+        Route::patch('leads/{lead}/status', [LeadController::class, 'changeStatus'])
+            ->middleware('permission:leads.manage');
+        Route::delete('leads/{lead}', [LeadController::class, 'destroy'])
+            ->middleware('permission:leads.manage');
+        Route::get('leads/{lead}/matching-clients', [LeadController::class, 'matchingClients'])
+            ->middleware('permission:leads.manage');
+        Route::post('leads/{lead}/convert', [LeadController::class, 'convert'])
+            ->middleware('permission:leads.manage');
+
         Route::get('clients', [ClientController::class, 'index'])
             ->middleware('permission:clients.view');
         Route::post('clients', [ClientController::class, 'store'])
@@ -152,11 +184,11 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:clients.delete');
 
         Route::get('client-origins', [ClientOriginController::class, 'index'])
-            ->middleware('permission:client_origins.manage|campaigns.manage|clients.create|clients.update');
+            ->middleware('permission:client_origins.manage|campaigns.manage|clients.create|clients.update|leads.view|leads.manage');
         Route::post('client-origins', [ClientOriginController::class, 'store'])
             ->middleware('permission:client_origins.manage');
         Route::get('client-origins/{client_origin}', [ClientOriginController::class, 'show'])
-            ->middleware('permission:client_origins.manage|campaigns.manage|clients.create|clients.update');
+            ->middleware('permission:client_origins.manage|campaigns.manage|clients.create|clients.update|leads.view|leads.manage');
         Route::put('client-origins/{client_origin}', [ClientOriginController::class, 'update'])
             ->middleware('permission:client_origins.manage');
         Route::delete('client-origins/{client_origin}', [ClientOriginController::class, 'destroy'])
@@ -297,7 +329,7 @@ Route::prefix('v1')->group(function (): void {
 
         // Agenda uses appointments.*; clinical consume/complete stay on treatments.*.
         Route::get('professionals', [UserController::class, 'professionals'])
-            ->middleware('permission:appointments.view|appointments.manage|users.view');
+            ->middleware('permission:appointments.view|appointments.manage|users.view|leads.manage');
         Route::get('appointments', [AppointmentController::class, 'index'])
             ->middleware('permission:appointments.view');
         Route::get('treatments/{treatment}/appointments', [AppointmentController::class, 'indexForTreatment'])

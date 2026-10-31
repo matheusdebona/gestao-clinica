@@ -11,6 +11,9 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import AttributionShortcuts from '@/features/clients/AttributionShortcuts.vue'
+import Badge from '@/components/ui/Badge.vue'
+import LeadHistory from '@/features/leads/LeadHistory.vue'
+import { formatDateTime } from '@/lib/formatters'
 import { deactivateClient, getClient, updateClient } from '@/features/clients/api'
 import { formatPhoneBR } from '@/lib/masks'
 import { useToastStore } from '@/stores/toast'
@@ -65,6 +68,12 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
 
 function goEdit() {
   void router.push({ name: 'clients-edit', params: { id: String(props.clientId) } })
+}
+
+function openLead() {
+  if (client.value?.lead_id) {
+    void router.push({ name: 'leads-show', params: { id: String(client.value.lead_id) } })
+  }
 }
 
 function goBack() {
@@ -160,6 +169,41 @@ function onConfirmDeactivate() {
           </dd>
         </div>
       </dl>
+    </SurfaceCard>
+
+    <SurfaceCard v-if="client?.lead">
+      <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <h2>Veio de lead</h2>
+        <PermissionGate permission="leads.view">
+          <Button variant="ghost" @click="openLead">Ver lead</Button>
+        </PermissionGate>
+      </div>
+      <dl class="flex flex-col gap-4">
+        <div>
+          <dt class="text-[13px] text-muted">Lead cadastrado em</dt>
+          <dd class="mt-0.5 text-[15px] text-title">
+            {{ formatDateTime(client.lead.created_at) }}
+            <template v-if="client.lead.created_by"> · por {{ client.lead.created_by.name }}</template>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-[13px] text-muted">Origem do lead</dt>
+          <dd class="mt-0.5 flex flex-wrap items-center gap-2 text-[15px] text-title">
+            {{ client.lead.client_origin?.name ?? '—' }}
+            <Badge v-if="client.lead.status" :variant="client.lead.status.color">
+              {{ client.lead.status.name }}
+            </Badge>
+          </dd>
+        </div>
+        <div>
+          <dt class="text-[13px] text-muted">Observação do lead</dt>
+          <dd class="mt-0.5 whitespace-pre-wrap text-[15px] text-title">{{ client.lead.notes || '—' }}</dd>
+        </div>
+      </dl>
+      <template v-if="client.lead.activities?.length">
+        <h2 class="mt-5 mb-3">Histórico do lead</h2>
+        <LeadHistory :activities="client.lead.activities" />
+      </template>
     </SurfaceCard>
 
     <ConfirmDialog

@@ -46,7 +46,16 @@ class ClientController extends Controller
 
     public function show(Client $client): ClientResource
     {
-        return new ClientResource($client->load(['clientOrigin', 'campaign']));
+        return new ClientResource($client->load([
+            'clientOrigin',
+            'campaign',
+            'lead.status',
+            'lead.clientOrigin',
+            'lead.createdBy',
+            'lead.activities.user',
+            'lead.activities.fromStatus',
+            'lead.activities.toStatus',
+        ]));
     }
 
     public function update(UpdateClientRequest $request, Client $client): ClientResource

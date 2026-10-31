@@ -11,8 +11,8 @@ export const ROLE_LABELS: Record<string, string> = {
 }
 
 export const ROLE_SUMMARIES: Record<string, string> = {
-  receptionist: 'Pacientes, orçamentos, criar vendas, agenda e ver documentos.',
-  seller: 'Pacientes, vendas completas, orçamentos e meios de pagamento.',
+  receptionist: 'Leads, pacientes, orçamentos, criar vendas, agenda e ver documentos.',
+  seller: 'Leads, pacientes, vendas completas, orçamentos e meios de pagamento.',
   stock: 'Produtos, estoque, catálogo (tipos/marcas/unidades) e upload de arquivos.',
   professional: 'Pacientes, tratamentos, consumo de sessão, agenda e documentos.',
 }
@@ -41,6 +41,9 @@ export const PERMISSION_LABELS: Record<string, string> = {
   'protocols.create': 'Criar protocolos',
   'protocols.update': 'Editar protocolos',
   'protocols.delete': 'Excluir protocolos',
+  'leads.view': 'Ver leads',
+  'leads.manage': 'Cadastrar e converter leads',
+  'lead_statuses.manage': 'Status de leads',
   'clients.view': 'Ver pacientes',
   'clients.create': 'Criar pacientes',
   'clients.update': 'Editar pacientes',

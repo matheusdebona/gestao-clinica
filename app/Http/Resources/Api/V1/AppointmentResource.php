@@ -42,7 +42,7 @@ class AppointmentResource extends JsonResource
             'consumptions' => AppointmentConsumptionResource::collection($this->whenLoaded('consumptions')),
             'client' => ClientResource::make($this->whenLoaded('client')),
             'professional' => UserResource::make($this->whenLoaded('professionalUser')),
-            'treatment' => $this->whenLoaded('treatment', fn () => [
+            'treatment' => $this->whenLoaded('treatment', fn () => $this->treatment === null ? null : [
                 'id' => $this->treatment->id,
                 'status' => $this->treatment->status,
                 'sale_id' => $this->treatment->sale_id,

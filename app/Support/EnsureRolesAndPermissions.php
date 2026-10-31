@@ -74,6 +74,9 @@ class EnsureRolesAndPermissions
         'appointments.start',
         'appointments.cancel',
         'metrics.view',
+        'leads.view',
+        'leads.manage',
+        'lead_statuses.manage',
     ];
 
     public static function run(): void
@@ -144,6 +147,9 @@ class EnsureRolesAndPermissions
             'appointments.start',
             'appointments.cancel',
             'metrics.view',
+            'leads.view',
+            'leads.manage',
+            'lead_statuses.manage',
         ]);
 
         Role::findOrCreate('receptionist', self::GUARD)->syncPermissions([
@@ -162,6 +168,8 @@ class EnsureRolesAndPermissions
             'appointments.manage',
             'appointments.start',
             'appointments.cancel',
+            'leads.view',
+            'leads.manage',
         ]);
 
         Role::findOrCreate('seller', self::GUARD)->syncPermissions([
@@ -187,6 +195,8 @@ class EnsureRolesAndPermissions
             'card_operators.manage',
             'card_brands.manage',
             'card_fees.manage',
+            'leads.view',
+            'leads.manage',
         ]);
 
         Role::findOrCreate('stock', self::GUARD)->syncPermissions([
@@ -199,6 +209,7 @@ class EnsureRolesAndPermissions
             'brands.manage',
             'units.manage',
             'files.upload',
+            'leads.view',
         ]);
 
         Role::findOrCreate('professional', self::GUARD)->syncPermissions([
@@ -217,6 +228,7 @@ class EnsureRolesAndPermissions
             'documents.generate',
             'documents.delete',
             'products.view',
+            'leads.view',
         ]);
     }
 

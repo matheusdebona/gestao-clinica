@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
+use App\Support\EnsureDefaultLeadStatuses;
 use App\Support\EnsureDefaultPaymentCatalog;
 use App\Support\EnsureDefaultUnitsOfMeasure;
 use Illuminate\Database\Seeder;
@@ -47,6 +48,8 @@ class DemoClinicSeeder extends Seeder
         $admin->syncRoles(['admin']);
 
         EnsureDefaultClientOrigins::run($clinic);
+
+        EnsureDefaultLeadStatuses::run($clinic);
         EnsureDefaultPaymentCatalog::run($clinic);
         EnsureDefaultUnitsOfMeasure::run($clinic);
 

@@ -22,6 +22,7 @@ class Client extends Model
         'service_duration_minutes',
         'client_origin_id',
         'campaign_id',
+        'lead_id',
         'initial_consultation_amount',
         'is_active',
     ];
@@ -50,6 +51,12 @@ class Client extends Model
     public function campaign(): BelongsTo
     {
         return $this->belongsTo(Campaign::class);
+    }
+
+    /** Lead this patient was converted from (keeps origin history). */
+    public function lead(): BelongsTo
+    {
+        return $this->belongsTo(Lead::class);
     }
 
     public function sales(): HasMany
