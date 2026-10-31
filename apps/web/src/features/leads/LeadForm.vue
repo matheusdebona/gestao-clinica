@@ -15,12 +15,7 @@ import Textarea from '@/components/ui/Textarea.vue'
 import { createClientOrigin } from '@/features/clients/api'
 import { checkLeadPhone } from '@/features/leads/api'
 import { LEAD_CANCELLED_KEY, LEAD_CONVERTED_KEY } from '@/features/leads/labels'
-import {
-  emptyLeadForm,
-  leadFormSchema,
-  leadToForm,
-  toLeadPayload,
-} from '@/features/leads/schema'
+import { emptyLeadForm, leadFormSchema, leadToForm, toLeadPayload } from '@/features/leads/schema'
 import { useLeadCatalogs } from '@/features/leads/useLeadCatalogs'
 import { useToastStore } from '@/stores/toast'
 import type { ClientOrigin } from '@/types/client'
@@ -83,7 +78,10 @@ const statusOptions = computed(() => {
   if (current && !list.some((status) => status.id === current.id)) {
     list.unshift(current)
   }
-  return list.map((status) => ({ value: String(status.id), label: status.name }))
+  return list.map((status) => ({
+    value: String(status.id),
+    label: status.name,
+  }))
 })
 
 watch(
@@ -174,11 +172,17 @@ function openConflict() {
     return
   }
   if (current.client) {
-    void router.push({ name: 'clients-show', params: { id: String(current.client.id) } })
+    void router.push({
+      name: 'clients-show',
+      params: { id: String(current.client.id) },
+    })
     return
   }
   if (current.lead) {
-    void router.push({ name: 'leads-show', params: { id: String(current.lead.id) } })
+    void router.push({
+      name: 'leads-show',
+      params: { id: String(current.lead.id) },
+    })
   }
 }
 
@@ -229,8 +233,12 @@ defineExpose({ setErrors, setDuplicate })
     >
       <p>{{ conflict.message }}</p>
       <div class="mt-2">
-        <Button variant="secondary" type="button" @click="openConflict">
-          {{ conflict.client ? `Abrir ${conflict.client.name}` : `Abrir lead ${conflict.lead?.name ?? ''}` }}
+        <Button mobile-block variant="secondary" type="button" @click="openConflict">
+          {{
+            conflict.client
+              ? `Abrir ${conflict.client.name}`
+              : `Abrir lead ${conflict.lead?.name ?? ''}`
+          }}
         </Button>
       </div>
     </Banner>
@@ -247,7 +255,9 @@ defineExpose({ setErrors, setDuplicate })
       </template>
     </FormField>
     <PermissionGate permission="client_origins.manage">
-      <Button variant="ghost" type="button" @click="originDialog = true">Nova origem</Button>
+      <Button mobile-block variant="ghost" type="button" @click="originDialog = true"
+        >Nova origem</Button
+      >
     </PermissionGate>
 
     <FormField
@@ -279,16 +289,28 @@ defineExpose({ setErrors, setDuplicate })
     </FormField>
 
     <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
+      <Button
+        mobile-block
+        variant="ghost"
+        type="button"
+        :disabled="loading"
+        @click="emit('cancel')"
+      >
         Cancelar
       </Button>
-      <Button type="submit" :loading="loading" :disabled="Boolean(conflict) || checkingPhone">
+      <Button
+        mobile-block
+        type="submit"
+        :loading="loading"
+        :disabled="Boolean(conflict) || checkingPhone"
+      >
         {{ submitLabel ?? 'Salvar' }}
       </Button>
     </div>
   </form>
 
   <AppDialog
+    stack-footer
     v-model:open="originDialog"
     title="Nova origem"
     description="A origem vale para leads e pacientes."
@@ -299,8 +321,11 @@ defineExpose({ setErrors, setDuplicate })
       </template>
     </FormField>
     <template #footer>
-      <Button variant="ghost" type="button" @click="originDialog = false">Cancelar</Button>
+      <Button mobile-block variant="ghost" type="button" @click="originDialog = false"
+        >Cancelar</Button
+      >
       <Button
+        mobile-block
         type="button"
         :loading="creatingOrigin"
         :disabled="!newOriginName.trim()"

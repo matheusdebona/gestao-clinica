@@ -44,13 +44,25 @@ const statuses = computed(() => data.value ?? [])
 const dialogOpen = ref(false)
 const confirmOpen = ref(false)
 const editing = ref<LeadStatus | null>(null)
-const form = ref({ name: '', color: 'muted' as LeadStatusColor, sort_order: '', is_active: true, is_default: false })
+const form = ref({
+  name: '',
+  color: 'muted' as LeadStatusColor,
+  sort_order: '',
+  is_active: true,
+  is_default: false,
+})
 const formErrors = ref<Record<string, string>>({})
 
 function openNew() {
   editing.value = null
   const nextOrder = Math.max(0, ...statuses.value.map((status) => status.sort_order)) + 10
-  form.value = { name: '', color: 'muted', sort_order: String(nextOrder), is_active: true, is_default: false }
+  form.value = {
+    name: '',
+    color: 'muted',
+    sort_order: String(nextOrder),
+    is_active: true,
+    is_default: false,
+  }
   formErrors.value = {}
   dialogOpen.value = true
 }
@@ -129,7 +141,11 @@ const { mutate: remove } = useMutation({
     await refresh()
   },
   onError: (error) => {
-    toast.error(error instanceof ApiError ? (error.first('lead_status') || error.message) : 'Não foi possível remover.')
+    toast.error(
+      error instanceof ApiError
+        ? error.first('lead_status') || error.message
+        : 'Não foi possível remover.',
+    )
   },
 })
 
@@ -149,10 +165,16 @@ function onSave() {
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader title="Status de leads" description="Etapas do funil de leads da clínica.">
+    <PageHeader
+      stack-actions
+      title="Status de leads"
+      description="Etapas do funil de leads da clínica."
+    >
       <template #actions>
-        <Button variant="ghost" @click="router.push({ name: 'settings' })">Configurações</Button>
-        <Button v-if="canManage" @click="openNew">Novo</Button>
+        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })"
+          >Configurações</Button
+        >
+        <Button mobile-block v-if="canManage" @click="openNew">Novo</Button>
       </template>
     </PageHeader>
 
@@ -192,9 +214,14 @@ function onSave() {
     </template>
 
     <AppDialog
+      stack-footer
       v-model:open="dialogOpen"
       :title="editing ? 'Editar status' : 'Novo status'"
-      :description="editing?.system_key ? 'Status do sistema: dá para renomear e trocar a cor, mas não desativar ou excluir.' : ''"
+      :description="
+        editing?.system_key
+          ? 'Status do sistema: dá para renomear e trocar a cor, mas não desativar ou excluir.'
+          : ''
+      "
     >
       <div class="flex flex-col gap-4">
         <Banner v-if="formErrors.form" variant="danger">{{ formErrors.form }}</Banner>
@@ -226,7 +253,12 @@ function onSave() {
           html-for="lead-status-order"
         >
           <template #default="{ invalid }">
-            <Input id="lead-status-order" v-model="form.sort_order" type="number" :invalid="invalid" />
+            <Input
+              id="lead-status-order"
+              v-model="form.sort_order"
+              type="number"
+              :invalid="invalid"
+            />
           </template>
         </FormField>
         <Switch
@@ -245,6 +277,7 @@ function onSave() {
       </div>
       <template #footer>
         <Button
+          mobile-block
           v-if="editing && !editing.system_key && !editing.is_default"
           variant="destructive"
           type="button"
@@ -253,12 +286,20 @@ function onSave() {
         >
           Excluir
         </Button>
-        <Button variant="ghost" type="button" :disabled="saving" @click="dialogOpen = false">Cancelar</Button>
-        <Button type="button" :loading="saving" @click="onSave">Salvar</Button>
+        <Button
+          mobile-block
+          variant="ghost"
+          type="button"
+          :disabled="saving"
+          @click="dialogOpen = false"
+          >Cancelar</Button
+        >
+        <Button mobile-block type="button" :loading="saving" @click="onSave">Salvar</Button>
       </template>
     </AppDialog>
 
     <ConfirmDialog
+      stack-footer
       v-model:open="confirmOpen"
       title="Excluir este status?"
       description="Se houver leads com ele, o status é só desativado e os leads continuam com ele."

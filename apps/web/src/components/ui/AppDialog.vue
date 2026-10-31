@@ -12,13 +12,16 @@ import Button from './Button.vue'
 
 const open = defineModel<boolean>('open', { default: false })
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     title: string
     description?: string
+    /** Footer actions stacked full width below `sm` (first slot item ends up at the bottom). */
+    stackFooter?: boolean
   }>(),
   {
     description: '',
+    stackFooter: false,
   },
 )
 </script>
@@ -39,7 +42,13 @@ withDefaults(
         <div class="mt-4 text-[15px] text-body">
           <slot />
         </div>
-        <div class="mt-5 flex justify-end gap-2">
+        <div
+          :class="
+            props.stackFooter
+              ? 'mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'
+              : 'mt-5 flex justify-end gap-2'
+          "
+        >
           <slot name="footer">
             <DialogClose as-child>
               <Button variant="secondary">OK</Button>

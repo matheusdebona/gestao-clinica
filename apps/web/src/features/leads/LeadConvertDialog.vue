@@ -56,7 +56,10 @@ const matchesQuery = useQuery({
 })
 
 const professionalOptions = computed(() =>
-  (professionalsQuery.data.value ?? []).map((user) => ({ value: String(user.id), label: user.name })),
+  (professionalsQuery.data.value ?? []).map((user) => ({
+    value: String(user.id),
+    label: user.name,
+  })),
 )
 
 const matches = computed(() => matchesQuery.data.value ?? [])
@@ -124,7 +127,11 @@ const { mutate, isPending } = useMutation({
     })
   },
   onSuccess: async (result) => {
-    toast.success(result.client_created ? 'Lead virou paciente e avaliação agendada' : 'Lead vinculado ao paciente e avaliação agendada')
+    toast.success(
+      result.client_created
+        ? 'Lead virou paciente e avaliação agendada'
+        : 'Lead vinculado ao paciente e avaliação agendada',
+    )
     open.value = false
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['leads'] }),
@@ -158,6 +165,7 @@ function onConfirm() {
 
 <template>
   <AppSheet
+    stack-footer
     v-model:open="open"
     title="Agendar avaliação"
     description="Ao confirmar, o lead vira paciente (com nome, telefone, origem e histórico) e a avaliação entra na agenda."
@@ -174,7 +182,11 @@ function onConfirm() {
         <Radio v-model="clientChoice" name="lead-convert-client" :options="clientOptions" />
       </FormField>
 
-      <FormField label="Profissional" :error="errors.professional_user_id" html-for="lead-convert-pro">
+      <FormField
+        label="Profissional"
+        :error="errors.professional_user_id"
+        html-for="lead-convert-pro"
+      >
         <template #default="{ invalid }">
           <Select
             id="lead-convert-pro"
@@ -216,8 +228,10 @@ function onConfirm() {
       </FormField>
     </div>
     <template #footer>
-      <Button variant="ghost" type="button" :disabled="isPending" @click="open = false">Cancelar</Button>
-      <Button type="button" :loading="isPending" @click="onConfirm">Confirmar</Button>
+      <Button mobile-block variant="ghost" type="button" :disabled="isPending" @click="open = false"
+        >Cancelar</Button
+      >
+      <Button mobile-block type="button" :loading="isPending" @click="onConfirm">Confirmar</Button>
     </template>
   </AppSheet>
 </template>

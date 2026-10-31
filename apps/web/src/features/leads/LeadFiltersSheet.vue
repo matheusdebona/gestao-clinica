@@ -42,7 +42,10 @@ const originOptions = computed(() => [
 
 const creatorOptions = computed(() => [
   { value: '', label: 'Todos os usuários' },
-  ...props.creators.map((user) => ({ value: String(user.id), label: user.name })),
+  ...props.creators.map((user) => ({
+    value: String(user.id),
+    label: user.name,
+  })),
 ])
 
 const periodError = computed(() => {
@@ -65,7 +68,12 @@ function toggleStatus(id: number, checked: boolean) {
 </script>
 
 <template>
-  <AppSheet v-model:open="open" title="Filtros" description="Os resultados atualizam na hora.">
+  <AppSheet
+    stack-footer
+    v-model:open="open"
+    title="Filtros"
+    description="Os resultados atualizam na hora."
+  >
     <div class="flex flex-col gap-5">
       <FormField label="Período de cadastro">
         <div class="flex flex-col gap-3">
@@ -137,13 +145,19 @@ function toggleStatus(id: number, checked: boolean) {
           :model-value="filters.converted"
           block
           :items="LEAD_CONVERTED_ITEMS"
-          @update:model-value="emit('change', { converted: $event as LeadConvertedFilter })"
+          @update:model-value="
+            emit('change', {
+              converted: $event as LeadConvertedFilter,
+            })
+          "
         />
       </FormField>
     </div>
     <template #footer>
-      <Button variant="ghost" type="button" @click="emit('clear')">Limpar filtros</Button>
-      <Button type="button" @click="open = false">
+      <Button mobile-block variant="ghost" type="button" @click="emit('clear')"
+        >Limpar filtros</Button
+      >
+      <Button mobile-block type="button" @click="open = false">
         Ver {{ total }} {{ total === 1 ? 'lead' : 'leads' }}
       </Button>
     </template>

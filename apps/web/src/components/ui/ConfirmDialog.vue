@@ -19,6 +19,8 @@ const props = withDefaults(
     confirmLabel?: string
     cancelLabel?: string
     confirmVariant?: 'destructive' | 'primary'
+    /** Actions stacked full width below `sm`. */
+    stackFooter?: boolean
   }>(),
   {
     title: 'Confirmar',
@@ -26,6 +28,7 @@ const props = withDefaults(
     confirmLabel: 'Confirmar',
     cancelLabel: 'Cancelar',
     confirmVariant: 'destructive',
+    stackFooter: false,
   },
 )
 
@@ -47,12 +50,19 @@ const emit = defineEmits<{
         <DialogDescription class="mt-1.5 text-[13px] text-muted">
           {{ description }}
         </DialogDescription>
-        <div class="mt-5 flex justify-end gap-2">
+        <div
+          :class="
+            props.stackFooter
+              ? 'mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'
+              : 'mt-5 flex justify-end gap-2'
+          "
+        >
           <DialogClose as-child>
-            <Button variant="ghost">{{ cancelLabel }}</Button>
+            <Button variant="ghost" :mobile-block="props.stackFooter">{{ cancelLabel }}</Button>
           </DialogClose>
           <Button
             :variant="props.confirmVariant"
+            :mobile-block="props.stackFooter"
             @click="
               () => {
                 emit('confirm')
