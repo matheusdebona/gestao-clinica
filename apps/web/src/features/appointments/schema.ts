@@ -5,7 +5,8 @@ import type { Appointment, AppointmentPayload } from '@/types/appointment'
 
 export const appointmentFormSchema = toTypedSchema(
   z.object({
-    treatment_id: z.string().trim().min(1, 'Selecione o tratamento.'),
+    // Required in the form unless it is an avaliação (no treatment); see AppointmentForm.
+    treatment_id: z.string().trim(),
     professional_user_id: z.string().trim().min(1, 'Selecione o profissional.'),
     scheduled_at: z.string().trim().min(1, 'Informe data e hora.'),
     duration_minutes: z.string().refine((value) => {
@@ -64,7 +65,7 @@ export function toAppointmentPayload(values: AppointmentFormValues): Appointment
 
 export function appointmentToForm(appointment: Appointment): AppointmentFormValues {
   return {
-    treatment_id: String(appointment.treatment_id),
+    treatment_id: appointment.treatment_id ? String(appointment.treatment_id) : '',
     professional_user_id: appointment.professional_user_id
       ? String(appointment.professional_user_id)
       : '',

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
+use App\Support\EnsureDefaultLeadStatuses;
 use App\Support\EnsureDefaultPaymentCatalog;
 use App\Support\EnsureDefaultUnitsOfMeasure;
 use App\Support\EnsureRolesAndPermissions;
@@ -31,6 +32,7 @@ class RegisterClinicAdminService
             ]);
 
             EnsureDefaultClientOrigins::run($clinic);
+            EnsureDefaultLeadStatuses::run($clinic);
             EnsureDefaultPaymentCatalog::run($clinic);
             EnsureDefaultUnitsOfMeasure::run($clinic);
 

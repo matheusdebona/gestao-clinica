@@ -1,3 +1,5 @@
+import type { Lead } from './lead'
+
 export interface ClientOrigin {
   id: number
   clinic_id: number
@@ -39,10 +41,13 @@ export interface Client {
   service_duration_minutes: number | null
   client_origin_id: number | null
   campaign_id: number | null
+  lead_id?: number | null
   initial_consultation_amount: string | null
   is_active: boolean
   client_origin?: ClientOrigin | null
   campaign?: Campaign | null
+  /** Lead this patient came from (history kept on conversion). */
+  lead?: Lead | null
   created_at: string
   updated_at: string
 }

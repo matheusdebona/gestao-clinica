@@ -135,7 +135,7 @@ function eventsOn(day: Date): Appointment[] {
 function eventMeta(item: Appointment): string {
   const time = formatTime(item.scheduled_at)
   const professional = item.professional?.name ?? 'Profissional'
-  const treatment = `Tratamento #${item.treatment_id}`
+  const treatment = item.treatment_id ? `Tratamento #${item.treatment_id}` : 'Avaliação'
   return `${time} · ${professional} · ${treatment}`
 }
 

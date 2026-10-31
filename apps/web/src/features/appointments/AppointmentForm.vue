@@ -27,6 +27,8 @@ const props = withDefaults(
     submitLabel?: string
     loading?: boolean
     initialTreatmentId?: number | null
+    /** Avaliação without sale/treatment: hides the treatment field. */
+    withoutTreatment?: boolean
   }>(),
   {
     appointment: null,
@@ -36,6 +38,7 @@ const props = withDefaults(
     submitLabel: 'Salvar',
     loading: false,
     initialTreatmentId: null,
+    withoutTreatment: false,
   },
 )
 
@@ -109,6 +112,10 @@ watch(
 )
 
 const onSubmit = handleSubmit((values: AppointmentFormValues) => {
+  if (!props.withoutTreatment && !values.treatment_id) {
+    setErrors({ treatment_id: 'Selecione o tratamento.' })
+    return
+  }
   emit('submit', {
     ...toAppointmentPayload(values),
     treatment_id: Number(values.treatment_id),
@@ -120,7 +127,12 @@ defineExpose({ setErrors })
 
 <template>
   <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
-    <FormField label="Tratamento" :error="errors.treatment_id" html-for="appointment-treatment">
+    <FormField
+      v-if="!withoutTreatment"
+      label="Tratamento"
+      :error="errors.treatment_id"
+      html-for="appointment-treatment"
+    >
       <template #default="{ invalid }">
         <Select
           id="appointment-treatment"
