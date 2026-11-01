@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import AuthShell from '@/components/patterns/AuthShell.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
@@ -12,6 +13,7 @@ import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
 
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 
@@ -44,6 +46,11 @@ async function submit() {
     loading.value = false
   }
 }
+
+function goToLogin(withEmail = false) {
+  const email = form.email.trim()
+  void router.push(withEmail && email ? { path: '/login', query: { email } } : '/login')
+}
 </script>
 
 <template>
@@ -51,22 +58,21 @@ async function submit() {
     title="Esqueceu a senha?"
     :subtitle="sent ? undefined : 'Informe o e-mail de acesso. Enviaremos uma senha temporária.'"
   >
-    <div v-if="sent" class="mt-6 flex flex-col gap-4">
+    <div v-if="sent" class="mt-5 flex flex-col gap-4">
       <Banner variant="success" title="E-mail enviado">
         {{ FORGOT_PASSWORD_SENT_MESSAGE }}
       </Banner>
       <p class="text-[13px] text-muted">
-        Entre com a senha temporária. Em seguida, você vai criar uma nova senha. Ela vale por 60 minutos.
+        A senha temporária vale por 60 minutos. Entre com ela e, em seguida, crie uma nova senha.
       </p>
-      <RouterLink
-        :to="{ path: '/login', query: { email: form.email.trim() } }"
-        class="inline-flex h-10 w-full items-center justify-center rounded-[12px] bg-brand px-4 text-[15px] font-medium text-inverse hover:bg-brand-hover"
-      >
-        Voltar para entrar
-      </RouterLink>
+      <ActionBar>
+        <Button class="sm:min-w-[200px]" @click="goToLogin(true)">
+          Ir para o login
+        </Button>
+      </ActionBar>
     </div>
 
-    <form v-else class="mt-6 flex flex-col gap-4" novalidate @submit.prevent="submit">
+    <form v-else class="mt-5 flex flex-col gap-4" novalidate @submit.prevent="submit">
       <FormField label="E-mail" :error="error" html-for="forgot-email">
         <template #default="{ invalid }">
           <Input
@@ -79,14 +85,16 @@ async function submit() {
           />
         </template>
       </FormField>
-      <Button type="submit" block :loading="loading">
-        Esqueci a senha
-      </Button>
+      <ActionBar class="mt-1">
+        <template #negative>
+          <Button variant="secondary" @click="goToLogin()">
+            Voltar ao login
+          </Button>
+        </template>
+        <Button type="submit" :loading="loading">
+          Esqueci a senha
+        </Button>
+      </ActionBar>
     </form>
-
-    <p class="mt-5 text-[13px] text-muted">
-      Lembrou a senha?
-      <RouterLink to="/login" class="px-1 font-medium text-brand hover:underline">Entrar</RouterLink>
-    </p>
   </AuthShell>
 </template>

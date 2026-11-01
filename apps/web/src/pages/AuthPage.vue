@@ -124,12 +124,14 @@ async function submitRegister() {
 </script>
 
 <template>
-  <div class="relative flex min-h-dvh items-center justify-center px-4 py-[5dvh]">
+  <div class="relative flex min-h-dvh flex-col items-center justify-center px-4 py-4 md:py-[5dvh]">
     <div class="absolute top-4 right-4 z-10">
       <ThemeToggle />
     </div>
+    <!-- Mobile has no image side: a small brand mark above the card. -->
+    <BrandMark size="lg" :decorative="false" class="mb-2 md:hidden" />
     <div
-      class="glass-regular auth-card h-[90dvh] w-full max-w-[920px] overflow-hidden rounded-[22px]"
+      class="glass-regular auth-card w-full max-w-[920px] overflow-hidden rounded-[22px] md:h-[90dvh] lg:max-w-[1040px]"
       :class="{ register: mode === 'register' }"
     >
       <div class="auth-image">
@@ -139,16 +141,14 @@ async function submitRegister() {
           class="size-full object-cover"
         >
         <div class="absolute inset-0 bg-sidebar/40" />
+        <BrandMark size="xl" tone="inverse" :decorative="false" class="absolute top-5 left-5" />
         <p class="absolute bottom-5 left-5 right-5 text-[15px] font-medium tracking-[-0.02em] text-inverse">
           {{ APP_NAME }}. Gestão da clínica, com calma.
         </p>
       </div>
 
-      <section class="auth-login flex min-h-0 flex-col overflow-y-auto px-6 py-8 md:px-10 md:py-10">
+      <section class="auth-login flex min-h-0 flex-col px-6 py-6 md:overflow-y-auto md:px-10 md:py-8">
         <div class="my-auto flex w-full flex-col">
-          <div class="mb-8 flex justify-center">
-            <BrandMark size="3xl" :decorative="false" />
-          </div>
           <div class="mx-auto w-full max-w-[360px]">
             <p class="text-center text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">
               {{ APP_NAME }}
@@ -199,28 +199,27 @@ async function submitRegister() {
         </div>
       </section>
 
-      <section class="auth-register flex min-h-0 flex-col overflow-y-auto px-6 py-8 md:px-10 md:py-10">
+      <section class="auth-register flex min-h-0 flex-col px-6 py-6 md:overflow-y-auto md:px-10 md:py-8">
         <div class="my-auto flex w-full flex-col">
-          <div class="mb-8 flex justify-center">
-            <BrandMark size="3xl" :decorative="false" />
-          </div>
-          <div class="mx-auto w-full max-w-[360px]">
+          <div class="mx-auto w-full max-w-[360px] lg:max-w-[440px]">
             <p class="text-center text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">
               {{ APP_NAME }}
             </p>
             <h1 class="mt-2 text-[28px] font-semibold tracking-[-0.03em] text-title">Cadastrar</h1>
             <p class="mt-1 text-[15px] text-muted">Abre a clínica e o primeiro acesso.</p>
-            <form class="mt-6 flex flex-col gap-4" @submit.prevent="submitRegister">
-              <FormField label="Nome da clínica" :error="registerErrors.clinic_name" html-for="reg-clinic">
-                <template #default="{ invalid }">
-                  <Input id="reg-clinic" v-model="registerForm.clinic_name" type="text" :invalid="invalid" />
-                </template>
-              </FormField>
-              <FormField label="Seu nome" :error="registerErrors.name" html-for="reg-name">
-                <template #default="{ invalid }">
-                  <Input id="reg-name" v-model="registerForm.name" type="text" :invalid="invalid" />
-                </template>
-              </FormField>
+            <form class="mt-5 flex flex-col gap-3.5" @submit.prevent="submitRegister">
+              <div class="grid grid-cols-1 items-start gap-3.5 lg:grid-cols-2 lg:gap-x-3">
+                <FormField label="Nome da clínica" :error="registerErrors.clinic_name" html-for="reg-clinic">
+                  <template #default="{ invalid }">
+                    <Input id="reg-clinic" v-model="registerForm.clinic_name" type="text" :invalid="invalid" />
+                  </template>
+                </FormField>
+                <FormField label="Seu nome" :error="registerErrors.name" html-for="reg-name">
+                  <template #default="{ invalid }">
+                    <Input id="reg-name" v-model="registerForm.name" type="text" :invalid="invalid" />
+                  </template>
+                </FormField>
+              </div>
               <FormField label="E-mail" :error="registerErrors.email" html-for="reg-email">
                 <template #default="{ invalid }">
                   <Input
@@ -232,40 +231,43 @@ async function submitRegister() {
                   />
                 </template>
               </FormField>
-              <FormField
-                label="Senha"
-                hint="Mínimo 10 caracteres, com maiúscula, número e símbolo."
-                :error="registerErrors.password"
-                html-for="reg-password"
-              >
-                <template #default="{ invalid }">
-                  <PasswordInput
-                    id="reg-password"
-                    v-model="registerForm.password"
-                    autocomplete="new-password"
-                    :invalid="invalid"
-                  />
-                </template>
-              </FormField>
-              <FormField
-                label="Confirmar senha"
-                :error="registerErrors.password_confirmation"
-                html-for="reg-password-2"
-              >
-                <template #default="{ invalid }">
-                  <PasswordInput
-                    id="reg-password-2"
-                    v-model="registerForm.password_confirmation"
-                    autocomplete="new-password"
-                    :invalid="invalid"
-                  />
-                </template>
-              </FormField>
-              <Button type="submit" block :loading="loading && mode === 'register'">
+              <div class="grid grid-cols-1 items-start gap-3.5 lg:grid-cols-2 lg:gap-x-3">
+                <FormField
+                  label="Senha"
+                  hint="Mínimo 10 caracteres, com maiúscula, número e símbolo."
+                  tip-hint
+                  :error="registerErrors.password"
+                  html-for="reg-password"
+                >
+                  <template #default="{ invalid }">
+                    <PasswordInput
+                      id="reg-password"
+                      v-model="registerForm.password"
+                      autocomplete="new-password"
+                      :invalid="invalid"
+                    />
+                  </template>
+                </FormField>
+                <FormField
+                  label="Confirmar senha"
+                  :error="registerErrors.password_confirmation"
+                  html-for="reg-password-2"
+                >
+                  <template #default="{ invalid }">
+                    <PasswordInput
+                      id="reg-password-2"
+                      v-model="registerForm.password_confirmation"
+                      autocomplete="new-password"
+                      :invalid="invalid"
+                    />
+                  </template>
+                </FormField>
+              </div>
+              <Button type="submit" block class="mt-1" :loading="loading && mode === 'register'">
                 Criar clínica
               </Button>
             </form>
-            <p class="mt-5 text-[13px] text-muted">
+            <p class="mt-4 text-[13px] text-muted">
               Já tem acesso?
               <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="setMode('login')">
                 Entrar

@@ -14,16 +14,22 @@ const props = withDefaults(
     htmlFor?: string
     /** Force the hint inline even when long. */
     inlineHint?: boolean
+    /** Force the hint behind the "i" even when short (e.g. fields side by side in a dense form). */
+    tipHint?: boolean
   }>(),
   {
     hint: '',
     error: '',
     inlineHint: false,
+    tipHint: false,
   },
 )
 
-const tipHint = computed(
-  () => Boolean(props.hint && props.label) && !props.inlineHint && props.hint.length > INLINE_HINT_MAX,
+const hintInTip = computed(
+  () =>
+    Boolean(props.hint && props.label) &&
+    !props.inlineHint &&
+    (props.tipHint || props.hint.length > INLINE_HINT_MAX),
 )
 </script>
 
@@ -33,13 +39,13 @@ const tipHint = computed(
       <label :for="htmlFor" class="text-[13px] font-medium text-title/70">
         {{ label }}
       </label>
-      <InfoTip v-if="tipHint" :text="hint" :label="`Sobre: ${label}`" />
+      <InfoTip v-if="hintInTip" :text="hint" :label="`Sobre: ${label}`" />
     </div>
     <slot :invalid="Boolean(error)" />
     <p v-if="error" class="text-[13px] text-danger" role="alert">
       {{ error }}
     </p>
-    <p v-else-if="hint && !tipHint" class="text-[13px] text-muted">
+    <p v-else-if="hint && !hintInTip" class="text-[13px] text-muted">
       {{ hint }}
     </p>
   </div>

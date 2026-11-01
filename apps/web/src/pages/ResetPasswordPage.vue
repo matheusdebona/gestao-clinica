@@ -2,6 +2,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import AuthShell from '@/components/patterns/AuthShell.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import PasswordInput from '@/components/ui/PasswordInput.vue'
@@ -68,11 +69,12 @@ async function leave() {
   <AuthShell
     title="Redefinir senha"
     subtitle="Você entrou com uma senha temporária. Crie uma nova senha para continuar."
+    wide
   >
-    <form class="mt-6 flex flex-col gap-4" novalidate @submit.prevent="submit">
+    <form class="mt-5 flex flex-col gap-3.5" novalidate @submit.prevent="submit">
       <FormField
         label="Senha temporária"
-        hint="A senha que chegou no seu e-mail."
+        hint="A senha que enviamos por e-mail."
         :error="errors.temporary_password"
         html-for="reset-temporary"
       >
@@ -85,44 +87,48 @@ async function leave() {
           />
         </template>
       </FormField>
-      <FormField
-        label="Nova senha"
-        :hint="PASSWORD_RULES_HINT"
-        :error="errors.password"
-        html-for="reset-password"
-      >
-        <template #default="{ invalid }">
-          <PasswordInput
-            id="reset-password"
-            v-model="form.password"
-            autocomplete="new-password"
-            :invalid="invalid"
-          />
+      <div class="grid grid-cols-1 items-start gap-3.5 lg:grid-cols-2 lg:gap-x-3">
+        <FormField
+          label="Nova senha"
+          :hint="PASSWORD_RULES_HINT"
+          tip-hint
+          :error="errors.password"
+          html-for="reset-password"
+        >
+          <template #default="{ invalid }">
+            <PasswordInput
+              id="reset-password"
+              v-model="form.password"
+              autocomplete="new-password"
+              :invalid="invalid"
+            />
+          </template>
+        </FormField>
+        <FormField
+          label="Confirmar nova senha"
+          :error="errors.password_confirmation"
+          html-for="reset-password-2"
+        >
+          <template #default="{ invalid }">
+            <PasswordInput
+              id="reset-password-2"
+              v-model="form.password_confirmation"
+              autocomplete="new-password"
+              :invalid="invalid"
+            />
+          </template>
+        </FormField>
+      </div>
+      <ActionBar class="mt-1">
+        <template #negative>
+          <Button variant="secondary" @click="leave">
+            Sair
+          </Button>
         </template>
-      </FormField>
-      <FormField
-        label="Confirmar nova senha"
-        :error="errors.password_confirmation"
-        html-for="reset-password-2"
-      >
-        <template #default="{ invalid }">
-          <PasswordInput
-            id="reset-password-2"
-            v-model="form.password_confirmation"
-            autocomplete="new-password"
-            :invalid="invalid"
-          />
-        </template>
-      </FormField>
-      <Button type="submit" block :loading="loading">
-        Salvar nova senha
-      </Button>
+        <Button type="submit" :loading="loading">
+          Salvar nova senha
+        </Button>
+      </ActionBar>
     </form>
-    <p class="mt-5 text-[13px] text-muted">
-      Não é você?
-      <Button variant="ghost" class="!inline !h-auto !px-1 !py-0" @click="leave">
-        Sair
-      </Button>
-    </p>
   </AuthShell>
 </template>
