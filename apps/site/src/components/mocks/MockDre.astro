@@ -1,15 +1,28 @@
 ---
+import {
+  DRE_DEMO,
+  DRE_DEMO_MARGEM,
+  DRE_DEMO_RESULTADO,
+  formatDemoBrl,
+} from '../../content/site'
+
+const brl = (n: number) => `R$ ${formatDemoBrl(n)}`
+const minus = (n: number) => `− R$ ${formatDemoBrl(n)}`
+const resultado = brl(DRE_DEMO_RESULTADO)
+const margem = `${DRE_DEMO_MARGEM}%`
+
 const kpis = [
-  { label: 'Resultado', value: 'R$ 9.840', tone: 'ok' },
-  { label: 'Margem líquida', value: '20%', tone: 'ink' },
+  { label: 'Resultado', value: resultado, tone: 'ok' },
+  { label: 'Margem líquida', value: margem, tone: 'ink' },
 ]
 
 const lines = [
-  { label: 'Receita bruta', value: 'R$ 52.000' },
-  { label: 'Taxa da maquininha', value: '− R$ 2.180' },
-  { label: 'Impostos sobre a receita', value: '− R$ 1.620' },
-  { label: 'Comissões', value: '− R$ 4.160' },
-  { label: 'Despesas do mês', value: '− R$ 9.920' },
+  { label: 'Receita bruta', value: brl(DRE_DEMO.receitaBruta) },
+  { label: 'Insumos', value: minus(DRE_DEMO.insumos) },
+  { label: 'Taxa da maquininha', value: minus(DRE_DEMO.taxaMaquininha) },
+  { label: 'Impostos sobre a receita', value: minus(DRE_DEMO.impostos) },
+  { label: 'Comissões', value: minus(DRE_DEMO.comissoes) },
+  { label: 'Despesas do mês', value: minus(DRE_DEMO.despesas) },
 ]
 ---
 
@@ -41,7 +54,7 @@ const lines = [
   <div class="mock-card mock-dre-lines mt-1.5 divide-y divide-border-divider">
     {
       lines.map((row) => (
-        <div class="flex items-center justify-between gap-2 py-[5px] first:pt-0 last:pb-0">
+        <div class="flex items-center justify-between gap-2 py-1 first:pt-0 last:pb-0">
           <span class="mock-copy text-[11px] leading-4">{row.label}</span>
           <span class="mock-quiet shrink-0 text-[11px] tabular-nums">{row.value}</span>
         </div>
@@ -53,9 +66,9 @@ const lines = [
     <div class="flex items-end justify-between gap-2">
       <div>
         <p class="mock-quiet text-[10px] leading-3">Resultado líquido</p>
-        <p class="mock-ok mt-0.5 text-[18px] font-semibold tabular-nums tracking-[-0.03em]">R$ 9.840</p>
+        <p class="mock-ok mt-0.5 text-[18px] font-semibold tabular-nums tracking-[-0.03em]">{resultado}</p>
       </div>
-      <p class="mock-ink text-right text-[11px] font-semibold tabular-nums">20%</p>
+      <p class="mock-ink text-right text-[11px] font-semibold tabular-nums">{margem}</p>
     </div>
   </div>
 </div>

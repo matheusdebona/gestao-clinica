@@ -27,6 +27,30 @@ export const CTA_LOGIN_SHORT_LABEL = 'Entrar'
 export const MOCK_CAPTION = 'Tela de exemplo. Números de demonstração, não são de clínica nenhuma.'
 export const HERO_STAGE_CAPTION = 'A planilha vira o DRE no celular.'
 
+export function formatDemoBrl(n: number): string {
+  return n.toLocaleString('pt-BR')
+}
+
+/** Demo DRE: resultado = receita bruta − todas as linhas; margem = round(resultado ÷ receita). */
+export const DRE_DEMO = {
+  receitaBruta: 52_000,
+  insumos: 24_280,
+  taxaMaquininha: 2_180,
+  impostos: 1_620,
+  comissoes: 4_160,
+  despesas: 9_920,
+} as const
+
+export const DRE_DEMO_RESULTADO =
+  DRE_DEMO.receitaBruta -
+  DRE_DEMO.insumos -
+  DRE_DEMO.taxaMaquininha -
+  DRE_DEMO.impostos -
+  DRE_DEMO.comissoes -
+  DRE_DEMO.despesas
+
+export const DRE_DEMO_MARGEM = Math.round((DRE_DEMO_RESULTADO / DRE_DEMO.receitaBruta) * 100)
+
 export const painItems = [
   {
     id: 'planilha',
