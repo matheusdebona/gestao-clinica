@@ -52,17 +52,19 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="brand?.name ?? 'Marca'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="router.push({ name: 'brands' })">Voltar</Button>
+        <PermissionGate v-if="brand?.is_active" permission="brands.manage">
+          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
+        </PermissionGate>
+      </template>
+      <template #actions>
         <PermissionGate v-if="brand?.is_active" permission="brands.manage">
           <Button variant="secondary" @click="router.push({ name: 'brands-edit', params: { id: String(props.brandId) } })">
             Editar
           </Button>
         </PermissionGate>
-        <PermissionGate v-if="brand?.is_active" permission="brands.manage">
-          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
-        </PermissionGate>
-        <PermissionGate v-else-if="brand" permission="brands.manage">
+        <PermissionGate v-if="brand && !(brand?.is_active)" permission="brands.manage">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()">Reativar</Button>
         </PermissionGate>
       </template>

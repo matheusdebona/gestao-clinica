@@ -167,10 +167,12 @@ function toggleStatus(id: number, checked: boolean) {
         />
       </FormField>
     </div>
-    <template #footer>
+    <template #footer-negative>
       <Button mobile-block variant="ghost" type="button" @click="emit('clear')"
         >Limpar filtros</Button
       >
+    </template>
+    <template #footer>
       <Button mobile-block type="button" @click="open = false">
         Ver {{ total }} {{ total === 1 ? 'lead' : 'leads' }}
       </Button>

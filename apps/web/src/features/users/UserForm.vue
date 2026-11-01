@@ -3,6 +3,7 @@ import { useForm } from 'vee-validate'
 import { computed, ref, watch } from 'vue'
 import { useQuery } from '@tanstack/vue-query'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
 import FormField from '@/components/ui/FormField.vue'
@@ -242,11 +243,13 @@ defineExpose({
       </div>
     </FormField>
 
-    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button mobile-block type="button" variant="ghost" :disabled="loading" @click="emit('cancel')">
-        Cancelar
-      </Button>
+    <ActionBar class="mt-2">
+      <template #negative>
+        <Button mobile-block type="button" variant="ghost" :disabled="loading" @click="emit('cancel')">
+          Cancelar
+        </Button>
+      </template>
       <Button mobile-block type="submit" :loading="loading">{{ submitLabel ?? 'Salvar' }}</Button>
-    </div>
+    </ActionBar>
   </form>
 </template>

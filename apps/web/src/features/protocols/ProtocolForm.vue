@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import InlineAlert from '@/components/ui/InlineAlert.vue'
@@ -15,6 +16,7 @@ import MaskedBox from '@/components/ui/MaskedBox.vue'
 import MoneyInput from '@/components/ui/MoneyInput.vue'
 import SearchField from '@/components/ui/SearchField.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
+import SectionTitle from '@/components/ui/SectionTitle.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
 import Textarea from '@/components/ui/Textarea.vue'
@@ -331,10 +333,10 @@ defineExpose({
 
     <Switch v-model="isActive" label="Ativo" />
 
-    <h2>Itens</h2>
-    <p class="text-[13px] text-muted">
-      Busque um produto ativo por nome ou SKU e informe a quantidade na unidade dele.
-    </p>
+    <SectionTitle
+      title="Itens"
+      hint="Busque um produto ativo por nome ou SKU e informe a quantidade na unidade dele."
+    />
 
     <SearchField
       v-model="searchInput"
@@ -454,8 +456,7 @@ defineExpose({
       </template>
     </FormField>
     <FormField
-      label="Condição especial"
-      hint="Opcional. Segundo valor para facilitar a venda."
+      label="Condição especial (opcional)" hint="Segundo valor para facilitar a venda."
       :error="errors.special_price"
       html-for="protocol-special"
     >
@@ -470,8 +471,7 @@ defineExpose({
     </FormField>
 
     <FormField
-      label="Retorno sugerido (dias)"
-      hint="Opcional. Ex.: 120 para toxina. Ao confirmar a venda (ou concluir o tratamento) o paciente entra em Retornos."
+      label="Retorno sugerido (dias) (opcional)" hint="Ex.: 120 para toxina. Ao confirmar a venda (ou concluir o tratamento) o paciente entra em Retornos."
       :error="errors.return_after_days"
       html-for="protocol-return-days"
     >
@@ -487,13 +487,15 @@ defineExpose({
       </template>
     </FormField>
 
-    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button mobile-block variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
-        Cancelar
-      </Button>
+    <ActionBar class="mt-2">
+      <template #negative>
+        <Button mobile-block variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
+          Cancelar
+        </Button>
+      </template>
       <Button mobile-block type="submit" :loading="loading">
         {{ submitLabel ?? 'Salvar' }}
       </Button>
-    </div>
+    </ActionBar>
   </form>
 </template>

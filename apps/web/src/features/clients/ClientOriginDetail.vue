@@ -60,8 +60,13 @@ function goCampaigns() {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="origin?.name ?? 'Origem'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="router.push({ name: 'client-origins' })">Voltar</Button>
+        <PermissionGate v-if="origin?.is_active" permission="client_origins.manage">
+          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
+        </PermissionGate>
+      </template>
+      <template #actions>
         <PermissionGate permission="campaigns.manage">
           <Button variant="secondary" @click="goCampaigns">Campanhas</Button>
         </PermissionGate>
@@ -73,10 +78,7 @@ function goCampaigns() {
             Editar
           </Button>
         </PermissionGate>
-        <PermissionGate v-if="origin?.is_active" permission="client_origins.manage">
-          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
-        </PermissionGate>
-        <PermissionGate v-else-if="origin" permission="client_origins.manage">
+        <PermissionGate v-if="origin && !(origin?.is_active)" permission="client_origins.manage">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()">Reativar</Button>
         </PermissionGate>
       </template>

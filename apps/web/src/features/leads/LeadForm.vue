@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import Checkbox from '@/components/ui/Checkbox.vue'
 import FormField from '@/components/ui/FormField.vue'
@@ -300,16 +301,18 @@ defineExpose({ setErrors, setDuplicate })
       label="Já abordei este lead (conta como primeira abordagem)"
     />
 
-    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button
-        mobile-block
-        variant="ghost"
-        type="button"
-        :disabled="loading"
-        @click="emit('cancel')"
-      >
-        Cancelar
-      </Button>
+    <ActionBar class="mt-2">
+      <template #negative>
+        <Button
+          mobile-block
+          variant="ghost"
+          type="button"
+          :disabled="loading"
+          @click="emit('cancel')"
+        >
+          Cancelar
+        </Button>
+      </template>
       <Button
         mobile-block
         type="submit"
@@ -318,7 +321,7 @@ defineExpose({ setErrors, setDuplicate })
       >
         {{ submitLabel ?? 'Salvar' }}
       </Button>
-    </div>
+    </ActionBar>
   </form>
 
   <AppDialog
@@ -332,10 +335,12 @@ defineExpose({ setErrors, setDuplicate })
         <Input id="new-lead-origin-name" v-model="newOriginName" type="text" :invalid="invalid" />
       </template>
     </FormField>
-    <template #footer>
+    <template #footer-negative>
       <Button mobile-block variant="ghost" type="button" @click="originDialog = false"
         >Cancelar</Button
       >
+    </template>
+    <template #footer>
       <Button
         mobile-block
         type="button"

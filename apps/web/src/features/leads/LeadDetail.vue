@@ -141,8 +141,10 @@ function onConverted(result: LeadConvertResult) {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader stack-actions :title="lead?.name ?? 'Lead'">
-      <template #actions>
+      <template #actions-negative>
         <Button mobile-block variant="ghost" @click="goBack">Voltar</Button>
+      </template>
+      <template #actions>
         <PermissionGate v-if="lead" permission="leads.manage">
           <Button mobile-block variant="secondary" @click="callOnWhatsApp">
             Chamar no WhatsApp
@@ -279,6 +281,7 @@ function onConverted(result: LeadConvertResult) {
       <LeadStatusDialog v-model:open="statusOpen" :lead="lead" :statuses="statuses" />
       <LeadConvertDialog v-model:open="convertOpen" :lead="lead" @converted="onConverted" />
       <AppDialog
+      size="md"
         v-model:open="cancelOpen"
         stack-footer
         title="Cancelar este lead?"
@@ -287,10 +290,12 @@ function onConverted(result: LeadConvertResult) {
         <FormField label="Motivo (opcional)" html-for="lead-cancel-reason">
           <Textarea id="lead-cancel-reason" v-model="cancelReason" :rows="3" />
         </FormField>
-        <template #footer>
+        <template #footer-negative>
           <Button mobile-block variant="ghost" type="button" @click="cancelOpen = false"
             >Voltar</Button
           >
+        </template>
+        <template #footer>
           <Button
             mobile-block
             variant="destructive"

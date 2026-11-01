@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InfoTip from '@/components/ui/InfoTip.vue'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import MetricCard from '@/components/patterns/MetricCard.vue'
@@ -65,12 +66,8 @@ const creatorMax = computed(() =>
 
 <template>
   <section class="flex flex-col gap-3">
-    <h2>Leads</h2>
+    <div class="flex items-center gap-1.5"><h2>Leads</h2><InfoTip text="Leads cadastrados no período, cancelados incluídos. Conta como convertido quem virou paciente, mesmo que depois do período." label="Sobre: Leads" /></div>
 
-    <p class="text-[13px] text-muted">
-      Leads cadastrados no período, cancelados incluídos. Conta como convertido quem virou
-      paciente, mesmo que depois do período.
-    </p>
 
     <Banner v-if="error" variant="danger" title="Leads">
       Não foi possível carregar os leads.

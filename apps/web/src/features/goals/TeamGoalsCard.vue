@@ -152,6 +152,7 @@ function inheritedHint(row: GoalProgress): string {
     </ul>
 
     <AppDialog
+      size="md"
       v-model:open="dialogOpen"
       stack-footer
       title="Meta do mês"
@@ -204,10 +205,12 @@ function inheritedHint(row: GoalProgress): string {
           Os meses seguintes repetem esta meta até você definir outra.
         </p>
       </div>
-      <template #footer>
+      <template #footer-negative>
         <Button mobile-block variant="ghost" type="button" @click="dialogOpen = false">
           Cancelar
         </Button>
+      </template>
+      <template #footer>
         <Button mobile-block type="button" :loading="saving" @click="onSave">Salvar meta</Button>
       </template>
     </AppDialog>

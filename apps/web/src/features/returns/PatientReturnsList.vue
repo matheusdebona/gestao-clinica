@@ -2,6 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { useRouter } from 'vue-router'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import {
@@ -77,7 +78,7 @@ function openClient(item: PatientReturn) {
         v-if="!hideActions && item.status === 'pending'"
         permission="clients.update"
       >
-        <div class="flex flex-col gap-2 sm:flex-row">
+        <ActionBar>
           <Button
             mobile-block
             variant="secondary"
@@ -94,7 +95,7 @@ function openClient(item: PatientReturn) {
           >
             Marcar como feito
           </Button>
-        </div>
+        </ActionBar>
       </PermissionGate>
     </li>
   </ul>

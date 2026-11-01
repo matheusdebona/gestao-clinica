@@ -88,15 +88,17 @@ function onConfirmDeactivate() {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="client?.name ?? 'Paciente'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
-        <PermissionGate v-if="client?.is_active" permission="clients.update">
-          <Button variant="secondary" @click="goEdit">Editar</Button>
-        </PermissionGate>
         <PermissionGate v-if="client?.is_active" permission="clients.delete">
           <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
         </PermissionGate>
-        <PermissionGate v-else-if="client" permission="clients.update">
+      </template>
+      <template #actions>
+        <PermissionGate v-if="client?.is_active" permission="clients.update">
+          <Button variant="secondary" @click="goEdit">Editar</Button>
+        </PermissionGate>
+        <PermissionGate v-if="client && !(client?.is_active)" permission="clients.update">
           <Button
             variant="secondary"
             :loading="reactivating"

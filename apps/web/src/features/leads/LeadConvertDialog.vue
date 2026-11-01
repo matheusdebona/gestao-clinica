@@ -227,10 +227,12 @@ function onConfirm() {
         </template>
       </FormField>
     </div>
-    <template #footer>
+    <template #footer-negative>
       <Button mobile-block variant="ghost" type="button" :disabled="isPending" @click="open = false"
         >Cancelar</Button
       >
+    </template>
+    <template #footer>
       <Button mobile-block type="button" :loading="isPending" @click="onConfirm">Confirmar</Button>
     </template>
   </AppSheet>

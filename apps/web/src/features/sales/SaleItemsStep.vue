@@ -12,6 +12,7 @@ import Input from '@/components/ui/Input.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import SearchField from '@/components/ui/SearchField.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
+import SectionTitle from '@/components/ui/SectionTitle.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { getProduct, listProducts } from '@/features/products/api'
 import { listProtocols } from '@/features/protocols/api'
@@ -181,10 +182,10 @@ function itemUnit(item: SaleItemDraft) {
 
 <template>
   <div class="flex flex-col gap-4">
-    <h2>Adicionar protocolo</h2>
-    <p class="text-[13px] text-muted">
-      Adicionar protocolo junta as quantidades aos itens já existentes. Não substitui o pacote.
-    </p>
+    <SectionTitle
+      title="Adicionar protocolo"
+      hint="Adicionar protocolo junta as quantidades aos itens já existentes. Não substitui o pacote."
+    />
 
     <SearchField
       v-model="protocolSearchInput"
