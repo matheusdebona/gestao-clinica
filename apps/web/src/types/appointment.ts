@@ -5,6 +5,9 @@ import type { Treatment } from './treatment'
 
 export type AppointmentStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
 
+/** aguardando confirmação / confirmado / não confirmado / desmarcou */
+export type AppointmentConfirmationStatus = 'pending' | 'confirmed' | 'not_confirmed' | 'declined'
+
 export type ConsumptionSource = 'suggested' | 'extra'
 
 export interface AppointmentProfessional {
@@ -71,6 +74,9 @@ export interface Appointment {
   notes: string | null
   confirmation_sent_at?: string | null
   confirmation_sent_by?: { id: number; name: string } | null
+  confirmation_status?: AppointmentConfirmationStatus
+  confirmation_status_at?: string | null
+  confirmation_status_by?: { id: number; name: string } | null
   client?: Client | null
   professional?: AppointmentProfessional | null
   treatment?: AppointmentTreatment | Treatment | null

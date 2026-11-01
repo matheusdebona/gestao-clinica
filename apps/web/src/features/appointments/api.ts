@@ -1,5 +1,10 @@
 import { api } from '@/lib/api'
-import type { Appointment, AppointmentPayload, ConsumptionPayload } from '@/types/appointment'
+import type {
+  Appointment,
+  AppointmentConfirmationStatus,
+  AppointmentPayload,
+  ConsumptionPayload,
+} from '@/types/appointment'
 import type { DataEnvelope, Paginated } from '@/types/pagination'
 import type { ClinicUser } from '@/types/team-user'
 
@@ -115,9 +120,40 @@ export async function listProfessionals(): Promise<ClinicUser[]> {
 
 /** Records that the WhatsApp confirmation link was opened (the UI opens wa.me itself). */
 export async function logAppointmentWhatsAppConfirmation(id: number): Promise<Appointment> {
-  const payload = await api<DataEnvelope<Appointment>>(`/appointments/${id}/whatsapp-confirmation`, {
-    method: 'POST',
-    body: {},
+  const payload = await api<DataEnvelope<Appointment>>(
+    `/appointments/${id}/whatsapp-confirmation`,
+    {
+      method: 'POST',
+      body: {},
+    },
+  )
+  return payload.data
+}
+
+export interface AppointmentConfirmationsResponse {
+  data: Appointment[]
+  meta: {
+    date: string
+    counts: { total: number } & Record<AppointmentConfirmationStatus, number>
+  }
+}
+
+/** "Confirmar amanhã": scheduled sessions of a clinic day (default: tomorrow). */
+export async function listAppointmentConfirmations(
+  date?: string,
+): Promise<AppointmentConfirmationsResponse> {
+  return api<AppointmentConfirmationsResponse>('/appointments/confirmations', {
+    query: date ? { date } : {},
+  })
+}
+
+export async function setAppointmentConfirmationStatus(
+  id: number,
+  status: AppointmentConfirmationStatus,
+): Promise<Appointment> {
+  const payload = await api<DataEnvelope<Appointment>>(`/appointments/${id}/confirmation-status`, {
+    method: 'PATCH',
+    body: { confirmation_status: status },
   })
   return payload.data
 }

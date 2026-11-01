@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, MessageCircle } from '@lucide/vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AgendaEventCard from '@/components/patterns/AgendaEventCard.vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
+import ConfirmTomorrowCard from '@/features/appointments/ConfirmTomorrowCard.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import DatePicker from '@/components/ui/DatePicker.vue'
@@ -36,7 +37,11 @@ import {
   toDateInput,
   weekDays,
 } from '@/features/appointments/calendar'
-import { APPOINTMENT_STATUS_BADGE, APPOINTMENT_STATUS_LABELS } from '@/features/appointments/labels'
+import {
+  APPOINTMENT_STATUS_BADGE,
+  APPOINTMENT_STATUS_LABELS,
+  CONFIRMATION_STATUS_LABELS,
+} from '@/features/appointments/labels'
 import { formatTime } from '@/lib/formatters'
 import { useAuthStore } from '@/stores/auth'
 import type { Appointment } from '@/types/appointment'
@@ -142,8 +147,12 @@ function eventMeta(item: Appointment): string {
   const time = formatTime(item.scheduled_at)
   const professional = item.professional?.name ?? 'Profissional'
   const treatment = item.treatment_id ? `Tratamento #${item.treatment_id}` : 'Avaliação'
-  const confirmed = item.confirmation_sent_at ? ' · WhatsApp enviado' : ''
-  return `${time} · ${professional} · ${treatment}${confirmed}`
+  const sent = item.confirmation_sent_at ? ' · WhatsApp enviado' : ''
+  const answer =
+    item.confirmation_status && item.confirmation_status !== 'pending'
+      ? ` · ${CONFIRMATION_STATUS_LABELS[item.confirmation_status]}`
+      : ''
+  return `${time} · ${professional} · ${treatment}${sent}${answer}`
 }
 
 const queryClient = useQueryClient()
@@ -196,6 +205,8 @@ function onClientSearch(value: string) {
     </Banner>
 
     <template v-else>
+      <ConfirmTomorrowCard />
+
       <div class="flex flex-wrap items-center gap-2">
         <IconButton label="Anterior" @click="shift(-1)">
           <ChevronLeft class="size-4" :stroke-width="1.75" />

@@ -1,4 +1,4 @@
-import type { AppointmentStatus } from '@/types/appointment'
+import type { AppointmentConfirmationStatus, AppointmentStatus } from '@/types/appointment'
 
 export const APPOINTMENT_STATUS_LABELS: Record<AppointmentStatus, string> = {
   scheduled: 'Agendada',
@@ -15,4 +15,21 @@ export const APPOINTMENT_STATUS_BADGE: Record<
   in_progress: 'warning',
   completed: 'success',
   cancelled: 'muted',
+}
+
+export const CONFIRMATION_STATUS_LABELS: Record<AppointmentConfirmationStatus, string> = {
+  pending: 'Aguardando confirmação',
+  confirmed: 'Confirmado',
+  not_confirmed: 'Não confirmado',
+  declined: 'Desmarcou',
+}
+
+export const CONFIRMATION_STATUS_BADGE: Record<
+  AppointmentConfirmationStatus,
+  'success' | 'purple' | 'muted' | 'warning' | 'danger'
+> = {
+  pending: 'purple',
+  confirmed: 'success',
+  not_confirmed: 'warning',
+  declined: 'danger',
 }

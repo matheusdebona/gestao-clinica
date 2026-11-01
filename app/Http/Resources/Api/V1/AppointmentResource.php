@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\Appointment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Appointment */
+/** @mixin Appointment */
 class AppointmentResource extends JsonResource
 {
     /**
@@ -43,6 +44,12 @@ class AppointmentResource extends JsonResource
             'confirmation_sent_by' => $this->whenLoaded('confirmationSentBy', fn () => $this->confirmationSentBy === null ? null : [
                 'id' => $this->confirmationSentBy->id,
                 'name' => $this->confirmationSentBy->name,
+            ]),
+            'confirmation_status' => $this->confirmation_status ?? Appointment::CONFIRMATION_PENDING,
+            'confirmation_status_at' => $this->confirmation_status_at,
+            'confirmation_status_by' => $this->whenLoaded('confirmationStatusBy', fn () => $this->confirmationStatusBy === null ? null : [
+                'id' => $this->confirmationStatusBy->id,
+                'name' => $this->confirmationStatusBy->name,
             ]),
             'consumptions' => AppointmentConsumptionResource::collection($this->whenLoaded('consumptions')),
             'client' => ClientResource::make($this->whenLoaded('client')),
