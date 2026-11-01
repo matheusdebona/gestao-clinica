@@ -14,9 +14,9 @@ import MockSpreadsheet from './mocks/MockSpreadsheet.astro'
 import PhoneFrame from './PhoneFrame.astro'
 ---
 
-<section id="topo" class="hero-solid relative overflow-hidden text-inverse">
-  <div class="site-wrap relative grid gap-14 pb-16 pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,28rem)] lg:items-end lg:gap-16 lg:pb-24 lg:pt-36">
-    <div class="hero-copy max-w-xl">
+<section id="topo" class="hero-solid relative overflow-hidden">
+  <div class="site-wrap relative grid gap-14 pb-24 pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,28rem)] lg:items-end lg:gap-16 lg:pb-24 lg:pt-36">
+    <div class="hero-copy max-w-xl text-inverse">
       <p class="kicker text-inverse/55">{HERO_KICKER}</p>
       <h1 class="display-title mt-6 text-inverse">
         {HERO_TITLE_LEAD}
@@ -42,7 +42,7 @@ import PhoneFrame from './PhoneFrame.astro'
       </div>
     </div>
 
-    <div class="hero-stage relative mx-auto w-full max-w-[28rem] lg:mx-0 lg:justify-self-end">
+    <div class="hero-stage relative mx-auto w-full max-w-[28rem] lg:mx-0 lg:justify-self-end" data-hero-stage>
       <div class="hero-swap">
         <div class="hero-sheet">
           <MockSpreadsheet />

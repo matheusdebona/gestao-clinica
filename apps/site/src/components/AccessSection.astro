@@ -5,13 +5,42 @@ import CtaRow from './CtaRow.astro'
 
 <section id="acesso" class="site-anchor py-10 sm:py-16">
   <div class="site-wrap">
-    <div class="hero-solid rounded-chrome px-5 py-14 text-inverse sm:px-12 sm:py-16" data-reveal>
-      <p class="kicker text-inverse/55">Começar</p>
-      <h2 class="section-title mt-4 max-w-xl text-inverse">Cria a clínica. Abre o DRE do mês.</h2>
-      <p class="mt-4 max-w-lg text-[16px] leading-7 text-inverse/70">
-        Sai da planilha. O cadastro já abre o sistema: lead, agenda e o fechamento no celular.
-      </p>
-      <CtaRow primary={CTA_REGISTER_STRONG_LABEL} secondary={CTA_LOGIN_LABEL} onDark />
+    <div
+      class="hero-solid overflow-hidden rounded-chrome px-5 py-14 sm:px-12 sm:py-16 lg:px-14 lg:py-16"
+      data-reveal
+    >
+      <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] lg:gap-16">
+        <div class="text-inverse">
+          <p class="kicker text-inverse/55">Começar</p>
+          <h2 class="section-title mt-4 max-w-xl text-inverse">Cria a clínica. Abre o DRE do mês.</h2>
+          <p class="mt-4 max-w-lg text-[16px] leading-7 text-inverse/70">
+            Sai da planilha. O cadastro já abre o sistema: lead, agenda e o fechamento no celular.
+          </p>
+          <CtaRow primary={CTA_REGISTER_STRONG_LABEL} secondary={CTA_LOGIN_LABEL} onDark />
+        </div>
+
+        <div class="access-visual hidden lg:block" aria-hidden="true">
+          <article class="access-visual-card">
+            <p class="text-[11px] font-medium text-inverse/50">Início · fila do dia</p>
+            <p class="mt-1 text-[22px] font-semibold tracking-[-0.04em] text-inverse">3 leads parados</p>
+            <p class="mt-1 text-[12px] leading-4 text-inverse/55">Orçamento enviado sem resposta.</p>
+          </article>
+          <article class="access-visual-card">
+            <p class="text-[11px] font-medium text-inverse/50">DRE · novembro</p>
+            <p class="mt-1 text-[28px] font-semibold tabular-nums tracking-[-0.04em] text-inverse">
+              R$ 9.840
+            </p>
+            <p class="mt-1 text-[12px] text-inverse/55">Resultado líquido · margem 20%</p>
+          </article>
+          <article class="access-visual-card">
+            <p class="text-[11px] font-medium text-inverse/50">WhatsApp</p>
+            <p class="mt-1 text-[16px] font-semibold tracking-[-0.03em] text-inverse">
+              Cobrar no WhatsApp
+            </p>
+            <p class="mt-1 text-[12px] text-inverse/55">Mensagem pronta. O toque fica no histórico.</p>
+          </article>
+        </div>
+      </div>
     </div>
   </div>
 </section>

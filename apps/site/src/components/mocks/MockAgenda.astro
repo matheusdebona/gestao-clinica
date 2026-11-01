@@ -1,8 +1,8 @@
 ---
 const events = [
-  { time: '09:00', title: 'Avaliação', meta: 'Paciente · retorno', status: 'Confirmado', tone: 'success' },
-  { time: '14:00', title: 'Harmonização · sessão 2', meta: 'Tratamento em andamento', status: 'Aguardando', tone: 'warning' },
-  { time: '16:30', title: 'Retorno', meta: 'Previsto nesta semana', status: 'Confirmado', tone: 'success' },
+  { time: '09:00', title: 'Avaliação', meta: 'Paciente · retorno', status: 'Confirmado', tone: 'ok' },
+  { time: '14:00', title: 'Harmonização · sessão 2', meta: 'Tratamento', status: 'Aguardando', tone: 'warn' },
+  { time: '16:30', title: 'Retorno', meta: 'Previsto nesta semana', status: 'Confirmado', tone: 'ok' },
 ]
 ---
 
@@ -10,20 +10,20 @@ const events = [
   <header class="mock-app-head">
     <p class="mock-kicker">Agenda</p>
     <h3 class="mock-title">Amanhã</h3>
-    <p class="mock-meta">Confirmar no WhatsApp. Tela de exemplo.</p>
+    <p class="mock-meta">Confirmar no WhatsApp</p>
   </header>
 
   <div class="mock-card">
     <div class="flex items-center justify-between gap-2">
       <div>
-        <p class="text-[12px] font-semibold tracking-[-0.02em] text-title">Confirmar amanhã</p>
-        <p class="mt-0.5 text-[10px] leading-4 text-muted">1 aguardando · 2 confirmados</p>
+        <p class="mock-ink text-[12px] font-semibold tracking-[-0.02em]">Confirmar amanhã</p>
+        <p class="mock-quiet mt-0.5 text-[10px] leading-4">1 aguardando · 2 confirmados</p>
       </div>
       <span class="grid size-8 place-items-center rounded-full bg-brand text-[11px] font-semibold text-inverse">
         3
       </span>
     </div>
-    <p class="mt-2 rounded-[10px] bg-brand px-3 py-2 text-center text-[11px] font-semibold text-inverse">
+    <p class="mt-1.5 rounded-[10px] bg-brand px-3 py-1.5 text-center text-[11px] font-semibold text-inverse">
       Abrir WhatsApp
     </p>
   </div>
@@ -34,15 +34,15 @@ const events = [
         <li class="mock-card">
           <div class="flex items-start justify-between gap-2">
             <div class="min-w-0">
-              <p class="text-[12px] font-semibold tracking-[-0.02em] text-title">{event.title}</p>
-              <p class="mt-0.5 text-[10px] text-muted">{event.meta}</p>
+              <p class="mock-ink text-[12px] font-semibold tracking-[-0.02em]">{event.title}</p>
+              <p class="mock-quiet mt-0.5 text-[10px]">{event.meta}</p>
             </div>
-            <span class="shrink-0 text-[11px] tabular-nums text-muted">{event.time}</span>
+            <span class="mock-quiet shrink-0 text-[11px] tabular-nums">{event.time}</span>
           </div>
           <span
             class:list={[
               'mt-2 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold',
-              event.tone === 'success' ? 'glass-chip-success text-success' : 'glass-chip-warning text-warning',
+              event.tone === 'ok' ? 'glass-chip-success mock-ok' : 'glass-chip-warning mock-warn',
             ]}
           >
             {event.status}

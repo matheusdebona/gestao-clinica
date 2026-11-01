@@ -1,7 +1,12 @@
 ---
 import BrandMark from './BrandMark.astro'
 import { APP_HOST, APP_LOGIN_URL, APP_NAME, APP_REGISTER_URL, MARKETING_HOST } from '../lib/urls'
-import { CTA_LOGIN_SHORT_LABEL, CTA_REGISTER_LABEL, SITE_ONE_LINER } from '../content/site'
+import {
+  CTA_LOGIN_SHORT_LABEL,
+  CTA_REGISTER_LABEL,
+  MOCK_CAPTION,
+  SITE_ONE_LINER,
+} from '../content/site'
 ---
 
 <footer class="site-footer-pad border-t border-border-divider pb-10 pt-14" data-site-footer>
@@ -12,7 +17,7 @@ import { CTA_LOGIN_SHORT_LABEL, CTA_REGISTER_LABEL, SITE_ONE_LINER } from '../co
         <span class="text-[15px] font-semibold tracking-[-0.03em]">{APP_NAME}</span>
       </a>
       <p class="mt-4 max-w-sm text-[15px] leading-6 text-body">
-        {SITE_ONE_LINER} Este site não pede login. O produto vive em app.hofpay.com.br.
+        {SITE_ONE_LINER} O produto vive em app.hofpay.com.br.
       </p>
     </div>
 
@@ -37,6 +42,6 @@ import { CTA_LOGIN_SHORT_LABEL, CTA_REGISTER_LABEL, SITE_ONE_LINER } from '../co
   </div>
   <div class="site-wrap mt-12 flex flex-wrap items-center justify-between gap-3 text-[13px] text-muted">
     <p>© {new Date().getFullYear()} {APP_NAME}</p>
-    <p>Saia da planilha. A clínica no celular.</p>
+    <p class="max-w-xs text-[12px] leading-5 sm:text-right">{MOCK_CAPTION}</p>
   </div>
 </footer>

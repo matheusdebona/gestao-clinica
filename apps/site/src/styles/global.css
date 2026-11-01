@@ -264,7 +264,7 @@
     justify-content: space-between;
     font-size: 11px;
     font-weight: 600;
-    color: var(--sv-text-title);
+    color: #1c1c1e;
     pointer-events: none;
   }
 
@@ -299,7 +299,7 @@
     border-radius: 26px;
     background-color: var(--sv-bg-canvas);
     background-image: var(--sv-canvas-mesh);
-    color: var(--sv-text-body);
+    color: #3a3a3c;
   }
 
   .phone-home {
@@ -315,11 +315,18 @@
   }
 
   .mock-app {
-    padding: 2.15rem 0.7rem 1.4rem;
+    box-sizing: border-box;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 1.9rem 0.62rem 1.15rem;
+    color: #3a3a3c;
   }
 
   .mock-app-head {
-    margin-bottom: 0.7rem;
+    margin-bottom: 0.55rem;
+    flex-shrink: 0;
   }
 
   .mock-kicker {
@@ -327,29 +334,49 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--sv-text-muted);
+    color: #8e8e93;
   }
 
   .mock-title {
     margin: 0;
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     letter-spacing: -0.03em;
-    color: var(--sv-text-title);
+    color: #1c1c1e;
   }
 
   .mock-meta {
-    margin-top: 0.15rem;
+    margin-top: 0.1rem;
     font-size: 11px;
-    color: var(--sv-text-muted);
+    color: #8e8e93;
   }
 
   .mock-card {
     border-radius: 12px;
-    padding: 0.65rem 0.7rem;
+    padding: 0.5rem 0.6rem;
     background-color: var(--sv-glass-regular-bg);
     border: 1px solid var(--sv-glass-regular-border);
     box-shadow: var(--sv-shadow-glass);
+  }
+
+  .mock-ink {
+    color: #1c1c1e;
+  }
+
+  .mock-copy {
+    color: #3a3a3c;
+  }
+
+  .mock-quiet {
+    color: #8e8e93;
+  }
+
+  .mock-ok {
+    color: var(--sv-success);
+  }
+
+  .mock-warn {
+    color: var(--sv-warning);
   }
 
   .hero-swap {
@@ -449,14 +476,28 @@
     table-layout: fixed;
   }
 
+  .sheet-col-n {
+    width: 1.35rem;
+  }
+
+  .sheet-col-item {
+    width: 46%;
+  }
+
+  .sheet-col-val {
+    width: 3.5rem;
+  }
+
+  .sheet-col-note {
+    width: 4.4rem;
+  }
+
   .sheet th,
   .sheet td {
     border: 1px solid var(--sv-border-divider);
-    padding: 0.38rem 0.45rem;
+    padding: 0.32rem 0.4rem;
     text-align: left;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    vertical-align: middle;
   }
 
   .sheet thead th {
@@ -465,18 +506,32 @@
     font-weight: 600;
     color: var(--sv-text-muted);
     text-align: center;
+    white-space: nowrap;
   }
 
-  .sheet tbody th {
-    width: 1.6rem;
+  .sheet tbody th,
+  .sheet thead th:first-child {
+    width: 1.35rem;
+    padding-inline: 0.12rem;
     background: var(--sv-bg-surface-muted);
     color: var(--sv-text-muted);
     font-weight: 500;
     text-align: center;
   }
 
-  .sheet tbody td:nth-child(2) {
-    width: 42%;
+  .sheet td.sheet-item {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.25;
+    font-weight: 500;
+  }
+
+  .sheet tbody td:nth-child(3),
+  .sheet tbody td:nth-child(4) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .sheet-empty {
@@ -507,5 +562,174 @@
       opacity: 1 !important;
       visibility: visible;
     }
+  }
+}
+
+/*
+  Mock UI is a self-contained light surface. These rules sit outside @layer so
+  they win over a parent `text-inverse` utility (hero / dark bands).
+*/
+.phone-screen,
+.phone-status,
+.mock-app,
+.sheet {
+  color: #3a3a3c;
+}
+
+.phone-status,
+.mock-title,
+.mock-ink,
+.sheet,
+.sheet-file {
+  color: #1c1c1e;
+}
+
+.mock-copy {
+  color: #3a3a3c;
+}
+
+.mock-kicker,
+.mock-meta,
+.mock-quiet,
+.sheet-foot,
+.sheet thead th,
+.sheet tbody th {
+  color: #8e8e93;
+}
+
+.mock-ok {
+  color: var(--sv-success);
+}
+
+.mock-warn {
+  color: var(--sv-warning);
+}
+
+.mock-dre-net {
+  flex-shrink: 0;
+}
+
+.mock-dre-lines {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.funnel-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(8.25rem, 1fr);
+  gap: 0.7rem;
+  margin: 0;
+  padding: 0.15rem 0 0.35rem;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.funnel-chip {
+  min-width: 8.25rem;
+  border-radius: 12px;
+  padding: 0.85rem 0.9rem;
+  background-color: var(--sv-glass-regular-bg);
+  border: 1px solid var(--sv-glass-regular-border);
+  box-shadow: var(--sv-shadow-glass);
+}
+
+.funnel-chip-bar {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 99px;
+  margin-top: 0.7rem;
+  background: var(--sv-bg-surface-muted);
+}
+
+.funnel-chip-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--sv-brand-primary);
+}
+
+.phone-cluster {
+  position: relative;
+  width: 100%;
+  max-width: 18.5rem;
+}
+
+.phone-cluster-main {
+  position: relative;
+  z-index: 2;
+}
+
+.phone-cluster-side {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .phone-cluster {
+    max-width: 36rem;
+    min-height: 612px;
+  }
+
+  .phone-cluster-main {
+    width: fit-content;
+    margin-inline: auto;
+  }
+
+  .phone-cluster-side {
+    display: block;
+    position: absolute;
+    top: 3.25rem;
+    z-index: 1;
+    transform: scale(0.78);
+    transform-origin: top center;
+    opacity: 0.9;
+    filter: saturate(0.92);
+  }
+
+  .phone-cluster-side-a {
+    left: 0;
+    top: 4.5rem;
+  }
+
+  .phone-cluster-side-b {
+    right: 0;
+    top: 2.25rem;
+  }
+}
+
+.access-visual {
+  position: relative;
+  min-height: 16.5rem;
+}
+
+.access-visual-card {
+  position: relative;
+  border-radius: 14px;
+  padding: 0.95rem 1.05rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: var(--sv-shadow-glass-dark);
+  color: var(--sv-text-inverse);
+}
+
+.access-visual-card + .access-visual-card {
+  margin-top: 0.7rem;
+}
+
+@media (min-width: 1024px) {
+  .access-visual-card:nth-child(1) {
+    width: 86%;
+    margin-left: auto;
+  }
+
+  .access-visual-card:nth-child(2) {
+    width: 100%;
+    margin-top: -0.35rem;
+  }
+
+  .access-visual-card:nth-child(3) {
+    width: 90%;
+    margin-top: -0.15rem;
   }
 }

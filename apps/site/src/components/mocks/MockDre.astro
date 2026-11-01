@@ -1,38 +1,34 @@
 ---
 const kpis = [
-  { label: 'Receita líquida', value: 'R$ 48.200', tone: 'title' },
-  { label: 'Margem de contribuição', value: '41%', tone: 'title' },
-  { label: 'Resultado', value: 'R$ 9.840', tone: 'success' },
-  { label: 'Margem líquida', value: '20%', tone: 'title' },
+  { label: 'Resultado', value: 'R$ 9.840', tone: 'ok' },
+  { label: 'Margem líquida', value: '20%', tone: 'ink' },
 ]
 
 const lines = [
-  { label: 'Receita bruta', value: 'R$ 52.000', strong: false },
-  { label: 'Taxa da maquininha', value: '− R$ 2.180', strong: false },
-  { label: 'Impostos sobre a receita', value: '− R$ 1.620', strong: false },
-  { label: 'Comissões', value: '− R$ 4.160', strong: false },
-  { label: 'Margem de contribuição', value: 'R$ 19.760', strong: true },
-  { label: 'Despesas do mês', value: '− R$ 9.920', strong: false },
-  { label: 'Resultado líquido', value: 'R$ 9.840', strong: true },
+  { label: 'Receita bruta', value: 'R$ 52.000' },
+  { label: 'Taxa da maquininha', value: '− R$ 2.180' },
+  { label: 'Impostos sobre a receita', value: '− R$ 1.620' },
+  { label: 'Comissões', value: '− R$ 4.160' },
+  { label: 'Despesas do mês', value: '− R$ 9.920' },
 ]
 ---
 
-<div class="mock-app">
+<div class="mock-app mock-app-dre">
   <header class="mock-app-head">
     <p class="mock-kicker">Financeiro</p>
     <h3 class="mock-title">DRE do mês</h3>
-    <p class="mock-meta">Novembro. Tela de exemplo.</p>
+    <p class="mock-meta">Novembro</p>
   </header>
 
   <div class="grid grid-cols-2 gap-1.5">
     {
       kpis.map((item) => (
         <div class="mock-card">
-          <p class="text-[10px] leading-3 text-muted">{item.label}</p>
+          <p class="mock-quiet text-[10px] leading-3">{item.label}</p>
           <p
             class:list={[
-              'mt-1 text-[13px] font-semibold tabular-nums tracking-[-0.03em]',
-              item.tone === 'success' ? 'text-success' : 'text-title',
+              'mt-0.5 text-[15px] font-semibold tabular-nums tracking-[-0.03em]',
+              item.tone === 'ok' ? 'mock-ok' : 'mock-ink',
             ]}
           >
             {item.value}
@@ -42,29 +38,24 @@ const lines = [
     }
   </div>
 
-  <div class="mock-card mt-1.5">
-    <p class="text-[10px] font-medium uppercase tracking-[0.06em] text-muted">Ponto de equilíbrio</p>
-    <p class="mt-1 text-[16px] font-semibold tabular-nums tracking-[-0.03em] text-title">R$ 38.400</p>
-    <p class="mt-0.5 text-[10px] leading-4 text-muted">Receita líquida para cobrir as despesas do mês.</p>
-  </div>
-
-  <div class="mock-card mt-1.5 divide-y divide-border-divider">
+  <div class="mock-card mock-dre-lines mt-1.5 divide-y divide-border-divider">
     {
       lines.map((row) => (
-        <div class="flex items-center justify-between gap-2 py-1.5 first:pt-0 last:pb-0">
-          <span class:list={['text-[11px] leading-4', row.strong ? 'font-semibold text-title' : 'text-body']}>
-            {row.label}
-          </span>
-          <span
-            class:list={[
-              'shrink-0 text-[11px] tabular-nums',
-              row.strong ? 'font-semibold text-title' : 'text-muted',
-            ]}
-          >
-            {row.value}
-          </span>
+        <div class="flex items-center justify-between gap-2 py-[5px] first:pt-0 last:pb-0">
+          <span class="mock-copy text-[11px] leading-4">{row.label}</span>
+          <span class="mock-quiet shrink-0 text-[11px] tabular-nums">{row.value}</span>
         </div>
       ))
     }
+  </div>
+
+  <div class="mock-card mock-dre-net mt-1.5">
+    <div class="flex items-end justify-between gap-2">
+      <div>
+        <p class="mock-quiet text-[10px] leading-3">Resultado líquido</p>
+        <p class="mock-ok mt-0.5 text-[18px] font-semibold tabular-nums tracking-[-0.03em]">R$ 9.840</p>
+      </div>
+      <p class="mock-ink text-right text-[11px] font-semibold tabular-nums">20%</p>
+    </div>
   </div>
 </div>

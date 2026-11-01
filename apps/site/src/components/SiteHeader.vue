@@ -15,19 +15,40 @@ const nav = [
 
 const open = ref(false)
 const condensed = ref(false)
+const heroInView = ref(true)
 const sectionCtaInView = ref(true)
 const footerNear = ref(false)
 
 const showSticky = computed(
-  () => condensed.value && !open.value && !sectionCtaInView.value && !footerNear.value,
+  () =>
+    condensed.value &&
+    !heroInView.value &&
+    !open.value &&
+    !sectionCtaInView.value &&
+    !footerNear.value,
 )
 const onHero = computed(() => !condensed.value)
 
 let ctaIo: IntersectionObserver | null = null
 let footerIo: IntersectionObserver | null = null
 
+function updateHeroLock() {
+  const stage =
+    document.querySelector<HTMLElement>('[data-hero-stage]') ??
+    document.querySelector<HTMLElement>('.hero-stage') ??
+    document.getElementById('topo')
+  if (!stage) {
+    heroInView.value = true
+    return
+  }
+  const rect = stage.getBoundingClientRect()
+  const stickyGuard = 120
+  heroInView.value = rect.bottom > stickyGuard
+}
+
 function onScroll() {
   condensed.value = window.scrollY > 24
+  updateHeroLock()
 }
 
 function onKey(event: KeyboardEvent) {
@@ -36,7 +57,9 @@ function onKey(event: KeyboardEvent) {
 
 onMounted(() => {
   onScroll()
+  requestAnimationFrame(updateHeroLock)
   window.addEventListener('scroll', onScroll, { passive: true })
+  window.addEventListener('resize', updateHeroLock, { passive: true })
   window.addEventListener('keydown', onKey)
 
   const visibleCtas = new Set<Element>()
@@ -63,6 +86,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll)
+  window.removeEventListener('resize', updateHeroLock)
   window.removeEventListener('keydown', onKey)
   ctaIo?.disconnect()
   footerIo?.disconnect()
@@ -142,6 +166,7 @@ onUnmounted(() => {
   <div
     class="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 transition-transform duration-200 motion-reduce:transition-none md:hidden"
     :class="showSticky ? 'translate-y-0' : 'translate-y-[140%]'"
+    data-sticky-cta
     :aria-hidden="!showSticky"
     style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom))"
   >
