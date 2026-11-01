@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\ClinicSettingsController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\LeadController;
+use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
 use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
 use App\Http\Controllers\Api\V1\LeadStatusController;
 use App\Http\Controllers\Api\V1\MetricsController;
@@ -162,6 +163,14 @@ Route::prefix('v1')->group(function (): void {
         Route::get('leads', [LeadController::class, 'index'])
             ->middleware('permission:leads.view');
         Route::get('leads/creators', [LeadController::class, 'creators'])
+            ->middleware('permission:leads.view');
+        Route::get('leads/daily-analysis', [LeadDailyAnalysisController::class, 'index'])
+            ->middleware('permission:leads.view');
+        Route::get('leads/checkins', [LeadDailyAnalysisController::class, 'checkins'])
+            ->middleware('permission:leads.view');
+        Route::get('leads/checkins/{day}', [LeadDailyAnalysisController::class, 'showCheckin'])
+            ->middleware('permission:leads.view');
+        Route::put('leads/checkins/{day}', [LeadDailyAnalysisController::class, 'saveCheckin'])
             ->middleware('permission:leads.view');
         Route::get('lead-follow-up-tiers', [LeadFollowUpTierController::class, 'index'])
             ->middleware('permission:leads.view|clinics.branding|clinics.manage');

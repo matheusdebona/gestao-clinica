@@ -18,7 +18,7 @@ class NotificationController extends Controller
     private const CATEGORY_TYPES = [
         'stock' => ['low_stock', 'projected_low_stock'],
         'agenda' => ['appointment_stock_warning'],
-        'leads' => ['stale_leads'],
+        'leads' => ['stale_leads', 'daily_review'],
     ];
 
     public function index(IndexNotificationRequest $request): AnonymousResourceCollection
