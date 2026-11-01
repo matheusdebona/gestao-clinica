@@ -48,8 +48,12 @@ export interface StockAdjustPayload {
   quantity: string
   unit_cost?: string | null
   reason?: string | null
+  /** Só em saída: expired | damaged | other. Vazio = ajuste (não é perda). */
+  loss_reason?: StockLossReason | null
   notes?: string | null
 }
+
+export type StockLossReason = 'expired' | 'damaged' | 'other'
 
 export interface StockAdjustResult {
   product: Product

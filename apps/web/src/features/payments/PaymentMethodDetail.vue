@@ -16,6 +16,7 @@ import {
 } from '@/features/payments/api'
 import { formatFeePercent, paymentKindLabel } from '@/features/payments/labels'
 import { formatBRL } from '@/lib/formatters'
+import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
 
@@ -24,12 +25,17 @@ const props = defineProps<{
 }>()
 
 const router = useRouter()
+const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
 const confirmOpen = ref(false)
 const idRef = computed(() => props.methodId)
 
-const { data: method, isPending, isError } = useQuery({
+const {
+  data: method,
+  isPending,
+  isError,
+} = useQuery({
   queryKey: ['payment-methods', 'detail', idRef],
   queryFn: () => getPaymentMethod(idRef.value),
 })
@@ -63,7 +69,9 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
         <PermissionGate v-if="method?.is_active" permission="payment_methods.manage">
           <Button
             variant="secondary"
-            @click="router.push({ name: 'payment-methods-edit', params: { id: String(props.methodId) } })"
+            @click="
+              router.push({ name: 'payment-methods-edit', params: { id: String(props.methodId) } })
+            "
           >
             Editar
           </Button>
@@ -72,7 +80,9 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
           <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
         </PermissionGate>
         <PermissionGate v-else-if="method" permission="payment_methods.manage">
-          <Button variant="secondary" :loading="reactivating" @click="reactivate()">Reativar</Button>
+          <Button variant="secondary" :loading="reactivating" @click="reactivate()"
+            >Reativar</Button
+          >
         </PermissionGate>
       </template>
     </PageHeader>
@@ -101,20 +111,28 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
         <div>
           <dt class="text-[13px] text-muted">Cartão</dt>
           <dd class="mt-0.5 text-[15px] text-title">
-            {{ method.requires_card_meta ? 'Exige operadora, bandeira e parcelas' : 'Não exige dados de cartão' }}
+            {{
+              method.requires_card_meta
+                ? 'Exige operadora, bandeira e parcelas'
+                : 'Não exige dados de cartão'
+            }}
           </dd>
         </div>
-        <div v-if="!method.requires_card_meta">
+        <div v-if="!method.requires_card_meta && auth.can('finance.view')">
           <dt class="text-[13px] text-muted">Taxa percentual</dt>
           <dd class="mt-0.5 text-[15px] text-title">{{ formatFeePercent(method.fee_percent) }}</dd>
         </div>
-        <div v-if="!method.requires_card_meta">
+        <div v-if="!method.requires_card_meta && auth.can('finance.view')">
           <dt class="text-[13px] text-muted">Taxa fixa</dt>
-          <dd class="mt-0.5 text-[15px] text-title">{{ method.fee_fixed ? formatBRL(method.fee_fixed) : '—' }}</dd>
+          <dd class="mt-0.5 text-[15px] text-title">
+            {{ method.fee_fixed ? formatBRL(method.fee_fixed) : '—' }}
+          </dd>
         </div>
         <div>
           <dt class="text-[13px] text-muted">Situação</dt>
-          <dd class="mt-0.5 text-[15px] text-title">{{ method.is_active ? 'Ativo' : 'Inativo' }}</dd>
+          <dd class="mt-0.5 text-[15px] text-title">
+            {{ method.is_active ? 'Ativo' : 'Inativo' }}
+          </dd>
         </div>
       </dl>
     </SurfaceCard>

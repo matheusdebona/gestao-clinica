@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\StockMovement */
+/** @mixin StockMovement */
 class StockMovementResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -21,6 +22,8 @@ class StockMovementResource extends JsonResource
             'stock_before' => $this->stock_before,
             'stock_after' => $this->stock_after,
             'reason' => $this->reason,
+            'loss_reason' => $this->loss_reason,
+            'loss_value' => $this->when((bool) $request->user()?->can('finance.view'), fn () => $this->loss_value),
             'notes' => $this->notes,
             'user_id' => $this->user_id,
             'created_at' => $this->created_at,

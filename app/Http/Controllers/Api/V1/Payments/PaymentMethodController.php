@@ -30,7 +30,7 @@ class PaymentMethodController extends Controller
 
     public function store(StorePaymentMethodRequest $request): JsonResponse
     {
-        $method = PaymentMethod::query()->create($request->validated());
+        $method = PaymentMethod::query()->create($this->withoutFeesUnlessFinance($request, $request->validated()));
 
         return (new PaymentMethodResource($method))
             ->response()
@@ -44,7 +44,7 @@ class PaymentMethodController extends Controller
 
     public function update(UpdatePaymentMethodRequest $request, PaymentMethod $paymentMethod): PaymentMethodResource
     {
-        $paymentMethod->update($request->validated());
+        $paymentMethod->update($this->withoutFeesUnlessFinance($request, $request->validated()));
 
         return new PaymentMethodResource($paymentMethod->fresh());
     }
@@ -54,5 +54,22 @@ class PaymentMethodController extends Controller
         $paymentMethod->update(['is_active' => false]);
 
         return response()->json(['message' => 'Payment method deactivated.']);
+    }
+
+    /**
+     * Taxas são custo: só quem gerencia o financeiro pode gravá-las.
+     *
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function withoutFeesUnlessFinance(Request $request, array $data): array
+    {
+        if ($request->user()?->can('finance.manage')) {
+            return $data;
+        }
+
+        unset($data['fee_percent'], $data['fee_fixed']);
+
+        return $data;
     }
 }

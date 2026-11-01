@@ -22,8 +22,13 @@ class StockService
         ?User $user = null,
         bool $allowNegative = false,
         ?Model $reference = null,
+        ?string $lossReason = null,
     ): StockMovement {
-        return DB::transaction(function () use ($product, $type, $quantity, $unitCost, $reason, $notes, $user, $allowNegative, $reference) {
+        if ($lossReason !== null && ($type !== StockMovementType::Out || ! in_array($lossReason, StockMovement::LOSS_REASONS, true))) {
+            throw new InvalidArgumentException('Loss reason is only valid for stock outbound.');
+        }
+
+        return DB::transaction(function () use ($product, $type, $quantity, $unitCost, $reason, $notes, $user, $allowNegative, $reference, $lossReason) {
             /** @var Product $locked */
             $locked = Product::query()->whereKey($product->id)->lockForUpdate()->firstOrFail();
 
@@ -73,6 +78,9 @@ class StockService
                 'stock_before' => $this->format($stockBefore),
                 'stock_after' => $this->format($stockAfter),
                 'reason' => $reason,
+                'loss_reason' => $lossReason,
+                // Perda valorizada pelo custo médio do momento da saída.
+                'loss_value' => $lossReason !== null ? number_format(round($qty * $costBefore, 2), 2, '.', '') : null,
                 'notes' => $notes,
                 'reference_type' => $reference?->getMorphClass(),
                 'reference_id' => $reference?->getKey(),

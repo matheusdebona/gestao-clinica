@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\V1\ClinicBrandingController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\ClinicSettingsController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\Finance\FinanceSettingsController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
 use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
@@ -353,6 +354,17 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:documents.view');
         Route::delete('documents/{document}', [DocumentController::class, 'destroy'])
             ->middleware('permission:documents.delete');
+
+        Route::get('finance/tax-settings', [FinanceSettingsController::class, 'taxSettings'])
+            ->middleware('permission:finance.view');
+        Route::post('finance/tax-settings', [FinanceSettingsController::class, 'storeTaxSetting'])
+            ->middleware('permission:finance.manage');
+        Route::delete('finance/tax-settings/{tax_setting}', [FinanceSettingsController::class, 'destroyTaxSetting'])
+            ->middleware('permission:finance.manage');
+        Route::put('finance/card-operators/{card_operator}/anticipation', [FinanceSettingsController::class, 'updateAnticipation'])
+            ->middleware('permission:finance.manage');
+        Route::post('finance/payment-fees/recalculate', [FinanceSettingsController::class, 'recalculatePaymentFees'])
+            ->middleware('permission:finance.manage');
 
         Route::get('metrics/commercial', [MetricsController::class, 'commercial'])
             ->middleware('permission:metrics.view');

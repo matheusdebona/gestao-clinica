@@ -112,6 +112,7 @@ class ProductController extends Controller
                 reason: $data['reason'] ?? null,
                 notes: $data['notes'] ?? null,
                 user: $request->user(),
+                lossReason: $data['loss_reason'] ?? null,
             );
         } catch (InvalidArgumentException $e) {
             return response()->json([

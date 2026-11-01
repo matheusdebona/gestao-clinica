@@ -10,6 +10,15 @@ class StockMovement extends Model
 {
     use BelongsToClinic;
 
+    public const LOSS_EXPIRED = 'expired';
+
+    public const LOSS_DAMAGED = 'damaged';
+
+    public const LOSS_OTHER = 'other';
+
+    /** Saídas valorizadas como perda (custo). Saída sem motivo = ajuste/correção. */
+    public const LOSS_REASONS = [self::LOSS_EXPIRED, self::LOSS_DAMAGED, self::LOSS_OTHER];
+
     protected $fillable = [
         'clinic_id',
         'product_id',
@@ -22,6 +31,8 @@ class StockMovement extends Model
         'stock_before',
         'stock_after',
         'reason',
+        'loss_reason',
+        'loss_value',
         'notes',
         'reference_type',
         'reference_id',
@@ -36,6 +47,7 @@ class StockMovement extends Model
             'cost_after' => 'decimal:4',
             'stock_before' => 'decimal:4',
             'stock_after' => 'decimal:4',
+            'loss_value' => 'decimal:2',
         ];
     }
 

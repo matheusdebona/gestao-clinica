@@ -95,6 +95,18 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/FollowUpTiersPage.vue'),
         },
         {
+          path: 'settings/taxas-cartao',
+          name: 'settings-card-fees',
+          meta: { title: 'Taxas de cartão', permission: 'finance.manage' },
+          component: () => import('@/pages/CardFeesSettingsPage.vue'),
+        },
+        {
+          path: 'settings/impostos',
+          name: 'settings-taxes',
+          meta: { title: 'Impostos', permission: 'finance.view' },
+          component: () => import('@/pages/TaxSettingsPage.vue'),
+        },
+        {
           path: 'settings/lead-statuses',
           name: 'lead-statuses',
           meta: { title: 'Status de leads', permission: 'lead_statuses.manage' },

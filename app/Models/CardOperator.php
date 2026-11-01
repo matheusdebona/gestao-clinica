@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
+use Database\Factories\CardOperatorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CardOperator extends Model
 {
-    /** @use HasFactory<\Database\Factories\CardOperatorFactory> */
+    /** @use HasFactory<CardOperatorFactory> */
     use BelongsToClinic, HasFactory;
 
     protected $fillable = [
@@ -17,6 +18,7 @@ class CardOperator extends Model
         'name',
         'code',
         'auto_anticipate',
+        'anticipation_rate_percent',
         'is_active',
     ];
 
@@ -32,6 +34,7 @@ class CardOperator extends Model
     {
         return [
             'auto_anticipate' => 'boolean',
+            'anticipation_rate_percent' => 'decimal:4',
             'is_active' => 'boolean',
         ];
     }

@@ -55,6 +55,18 @@ const entries: SettingsEntry[] = [
     description: 'Prazos sem resposta (ex.: 2, 5 e 10 dias) para cobrar orçamentos enviados.',
     permissions: ['clinics.branding', 'clinics.manage'],
   },
+  {
+    name: 'settings-card-fees',
+    title: 'Taxas de cartão',
+    description: 'Taxa da maquininha por operadora, bandeira e parcelas, e antecipação.',
+    permissions: ['finance.manage'],
+  },
+  {
+    name: 'settings-taxes',
+    title: 'Impostos',
+    description: 'Regime tributário e alíquota sobre a receita por mês de competência.',
+    permissions: ['finance.view'],
+  },
 ]
 
 const visible = computed(() => entries.filter((entry) => entry.permissions.some((name) => auth.can(name))))

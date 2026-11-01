@@ -11,7 +11,7 @@ import MoneyInput from '@/components/ui/MoneyInput.vue'
 import Select from '@/components/ui/Select.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import { emptyToMoney, emptyToNull } from '@/lib/formatters'
-import type { StockAdjustPayload } from '@/types/product'
+import type { StockAdjustPayload, StockLossReason } from '@/types/product'
 
 const open = defineModel<boolean>('open', { default: false })
 
@@ -26,7 +26,10 @@ const emit = defineEmits<{
 const schema = toTypedSchema(
   z
     .object({
-      type: z.string().min(1, 'Selecione entrada ou saída.').refine((value) => value === 'in' || value === 'out', 'Selecione entrada ou saída.'),
+      type: z
+        .string()
+        .min(1, 'Selecione entrada ou saída.')
+        .refine((value) => value === 'in' || value === 'out', 'Selecione entrada ou saída.'),
       quantity: z
         .string()
         .trim()
@@ -37,6 +40,7 @@ const schema = toTypedSchema(
         }, 'Quantidade deve ser maior que zero.'),
       unit_cost: z.string(),
       reason: z.string(),
+      loss_reason: z.string(),
       notes: z.string(),
     })
     .superRefine((values, ctx) => {
@@ -60,6 +64,7 @@ const { defineField, handleSubmit, errors, resetForm, setErrors } = useForm({
     quantity: '',
     unit_cost: '',
     reason: '',
+    loss_reason: '',
     notes: '',
   },
 })
@@ -68,6 +73,7 @@ const [type] = defineField('type')
 const [quantity, quantityAttrs] = defineField('quantity')
 const [unitCost, unitCostAttrs] = defineField('unit_cost')
 const [reason, reasonAttrs] = defineField('reason')
+const [lossReason] = defineField('loss_reason')
 const [notes, notesAttrs] = defineField('notes')
 
 watch(open, (isOpen) => {
@@ -78,6 +84,7 @@ watch(open, (isOpen) => {
         quantity: '',
         unit_cost: '',
         reason: '',
+        loss_reason: '',
         notes: '',
       },
     })
@@ -89,12 +96,23 @@ const typeOptions = [
   { value: 'out', label: 'Saída' },
 ]
 
+const lossOptions = [
+  { value: 'adjust', label: 'Ajuste de inventário (não é perda)' },
+  { value: 'expired', label: 'Perda por vencimento' },
+  { value: 'damaged', label: 'Perda por quebra ou dano' },
+  { value: 'other', label: 'Outra perda' },
+]
+
 const onSubmit = handleSubmit((values) => {
   emit('submit', {
     type: values.type as 'in' | 'out',
     quantity: emptyToMoney(values.quantity) ?? values.quantity,
     unit_cost: values.type === 'in' ? emptyToMoney(values.unit_cost) : null,
     reason: emptyToNull(values.reason),
+    loss_reason:
+      values.type === 'out' && ['expired', 'damaged', 'other'].includes(values.loss_reason)
+        ? (values.loss_reason as StockLossReason)
+        : null,
     notes: emptyToNull(values.notes),
   })
 })
@@ -140,6 +158,19 @@ defineExpose({ setErrors })
             :invalid="invalid"
           />
         </template>
+      </FormField>
+      <FormField
+        v-if="type === 'out'"
+        label="Tipo de saída"
+        hint="Perdas entram como custo na margem de contribuição, pelo custo médio atual."
+        html-for="stock-loss"
+      >
+        <Select
+          id="stock-loss"
+          v-model="lossReason"
+          :options="lossOptions"
+          placeholder="Ajuste de inventário (não é perda)"
+        />
       </FormField>
       <FormField label="Motivo" :error="errors.reason" html-for="stock-reason">
         <Input id="stock-reason" v-model="reason" v-bind="reasonAttrs" type="text" />

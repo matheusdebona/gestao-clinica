@@ -117,13 +117,26 @@ class SalePricingService
                     }
                 }
 
+                $amount = (float) $this->money2((float) $payment['amount']);
+                $operatorId = ! empty($payment['card_operator_id']) ? (int) $payment['card_operator_id'] : null;
+                $brandId = ! empty($payment['card_brand_id']) ? (int) $payment['card_brand_id'] : null;
+                $installments = ! empty($payment['installments']) ? (int) $payment['installments'] : null;
+
                 $locked->payments()->create([
                     'payment_method_id' => $method->id,
-                    'amount' => $this->money2((float) $payment['amount']),
-                    'card_operator_id' => $payment['card_operator_id'] ?? null,
-                    'card_brand_id' => $payment['card_brand_id'] ?? null,
-                    'installments' => $payment['installments'] ?? null,
+                    'amount' => $this->money2($amount),
+                    'card_operator_id' => $operatorId,
+                    'card_brand_id' => $brandId,
+                    'installments' => $installments,
                     'paid_at' => $payment['paid_at'] ?? null,
+                    ...app(PaymentFeeService::class)->compute(
+                        (int) $locked->clinic_id,
+                        $method,
+                        $amount,
+                        $operatorId,
+                        $brandId,
+                        $installments,
+                    ),
                 ]);
             }
 
@@ -203,6 +216,8 @@ class SalePricingService
             'status' => Sale::STATUS_CONFIRMED,
             'sold_at' => $sale->sold_at ?? now(),
         ]);
+        // Taxas vigentes no momento da confirmação (regras podem ter mudado desde o rascunho).
+        app(PaymentFeeService::class)->applyToSale($sale);
         app(PatientReturnService::class)->onSaleConfirmed($sale);
 
         return $sale->fresh(['items.product', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser']);

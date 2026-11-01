@@ -456,7 +456,7 @@ class AppointmentService
             }
         }
 
-        return SalePayment::query()->create([
+        $created = SalePayment::query()->create([
             'sale_id' => $saleId,
             'payment_method_id' => $method->id,
             'amount' => $amount,
@@ -465,5 +465,7 @@ class AppointmentService
             'installments' => $payment['installments'] ?? null,
             'paid_at' => $payment['paid_at'] ?? now(),
         ]);
+
+        return app(PaymentFeeService::class)->apply($created);
     }
 }

@@ -2,7 +2,12 @@ import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { CARD_KINDS } from '@/features/payments/labels'
 import { emptyToMoney } from '@/lib/formatters'
-import type { CardBrandPayload, CardOperatorPayload, PaymentMethod, PaymentMethodPayload } from '@/types/sale'
+import type {
+  CardBrandPayload,
+  CardOperatorPayload,
+  PaymentMethod,
+  PaymentMethodPayload,
+} from '@/types/sale'
 
 const KINDS = ['cash', 'pix', 'check', 'credit_card', 'debit_card', 'boleto', 'other'] as const
 
@@ -23,9 +28,12 @@ export const paymentMethodFormSchema = toTypedSchema(
       .min(1, 'Informe o código.')
       .max(50, 'Código muito longo.')
       .regex(/^[A-Za-z0-9_-]+$/, 'Use letras, números, hífen ou underline.'),
-    kind: z.string().min(1, 'Selecione o tipo.').refine((value) => KINDS.includes(value as (typeof KINDS)[number]), {
-      message: 'Tipo inválido.',
-    }),
+    kind: z
+      .string()
+      .min(1, 'Selecione o tipo.')
+      .refine((value) => KINDS.includes(value as (typeof KINDS)[number]), {
+        message: 'Tipo inválido.',
+      }),
     fee_percent: z.string().refine((value) => {
       const parsed = emptyToPercent(value)
       if (parsed === null) {
@@ -72,7 +80,9 @@ export function emptyPaymentMethodForm(): PaymentMethodFormValues {
   }
 }
 
-export function paymentMethodToFormValues(method: PaymentMethod | null | undefined): PaymentMethodFormValues {
+export function paymentMethodToFormValues(
+  method: PaymentMethod | null | undefined,
+): PaymentMethodFormValues {
   return {
     name: method?.name ?? '',
     code: method?.code ?? '',
@@ -83,19 +93,29 @@ export function paymentMethodToFormValues(method: PaymentMethod | null | undefin
   }
 }
 
-export function toPaymentMethodPayload(values: PaymentMethodFormValues): PaymentMethodPayload {
+export function toPaymentMethodPayload(
+  values: PaymentMethodFormValues,
+  includeFees = true,
+): PaymentMethodPayload {
   const isCard = CARD_KINDS.has(values.kind)
-  return {
+  const payload: PaymentMethodPayload = {
     name: values.name.trim(),
     code: values.code.trim(),
     kind: values.kind,
-    fee_percent: isCard ? null : emptyToPercent(values.fee_percent),
-    fee_fixed: isCard ? null : emptyToMoney(values.fee_fixed),
     is_active: values.is_active,
   }
+  if (includeFees) {
+    payload.fee_percent = isCard ? null : emptyToPercent(values.fee_percent)
+    payload.fee_fixed = isCard ? null : emptyToMoney(values.fee_fixed)
+  }
+  return payload
 }
 
-export function toCardBrandPayload(values: { name: string; code: string; is_active: boolean }): CardBrandPayload {
+export function toCardBrandPayload(values: {
+  name: string
+  code: string
+  is_active: boolean
+}): CardBrandPayload {
   return {
     name: values.name.trim(),
     code: values.code.trim(),
