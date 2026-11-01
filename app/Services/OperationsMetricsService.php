@@ -100,13 +100,61 @@ class OperationsMetricsService
                 'pending_fulfillment_treatments_count' => $pending['treatments_count'],
             ],
             'sessions_by_status' => $sessionsByStatus,
+            'confirmation' => $this->confirmation($fromStart, $toEnd),
             'pending_fulfillments' => $pending['list'],
             'by_professional' => $byProfessionalRows,
             'notes' => [
                 'Sessions are filtered by scheduled_at within the period.',
                 'pending_fulfillments lists open treatments with remaining sale units (limit '.self::PENDING_LIST_LIMIT.').',
+                'confirmation: base excludes sessions cancelled by the clinic; no_show = past session never started (not cancelled, not "desmarcou").',
                 'by_professional uses completed appointments only (count + total_cost; no associated revenue in v1).',
             ],
+        ];
+    }
+
+    /**
+     * Confirmation and no-show for sessions scheduled in the period.
+     * Base = sessions not cancelled by the clinic (a cancelled session the patient "desmarcou" still counts).
+     * No-show = past session (before now) never started, not cancelled and not "desmarcou".
+     *
+     * @return array<string, mixed>
+     */
+    private function confirmation(CarbonImmutable $fromStart, CarbonImmutable $toEnd): array
+    {
+        $rows = Appointment::query()
+            ->whereNotNull('scheduled_at')
+            ->whereBetween('scheduled_at', [$fromStart, $toEnd])
+            ->get(['id', 'status', 'scheduled_at', 'confirmation_status']);
+
+        $now = CarbonImmutable::now();
+        $base = $rows->reject(fn (Appointment $a) => $a->status === Appointment::STATUS_CANCELLED
+            && $a->confirmation_status !== Appointment::CONFIRMATION_DECLINED);
+        $count = fn (string $status) => $base->where('confirmation_status', $status)->count();
+
+        $past = $base->filter(fn (Appointment $a) => $a->scheduled_at !== null && $a->scheduled_at->lt($now)
+            && $a->confirmation_status !== Appointment::CONFIRMATION_DECLINED
+            && $a->status !== Appointment::STATUS_CANCELLED);
+        $noShow = $past->where('status', Appointment::STATUS_SCHEDULED)->count();
+        $pastConfirmed = $past->where('confirmation_status', Appointment::CONFIRMATION_CONFIRMED);
+        $noShowConfirmed = $pastConfirmed->where('status', Appointment::STATUS_SCHEDULED)->count();
+
+        $rate = fn (int $part, int $total): ?string => $total > 0 ? number_format(($part / $total) * 100, 2, '.', '') : null;
+        $total = $base->count();
+        $confirmed = $count(Appointment::CONFIRMATION_CONFIRMED);
+        $declined = $count(Appointment::CONFIRMATION_DECLINED);
+
+        return [
+            'total' => $total,
+            'pending' => $count(Appointment::CONFIRMATION_PENDING),
+            'confirmed' => $confirmed,
+            'not_confirmed' => $count(Appointment::CONFIRMATION_NOT_CONFIRMED),
+            'declined' => $declined,
+            'confirmation_rate' => $rate($confirmed, $total),
+            'declined_rate' => $rate($declined, $total),
+            'past_sessions' => $past->count(),
+            'no_show' => $noShow,
+            'no_show_rate' => $rate($noShow, $past->count()),
+            'no_show_rate_confirmed' => $rate($noShowConfirmed, $pastConfirmed->count()),
         ];
     }
 

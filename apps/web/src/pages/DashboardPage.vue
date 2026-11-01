@@ -5,6 +5,7 @@ import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import ConfirmTomorrowCard from '@/features/appointments/ConfirmTomorrowCard.vue'
 import StaleLeadsCard from '@/features/leads/StaleLeadsCard.vue'
 import { PAYMENT_CATALOG_PERMISSIONS, paymentCatalogHome } from '@/features/payments/access'
 import { useAuthStore } from '@/stores/auth'
@@ -68,6 +69,9 @@ function openShortcut(to: { name: string }) {
       :title="auth.clinicName ? auth.clinicName : 'Início'"
       :description="auth.user ? `Olá, ${auth.user.name}.` : undefined"
     />
+    <PermissionGate permission="appointments.view">
+      <ConfirmTomorrowCard :limit="3" show-agenda-link />
+    </PermissionGate>
     <PermissionGate permission="leads.view">
       <StaleLeadsCard />
     </PermissionGate>

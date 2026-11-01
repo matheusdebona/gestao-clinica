@@ -1,6 +1,7 @@
 <?php
 
 use App\Jobs\CheckLowStockProductsJob;
+use App\Jobs\NotifyAppointmentConfirmationsJob;
 use App\Jobs\NotifyDailyReviewJob;
 use App\Jobs\NotifyStaleLeadsJob;
 use App\Services\TemporaryPasswordService;
@@ -16,6 +17,9 @@ Schedule::job(new CheckLowStockProductsJob)->dailyAt('01:00');
 
 // 11:00 UTC = 08:00 em Brasília: resumo diário de leads parados.
 Schedule::job(new NotifyStaleLeadsJob)->dailyAt('11:00');
+
+// 11:00 UTC = 08:00 em Brasília: sessões de amanhã ainda sem confirmação (só aviso interno; o WhatsApp é por link).
+Schedule::job(new NotifyAppointmentConfirmationsJob)->dailyAt('11:00');
 
 // 21:00 UTC = 18:00 em Brasília: lembrete de fim de dia (acompanhamentos pendentes / check-in).
 Schedule::job(new NotifyDailyReviewJob)->dailyAt('21:00');

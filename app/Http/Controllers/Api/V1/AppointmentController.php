@@ -10,12 +10,16 @@ use App\Http\Requests\Api\V1\Appointments\UpdateAppointmentRequest;
 use App\Http\Resources\Api\V1\AppointmentResource;
 use App\Models\Appointment;
 use App\Models\Treatment;
+use App\Services\AppointmentConfirmationService;
 use App\Services\AppointmentService;
 use App\Support\CaseInsensitiveSearch;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class AppointmentController extends Controller
 {
@@ -97,8 +101,48 @@ class AppointmentController extends Controller
                 'treatment',
                 'professionalUser',
                 'confirmationSentBy',
+                'confirmationStatusBy',
             ])
         );
+    }
+
+    /**
+     * "Confirmar amanhã": scheduled sessions of a clinic day (default: tomorrow, Brasília) + counts.
+     */
+    public function confirmations(Request $request, AppointmentConfirmationService $confirmations): JsonResponse
+    {
+        $data = $request->validate(['date' => ['sometimes', 'nullable', 'date_format:Y-m-d']]);
+        $day = isset($data['date'])
+            ? CarbonImmutable::createFromFormat('Y-m-d', $data['date'], AppointmentConfirmationService::TZ)->startOfDay()
+            : $confirmations->tomorrow();
+        $appointments = $confirmations->forDay($day);
+
+        return response()->json([
+            'data' => AppointmentResource::collection($appointments),
+            'meta' => ['date' => $day->toDateString(), 'counts' => $confirmations->counts($appointments)],
+        ]);
+    }
+
+    /**
+     * Records the patient's answer: confirmed / not_confirmed / declined ("desmarcou") / pending.
+     */
+    public function confirmationStatus(Request $request, Appointment $appointment, AppointmentConfirmationService $confirmations): AppointmentResource
+    {
+        $data = $request->validate([
+            'confirmation_status' => ['required', 'string', Rule::in(Appointment::CONFIRMATION_STATUSES)],
+        ], [
+            'confirmation_status.required' => 'Escolha a confirmação.',
+            'confirmation_status.in' => 'Confirmação inválida.',
+        ]);
+        if (! $appointment->isScheduled()) {
+            throw ValidationException::withMessages([
+                'confirmation_status' => ['Só sessões agendadas (não iniciadas nem canceladas) podem ser confirmadas.'],
+            ]);
+        }
+
+        $confirmations->setStatus($appointment, $data['confirmation_status'], $request->user());
+
+        return new AppointmentResource($appointment->load(['client', 'treatment', 'professionalUser', 'confirmationSentBy', 'confirmationStatusBy']));
     }
 
     /**

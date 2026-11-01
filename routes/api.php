@@ -377,6 +377,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:treatments.view|appointments.view');
         Route::post('treatments/{treatment}/appointments', [AppointmentController::class, 'store'])
             ->middleware('permission:treatments.manage|appointments.manage');
+        Route::get('appointments/confirmations', [AppointmentController::class, 'confirmations'])
+            ->middleware('permission:appointments.view');
+        Route::patch('appointments/{appointment}/confirmation-status', [AppointmentController::class, 'confirmationStatus'])
+            ->middleware('permission:appointments.manage|treatments.manage');
         Route::get('appointments/{appointment}', [AppointmentController::class, 'show'])
             ->middleware('permission:treatments.view|appointments.view');
         Route::patch('appointments/{appointment}', [AppointmentController::class, 'update'])

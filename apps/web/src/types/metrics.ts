@@ -154,6 +154,19 @@ export interface OperationsMetrics {
   date_field: string
   kpis: OperationsKpis
   sessions_by_status: Record<string, number>
+  confirmation?: {
+    total: number
+    pending: number
+    confirmed: number
+    not_confirmed: number
+    declined: number
+    confirmation_rate: string | null
+    declined_rate: string | null
+    past_sessions: number
+    no_show: number
+    no_show_rate: string | null
+    no_show_rate_confirmed: string | null
+  }
   pending_fulfillments: PendingFulfillment[]
   by_professional: ProfessionalOpsRow[]
   notes: string[]

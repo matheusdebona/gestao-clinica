@@ -133,6 +133,21 @@ function pendingMeta(row: (typeof pending.value)[number]) {
         </MetricCard>
       </div>
 
+      <div v-if="operations?.confirmation" class="grid grid-cols-2 gap-3">
+        <MetricCard
+          label="Confirmação"
+          :hint="`${operations.confirmation.confirmed} de ${operations.confirmation.total} confirmadas · ${operations.confirmation.declined} desmarcaram`"
+        >
+          {{ formatPercent(operations.confirmation.confirmation_rate) }}
+        </MetricCard>
+        <MetricCard
+          label="Faltas (no-show)"
+          :hint="`${operations.confirmation.no_show} de ${operations.confirmation.past_sessions} sessões passadas · ${formatPercent(operations.confirmation.no_show_rate_confirmed)} entre confirmadas`"
+        >
+          {{ formatPercent(operations.confirmation.no_show_rate) }}
+        </MetricCard>
+      </div>
+
       <SurfaceCard v-if="operations">
         <p class="text-[13px] font-medium text-muted">Sessões por situação</p>
         <div class="mt-2 divide-y divide-border-divider">
