@@ -84,15 +84,17 @@ function itemUnit(item: {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="protocol?.name ?? 'Protocolo'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
-        <PermissionGate v-if="protocol?.is_active" permission="protocols.update">
-          <Button variant="secondary" @click="goEdit">Editar</Button>
-        </PermissionGate>
         <PermissionGate v-if="protocol?.is_active" permission="protocols.delete">
           <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
         </PermissionGate>
-        <PermissionGate v-else-if="protocol" permission="protocols.update">
+      </template>
+      <template #actions>
+        <PermissionGate v-if="protocol?.is_active" permission="protocols.update">
+          <Button variant="secondary" @click="goEdit">Editar</Button>
+        </PermissionGate>
+        <PermissionGate v-if="protocol && !(protocol?.is_active)" permission="protocols.update">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()">
             Reativar
           </Button>

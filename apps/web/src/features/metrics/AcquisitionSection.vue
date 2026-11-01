@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InfoTip from '@/components/ui/InfoTip.vue'
 import { computed } from 'vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import RankBar from '@/components/patterns/RankBar.vue'
@@ -33,14 +34,10 @@ const rankMax = computed(() => maxNumeric(ranked.value.map((row) => row.sales_re
 <template>
   <section class="flex flex-col gap-3">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <h2>Aquisição</h2>
+      <div class="flex items-center gap-1.5"><h2>Aquisição</h2><InfoTip text="Conversão lifetime: paciente cadastrado no período com pelo menos uma venda confirmada depois do cadastro." label="Sobre: Aquisição" /></div>
       <Tabs v-model="groupBy" :items="GROUP_BY_ITEMS" />
     </div>
 
-    <p class="text-[13px] text-muted">
-      Conversão lifetime: paciente cadastrado no período com pelo menos uma venda confirmada depois
-      do cadastro.
-    </p>
 
     <Banner v-if="error" variant="danger" title="Aquisição">
       Não foi possível carregar a aquisição.

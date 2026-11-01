@@ -173,7 +173,7 @@ const isEmpty = computed(
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
       title="DRE do mês"
       description="Receitas, custos e despesas pela competência. Só a administração vê."

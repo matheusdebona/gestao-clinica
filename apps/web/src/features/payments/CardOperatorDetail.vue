@@ -52,8 +52,13 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="operator?.name ?? 'Operadora'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="router.push({ name: 'card-operators' })">Voltar</Button>
+        <PermissionGate v-if="operator?.is_active" permission="card_operators.manage">
+          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
+        </PermissionGate>
+      </template>
+      <template #actions>
         <PermissionGate v-if="operator?.is_active" permission="card_operators.manage">
           <Button
             variant="secondary"
@@ -62,10 +67,7 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
             Editar
           </Button>
         </PermissionGate>
-        <PermissionGate v-if="operator?.is_active" permission="card_operators.manage">
-          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
-        </PermissionGate>
-        <PermissionGate v-else-if="operator" permission="card_operators.manage">
+        <PermissionGate v-if="operator && !(operator?.is_active)" permission="card_operators.manage">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()">Reativar</Button>
         </PermissionGate>
       </template>

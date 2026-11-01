@@ -68,6 +68,7 @@ const { mutate, isPending } = useMutation({
 
 <template>
   <AppDialog
+      size="md"
     stack-footer
     v-model:open="open"
     title="Mudar status"
@@ -80,15 +81,16 @@ const { mutate, isPending } = useMutation({
         </template>
       </FormField>
       <FormField
-        label="Observação"
-        hint="Opcional. Ex.: restrição, por que avançou ou não."
+        label="Observação (opcional)" hint="Ex.: restrição, por que avançou ou não."
         html-for="lead-quick-note"
       >
         <Textarea id="lead-quick-note" v-model="note" :rows="3" />
       </FormField>
     </div>
-    <template #footer>
+    <template #footer-negative>
       <Button mobile-block variant="ghost" type="button" @click="open = false">Cancelar</Button>
+    </template>
+    <template #footer>
       <Button
         mobile-block
         type="button"

@@ -58,9 +58,9 @@ const total = computed(() => listData.value?.meta.total ?? 0)
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader title="Tipos de produto" :description="total ? `${total} na clínica` : undefined">
+    <PageHeader
+      :back="{ label: 'Produtos', to: { name: 'products' } }" title="Tipos de produto" :description="total ? `${total} na clínica` : undefined">
       <template #actions>
-        <Button variant="ghost" @click="router.push({ name: 'products' })">Produtos</Button>
         <PermissionGate permission="product_types.manage">
           <Button @click="router.push({ name: 'product-types-new' })">Novo</Button>
         </PermissionGate>

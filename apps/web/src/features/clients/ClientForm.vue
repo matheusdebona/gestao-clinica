@@ -4,6 +4,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
@@ -347,8 +348,7 @@ defineExpose({ setErrors })
     </PermissionGate>
 
     <FormField
-      label="Valor da avaliação"
-      hint="Opcional."
+      label="Valor da avaliação (opcional)"
       :error="errors.initial_consultation_amount"
       html-for="client-consultation"
     >
@@ -390,14 +390,16 @@ defineExpose({ setErrors })
       </template>
     </FormField>
 
-    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button mobile-block variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
-        Cancelar
-      </Button>
+    <ActionBar class="mt-2">
+      <template #negative>
+        <Button mobile-block variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
+          Cancelar
+        </Button>
+      </template>
       <Button mobile-block type="submit" :loading="loading">
         {{ submitLabel ?? 'Salvar' }}
       </Button>
-    </div>
+    </ActionBar>
   </form>
 
   <AppDialog
@@ -410,8 +412,10 @@ defineExpose({ setErrors })
         <Input id="new-origin-name" v-model="newOriginName" type="text" :invalid="invalid" />
       </template>
     </FormField>
-    <template #footer>
+    <template #footer-negative>
       <Button variant="ghost" type="button" @click="originDialog = false">Cancelar</Button>
+    </template>
+    <template #footer>
       <Button
         type="button"
         :loading="creatingOrigin"
@@ -433,8 +437,10 @@ defineExpose({ setErrors })
         <Input id="new-campaign-name" v-model="newCampaignName" type="text" :invalid="invalid" />
       </template>
     </FormField>
-    <template #footer>
+    <template #footer-negative>
       <Button variant="ghost" type="button" @click="campaignDialog = false">Cancelar</Button>
+    </template>
+    <template #footer>
       <Button
         type="button"
         :loading="creatingCampaign"

@@ -103,9 +103,9 @@ function goNew() {
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader title="Campanhas" :description="total ? `${total} na clínica` : undefined">
+    <PageHeader
+      :back="{ label: 'Pacientes', to: { name: 'clients' } }" title="Campanhas" :description="total ? `${total} na clínica` : undefined">
       <template #actions>
-        <Button variant="ghost" @click="router.push({ name: 'clients' })">Pacientes</Button>
         <PermissionGate permission="campaigns.manage">
           <Button @click="goNew">Nova</Button>
         </PermissionGate>

@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
@@ -30,7 +29,6 @@ import { useToastStore } from '@/stores/toast'
 import type { LeadStatusColor } from '@/types/lead'
 import { ApiError } from '@/types/user'
 
-const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
@@ -115,14 +113,13 @@ function onSave() {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader
+      hint="Conta como contato: cadastro, comentário, mudança de status e WhatsApp. Leads que viraram paciente ou foram cancelados nunca ficam parados. Cada lead é avisado uma vez por prazo; um novo contato zera a contagem."
+      :back="{ label: 'Configurações', to: { name: 'settings' } }"
       stack-actions
       title="Alertas de acompanhamento"
       description="Prazos sem nenhum contato para um lead em aberto aparecer como parado. Quem gerencia leads é avisado em Alertas quando um lead passa de cada prazo."
     >
       <template #actions>
-        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })">
-          Configurações
-        </Button>
         <Button v-if="canEdit" mobile-block @click="openNew">Novo prazo</Button>
       </template>
     </PageHeader>
@@ -168,14 +165,10 @@ function onSave() {
         </div>
       </SurfaceCard>
 
-      <p class="text-[13px] text-muted">
-        Conta como contato: cadastro, comentário, mudança de status e WhatsApp. Leads que viraram
-        paciente ou foram cancelados nunca ficam parados. Cada lead é avisado uma vez por prazo; um
-        novo contato zera a contagem.
-      </p>
     </template>
 
     <AppDialog
+      size="md"
       v-model:open="dialogOpen"
       stack-footer
       :title="editing ? 'Editar prazo' : 'Novo prazo'"
@@ -213,7 +206,7 @@ function onSave() {
           </template>
         </FormField>
       </div>
-      <template #footer>
+      <template #footer-negative>
         <Button
           v-if="editing"
           mobile-block
@@ -227,6 +220,8 @@ function onSave() {
         <Button mobile-block variant="ghost" type="button" :disabled="saving" @click="dialogOpen = false">
           Cancelar
         </Button>
+      </template>
+      <template #footer>
         <Button mobile-block type="button" :loading="saving" @click="onSave">Salvar</Button>
       </template>
     </AppDialog>

@@ -2,6 +2,7 @@
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { ref } from 'vue'
 import Badge from '@/components/ui/Badge.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Textarea from '@/components/ui/Textarea.vue'
@@ -116,15 +117,17 @@ function saveEdit(activity: LeadActivity) {
               />
             </template>
           </FormField>
-          <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-            <Button
-              mobile-block
-              variant="ghost"
-              :disabled="editMutation.isPending.value"
-              @click="cancelEdit"
-            >
-              Cancelar
-            </Button>
+          <ActionBar>
+            <template #negative>
+              <Button
+                mobile-block
+                variant="ghost"
+                :disabled="editMutation.isPending.value"
+                @click="cancelEdit"
+              >
+                Cancelar
+              </Button>
+            </template>
             <Button
               mobile-block
               type="submit"
@@ -134,7 +137,7 @@ function saveEdit(activity: LeadActivity) {
             >
               Salvar
             </Button>
-          </div>
+          </ActionBar>
         </form>
         <p v-else class="mt-1 whitespace-pre-wrap text-[15px] text-body">{{ activity.note }}</p>
       </template>

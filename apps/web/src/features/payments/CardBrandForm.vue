@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
 import { ref, watch } from 'vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
@@ -89,9 +90,11 @@ defineExpose({ setErrors })
       </template>
     </FormField>
     <Switch v-model="isActive" label="Ativa" />
-    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">Cancelar</Button>
+    <ActionBar class="mt-2">
+      <template #negative>
+        <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">Cancelar</Button>
+      </template>
       <Button type="submit" :loading="loading">{{ submitLabel ?? 'Salvar' }}</Button>
-    </div>
+    </ActionBar>
   </form>
 </template>

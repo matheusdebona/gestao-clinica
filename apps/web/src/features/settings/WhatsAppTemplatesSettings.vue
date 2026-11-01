@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -16,7 +16,6 @@ import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import { ApiError } from '@/types/user'
 
-const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
@@ -106,15 +105,11 @@ const { mutate: save, isPending: saving } = useMutation({
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader
+      :back="{ label: 'Configurações', to: { name: 'settings' } }"
       stack-actions
       title="Mensagens do WhatsApp"
       description="Textos que abrem prontos no WhatsApp. Você revisa antes de enviar."
     >
-      <template #actions>
-        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })">
-          Configurações
-        </Button>
-      </template>
     </PageHeader>
 
     <Banner v-if="!canEdit" variant="danger" title="Sem permissão">
@@ -154,11 +149,13 @@ const { mutate: save, isPending: saving } = useMutation({
             <p class="text-[13px] font-medium text-muted">Prévia</p>
             <p class="mt-1 whitespace-pre-wrap text-[15px] text-body">{{ preview(section.key) }}</p>
           </div>
-          <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <Button mobile-block variant="ghost" type="button" @click="restore(section.key)">
-              Restaurar padrão
-            </Button>
-          </div>
+          <ActionBar>
+            <template #negative>
+              <Button mobile-block variant="ghost" type="button" @click="restore(section.key)">
+                Restaurar padrão
+              </Button>
+            </template>
+          </ActionBar>
         </div>
       </SurfaceCard>
 

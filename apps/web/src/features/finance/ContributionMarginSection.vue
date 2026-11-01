@@ -7,9 +7,11 @@ import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import RankBar from '@/components/patterns/RankBar.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
+import SectionTitle from '@/components/ui/SectionTitle.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import { getContributionMargin } from '@/features/finance/api'
 import { formatBRL, formatIsoDate, formatPercent } from '@/lib/formatters'
@@ -122,11 +124,10 @@ const warnings = computed(() => {
 
 <template>
   <section class="flex flex-col gap-3">
-    <h2>Margem de contribuição</h2>
-    <p class="text-[13px] text-muted">
-      Vendas confirmadas no período menos insumos, taxas, antecipação, impostos e comissões; depois,
-      as perdas de estoque. A margem bruta acima continua igual.
-    </p>
+    <SectionTitle
+      title="Margem de contribuição"
+      hint="Vendas confirmadas no período menos insumos, taxas, antecipação, impostos e comissões; depois, as perdas de estoque. A margem bruta acima continua igual."
+    />
 
     <Banner v-if="isError" variant="danger" title="Margem de contribuição">
       Não foi possível carregar.
@@ -143,7 +144,7 @@ const warnings = computed(() => {
         <Banner variant="warning" title="Números incompletos">
           {{ warnings.join(' ') }}
         </Banner>
-        <div class="flex flex-col gap-2 sm:flex-row">
+        <ActionBar>
           <Button
             v-if="!data.checks.tax_configured"
             mobile-block
@@ -168,7 +169,7 @@ const warnings = computed(() => {
           >
             Comissões
           </Button>
-        </div>
+        </ActionBar>
       </template>
 
       <div class="grid grid-cols-2 gap-3">

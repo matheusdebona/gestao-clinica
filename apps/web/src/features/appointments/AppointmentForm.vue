@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
 import { computed, watch } from 'vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import DateTimePicker from '@/components/ui/DateTimePicker.vue'
 import FormField from '@/components/ui/FormField.vue'
@@ -196,11 +197,13 @@ defineExpose({ setErrors })
       </template>
     </FormField>
 
-    <div class="flex flex-wrap gap-2 pt-1">
+    <ActionBar class="pt-1">
+      <template #negative>
+        <Button type="button" variant="ghost" :disabled="loading" @click="emit('cancel')">
+          Cancelar
+        </Button>
+      </template>
       <Button type="submit" :loading="loading">{{ submitLabel }}</Button>
-      <Button type="button" variant="ghost" :disabled="loading" @click="emit('cancel')">
-        Cancelar
-      </Button>
-    </div>
+    </ActionBar>
   </form>
 </template>

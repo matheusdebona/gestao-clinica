@@ -7,6 +7,7 @@ import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -85,13 +86,15 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="sale?.client?.name ?? 'Venda'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
-        <PermissionGate v-if="isDraft" permission="sales.update">
-          <Button variant="secondary" @click="goEdit">Continuar</Button>
-        </PermissionGate>
         <PermissionGate v-if="isDraft || isConfirmed" permission="sales.cancel">
           <Button variant="destructive" @click="cancelOpen = true">Cancelar venda</Button>
+        </PermissionGate>
+      </template>
+      <template #actions>
+        <PermissionGate v-if="isDraft" permission="sales.update">
+          <Button variant="secondary" @click="goEdit">Continuar</Button>
         </PermissionGate>
       </template>
     </PageHeader>
@@ -211,7 +214,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
         <Banner variant="info" title="Tratamento aberto">
           O caso clínico já foi iniciado a partir desta venda.
         </Banner>
-        <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <ActionBar>
           <PermissionGate permission="treatments.view">
             <Button
               mobile-block
@@ -239,7 +242,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
               Ver agenda
             </Button>
           </PermissionGate>
-        </div>
+        </ActionBar>
       </template>
 
       <SaleBudgetsPanel :sale-id="sale.id" :can-create="isDraft && items.length > 0" />

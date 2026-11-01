@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { useMutation, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
@@ -18,7 +18,6 @@ import { ApiError } from '@/types/user'
 
 const MAX_TIERS = 5
 
-const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
@@ -101,15 +100,12 @@ function tierHint(index: number): string {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader
+      hint="Conta como esquecido: orçamento enviado que não foi aceito, recusado nem expirou (pela situação ou pela validade). Cada prazo pede uma cobrança; usar “Cobrar no WhatsApp” tira o orçamento da fila até o próximo prazo."
+      :back="{ label: 'Configurações', to: { name: 'settings' } }"
       stack-actions
       title="Orçamentos esquecidos"
       description="Prazos sem resposta para um orçamento enviado virar alerta. Quem cuida de orçamentos é avisado às 08:00 e vê a fila no Resumo do dia."
     >
-      <template #actions>
-        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })">
-          Configurações
-        </Button>
-      </template>
     </PageHeader>
 
     <Banner v-if="!canEdit" variant="danger" title="Sem permissão">
@@ -159,10 +155,12 @@ function tierHint(index: number): string {
             </template>
           </FormField>
           <p v-if="error" class="text-[13px] text-danger">{{ error }}</p>
-          <div class="flex flex-col gap-2 sm:flex-row sm:justify-end">
-            <Button mobile-block variant="ghost" type="button" @click="restore">
-              Restaurar padrão
-            </Button>
+          <ActionBar>
+            <template #negative>
+              <Button mobile-block variant="ghost" type="button" @click="restore">
+                Restaurar padrão
+              </Button>
+            </template>
             <Button
               mobile-block
               variant="secondary"
@@ -172,15 +170,10 @@ function tierHint(index: number): string {
             >
               Novo prazo
             </Button>
-          </div>
+          </ActionBar>
         </div>
       </SurfaceCard>
 
-      <p class="text-[13px] text-muted">
-        Conta como esquecido: orçamento enviado que não foi aceito, recusado nem expirou (pela
-        situação ou pela validade). Cada prazo pede uma cobrança; usar “Cobrar no WhatsApp” tira o
-        orçamento da fila até o próximo prazo.
-      </p>
 
       <div class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button mobile-block :loading="saving" @click="save">Salvar prazos</Button>

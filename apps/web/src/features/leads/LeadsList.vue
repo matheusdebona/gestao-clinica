@@ -7,6 +7,7 @@ import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import IconButton from '@/components/ui/IconButton.vue'
@@ -170,15 +171,17 @@ function openStatus(lead: Lead) {
     <template v-else>
       <ClientSearchBar v-model="searchInput" placeholder="Nome ou telefone" @search="onSearch" />
 
-      <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+      <ActionBar>
+        <template #negative>
+          <Button mobile-block v-if="filterCount" variant="ghost" @click="clearFilters"
+            >Limpar filtros</Button
+          >
+        </template>
         <Button mobile-block variant="secondary" @click="filtersOpen = true">
           <SlidersHorizontal class="size-4" :stroke-width="1.75" aria-hidden="true" />
           Filtros{{ filterCount ? ` (${filterCount})` : '' }}
         </Button>
-        <Button mobile-block v-if="filterCount" variant="ghost" @click="clearFilters"
-          >Limpar filtros</Button
-        >
-      </div>
+      </ActionBar>
 
       <Banner v-if="isError" variant="danger" title="Não foi possível carregar">
         Tente de novo em instantes.
@@ -241,7 +244,7 @@ function openStatus(lead: Lead) {
             </PermissionGate>
           </div>
           <PermissionGate v-if="nextQuickMilestone(lead)" permission="leads.manage">
-            <div class="flex gap-2 px-2 pb-3 max-sm:flex-col">
+            <div class="flex gap-2 px-2 pb-3 max-sm:flex-col sm:justify-end">
               <Button
                 mobile-block
                 variant="secondary"

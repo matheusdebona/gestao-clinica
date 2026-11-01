@@ -8,6 +8,7 @@ import {
   DialogRoot,
   DialogTitle,
 } from 'reka-ui'
+import ActionBar from './ActionBar.vue'
 import Button from './Button.vue'
 
 const open = defineModel<boolean>('open', { default: false })
@@ -50,19 +51,14 @@ const emit = defineEmits<{
         <DialogDescription class="mt-1.5 text-[13px] text-muted">
           {{ description }}
         </DialogDescription>
-        <div
-          :class="
-            props.stackFooter
-              ? 'mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end'
-              : 'mt-5 flex justify-end gap-2'
-          "
-        >
-          <DialogClose as-child>
-            <Button variant="ghost" :mobile-block="props.stackFooter">{{ cancelLabel }}</Button>
-          </DialogClose>
+        <ActionBar class="mt-5">
+          <template #negative>
+            <DialogClose as-child>
+              <Button variant="ghost">{{ cancelLabel }}</Button>
+            </DialogClose>
+          </template>
           <Button
             :variant="props.confirmVariant"
-            :mobile-block="props.stackFooter"
             @click="
               () => {
                 emit('confirm')
@@ -72,7 +68,7 @@ const emit = defineEmits<{
           >
             {{ confirmLabel }}
           </Button>
-        </div>
+        </ActionBar>
       </DialogContent>
     </DialogPortal>
   </DialogRoot>

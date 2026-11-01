@@ -166,7 +166,7 @@ function submit() {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
       title="Despesas recorrentes"
       description="Aluguel, salários, pró-labore, software… lançados automaticamente em todo mês de competência."
@@ -202,9 +202,6 @@ function submit() {
           title="Nenhuma recorrente"
           description="Cadastre as despesas que se repetem todo mês para o DRE já vir preenchido."
         >
-          <template v-if="canManage" #action>
-            <Button mobile-block @click="openNew">Nova recorrente</Button>
-          </template>
         </EmptyState>
         <div v-else class="mt-2 divide-y divide-border-divider">
           <ListCard
@@ -221,11 +218,12 @@ function submit() {
     </template>
 
     <AppDialog
+      size="lg"
       v-model:open="open"
       :title="editing ? 'Editar recorrente' : 'Nova despesa recorrente'"
       description="Mudanças valem para os meses ainda não lançados; meses já lançados ficam como estão."
     >
-      <form class="flex flex-col gap-4" @submit.prevent="submit">
+      <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
         <FormField label="Categoria" :error="errors.expense_category_id" html-for="rec-category">
           <template #default="{ invalid }">
             <Select
@@ -254,8 +252,7 @@ function submit() {
           </template>
         </FormField>
         <FormField
-          label="Dia do vencimento"
-          hint="Opcional."
+          label="Dia do vencimento (opcional)"
           :error="errors.due_day"
           html-for="rec-day"
         >
@@ -272,7 +269,7 @@ function submit() {
         <FormField label="Começa em" html-for="rec-start">
           <MonthSelect id="rec-start" v-model="form.starts_month" />
         </FormField>
-        <Switch v-model="form.has_end" label="Tem data para terminar" />
+        <Switch class="md:col-span-2" v-model="form.has_end" label="Tem data para terminar" />
         <FormField
           v-if="form.has_end"
           label="Termina em"
@@ -281,7 +278,7 @@ function submit() {
         >
           <MonthSelect id="rec-end" v-model="form.ends_month" :future="60" />
         </FormField>
-        <FormField label="Fornecedor" hint="Opcional." html-for="rec-supplier">
+        <FormField label="Fornecedor (opcional)" html-for="rec-supplier">
           <Input id="rec-supplier" v-model="form.supplier" type="text" />
         </FormField>
         <template v-if="formKind === 'marketing'">
@@ -293,7 +290,7 @@ function submit() {
               @update:model-value="form.campaign = 'none'"
             />
           </FormField>
-          <FormField label="Campanha" hint="Opcional." html-for="rec-campaign">
+          <FormField label="Campanha (opcional)" html-for="rec-campaign">
             <Select
               id="rec-campaign"
               v-model="form.campaign"
@@ -301,10 +298,12 @@ function submit() {
             />
           </FormField>
         </template>
-        <Switch v-if="editing" v-model="form.is_active" label="Ativa" />
+        <Switch class="md:col-span-2" v-if="editing" v-model="form.is_active" label="Ativa" />
       </form>
-      <template #footer>
+      <template #footer-negative>
         <Button variant="ghost" type="button" @click="open = false">Cancelar</Button>
+      </template>
+      <template #footer>
         <Button type="button" :loading="saving" @click="submit">Salvar</Button>
       </template>
     </AppDialog>

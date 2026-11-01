@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import MonthSelect from '@/components/patterns/MonthSelect.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Badge from '@/components/ui/Badge.vue'
@@ -15,6 +14,7 @@ import MoneyInput from '@/components/ui/MoneyInput.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
+import SectionTitle from '@/components/ui/SectionTitle.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import {
   isValidPercent,
@@ -33,7 +33,6 @@ import { useToastStore } from '@/stores/toast'
 import type { CommissionRole, CommissionRuleRow } from '@/types/finance'
 import { ApiError } from '@/types/user'
 
-const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
@@ -262,15 +261,13 @@ function unpayUser(userId: number) {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
+      :back="{ label: 'Configurações', to: { name: 'settings' } }"
       title="Comissões"
       description="Regras para vendedores (por venda) e profissionais (por sessão realizada). Os lançamentos são gerados ao confirmar vendas e concluir sessões e entram na margem de contribuição."
     >
       <template #actions>
-        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })">
-          Configurações
-        </Button>
         <Button v-if="canManage" mobile-block @click="openNew">Nova regra</Button>
       </template>
     </PageHeader>
@@ -395,11 +392,10 @@ function unpayUser(userId: number) {
       </SurfaceCard>
 
       <SurfaceCard>
-        <h2>Regras</h2>
-        <p class="mt-1 text-[13px] text-muted">
-          Vale a regra mais específica: pessoa + protocolo, depois pessoa, depois protocolo, depois
-          a geral. Lançamentos já pagos não mudam.
-        </p>
+        <SectionTitle
+          title="Regras"
+          hint="Vale a regra mais específica: pessoa + protocolo, depois pessoa, depois protocolo, depois a geral. Lançamentos já pagos não mudam."
+        />
         <div v-if="rulesQuery.isPending.value" class="mt-4">
           <Skeleton class="h-12" />
         </div>
@@ -408,9 +404,6 @@ function unpayUser(userId: number) {
           title="Nenhuma regra"
           description="Sem regras, nenhuma comissão é lançada e a margem fica maior do que a real."
         >
-          <template v-if="canManage" #action>
-            <Button mobile-block @click="openNew">Nova regra</Button>
-          </template>
         </EmptyState>
         <div v-else class="mt-2 divide-y divide-border-divider">
           <ListCard
@@ -427,11 +420,12 @@ function unpayUser(userId: number) {
     </template>
 
     <AppDialog
+      size="lg"
       v-model:open="dialogOpen"
       :title="editing ? 'Editar regra' : 'Nova regra de comissão'"
       description="Percentual sobre o valor ou valor fixo por venda/sessão."
     >
-      <form class="flex flex-col gap-4" @submit.prevent="submit">
+      <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
         <FormField label="Quem recebe" html-for="cr-role">
           <Select id="cr-role" v-model="form.role" :options="roleOptions" />
         </FormField>
@@ -475,7 +469,7 @@ function unpayUser(userId: number) {
           <Select id="cr-base" v-model="form.base" :options="baseOptions" />
         </FormField>
       </form>
-      <template #footer>
+      <template #footer-negative>
         <Button
           v-if="editing"
           variant="ghost"
@@ -486,6 +480,8 @@ function unpayUser(userId: number) {
           {{ editing.is_active ? 'Desativar' : 'Reativar' }}
         </Button>
         <Button variant="ghost" type="button" @click="dialogOpen = false">Cancelar</Button>
+      </template>
+      <template #footer>
         <Button type="button" :loading="saving" @click="submit">Salvar</Button>
       </template>
     </AppDialog>

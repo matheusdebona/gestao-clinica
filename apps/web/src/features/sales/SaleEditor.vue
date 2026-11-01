@@ -34,7 +34,7 @@ function goBack() {
       :title="isEdit ? 'Continuar venda' : 'Nova venda'"
       description="Paciente, itens, valor, pagamentos e confirmação."
     >
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
       </template>
     </PageHeader>

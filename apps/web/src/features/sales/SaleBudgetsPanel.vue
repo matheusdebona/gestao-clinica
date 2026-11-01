@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import DatePicker from '@/components/ui/DatePicker.vue'
@@ -210,7 +211,25 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
             :badge="BUDGET_STATUS_LABELS[budget.status]"
             :badge-variant="BUDGET_STATUS_BADGE[budget.status]"
           />
-          <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          <ActionBar class="mt-2">
+            <template #negative>
+              <PermissionGate
+                v-if="canActOn(budget.status)"
+                permission="budgets.update"
+              >
+                <Button mobile-block variant="ghost" @click="pendingAction = { id: budget.id, kind: 'expire' }">
+                  Expirar
+                </Button>
+              </PermissionGate>
+              <PermissionGate
+                v-if="canActOn(budget.status)"
+                permission="budgets.update"
+              >
+                <Button mobile-block variant="ghost" @click="pendingAction = { id: budget.id, kind: 'reject' }">
+                  Recusar
+                </Button>
+              </PermissionGate>
+            </template>
             <PermissionGate permission="documents.generate">
               <Button
                 mobile-block
@@ -231,22 +250,6 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
                 Enviar
               </Button>
             </PermissionGate>
-            <PermissionGate
-              v-if="canActOn(budget.status)"
-              permission="budgets.update"
-            >
-              <Button mobile-block variant="ghost" @click="pendingAction = { id: budget.id, kind: 'expire' }">
-                Expirar
-              </Button>
-            </PermissionGate>
-            <PermissionGate
-              v-if="canActOn(budget.status)"
-              permission="budgets.update"
-            >
-              <Button mobile-block variant="ghost" @click="pendingAction = { id: budget.id, kind: 'reject' }">
-                Recusar
-              </Button>
-            </PermissionGate>
             <PermissionGate v-if="canActOn(budget.status)" permission="budgets.convert">
               <Button
                 mobile-block
@@ -256,7 +259,7 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
                 Aceitar
               </Button>
             </PermissionGate>
-          </div>
+          </ActionBar>
         </div>
       </div>
     </SurfaceCard>

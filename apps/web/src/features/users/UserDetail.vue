@@ -110,15 +110,17 @@ const permissionList = computed(() =>
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="user?.name ?? 'Usuário'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
-        <PermissionGate v-if="user?.is_active" permission="users.update">
-          <Button variant="secondary" @click="goEdit">Editar</Button>
-        </PermissionGate>
         <PermissionGate v-if="canDeactivate" permission="users.delete">
           <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
         </PermissionGate>
-        <PermissionGate v-else-if="isInactive" permission="users.update">
+      </template>
+      <template #actions>
+        <PermissionGate v-if="user?.is_active" permission="users.update">
+          <Button variant="secondary" @click="goEdit">Editar</Button>
+        </PermissionGate>
+        <PermissionGate v-if="isInactive && !(canDeactivate)" permission="users.update">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()">
             Reativar
           </Button>
