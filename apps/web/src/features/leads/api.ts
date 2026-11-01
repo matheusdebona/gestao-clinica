@@ -178,7 +178,7 @@ export async function logLeadWhatsApp(id: number): Promise<LeadActivity> {
 export interface StaleLeadSummaryItem {
   id: number
   name: string
-  phone: string
+  phone: string | null
   status: { id: number; name: string; color: LeadStatusColor } | null
   last_activity_at: string | null
 }

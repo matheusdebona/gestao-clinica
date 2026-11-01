@@ -28,7 +28,7 @@ const props = withDefaults(
     submitLabel?: string
     loading?: boolean
     initialTreatmentId?: number | null
-    /** Avaliação without sale/treatment: hides the treatment field. */
+    /** Consulta without sale/treatment: hides the treatment field. */
     withoutTreatment?: boolean
   }>(),
   {

@@ -19,7 +19,7 @@ export function activityLabel(activity: LeadActivity): string {
     case 'created':
       return activity.to_status ? `Cadastrado como ${activity.to_status.name}` : 'Cadastrado'
     case 'converted':
-      return 'Virou paciente (avaliação agendada)'
+      return 'Virou paciente (consulta agendada)'
     case 'cancelled':
       return 'Lead cancelado'
     case 'comment':

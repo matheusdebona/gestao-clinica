@@ -24,7 +24,7 @@ const { mutate, isPending } = useLeadMilestone()
 
 <template>
   <SurfaceCard>
-    <div class="mb-3 flex items-center gap-1.5"><h2>Funil</h2><InfoTip text="O primeiro WhatsApp aberto já marca como abordado. &quot;Agendou&quot; é marcado ao agendar a avaliação." label="Sobre: Funil" /></div>
+    <div class="mb-3 flex items-center gap-1.5"><h2>Funil</h2><InfoTip text="O primeiro WhatsApp aberto já marca como abordado. &quot;Agendou&quot; é marcado ao agendar a consulta." label="Sobre: Funil" /></div>
     <ol class="flex flex-col gap-3">
       <li v-for="step in steps" :key="step.key" class="flex items-start justify-between gap-3">
         <div class="min-w-0">

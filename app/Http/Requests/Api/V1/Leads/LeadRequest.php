@@ -15,7 +15,9 @@ class LeadRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         if ($this->has('phone')) {
-            $this->merge(['phone' => preg_replace('/\D+/', '', (string) $this->input('phone'))]);
+            $digits = preg_replace('/\D+/', '', (string) $this->input('phone')) ?? '';
+            // Telefone é opcional no lead: vazio vira null.
+            $this->merge(['phone' => $digits === '' ? null : $digits]);
         }
     }
 
@@ -26,7 +28,8 @@ class LeadRequest extends FormRequest
 
         return [
             'name' => [$required, 'string', 'max:255'],
-            'phone' => [$required, 'string', 'min:10', 'max:13'],
+            // Opcional: o lead pode ainda não ter passado o número. Para agendar é obrigatório (ConvertLeadRequest).
+            'phone' => ['sometimes', 'nullable', 'string', 'min:10', 'max:13'],
             'client_origin_id' => [
                 $required,
                 'integer',
@@ -51,7 +54,6 @@ class LeadRequest extends FormRequest
     {
         return [
             'name.required' => 'Informe o nome.',
-            'phone.required' => 'Informe o telefone.',
             'phone.min' => 'Informe DDD e número.',
             'phone.max' => 'Telefone muito longo.',
             'client_origin_id.required' => 'Selecione a origem.',

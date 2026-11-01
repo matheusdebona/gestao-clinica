@@ -175,6 +175,13 @@ class LeadController extends Controller
      */
     public function whatsapp(Request $request, Lead $lead): JsonResponse
     {
+        if (blank($lead->phone)) {
+            return response()->json([
+                'message' => 'Este lead ainda não tem telefone.',
+                'errors' => ['phone' => ['Este lead ainda não tem telefone.']],
+            ], 422);
+        }
+
         // First WhatsApp opened = first outreach ("Abordado").
         if ($lead->approached_at === null && $lead->cancelled_at === null) {
             $this->leads->markMilestone($lead, 'approached', $request->user());

@@ -135,7 +135,7 @@ class PatientReturnTest extends TestCase
         ])->assertCreated();
         $this->assertTrue($return->fresh()->isPending());
 
-        // A new appointment outside that treatment (e.g. an avaliação) closes it.
+        // A new appointment outside that treatment (e.g. a consulta) closes it.
         app(AppointmentService::class)->scheduleEvaluation($this->client, [
             'professional_user_id' => $this->admin->id, 'scheduled_at' => '2026-10-25 13:00:00',
         ]);

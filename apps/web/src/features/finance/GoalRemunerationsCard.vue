@@ -46,7 +46,7 @@ const rows = computed(() => query.data.value ?? []);
 
 const COUNT_HINT: Record<GoalRemunerationRow["metric"], string> = {
     appointments:
-        'Conta cada lead que a pessoa converteu em paciente com avaliação marcada (marco "Agendou") no mês. Se a avaliação for cancelada, deixa de contar.',
+        'Conta cada lead que a pessoa converteu em paciente com consulta marcada (marco "Agendou") no mês. Se a consulta for cancelada, deixa de contar.',
     approached:
         'Conta cada lead marcado como "Abordado" pela pessoa no mês. Não conta se o lead for cancelado, nem quando a pessoa converte o lead sem ter marcado "Abordado" antes (aí paga só o agendamento). Igual à contagem de Metas.',
     sales: "O bônus sai quando a soma das vendas confirmadas da pessoa no mês chega à meta. Comissão por venda fica nas regras acima.",

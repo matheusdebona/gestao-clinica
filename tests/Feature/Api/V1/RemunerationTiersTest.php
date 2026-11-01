@@ -112,7 +112,7 @@ class RemunerationTiersTest extends TestCase
         ]);
     }
 
-    /** @return array{0: Lead, 1: int} lead convertido pelo vendedor e a avaliação marcada */
+    /** @return array{0: Lead, 1: int} lead convertido pelo vendedor e a consulta marcada */
     private function convertAsSeller(): array
     {
         $lead = $this->newLead();
@@ -313,7 +313,7 @@ class RemunerationTiersTest extends TestCase
         $occurrences = CommissionEntry::query()->where('role', 'goal')->where('goal_kind', 'occurrence')->where('user_id', $this->seller->id)->pluck('amount')->all();
         $this->assertSame(['20.00', '20.00', '20.00'], $occurrences);
 
-        // Avaliação cancelada não conta: volta à faixa de 2.
+        // Consulta cancelada não conta: volta à faixa de 2.
         Sanctum::actingAs($this->admin);
         $this->postJson("/api/v1/appointments/{$firstAppointment}/cancel")->assertOk();
         $this->assertSame(['100.00'], $this->tierEntries()->pluck('amount')->all());

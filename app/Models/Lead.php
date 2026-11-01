@@ -44,7 +44,10 @@ class Lead extends Model
     protected static function booted(): void
     {
         static::saving(function (Lead $lead): void {
-            $lead->phone_digits = LeadPhone::canonical((string) $lead->phone);
+            // Sem telefone: NULL (nunca ''), para o índice único deixar vários leads sem número.
+            $digits = LeadPhone::canonical((string) $lead->phone);
+            $lead->phone = $digits === '' ? null : $lead->phone;
+            $lead->phone_digits = $digits === '' ? null : $digits;
         });
     }
 

@@ -162,7 +162,7 @@ const isEvaluation = computed(() => appointment.value?.treatment_id === null)
 const completeEvaluationMutation = useMutation({
   mutationFn: () => completeAppointment(props.appointmentId),
   onSuccess: async () => {
-    toast.success('Avaliação concluída')
+    toast.success('Consulta concluída')
     await queryClient.invalidateQueries({ queryKey: ['appointments'] })
   },
   onError: (error) => {
@@ -262,7 +262,7 @@ function goBack() {
           <div>
             <dt class="text-[13px] text-muted">Tratamento</dt>
             <dd v-if="isEvaluation" class="mt-0.5 text-[15px] text-title">
-              Avaliação (sem tratamento)
+              Consulta (sem tratamento)
             </dd>
             <dd v-else class="mt-0.5 text-[15px] text-title">
               <RouterLink
@@ -313,7 +313,7 @@ function goBack() {
           permission="treatments.complete"
         >
           <Button mobile-block :loading="completeEvaluationMutation.isPending.value" @click="completeEvaluationMutation.mutate()">
-            Concluir avaliação
+            Concluir consulta
           </Button>
         </PermissionGate>
         <PermissionGate v-if="appointment.status === 'in_progress' && !isEvaluation" permission="treatments.consume">

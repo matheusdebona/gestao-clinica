@@ -22,7 +22,7 @@ use Illuminate\Support\Facades\DB;
  *
  * Mês = mês civil em America/Sao_Paulo (o mesmo das metas). O que conta, por colaborador:
  *  - Novo agendamento: lead com o marco "Agendou" feito pelo colaborador (booked_by_user_id)
- *    no mês (booked_at). Não conta se a avaliação marcada na conversão foi cancelada.
+ *    no mês (booked_at). Não conta se a consulta marcada na conversão foi cancelada.
  *  - Lead abordado: lead com o marco "Abordado" feito pelo colaborador no mês. Não conta se o
  *    lead for cancelado depois, nem quando o "Abordado" veio junto com a conversão ("Agendou"
  *    sem abordagem anterior): converter paga só o agendamento.
@@ -424,7 +424,7 @@ class GoalRemunerationService
         }
     }
 
-    /** Avaliação cancelada: o agendamento de quem converteu o lead deixa de contar. */
+    /** Consulta cancelada: o agendamento de quem converteu o lead deixa de contar. */
     public function onAppointmentStatusChanged(Appointment $appointment): void
     {
         Lead::query()->withoutGlobalScope('clinic')

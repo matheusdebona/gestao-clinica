@@ -145,7 +145,7 @@ function onConverted(result: LeadConvertResult) {
         <Button mobile-block variant="ghost" @click="goBack">Voltar</Button>
       </template>
       <template #actions>
-        <PermissionGate v-if="lead" permission="leads.manage">
+        <PermissionGate v-if="lead?.phone" permission="leads.manage">
           <Button mobile-block variant="secondary" @click="callOnWhatsApp">
             Chamar no WhatsApp
           </Button>
@@ -154,7 +154,7 @@ function onConverted(result: LeadConvertResult) {
           <Button mobile-block variant="secondary" @click="goEdit">Editar</Button>
         </PermissionGate>
         <PermissionGate v-if="lead && !isFinal" permission="leads.manage">
-          <Button mobile-block @click="convertOpen = true">Agendar</Button>
+          <Button mobile-block @click="convertOpen = true">Agendar consulta</Button>
         </PermissionGate>
       </template>
     </PageHeader>
@@ -195,7 +195,8 @@ function onConverted(result: LeadConvertResult) {
           <div>
             <dt class="text-[13px] text-muted">Telefone</dt>
             <dd class="mt-0.5 text-[15px] text-title">
-              {{ formatPhoneBR(lead.phone) || lead.phone }}
+              <template v-if="lead.phone">{{ formatPhoneBR(lead.phone) || lead.phone }}</template>
+              <span v-else class="text-muted">Sem telefone. Para agendar, peça o número.</span>
             </dd>
           </div>
           <div>

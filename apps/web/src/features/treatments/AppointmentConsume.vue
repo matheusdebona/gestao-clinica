@@ -431,7 +431,7 @@ const completePending = computed(() => completeMutation.isPending.value)
       :description="
         draftsHaveProducts(drafts)
           ? 'As quantidades preenchidas serão ignoradas. Nenhum produto sai do estoque.'
-          : 'Sessão de avaliação: nenhum produto sai do estoque.'
+          : 'Consulta sem tratamento: nenhum produto sai do estoque.'
       "
       confirm-label="Concluir sem produtos"
       confirm-variant="primary"

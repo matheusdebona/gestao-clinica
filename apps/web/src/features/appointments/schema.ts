@@ -6,7 +6,7 @@ import type { Appointment, AppointmentPayload } from '@/types/appointment'
 
 export const appointmentFormSchema = toTypedSchema(
   z.object({
-    // Required in the form unless it is an avaliação (no treatment); see AppointmentForm.
+    // Required in the form unless it is a consulta (no treatment); see AppointmentForm.
     treatment_id: z.string().trim(),
     professional_user_id: z.string().trim().min(1, 'Selecione o profissional.'),
     scheduled_at: z.string().trim().min(1, 'Informe data e hora.'),
