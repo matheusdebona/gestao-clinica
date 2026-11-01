@@ -98,7 +98,7 @@ class LeadTest extends TestCase
             ->assertJsonPath('data.activities.0.type', 'created');
     }
 
-    public function test_create_requires_name_phone_and_origin_of_same_clinic(): void
+    public function test_create_requires_name_and_origin_of_same_clinic_phone_is_optional(): void
     {
         Sanctum::actingAs($this->admin);
         $other = Clinic::factory()->create();
@@ -106,7 +106,8 @@ class LeadTest extends TestCase
         $foreignOrigin = ClientOrigin::query()->withoutGlobalScopes()->where('clinic_id', $other->id)->firstOrFail();
 
         $this->postJson('/api/v1/leads', [])->assertUnprocessable()
-            ->assertJsonValidationErrors(['name', 'phone', 'client_origin_id']);
+            ->assertJsonValidationErrors(['name', 'client_origin_id'])
+            ->assertJsonMissingValidationErrors(['phone']);
 
         $this->postJson('/api/v1/leads', [
             'name' => 'X',

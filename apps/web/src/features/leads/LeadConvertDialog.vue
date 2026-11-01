@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
-import AppSheet from '@/components/ui/AppSheet.vue'
+import AppDialog from '@/components/ui/AppDialog.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import DateTimePicker from '@/components/ui/DateTimePicker.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
+import PhoneInput from '@/components/ui/PhoneInput.vue'
 import Radio from '@/components/ui/Radio.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
@@ -14,7 +15,7 @@ import Textarea from '@/components/ui/Textarea.vue'
 import { listProfessionals } from '@/features/appointments/api'
 import { datetimeLocalToIso } from '@/features/appointments/schema'
 import { convertLead, listLeadMatchingClients } from '@/features/leads/api'
-import { formatPhoneBR } from '@/lib/masks'
+import { formatPhoneBR, phoneDigits } from '@/lib/masks'
 import { useToastStore } from '@/stores/toast'
 import type { Lead, LeadConvertResult } from '@/types/lead'
 import { ApiError } from '@/types/user'
@@ -38,10 +39,13 @@ const professionalId = ref('')
 const scheduledAt = ref('')
 const duration = ref('')
 const notes = ref('')
+const phone = ref('')
 const clientChoice = ref(NEW_CLIENT)
 const errors = ref<Record<string, string>>({})
 
 const leadId = computed(() => props.lead.id)
+/** Agendar exige telefone: lead sem número informa aqui (salvo no lead e no paciente). */
+const needsPhone = computed(() => !props.lead.phone)
 
 const professionalsQuery = useQuery({
   queryKey: ['professionals'],
@@ -80,6 +84,7 @@ watch(open, (isOpen) => {
   scheduledAt.value = ''
   duration.value = ''
   notes.value = ''
+  phone.value = ''
   clientChoice.value = NEW_CLIENT
 })
 
@@ -98,6 +103,14 @@ watch(professionalOptions, (options) => {
 
 function validate(): boolean {
   const next: Record<string, string> = {}
+  if (needsPhone.value) {
+    const digits = phoneDigits(phone.value)
+    if (!digits) {
+      next.phone = 'Informe o telefone do paciente para agendar.'
+    } else if (digits.length !== 10 && digits.length !== 11) {
+      next.phone = 'Informe DDD e número.'
+    }
+  }
   if (!professionalId.value) {
     next.professional_user_id = 'Selecione o profissional.'
   }
@@ -124,6 +137,7 @@ const { mutate, isPending } = useMutation({
       notes: notes.value.trim() || null,
       client_id: linking ? Number(clientChoice.value) : null,
       create_new_client: !linking,
+      ...(needsPhone.value ? { phone: phoneDigits(phone.value) } : {}),
     })
   },
   onSuccess: async (result) => {
@@ -148,6 +162,8 @@ const { mutate, isPending } = useMutation({
       }
       errors.value = Object.keys(mapped).length ? mapped : { lead: error.message }
       if (mapped.client_id) {
+        // O telefone informado já ficou salvo no lead: atualiza o lead e mostra o paciente com o mesmo número.
+        void queryClient.invalidateQueries({ queryKey: ['leads'] })
         void matchesQuery.refetch()
       }
       return
@@ -164,22 +180,36 @@ function onConfirm() {
 </script>
 
 <template>
-  <AppSheet
-    stack-footer
+  <AppDialog
     v-model:open="open"
+    size="lg"
     title="Agendar avaliação"
     description="Ao confirmar, o lead vira paciente (com nome, telefone, origem e histórico) e a avaliação entra na agenda."
   >
-    <div class="flex flex-col gap-4">
-      <Banner v-if="errors.lead" variant="danger">{{ errors.lead }}</Banner>
+    <div class="grid gap-4 md:grid-cols-2">
+      <Banner v-if="errors.lead" variant="danger" class="md:col-span-2">{{ errors.lead }}</Banner>
 
-      <Skeleton v-if="matchesQuery.isPending.value" class="h-11" />
+      <Skeleton v-if="matchesQuery.isPending.value" class="h-11 md:col-span-2" />
       <FormField
         v-else-if="matches.length"
         label="Já existe paciente com este telefone"
         :error="errors.client_id"
+        class="md:col-span-2"
       >
         <Radio v-model="clientChoice" name="lead-convert-client" :options="clientOptions" />
+      </FormField>
+
+      <FormField
+        v-if="needsPhone"
+        label="Telefone do paciente"
+        hint="Este lead ainda não tem telefone. Para agendar ele é obrigatório: fica salvo no lead e no cadastro do paciente."
+        tip-hint
+        :error="errors.phone"
+        html-for="lead-convert-phone"
+      >
+        <template #default="{ invalid }">
+          <PhoneInput id="lead-convert-phone" v-model="phone" :invalid="invalid" />
+        </template>
       </FormField>
 
       <FormField
@@ -221,7 +251,7 @@ function onConfirm() {
         </template>
       </FormField>
 
-      <FormField label="Notas" :error="errors.notes" html-for="lead-convert-notes">
+      <FormField label="Notas" :error="errors.notes" html-for="lead-convert-notes" class="md:col-span-2">
         <template #default="{ invalid }">
           <Textarea id="lead-convert-notes" v-model="notes" :rows="2" :invalid="invalid" />
         </template>
@@ -235,5 +265,5 @@ function onConfirm() {
     <template #footer>
       <Button mobile-block type="button" :loading="isPending" @click="onConfirm">Confirmar</Button>
     </template>
-  </AppSheet>
+  </AppDialog>
 </template>

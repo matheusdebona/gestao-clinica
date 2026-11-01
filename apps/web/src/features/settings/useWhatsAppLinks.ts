@@ -18,7 +18,7 @@ export function useWhatsAppLinks() {
     return settings.value?.whatsapp_templates[key] ?? FALLBACKS[key]
   }
 
-  function leadUrl(lead: { name: string; phone: string }): string | null {
+  function leadUrl(lead: { name: string; phone: string | null }): string | null {
     const text = renderWhatsAppTemplate(template('lead_follow_up'), {
       ...base.value,
       paciente: firstName(lead.name),

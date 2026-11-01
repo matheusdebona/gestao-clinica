@@ -121,7 +121,7 @@ function callOnWhatsApp(lead: Lead) {
 }
 
 function leadMeta(lead: Lead) {
-  const bits = [formatPhoneBR(lead.phone) || lead.phone]
+  const bits = [formatPhoneBR(lead.phone) || 'Sem telefone']
   if (lead.client_origin?.name) {
     bits.push(lead.client_origin.name)
   }
@@ -232,7 +232,7 @@ function openStatus(lead: Lead) {
                 </template>
               </ListCard>
             </div>
-            <PermissionGate permission="leads.manage">
+            <PermissionGate v-if="lead.phone" permission="leads.manage">
               <IconButton label="Chamar no WhatsApp" @click="callOnWhatsApp(lead)">
                 <MessageCircle class="size-4" :stroke-width="1.75" />
               </IconButton>

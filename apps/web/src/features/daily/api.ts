@@ -20,7 +20,7 @@ export type DailyKpiKey = keyof DailyKpis
 export interface DailyQueueItem {
   id: number
   name: string
-  phone: string
+  phone: string | null
   client_id: number | null
   cancelled_at: string | null
   lead_status_id: number

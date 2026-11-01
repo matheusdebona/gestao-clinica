@@ -43,7 +43,7 @@ const comment = ref('')
 const commentError = ref('')
 
 function meta(item: DailyQueueItem): string {
-  const bits = [formatPhoneBR(item.phone) || item.phone]
+  const bits = [formatPhoneBR(item.phone) || 'Sem telefone']
   if (item.origin) {
     bits.push(item.origin)
   }
@@ -123,7 +123,7 @@ function onComment() {
             </ListCard>
           </div>
           <PermissionGate permission="leads.manage">
-            <IconButton label="Chamar no WhatsApp" @click="callOnWhatsApp(item)">
+            <IconButton v-if="item.phone" label="Chamar no WhatsApp" @click="callOnWhatsApp(item)">
               <MessageCircle class="size-4" :stroke-width="1.75" />
             </IconButton>
             <IconButton label="Comentar" @click="openComment(item)">

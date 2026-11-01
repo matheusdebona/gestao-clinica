@@ -33,7 +33,7 @@ function openTier(days: number) {
 }
 
 function itemMeta(item: StaleLeadSummaryItem): string {
-  return [staleLabel(daysSince(item.last_activity_at)), formatPhoneBR(item.phone)].join(' · ')
+  return [staleLabel(daysSince(item.last_activity_at)), formatPhoneBR(item.phone) || 'Sem telefone'].join(' · ')
 }
 
 function openLead(id: number) {

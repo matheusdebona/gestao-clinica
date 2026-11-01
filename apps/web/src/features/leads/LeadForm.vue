@@ -221,7 +221,12 @@ defineExpose({ setErrors, setDuplicate })
       </template>
     </FormField>
 
-    <FormField label="Telefone" :error="errors.phone" html-for="lead-phone">
+    <FormField
+      label="Telefone"
+      hint="Opcional. Obrigatório só para agendar."
+      :error="errors.phone"
+      html-for="lead-phone"
+    >
       <template #default="{ invalid }">
         <PhoneInput
           id="lead-phone"

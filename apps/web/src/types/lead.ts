@@ -61,7 +61,7 @@ export interface Lead {
   id: number
   clinic_id: number
   name: string
-  phone: string
+  phone: string | null
   client_origin_id: number
   lead_status_id: number
   notes: string | null
@@ -88,7 +88,7 @@ export interface Lead {
 
 export interface LeadPayload {
   name: string
-  phone: string
+  phone: string | null
   client_origin_id: number
   lead_status_id?: number | null
   notes: string | null
@@ -103,6 +103,8 @@ export interface LeadConvertPayload {
   notes: string | null
   client_id?: number | null
   create_new_client?: boolean
+  /** Required when the lead has no phone yet (saved on the lead and on the new patient). */
+  phone?: string | null
 }
 
 export interface LeadConvertResult {

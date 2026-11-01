@@ -21,17 +21,17 @@ class LeadService
     public function __construct(private readonly AppointmentService $appointments) {}
 
     /**
-     * @param  array{name: string, phone: string, client_origin_id: int, lead_status_id?: int|null, notes?: string|null}  $data
+     * @param  array{name: string, phone?: string|null, client_origin_id: int, lead_status_id?: int|null, notes?: string|null}  $data
      */
     public function create(array $data, User $user): Lead
     {
-        $this->assertPhoneAvailable((int) $user->clinic_id, (string) $data['phone'], null);
+        $this->assertPhoneAvailable((int) $user->clinic_id, (string) ($data['phone'] ?? ''), null);
 
         try {
             return $this->createLead($data, $user);
         } catch (UniqueConstraintViolationException) {
             // Concurrent insert of the same phone: re-run the check to return the structured error.
-            $this->assertPhoneAvailable((int) $user->clinic_id, (string) $data['phone'], null);
+            $this->assertPhoneAvailable((int) $user->clinic_id, (string) ($data['phone'] ?? ''), null);
             throw ValidationException::withMessages(['phone' => ['Já existe um lead com este telefone.']]);
         }
     }
@@ -50,7 +50,7 @@ class LeadService
             $lead = Lead::query()->create([
                 'clinic_id' => $user->clinic_id,
                 'name' => trim($data['name']),
-                'phone' => $data['phone'],
+                'phone' => $data['phone'] ?? null,
                 'client_origin_id' => $data['client_origin_id'],
                 'lead_status_id' => $statusId,
                 'notes' => $data['notes'] ?? null,
@@ -181,6 +181,8 @@ class LeadService
                 'lead' => ['Este lead já virou paciente.'],
             ]);
         }
+
+        $lead = $this->ensurePhoneForScheduling($lead, $data['phone'] ?? null);
 
         $clientId = $data['client_id'] ?? null;
         $createNew = (bool) ($data['create_new_client'] ?? false);
@@ -400,6 +402,38 @@ class LeadService
         }
 
         return null;
+    }
+
+    /**
+     * Agendar exige telefone. Lead sem número: o telefone informado na conversão é salvo no lead
+     * (e vai para o paciente novo). Só bloqueia outro lead ativo com o mesmo número; paciente com o
+     * mesmo número segue o fluxo normal de "vincular ao paciente existente".
+     */
+    private function ensurePhoneForScheduling(Lead $lead, ?string $phone): Lead
+    {
+        if (filled($lead->phone)) {
+            return $lead;
+        }
+
+        if (blank($phone)) {
+            throw ValidationException::withMessages([
+                'phone' => ['Informe o telefone do paciente para agendar.'],
+            ]);
+        }
+
+        $conflict = $this->phoneConflict((int) $lead->clinic_id, (string) $phone, $lead);
+        if ($conflict !== null && $conflict['lead'] !== null) {
+            throw new HttpResponseException(response()->json([
+                'message' => $conflict['message'],
+                'errors' => ['phone' => [$conflict['message']]],
+                'duplicate' => $conflict,
+            ], 422));
+        }
+
+        $lead->phone = $phone;
+        $lead->save();
+
+        return $lead;
     }
 
     private function assertPhoneAvailable(int $clinicId, string $phone, ?Lead $ignore): void
