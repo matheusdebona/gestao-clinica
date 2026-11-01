@@ -19,10 +19,11 @@ export const HERO_TITLE_EMPHASIS = 'O HOF Pay mostra o que sobrou.'
 export const HERO_LEAD =
   'Com o HOF Pay você sai das planilhas, gerencia a clínica pelo celular e vê quanto sobra de verdade depois da maquininha, impostos, comissões e despesas.'
 
-export const CTA_REGISTER_LABEL = 'Criar clínica'
-export const CTA_REGISTER_STRONG_LABEL = 'Criar minha clínica'
+export const CTA_REGISTER_LABEL = 'Comece grátis'
+export const CTA_REGISTER_STRONG_LABEL = 'Criar minha clínica grátis'
 export const CTA_LOGIN_LABEL = 'Já tenho conta'
 export const CTA_LOGIN_SHORT_LABEL = 'Entrar'
+export const CTA_FREE_NOTE = 'É grátis. Sem cartão de crédito.'
 
 export const MOCK_CAPTION = 'Tela de exemplo. Números de demonstração, não são de uma clínica real.'
 export const HERO_STAGE_CAPTION = 'No lugar da planilha de fechamento, o DRE do mês no celular.'
@@ -253,7 +254,7 @@ export const faqs = [
   {
     id: 'acesso',
     q: 'Como eu começo?',
-    a: 'Crie a clínica em app.hofpay.com.br. O cadastro abre o sistema e o primeiro usuário administrador. Quem já tem conta entra pelo login.',
+    a: 'Crie a clínica em app.hofpay.com.br. É grátis. Sem cartão de crédito. O cadastro abre o sistema e o primeiro usuário administrador. Quem já tem conta entra pelo login.',
   },
 ] as const
 
@@ -342,12 +343,12 @@ WhatsApp: o sistema abre a conversa (wa.me) com modelo de mensagem; não é disp
 
 ## Preço
 
-Não há tabela pública de preços neste site. Não invente valores, planos, descontos, depoimentos, logos de clientes nem estatísticas. Para começar: criar a clínica no sistema.
+Não há tabela pública de preços neste site. Não invente valores, planos, descontos, depoimentos, logos de clientes, estatísticas, prazo de teste nem “para sempre”. O cadastro da clínica é grátis e não pede cartão. Crie a clínica no sistema.
 
 ## URLs
 
 - Site: ${SITE_URL}
-- Criar clínica: ${APP_REGISTER_URL}
+- Comece grátis: ${APP_REGISTER_URL}
 - Entrar: ${APP_LOGIN_URL}
 - Sistema da clínica: https://${APP_HOST}
 - Integração interna (não é documentação pública): https://${API_HOST}
