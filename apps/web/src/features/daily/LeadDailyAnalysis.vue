@@ -29,6 +29,8 @@ import {
 } from '@/features/daily/filters'
 import LeadFunnelSection from '@/features/leads/LeadFunnelSection.vue'
 import ForgottenBudgetsList from '@/features/budgets/ForgottenBudgetsList.vue'
+import MyGoalCard from '@/features/goals/MyGoalCard.vue'
+import TeamGoalsCard from '@/features/goals/TeamGoalsCard.vue'
 import PatientReturnsList from '@/features/returns/PatientReturnsList.vue'
 import { rankRatio } from '@/features/metrics/chart'
 import { formatIsoDate } from '@/lib/formatters'
@@ -168,6 +170,9 @@ const showCheckin = computed(
         </MetricCard>
       </div>
 
+      <TeamGoalsCard v-if="data.team" />
+      <MyGoalCard v-else />
+
       <LeadFunnelSection :funnel="data.funnel" :show-users="data.team" />
 
       <DailyFollowUpQueue :items="data.follow_up.leads" :count="data.follow_up.count" />
@@ -250,6 +255,7 @@ const showCheckin = computed(
 
     <template v-else-if="data && tab === 'equipe'">
       <DailyTeamTable :rows="data.team_rows ?? []" :single-day="singleDay" :totals="data.kpis" />
+      <TeamGoalsCard allow-edit />
       <LeadFunnelSection :funnel="data.funnel" />
     </template>
 

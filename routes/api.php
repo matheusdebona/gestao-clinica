@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\V1\ProtocolController;
 use App\Http\Controllers\Api\V1\SaleController;
 use App\Http\Controllers\Api\V1\TreatmentController;
 use App\Http\Controllers\Api\V1\UserController;
+use App\Http\Controllers\Api\V1\UserGoalController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -72,6 +73,13 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:clinics.manage');
         Route::put('clinics/{clinic}', [ClinicController::class, 'update'])
             ->middleware('permission:clinics.manage');
+
+        Route::get('goals/me', [UserGoalController::class, 'me'])
+            ->middleware('permission:leads.view|sales.view');
+        Route::get('goals', [UserGoalController::class, 'index'])
+            ->middleware('permission:users.view|metrics.view');
+        Route::put('goals/{user}', [UserGoalController::class, 'update'])
+            ->middleware('permission:users.update');
 
         Route::get('users', [UserController::class, 'index'])
             ->middleware('permission:users.view');

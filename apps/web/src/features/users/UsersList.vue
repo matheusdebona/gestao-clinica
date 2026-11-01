@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ListCard from '@/components/ui/ListCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
+import TeamGoalsCard from '@/features/goals/TeamGoalsCard.vue'
 import Pagination from '@/components/ui/Pagination.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
@@ -118,6 +119,8 @@ function userMeta(user: ClinicUser) {
         :disabled="isFetching"
         @update:page="(value) => (page = value)"
       />
+
+      <TeamGoalsCard allow-edit />
     </template>
   </div>
 </template>
