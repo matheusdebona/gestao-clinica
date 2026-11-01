@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Api\V1;
 
 use App\Models\Lead;
+use App\Models\LeadActivity;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -40,7 +41,7 @@ class LeadResource extends JsonResource
                 'name' => $this->client->name,
                 'whatsapp' => $this->client->whatsapp,
             ]),
-            'activities' => LeadActivityResource::collection($this->whenLoaded('activities')),
+            'activities' => $this->whenLoaded('activities', fn () => $this->activityResources()),
             'comments_count' => $this->whenCounted('comments'),
             'last_activity_at' => $this->lastActivityAt()?->toISOString(),
             'created_at' => $this->created_at,
@@ -54,5 +55,14 @@ class LeadResource extends JsonResource
     private function userRef(mixed $user): ?array
     {
         return $user === null ? null : ['id' => $user->id, 'name' => $user->name];
+    }
+
+    private function activityResources(): array
+    {
+        $latestCommentId = LeadActivity::latestCommentIdIn($this->activities);
+
+        return $this->activities
+            ->map(fn (LeadActivity $activity) => (new LeadActivityResource($activity))->withLatestCommentId($latestCommentId))
+            ->all();
     }
 }

@@ -234,7 +234,7 @@ function onConverted(result: LeadConvertResult) {
           <form class="mb-4 flex flex-col gap-2" @submit.prevent="submitComment">
             <FormField
               label="Novo comentário"
-              hint="Alinhamentos e conversas com o lead. Comentários ficam no histórico."
+              hint="Alinhamentos e conversas com o lead. Comentários ficam no histórico; só o mais recente pode ser editado."
               :error="commentError"
               html-for="lead-comment"
             >
@@ -261,7 +261,11 @@ function onConverted(result: LeadConvertResult) {
             </div>
           </form>
         </PermissionGate>
-        <LeadHistory v-if="lead.activities?.length" :activities="lead.activities" />
+        <LeadHistory
+          v-if="lead.activities?.length"
+          :activities="lead.activities"
+          :lead-id="lead.id"
+        />
       </SurfaceCard>
 
       <PermissionGate v-if="!isFinal" permission="leads.manage">

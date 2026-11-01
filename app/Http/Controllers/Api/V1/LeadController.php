@@ -22,6 +22,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
 class LeadController extends Controller
@@ -187,7 +188,8 @@ class LeadController extends Controller
     }
 
     /**
-     * Comments are history: immutable, never deleted, allowed on cancelled and converted leads too.
+     * Comments are history: never deleted, allowed on cancelled and converted leads too.
+     * Only the latest comment can be edited (by its author or a clinic admin), see updateComment().
      */
     public function comment(Request $request, Lead $lead): JsonResponse
     {
@@ -210,6 +212,38 @@ class LeadController extends Controller
         ]);
 
         return (new LeadActivityResource($activity->load('user')))->response()->setStatusCode(201);
+    }
+
+    /**
+     * Edit the lead's latest comment. Older comments are locked; only the author or an admin may edit.
+     * The comment is looked up through the (clinic-scoped) lead, so another clinic's comment is a 404.
+     */
+    public function updateComment(Request $request, Lead $lead, int $comment): LeadActivityResource
+    {
+        $activity = $lead->comments()->whereKey($comment)->firstOrFail();
+        Gate::authorize('update', $activity);
+
+        $data = $request->validate([
+            'body' => ['required', 'string', 'max:5000'],
+        ], [
+            'body.required' => 'Escreva o comentário.',
+            'body.max' => 'Comentário muito longo.',
+        ]);
+
+        $body = trim($data['body']);
+        if ($body === '') {
+            throw ValidationException::withMessages(['body' => ['Escreva o comentário.']]);
+        }
+
+        if ($body !== $activity->note) {
+            $activity->forceFill([
+                'note' => $body,
+                'edited_at' => now(),
+                'edited_by_user_id' => $request->user()->id,
+            ])->save();
+        }
+
+        return (new LeadActivityResource($activity->load('user')))->withLatestCommentId($activity->id);
     }
 
     /**

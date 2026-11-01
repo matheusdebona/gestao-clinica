@@ -99,6 +99,19 @@ export async function addLeadComment(id: number, body: { body: string }): Promis
   return payload.data
 }
 
+/** Only the latest comment, by its author or an admin (403 otherwise). */
+export async function updateLeadComment(
+  leadId: number,
+  commentId: number,
+  body: { body: string },
+): Promise<LeadActivity> {
+  const payload = await api<DataEnvelope<LeadActivity>>(`/leads/${leadId}/comments/${commentId}`, {
+    method: 'PATCH',
+    body,
+  })
+  return payload.data
+}
+
 export async function checkLeadPhone(
   phone: string,
   leadId?: number | null,

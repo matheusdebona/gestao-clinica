@@ -47,7 +47,35 @@ class LeadActivity extends Model
         'from_status_id',
         'to_status_id',
         'note',
+        'edited_at',
+        'edited_by_user_id',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'edited_at' => 'datetime',
+        ];
+    }
+
+    public function isComment(): bool
+    {
+        return $this->type === self::TYPE_COMMENT;
+    }
+
+    /** Only the latest comment of the lead can be edited, by its author or a clinic admin. */
+    public function canBeEditedBy(?User $user, ?int $latestCommentId = null): bool
+    {
+        if ($user === null || ! $this->isComment()) {
+            return false;
+        }
+        $latestCommentId ??= self::latestCommentIdFor((int) $this->lead_id);
+        if ((int) $latestCommentId !== (int) $this->id) {
+            return false;
+        }
+
+        return (int) $this->user_id === (int) $user->id || $user->hasAnyRole(['admin', 'super-admin']);
+    }
 
     public function lead(): BelongsTo
     {
@@ -57,6 +85,33 @@ class LeadActivity extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public static function latestCommentIdFor(int $leadId): ?int
+    {
+        $id = self::query()
+            ->where('lead_id', $leadId)
+            ->where('type', self::TYPE_COMMENT)
+            ->orderByDesc('created_at')->orderByDesc('id')
+            ->value('id');
+
+        return $id === null ? null : (int) $id;
+    }
+
+    /** Same ordering as latestCommentIdFor(), on an already loaded history. */
+    public static function latestCommentIdIn(iterable $activities): ?int
+    {
+        $latest = collect($activities)
+            ->filter(fn (LeadActivity $a) => $a->isComment())
+            ->sort(fn (LeadActivity $a, LeadActivity $b) => [$b->created_at?->getTimestamp(), $b->id] <=> [$a->created_at?->getTimestamp(), $a->id])
+            ->first();
+
+        return $latest === null ? null : (int) $latest->id;
+    }
+
+    public function editedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'edited_by_user_id');
     }
 
     public function fromStatus(): BelongsTo

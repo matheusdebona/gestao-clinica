@@ -506,7 +506,7 @@ class LeadTest extends TestCase
 
         $this->getJson('/api/v1/leads')->assertOk()->assertJsonPath('data.0.comments_count', 2);
 
-        // View-only users read but cannot comment; no edit/delete endpoints exist.
+        // View-only users read but cannot comment; comments are never deleted.
         $viewer = User::factory()->forClinic($this->clinic)->create();
         $viewer->givePermissionTo('leads.view');
         Sanctum::actingAs($viewer);
