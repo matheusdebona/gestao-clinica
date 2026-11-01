@@ -101,6 +101,12 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/ClientsPage.vue'),
         },
         {
+          path: 'retornos',
+          name: 'patient-returns',
+          meta: { title: 'Retornos' },
+          component: () => import('@/features/returns/PatientReturnsPage.vue'),
+        },
+        {
           path: 'clients/new',
           name: 'clients-new',
           component: () => import('@/pages/ClientFormPage.vue'),

@@ -1,7 +1,17 @@
 /** WhatsApp via wa.me deep links (no paid API). */
 
 export type WhatsAppVars = Partial<
-  Record<'paciente' | 'clinica' | 'data' | 'hora' | 'profissional' | 'usuario', string>
+  Record<
+    | 'paciente'
+    | 'clinica'
+    | 'data'
+    | 'hora'
+    | 'profissional'
+    | 'usuario'
+    | 'procedimento'
+    | 'valor',
+    string
+  >
 >
 
 /** Digits with the Brazilian country code (55) added when missing. */
@@ -17,7 +27,11 @@ export function whatsappDigits(phone: string | null | undefined): string {
 }
 
 export function firstName(name: string | null | undefined): string {
-  return String(name ?? '').trim().split(/\s+/)[0] ?? ''
+  return (
+    String(name ?? '')
+      .trim()
+      .split(/\s+/)[0] ?? ''
+  )
 }
 
 /**
@@ -29,9 +43,12 @@ export function renderWhatsAppTemplate(template: string, vars: WhatsAppVars): st
   if (!vars.profissional) {
     text = text.replace(/\s*\bcom\s+\{profissional\}/giu, '')
   }
-  text = text.replace(/\{(paciente|clinica|data|hora|profissional|usuario)\}/giu, (_, key: string) => {
-    return vars[key.toLowerCase() as keyof WhatsAppVars] ?? ''
-  })
+  text = text.replace(
+    /\{(paciente|clinica|data|hora|profissional|usuario|procedimento|valor)\}/giu,
+    (_, key: string) => {
+      return vars[key.toLowerCase() as keyof WhatsAppVars] ?? ''
+    },
+  )
   return text.replace(/[ \t]{2,}/g, ' ').trim()
 }
 
@@ -54,8 +71,12 @@ export function whatsappDateParts(iso: string | null | undefined): { data: strin
   }
   const zone = { timeZone: 'America/Sao_Paulo' } as const
   return {
-    data: new Intl.DateTimeFormat('pt-BR', { ...zone, day: '2-digit', month: '2-digit' }).format(date),
-    hora: new Intl.DateTimeFormat('pt-BR', { ...zone, hour: '2-digit', minute: '2-digit' }).format(date),
+    data: new Intl.DateTimeFormat('pt-BR', { ...zone, day: '2-digit', month: '2-digit' }).format(
+      date,
+    ),
+    hora: new Intl.DateTimeFormat('pt-BR', { ...zone, hour: '2-digit', minute: '2-digit' }).format(
+      date,
+    ),
   }
 }
 

@@ -2,6 +2,7 @@ import { api } from '@/lib/api'
 import type { LeadFunnel } from '@/features/leads/funnel'
 import type { DataEnvelope } from '@/types/pagination'
 import type { LeadStatusColor } from '@/types/lead'
+import type { PatientReturn } from '@/features/returns/api'
 
 export interface DailyKpis {
   registered: number
@@ -63,7 +64,12 @@ export interface DailyAnalysis {
   registered_by_origin: { id: number | null; label: string; total: number }[]
   status_snapshot: { id: number; label: string; color: LeadStatusColor; total: number }[]
   funnel: LeadFunnel
-  follow_up: { count: number; leads: DailyQueueItem[] }
+  follow_up: {
+    count: number
+    leads: DailyQueueItem[]
+    /** Retornos de pacientes a vencer/atrasados; null sem sales.view. */
+    returns?: { count: number; overdue: number; items: PatientReturn[] } | null
+  }
   suggestions: { kind: 'warning' | 'info' | 'success'; text: string }[]
   team_rows?: DailyTeamRow[]
   users: { id: number; name: string }[]

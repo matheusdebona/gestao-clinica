@@ -21,6 +21,7 @@ export interface Protocol {
   min_price: string
   min_price_is_manual: boolean
   special_price: string | null
+  return_after_days?: number | null
   margin_at_suggested: string
   margin_at_min: string
   margin_at_special: string | null
@@ -42,6 +43,7 @@ export interface ProtocolHeaderPayload {
   suggested_price?: string
   min_price?: string
   special_price?: string | null
+  return_after_days?: number | null
 }
 
 export interface ProtocolCreatePayload extends ProtocolHeaderPayload {
