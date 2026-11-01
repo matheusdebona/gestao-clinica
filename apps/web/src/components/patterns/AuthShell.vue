@@ -8,32 +8,39 @@ import { APP_NAME } from '@/lib/brand'
  * Same card as the login screen (image on the left on desktop, form on the
  * right; form only on mobile). Used by "Esqueceu a senha?" and "Redefinir senha".
  */
-defineProps<{
-  title: string
-  subtitle?: string
-}>()
+withDefaults(
+  defineProps<{
+    title: string
+    subtitle?: string
+    /** Wider form column on desktop, for two fields per row. */
+    wide?: boolean
+  }>(),
+  { subtitle: undefined, wide: false },
+)
 </script>
 
 <template>
-  <div class="relative flex min-h-dvh items-center justify-center px-4 py-[5dvh]">
+  <div class="relative flex min-h-dvh flex-col items-center justify-center px-4 py-4 md:py-[5dvh]">
     <div class="absolute top-4 right-4 z-10">
       <ThemeToggle />
     </div>
-    <div class="glass-regular auth-shell h-[90dvh] w-full max-w-[920px] overflow-hidden rounded-[22px]">
+    <!-- Mobile has no image side: a small brand mark above the card. -->
+    <BrandMark size="lg" :decorative="false" class="mb-2 md:hidden" />
+    <div
+      class="glass-regular auth-shell w-full max-w-[920px] overflow-hidden rounded-[22px] md:h-[90dvh] lg:max-w-[1040px]"
+    >
       <div class="auth-shell-image">
         <img :src="authClinic" alt="" class="size-full object-cover">
         <div class="absolute inset-0 bg-sidebar/40" />
+        <BrandMark size="xl" tone="inverse" :decorative="false" class="absolute top-5 left-5" />
         <p class="absolute bottom-5 left-5 right-5 text-[15px] font-medium tracking-[-0.02em] text-inverse">
           {{ APP_NAME }}. Gestão da clínica, com calma.
         </p>
       </div>
 
-      <section class="auth-shell-content flex min-h-0 flex-col overflow-y-auto px-6 py-8 md:px-10 md:py-10">
+      <section class="auth-shell-content flex min-h-0 flex-col px-6 py-6 md:overflow-y-auto md:px-10 md:py-8">
         <div class="my-auto flex w-full flex-col">
-          <div class="mb-8 flex justify-center">
-            <BrandMark size="3xl" :decorative="false" />
-          </div>
-          <div class="mx-auto w-full max-w-[360px]">
+          <div class="mx-auto w-full max-w-[360px]" :class="{ 'lg:max-w-[440px]': wide }">
             <p class="text-center text-[12px] font-semibold tracking-[0.16em] uppercase text-brand">
               {{ APP_NAME }}
             </p>
