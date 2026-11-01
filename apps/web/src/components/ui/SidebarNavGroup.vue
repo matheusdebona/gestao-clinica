@@ -10,7 +10,7 @@ const props = withDefaults(
     open?: boolean
     active?: boolean
     compact?: boolean
-    tone?: 'inverse' | 'default'
+    tone?: 'inverse' | 'default' | 'shell'
     icon?: Component
   }>(),
   {

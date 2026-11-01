@@ -15,7 +15,7 @@ const props = withDefaults(
     openGroups: Record<string, boolean>
     currentPath: string
     alertCount?: number
-    tone?: 'inverse' | 'default'
+    tone?: 'inverse' | 'default' | 'shell'
     compact?: boolean
   }>(),
   {
