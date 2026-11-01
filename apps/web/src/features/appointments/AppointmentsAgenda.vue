@@ -195,7 +195,7 @@ function onClientSearch(value: string) {
     <PageHeader title="Agenda" :description="heading">
       <template #actions>
         <PermissionGate permission="appointments.manage">
-          <Button @click="goNew">Nova sessão</Button>
+          <Button mobile-block @click="goNew">Nova sessão</Button>
         </PermissionGate>
       </template>
     </PageHeader>
@@ -257,7 +257,7 @@ function onClientSearch(value: string) {
           >
             <template #action>
               <PermissionGate permission="appointments.manage">
-                <Button @click="goNew">Nova sessão</Button>
+                <Button mobile-block @click="goNew">Nova sessão</Button>
               </PermissionGate>
             </template>
           </EmptyState>

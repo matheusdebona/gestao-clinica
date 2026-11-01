@@ -243,10 +243,10 @@ defineExpose({
     </FormField>
 
     <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button type="button" variant="ghost" :disabled="loading" @click="emit('cancel')">
+      <Button mobile-block type="button" variant="ghost" :disabled="loading" @click="emit('cancel')">
         Cancelar
       </Button>
-      <Button type="submit" :loading="loading">{{ submitLabel ?? 'Salvar' }}</Button>
+      <Button mobile-block type="submit" :loading="loading">{{ submitLabel ?? 'Salvar' }}</Button>
     </div>
   </form>
 </template>

@@ -28,7 +28,7 @@ const props = withDefaults(
     confirmLabel: 'Confirmar',
     cancelLabel: 'Cancelar',
     confirmVariant: 'destructive',
-    stackFooter: false,
+    stackFooter: true,
   },
 )
 
