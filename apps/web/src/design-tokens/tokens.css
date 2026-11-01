@@ -26,6 +26,15 @@
   --sv-danger-light: #ffecea;
   --sv-warning: #ff9f0a;
   --sv-warning-light: #fff4e5;
+  /* Faixas de paciente (Bronze, Prata, Ouro, Diamante): texto + fundo do chip. */
+  --sv-tier-bronze: #9a5530;
+  --sv-tier-bronze-light: #f6e9df;
+  --sv-tier-silver: #5f6673;
+  --sv-tier-silver-light: #eceff3;
+  --sv-tier-gold: #9a6f00;
+  --sv-tier-gold-light: #fbf0cf;
+  --sv-tier-diamond: #0b7fa3;
+  --sv-tier-diamond-light: #ddf3fa;
   --sv-card-pink: #f7f7f8;
   --sv-card-purple: #f7f7f8;
   --sv-card-blue: #f7f7f8;
@@ -176,6 +185,14 @@ html.dark {
   --sv-danger-light: #2a1218;
   --sv-warning: #ffd60a;
   --sv-warning-light: #2a2210;
+  --sv-tier-bronze: #e3a27a;
+  --sv-tier-bronze-light: #2c1c12;
+  --sv-tier-silver: #c7cdd8;
+  --sv-tier-silver-light: #1f2531;
+  --sv-tier-gold: #f2c94c;
+  --sv-tier-gold-light: #2b2410;
+  --sv-tier-diamond: #64d2ff;
+  --sv-tier-diamond-light: #0c2633;
   --sv-card-pink: #152036;
   --sv-card-purple: #152036;
   --sv-card-blue: #152036;
@@ -397,6 +414,30 @@ html.dark {
   border-color: color-mix(in srgb, var(--sv-danger) 22%, var(--sv-glass-clear-border));
 }
 
+.glass-chip-tier-bronze {
+  background-color: color-mix(in srgb, var(--sv-tier-bronze-light) 78%, var(--sv-glass-clear-bg));
+  border-color: color-mix(in srgb, var(--sv-tier-bronze) 26%, var(--sv-glass-clear-border));
+  color: var(--sv-tier-bronze);
+}
+
+.glass-chip-tier-silver {
+  background-color: color-mix(in srgb, var(--sv-tier-silver-light) 78%, var(--sv-glass-clear-bg));
+  border-color: color-mix(in srgb, var(--sv-tier-silver) 26%, var(--sv-glass-clear-border));
+  color: var(--sv-tier-silver);
+}
+
+.glass-chip-tier-gold {
+  background-color: color-mix(in srgb, var(--sv-tier-gold-light) 78%, var(--sv-glass-clear-bg));
+  border-color: color-mix(in srgb, var(--sv-tier-gold) 26%, var(--sv-glass-clear-border));
+  color: var(--sv-tier-gold);
+}
+
+.glass-chip-tier-diamond {
+  background-color: color-mix(in srgb, var(--sv-tier-diamond-light) 78%, var(--sv-glass-clear-bg));
+  border-color: color-mix(in srgb, var(--sv-tier-diamond) 26%, var(--sv-glass-clear-border));
+  color: var(--sv-tier-diamond);
+}
+
 .glass-toast {
   background-color: var(--sv-glass-dark-bg);
   border: 1px solid var(--sv-glass-dark-border);
@@ -429,6 +470,10 @@ html.dark {
   .glass-chip-success,
   .glass-chip-warning,
   .glass-chip-danger,
+  .glass-chip-tier-bronze,
+  .glass-chip-tier-silver,
+  .glass-chip-tier-gold,
+  .glass-chip-tier-diamond,
   .glass-toast,
   .sv-scrim {
     -webkit-backdrop-filter: none !important;
@@ -482,6 +527,22 @@ html.dark {
 
   .glass-chip-danger {
     background-color: var(--sv-danger-light);
+  }
+
+  .glass-chip-tier-bronze {
+    background-color: var(--sv-tier-bronze-light);
+  }
+
+  .glass-chip-tier-silver {
+    background-color: var(--sv-tier-silver-light);
+  }
+
+  .glass-chip-tier-gold {
+    background-color: var(--sv-tier-gold-light);
+  }
+
+  .glass-chip-tier-diamond {
+    background-color: var(--sv-tier-diamond-light);
   }
 
   .sv-scrim {

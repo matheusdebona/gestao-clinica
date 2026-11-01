@@ -13,7 +13,8 @@ import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import AttributionShortcuts from '@/features/clients/AttributionShortcuts.vue'
 import Badge from '@/components/ui/Badge.vue'
 import LeadHistory from '@/features/leads/LeadHistory.vue'
-import { formatDateTime } from '@/lib/formatters'
+import { tierBadgeVariant, usePatientTiers } from '@/features/clients/tiers'
+import { formatBRL, formatDateTime } from '@/lib/formatters'
 import { deactivateClient, getClient, updateClient } from '@/features/clients/api'
 import { formatPhoneBR } from '@/lib/masks'
 import { useToastStore } from '@/stores/toast'
@@ -83,6 +84,8 @@ function goBack() {
 function onConfirmDeactivate() {
   deactivateMutation.mutate()
 }
+
+const { tiers } = usePatientTiers()
 </script>
 
 <template>
@@ -130,6 +133,16 @@ function onConfirmDeactivate() {
 
     <SurfaceCard v-else-if="client">
       <dl class="flex flex-col gap-4">
+        <div v-if="tiers.length">
+          <dt class="text-[13px] text-muted">Faixa</dt>
+          <dd class="mt-1 flex flex-wrap items-center gap-2">
+            <Badge v-if="client.tier" :variant="tierBadgeVariant(client.tier.color)">{{ client.tier.name }}</Badge>
+            <Badge v-else variant="muted">Sem faixa</Badge>
+            <span v-if="client.purchases_12m !== undefined" class="text-[13px] text-muted">
+              {{ formatBRL(client.purchases_12m) }} em vendas confirmadas nos últimos 12 meses
+            </span>
+          </dd>
+        </div>
         <div>
           <dt class="text-[13px] text-muted">WhatsApp</dt>
           <dd class="mt-0.5 text-[15px] text-title">{{ formatPhoneBR(client.whatsapp) || client.whatsapp }}</dd>

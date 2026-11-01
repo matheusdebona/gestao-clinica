@@ -1,0 +1,10 @@
+export type BadgeVariant =
+  | 'success'
+  | 'purple'
+  | 'muted'
+  | 'warning'
+  | 'danger'
+  | 'bronze'
+  | 'silver'
+  | 'gold'
+  | 'diamond'

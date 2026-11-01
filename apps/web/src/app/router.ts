@@ -95,6 +95,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/FollowUpTiersPage.vue'),
       },
       {
+        path: 'settings/faixas-paciente',
+        name: 'settings-patient-tiers',
+        meta: { title: 'Faixas de paciente', permission: 'clinics.branding' },
+        component: () => import('@/pages/PatientTiersPage.vue'),
+      },
+      {
         path: 'settings/taxas-cartao',
         name: 'settings-card-fees',
         meta: { title: 'Taxas de cartão', permission: 'finance.manage' },

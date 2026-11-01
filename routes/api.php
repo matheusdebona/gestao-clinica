@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\Finance\FinanceSettingsController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
 use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
+use App\Http\Controllers\Api\V1\PatientTierController;
 use App\Http\Controllers\Api\V1\LeadStatusController;
 use App\Http\Controllers\Api\V1\MetricsController;
 use App\Http\Controllers\Api\V1\NotificationController;
@@ -231,6 +232,16 @@ Route::prefix('v1')->group(function (): void {
         Route::post('patient-returns/{patientReturn}/whatsapp', [PatientReturnController::class, 'whatsapp'])
             ->middleware(['permission:clients.update', 'permission:sales.view']);
 
+        Route::get('patient-tiers', [PatientTierController::class, 'index'])
+            ->middleware('permission:clients.view|clinics.branding|clinics.manage');
+        Route::post('patient-tiers', [PatientTierController::class, 'store'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::post('patient-tiers/restore-defaults', [PatientTierController::class, 'restoreDefaults'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::put('patient-tiers/{tier}', [PatientTierController::class, 'update'])
+            ->middleware('permission:clinics.branding|clinics.manage');
+        Route::delete('patient-tiers/{tier}', [PatientTierController::class, 'destroy'])
+            ->middleware('permission:clinics.branding|clinics.manage');
         Route::get('clients', [ClientController::class, 'index'])
             ->middleware('permission:clients.view');
         Route::post('clients', [ClientController::class, 'store'])

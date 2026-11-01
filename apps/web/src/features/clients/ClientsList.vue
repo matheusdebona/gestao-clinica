@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref, watch } from 'vue'
+import { SlidersHorizontal } from '@lucide/vue'
 import { useRouter } from 'vue-router'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
+import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
@@ -14,6 +16,14 @@ import Skeleton from '@/components/ui/Skeleton.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
 import AttributionShortcuts from '@/features/clients/AttributionShortcuts.vue'
+import PatientFiltersSheet from '@/features/clients/PatientFiltersSheet.vue'
+import {
+  sanitizeTierFilter,
+  tierBadgeVariant,
+  tierFilterQuery,
+  usePatientTiers,
+  type TierFilterToken,
+} from '@/features/clients/tiers'
 import { listClients } from '@/features/clients/api'
 import { formatPhoneBR } from '@/lib/masks'
 import { useAuthStore } from '@/stores/auth'
@@ -26,12 +36,24 @@ const searchInput = ref('')
 const q = ref('')
 const page = ref(1)
 const activeOnly = ref(true)
+const filtersOpen = ref(false)
+/** Filtro de faixa: [] = Todos. */
+const tierFilter = ref<TierFilterToken[]>([])
+
+const { tiers } = usePatientTiers(computed(() => auth.can('clients.view')))
+// Faixa apagada nas configurações sai do filtro; sem faixas, o filtro volta para Todos.
+watch(tiers, (list) => {
+  const clean = sanitizeTierFilter(tierFilter.value, list)
+  if (clean.length !== tierFilter.value.length) tierFilter.value = clean
+})
+const tierParam = computed(() => tierFilterQuery(tierFilter.value))
+const filterCount = computed(() => (tierFilter.value.length ? 1 : 0))
 
 watch(q, () => {
   page.value = 1
 })
 
-watch(activeOnly, () => {
+watch([activeOnly, tierParam], () => {
   page.value = 1
 })
 
@@ -41,12 +63,13 @@ const {
   isError,
   isFetching,
 } = useQuery({
-  queryKey: ['clients', 'list', q, page, activeOnly],
+  queryKey: ['clients', 'list', q, page, activeOnly, tierParam],
   queryFn: () =>
     listClients({
       q: q.value || undefined,
       page: page.value,
       is_active: activeOnly.value ? true : undefined,
+      tiers: tierParam.value,
     }),
   enabled: computed(() => auth.can('clients.view')),
 })
@@ -95,7 +118,13 @@ function clientMeta(client: Client) {
 
       <ClientSearchBar v-model="searchInput" @search="onSearch" />
 
-      <Switch v-model="activeOnly" label="Somente ativos" />
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <Switch v-model="activeOnly" label="Somente ativos" />
+        <Button v-if="tiers.length" mobile-block variant="secondary" @click="filtersOpen = true">
+          <SlidersHorizontal class="size-4" :stroke-width="1.75" aria-hidden="true" />
+          Filtros{{ filterCount ? ` (${filterCount})` : '' }}
+        </Button>
+      </div>
 
       <Banner v-if="isError" variant="danger" title="Não foi possível carregar">
         Tente de novo em instantes.
@@ -111,10 +140,12 @@ function clientMeta(client: Client) {
 
       <SurfaceCard v-else-if="clients.length === 0" :padding="false">
         <EmptyState
-          :title="q ? 'Nenhum paciente encontrado' : 'Nenhum paciente ainda'"
-          :description="q ? 'Tente outro nome ou WhatsApp.' : 'Cadastre o primeiro paciente da clínica.'"
+          :title="q || filterCount ? 'Nenhum paciente encontrado' : 'Nenhum paciente ainda'"
+          :description="
+            q ? 'Tente outro nome ou WhatsApp.' : filterCount ? 'Nenhum paciente nessa faixa.' : 'Cadastre o primeiro paciente da clínica.'
+          "
         >
-          <template v-if="!q" #action>
+          <template v-if="!q && !filterCount" #action>
             <PermissionGate permission="clients.create">
               <Button @click="goNew">Novo paciente</Button>
             </PermissionGate>
@@ -129,12 +160,24 @@ function clientMeta(client: Client) {
             :key="client.id"
             :title="client.name"
             :meta="clientMeta(client)"
-            :badge="client.is_active ? '' : 'Inativo'"
-            badge-variant="muted"
+            :badge="client.tier?.name ?? ''"
+            :badge-variant="tierBadgeVariant(client.tier?.color)"
             @action="openClient(client.id)"
-          />
+          >
+            <template v-if="!client.is_active" #status>
+              <Badge variant="muted">Inativo</Badge>
+            </template>
+          </ListCard>
         </div>
       </SurfaceCard>
+
+      <PatientFiltersSheet
+        v-model:open="filtersOpen"
+        :tiers="tiers"
+        :selected="tierFilter"
+        :total="total"
+        @change="tierFilter = $event"
+      />
 
       <Pagination
         v-if="lastPage > 1"

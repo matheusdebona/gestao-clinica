@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\Client;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Client */
+/** @mixin Client */
 class ClientResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -23,6 +24,16 @@ class ClientResource extends JsonResource
             'lead_id' => $this->lead_id,
             'initial_consultation_amount' => $this->initial_consultation_amount,
             'is_active' => $this->is_active,
+            // Faixa pelo total comprado em 12 meses (só na lista e no detalhe do paciente).
+            'tier' => $this->when($this->relationLoaded('patientTier'), fn () => $this->patientTier === null ? null : [
+                'id' => $this->patientTier->id,
+                'name' => $this->patientTier->name,
+                'color' => $this->patientTier->color,
+            ]),
+            'purchases_12m' => $this->when(
+                $this->relationLoaded('patientTier') && (bool) $request->user()?->can('sales.view'),
+                fn () => number_format((float) $this->getAttribute('purchases_12m'), 2, '.', ''),
+            ),
             'client_origin' => ClientOriginResource::make($this->whenLoaded('clientOrigin')),
             'campaign' => CampaignResource::make($this->whenLoaded('campaign')),
             'lead' => LeadResource::make($this->whenLoaded('lead')),

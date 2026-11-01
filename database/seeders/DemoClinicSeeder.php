@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
 use App\Support\EnsureDefaultFollowUpTiers;
+use App\Support\EnsureDefaultPatientTiers;
 use App\Support\EnsureDefaultLeadStatuses;
 use App\Support\EnsureDefaultPaymentCatalog;
 use App\Support\EnsureDefaultUnitsOfMeasure;
@@ -53,6 +54,7 @@ class DemoClinicSeeder extends Seeder
         EnsureDefaultLeadStatuses::run($clinic);
 
         EnsureDefaultFollowUpTiers::run($clinic);
+        EnsureDefaultPatientTiers::run($clinic);
         EnsureDefaultPaymentCatalog::run($clinic);
         EnsureDefaultUnitsOfMeasure::run($clinic);
 

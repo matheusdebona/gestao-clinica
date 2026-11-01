@@ -213,6 +213,10 @@ function simulateLoading() {
               <Badge variant="success">Concluído</Badge>
               <Badge variant="warning">Estoque</Badge>
               <Badge variant="danger">Atraso</Badge>
+              <Badge variant="bronze">Bronze</Badge>
+              <Badge variant="silver">Prata</Badge>
+              <Badge variant="gold">Ouro</Badge>
+              <Badge variant="diamond">Diamante</Badge>
             </div>
             <div class="mt-4 flex flex-wrap items-center gap-3">
               <MoneyDisplay value="120.5" />
