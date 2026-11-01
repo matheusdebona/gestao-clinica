@@ -32,6 +32,8 @@ export interface ClientListParams {
   q?: string
   page?: number
   is_active?: boolean
+  /** "3,none" — vazio/undefined = Todos. */
+  tiers?: string
 }
 
 export async function listClients(params: ClientListParams = {}): Promise<Paginated<Client>> {
@@ -43,6 +45,9 @@ export async function listClients(params: ClientListParams = {}): Promise<Pagina
   }
   if (params.is_active !== undefined) {
     query.is_active = params.is_active ? 1 : 0
+  }
+  if (params.tiers) {
+    query.tiers = params.tiers
   }
 
   return api<Paginated<Client>>('/clients', { query })

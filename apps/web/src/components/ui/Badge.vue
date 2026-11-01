@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { cn } from '@/lib/cn'
 import { computed } from 'vue'
+import type { BadgeVariant } from './badge-variants'
 
 const props = withDefaults(
   defineProps<{
-    variant?: 'success' | 'purple' | 'muted' | 'warning' | 'danger'
+    variant?: BadgeVariant
   }>(),
   { variant: 'muted' },
 )
@@ -17,6 +18,10 @@ const classes = computed(() =>
     props.variant === 'muted' && 'text-muted',
     props.variant === 'warning' && 'glass-chip-warning text-warning',
     props.variant === 'danger' && 'glass-chip-danger text-danger',
+    props.variant === 'bronze' && 'glass-chip-tier-bronze',
+    props.variant === 'silver' && 'glass-chip-tier-silver',
+    props.variant === 'gold' && 'glass-chip-tier-gold',
+    props.variant === 'diamond' && 'glass-chip-tier-diamond',
   ),
 )
 </script>

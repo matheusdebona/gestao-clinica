@@ -2,6 +2,7 @@
 import { ChevronRight } from '@lucide/vue'
 import { cn } from '@/lib/cn'
 import Badge from './Badge.vue'
+import type { BadgeVariant } from './badge-variants'
 
 withDefaults(
   defineProps<{
@@ -10,7 +11,7 @@ withDefaults(
     description?: string
     meta?: string
     badge?: string
-    badgeVariant?: 'success' | 'purple' | 'muted' | 'warning' | 'danger'
+    badgeVariant?: BadgeVariant
     emphasis?: boolean
     showChevron?: boolean
   }>(),
