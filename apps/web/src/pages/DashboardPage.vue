@@ -71,6 +71,17 @@ function openShortcut(to: { name: string }) {
     <PermissionGate permission="leads.view">
       <StaleLeadsCard />
     </PermissionGate>
+    <PermissionGate permission="leads.view">
+      <SurfaceCard :padding="false">
+        <div class="px-5 py-2">
+          <ListCard
+            title="Resumo do dia"
+            meta="Seu dia nos leads, fila de acompanhamento e check-in"
+            @action="router.push({ name: 'leads-daily' })"
+          />
+        </div>
+      </SurfaceCard>
+    </PermissionGate>
     <PermissionGate :permission="['products.view', 'leads.manage']" mode="any">
       <SurfaceCard :padding="false">
         <div class="px-5 py-2">

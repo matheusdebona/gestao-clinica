@@ -15,7 +15,7 @@ import { ApiError } from '@/types/user'
 const open = defineModel<boolean>('open', { default: false })
 
 const props = defineProps<{
-  lead: Lead | null
+  lead: Pick<Lead, 'id' | 'name' | 'lead_status_id'> | null
   statuses: LeadStatus[]
 }>()
 

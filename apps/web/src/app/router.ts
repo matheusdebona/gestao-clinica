@@ -47,6 +47,12 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/LeadsPage.vue'),
         },
         {
+          path: 'leads/resumo-do-dia',
+          name: 'leads-daily',
+          meta: { title: 'Resumo do dia', permission: 'leads.view' },
+          component: () => import('@/pages/LeadDailyAnalysisPage.vue'),
+        },
+        {
           path: 'leads/new',
           name: 'leads-new',
           meta: { title: 'Novo lead', permission: 'leads.manage' },

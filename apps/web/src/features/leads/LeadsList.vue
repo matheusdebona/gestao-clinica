@@ -156,6 +156,7 @@ function openStatus(lead: Lead) {
       :description="total ? `${total} ${hasCriteria ? 'encontrados' : 'na clínica'}` : undefined"
     >
       <template #actions>
+        <Button mobile-block variant="secondary" @click="router.push({ name: 'leads-daily' })">Resumo do dia</Button>
         <PermissionGate permission="leads.manage">
           <Button mobile-block @click="goNew">Novo</Button>
         </PermissionGate>

@@ -29,6 +29,10 @@ export function notificationHref(item: ClinicNotification): string | null {
     return productId !== null ? `/products/${productId}` : null
   }
 
+  if (type === 'daily_review') {
+    return '/leads/resumo-do-dia'
+  }
+
   if (type === 'stale_leads') {
     const days = numericId(item.data?.days)
     return days !== null ? `/leads?parados=${days}` : '/leads?parados=todos'
