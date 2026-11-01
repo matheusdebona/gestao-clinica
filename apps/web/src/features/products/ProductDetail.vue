@@ -116,18 +116,20 @@ function goBack() {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="product?.name ?? 'Produto'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
+        <PermissionGate v-if="product?.is_active" permission="products.delete">
+          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
+        </PermissionGate>
+      </template>
+      <template #actions>
         <PermissionGate v-if="product?.is_active" permission="products.update">
           <Button variant="secondary" @click="goEdit">Editar</Button>
         </PermissionGate>
         <PermissionGate permission="products.adjust_stock">
           <Button variant="secondary" @click="adjustOpen = true">Ajustar estoque</Button>
         </PermissionGate>
-        <PermissionGate v-if="product?.is_active" permission="products.delete">
-          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
-        </PermissionGate>
-        <PermissionGate v-else-if="product" permission="products.update">
+        <PermissionGate v-if="product && !(product?.is_active)" permission="products.update">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()">
             Reativar
           </Button>

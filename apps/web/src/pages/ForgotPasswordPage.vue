@@ -80,7 +80,7 @@ async function submit() {
         </template>
       </FormField>
       <Button type="submit" block :loading="loading">
-        Enviar senha temporária
+        Esqueci a senha
       </Button>
     </form>
 

@@ -96,7 +96,7 @@ function submit() {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
       title="Categorias de despesa"
       description="A natureza de cada categoria define em qual linha do DRE a despesa aparece."
@@ -134,6 +134,7 @@ function submit() {
     </template>
 
     <AppDialog
+      size="md"
       v-model:open="open"
       :title="editing ? 'Editar categoria' : 'Nova categoria'"
       description="Categorias inativas somem dos formulários, mas os lançamentos antigos continuam."
@@ -149,8 +150,10 @@ function submit() {
         </FormField>
         <Switch v-if="editing" v-model="form.is_active" label="Ativa" />
       </form>
-      <template #footer>
+      <template #footer-negative>
         <Button variant="ghost" type="button" @click="open = false">Cancelar</Button>
+      </template>
+      <template #footer>
         <Button type="button" :loading="saving" @click="submit">Salvar</Button>
       </template>
     </AppDialog>

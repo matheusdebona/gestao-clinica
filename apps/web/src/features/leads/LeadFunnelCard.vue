@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InfoTip from '@/components/ui/InfoTip.vue'
 import { computed } from 'vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Badge from '@/components/ui/Badge.vue'
@@ -23,7 +24,7 @@ const { mutate, isPending } = useLeadMilestone()
 
 <template>
   <SurfaceCard>
-    <h2 class="mb-3">Funil</h2>
+    <div class="mb-3 flex items-center gap-1.5"><h2>Funil</h2><InfoTip text="O primeiro WhatsApp aberto já marca como abordado. &quot;Agendou&quot; é marcado ao agendar a avaliação." label="Sobre: Funil" /></div>
     <ol class="flex flex-col gap-3">
       <li v-for="step in steps" :key="step.key" class="flex items-start justify-between gap-3">
         <div class="min-w-0">
@@ -45,8 +46,5 @@ const { mutate, isPending } = useLeadMilestone()
         </Button>
       </div>
     </PermissionGate>
-    <p class="mt-3 text-[13px] text-muted">
-      O primeiro WhatsApp aberto já marca como abordado. "Agendou" é marcado ao agendar a avaliação.
-    </p>
   </SurfaceCard>
 </template>

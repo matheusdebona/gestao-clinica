@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
@@ -193,7 +194,7 @@ function goBack() {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="appointment?.client?.name ?? 'Sessão'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
       </template>
     </PageHeader>
@@ -289,7 +290,12 @@ function goBack() {
         </dl>
       </SurfaceCard>
 
-      <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <ActionBar>
+        <template #negative>
+          <PermissionGate v-if="canCancelStatus" permission="appointments.cancel">
+            <Button mobile-block variant="destructive" @click="cancelOpen = true">Cancelar sessão</Button>
+          </PermissionGate>
+        </template>
         <PermissionGate
           v-if="isScheduled && appointment.client?.whatsapp"
           :permission="['appointments.manage', 'treatments.manage']"
@@ -315,10 +321,7 @@ function goBack() {
             Registrar consumo
           </Button>
         </PermissionGate>
-        <PermissionGate v-if="canCancelStatus" permission="appointments.cancel">
-          <Button mobile-block variant="destructive" @click="cancelOpen = true">Cancelar sessão</Button>
-        </PermissionGate>
-      </div>
+      </ActionBar>
 
       <PermissionGate v-if="isScheduled" permission="appointments.manage">
         <div>

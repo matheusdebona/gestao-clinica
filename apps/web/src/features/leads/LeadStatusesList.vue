@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import AppDialog from '@/components/ui/AppDialog.vue'
 import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
@@ -28,7 +27,6 @@ import { useToastStore } from '@/stores/toast'
 import type { LeadStatus, LeadStatusColor, LeadStatusPayload } from '@/types/lead'
 import { ApiError } from '@/types/user'
 
-const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
@@ -166,14 +164,12 @@ function onSave() {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader
+      :back="{ label: 'Configurações', to: { name: 'settings' } }"
       stack-actions
       title="Status de leads"
       description="Etapas do funil de leads da clínica."
     >
       <template #actions>
-        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })"
-          >Configurações</Button
-        >
         <Button mobile-block v-if="canManage" @click="openNew">Novo</Button>
       </template>
     </PageHeader>
@@ -214,6 +210,7 @@ function onSave() {
     </template>
 
     <AppDialog
+      size="md"
       stack-footer
       v-model:open="dialogOpen"
       :title="editing ? 'Editar status' : 'Novo status'"
@@ -275,7 +272,7 @@ function onSave() {
           {{ formErrors.is_default || formErrors.is_active }}
         </p>
       </div>
-      <template #footer>
+      <template #footer-negative>
         <Button
           mobile-block
           v-if="editing && !editing.system_key && !editing.is_default"
@@ -294,6 +291,8 @@ function onSave() {
           @click="dialogOpen = false"
           >Cancelar</Button
         >
+      </template>
+      <template #footer>
         <Button mobile-block type="button" :loading="saving" @click="onSave">Salvar</Button>
       </template>
     </AppDialog>

@@ -185,7 +185,7 @@ const { mutate: remove } = useMutation({
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
       title="Despesas"
       description="Custos da clínica por mês de competência. Recorrentes e depreciação entram sozinhas todo mês."
@@ -230,9 +230,6 @@ const { mutate: remove } = useMutation({
           title="Nenhuma despesa no mês"
           description="Lance aluguel, luz, salários, pró-labore, mídia… ou cadastre recorrentes para não precisar lançar todo mês."
         >
-          <template v-if="canManage" #action>
-            <Button mobile-block @click="openNew">Nova despesa</Button>
-          </template>
         </EmptyState>
       </SurfaceCard>
 
@@ -261,6 +258,7 @@ const { mutate: remove } = useMutation({
     </template>
 
     <AppDialog
+      size="lg"
       v-model:open="open"
       :title="editing ? 'Editar despesa' : 'Nova despesa'"
       :description="
@@ -269,7 +267,7 @@ const { mutate: remove } = useMutation({
           : 'A competência define em qual mês do DRE a despesa entra.'
       "
     >
-      <form class="flex flex-col gap-4" @submit.prevent="submit">
+      <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
         <FormField label="Categoria" :error="errors.expense_category_id" html-for="exp-category">
           <template #default="{ invalid }">
             <Select
@@ -300,13 +298,13 @@ const { mutate: remove } = useMutation({
         <FormField label="Competência" :error="errors.competence_month" html-for="exp-month">
           <MonthSelect id="exp-month" v-model="form.competence_month" />
         </FormField>
-        <FormField label="Vencimento" hint="Opcional." html-for="exp-due">
+        <FormField label="Vencimento (opcional)" html-for="exp-due">
           <DatePicker id="exp-due" v-model="form.due_on" />
         </FormField>
-        <FormField label="Pago em" hint="Opcional." html-for="exp-paid">
+        <FormField label="Pago em (opcional)" html-for="exp-paid">
           <DatePicker id="exp-paid" v-model="form.paid_on" />
         </FormField>
-        <FormField label="Fornecedor" hint="Opcional." html-for="exp-supplier">
+        <FormField label="Fornecedor (opcional)" html-for="exp-supplier">
           <Input id="exp-supplier" v-model="form.supplier" type="text" />
         </FormField>
         <template v-if="formKind === 'marketing'">
@@ -322,7 +320,7 @@ const { mutate: remove } = useMutation({
               @update:model-value="form.campaign = 'none'"
             />
           </FormField>
-          <FormField label="Campanha" hint="Opcional." html-for="exp-campaign">
+          <FormField label="Campanha (opcional)" html-for="exp-campaign">
             <Select
               id="exp-campaign"
               v-model="form.campaign"
@@ -330,15 +328,17 @@ const { mutate: remove } = useMutation({
             />
           </FormField>
         </template>
-        <FormField label="Observações" html-for="exp-notes">
+        <FormField class="md:col-span-2" label="Observações" html-for="exp-notes">
           <Textarea id="exp-notes" v-model="form.notes" />
         </FormField>
       </form>
-      <template #footer>
+      <template #footer-negative>
         <Button v-if="editing" variant="ghost" type="button" @click="confirmDelete = true">
           Excluir
         </Button>
         <Button variant="ghost" type="button" @click="open = false">Cancelar</Button>
+      </template>
+      <template #footer>
         <Button type="button" :loading="saving" @click="submit">Salvar</Button>
       </template>
     </AppDialog>

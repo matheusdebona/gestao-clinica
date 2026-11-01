@@ -7,6 +7,7 @@ import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import WizardStepper from '@/components/patterns/WizardStepper.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormField from '@/components/ui/FormField.vue'
@@ -686,14 +687,16 @@ function pickClient(client: Client) {
         </PermissionGate>
       </div>
 
-      <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Button mobile-block variant="ghost" type="button" :disabled="saving" @click="goBack">
-          {{ step === SALE_WIZARD_STEP.client ? 'Cancelar' : 'Voltar' }}
-        </Button>
+      <ActionBar class="mt-2">
+        <template #negative>
+          <Button mobile-block variant="ghost" type="button" :disabled="saving" @click="goBack">
+            {{ step === SALE_WIZARD_STEP.client ? 'Cancelar' : 'Voltar' }}
+          </Button>
+        </template>
         <Button mobile-block v-if="step < SALE_WIZARD_LAST_INDEX" :loading="saving" @click="goNext">
           Continuar
         </Button>
-      </div>
+      </ActionBar>
     </template>
 
     <ConfirmDialog

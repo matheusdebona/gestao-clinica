@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InfoTip from '@/components/ui/InfoTip.vue'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import MetricCard from '@/components/patterns/MetricCard.vue'
@@ -105,13 +106,8 @@ function stepsLine(row: SalesFunnelRow): string {
 
 <template>
   <section class="flex flex-col gap-3">
-    <h2>Funil de vendas</h2>
+    <div class="flex items-center gap-1.5"><h2>Funil de vendas</h2><InfoTip text="Leads criados no período, do cadastro até a venda. Cada etapa conta uma vez por lead, mesmo que aconteça depois do período. Origem e colaborador são os do lead (quem cadastrou); pacientes cadastrados sem lead aparecem em “Sem lead”." label="Sobre: Funil de vendas" /></div>
 
-    <p class="text-[13px] text-muted">
-      Leads criados no período, do cadastro até a venda. Cada etapa conta uma vez por lead, mesmo
-      que aconteça depois do período. Origem e colaborador são os do lead (quem cadastrou);
-      pacientes cadastrados sem lead aparecem em “Sem lead”.
-    </p>
 
     <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
       <FormField label="Origem" html-for="funnel-origin">

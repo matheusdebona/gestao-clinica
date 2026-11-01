@@ -64,8 +64,13 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="method?.name ?? 'Método'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="router.push({ name: 'payment-methods' })">Voltar</Button>
+        <PermissionGate v-if="method?.is_active" permission="payment_methods.manage">
+          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
+        </PermissionGate>
+      </template>
+      <template #actions>
         <PermissionGate v-if="method?.is_active" permission="payment_methods.manage">
           <Button
             variant="secondary"
@@ -76,10 +81,7 @@ const { mutate: reactivate, isPending: reactivating } = useMutation({
             Editar
           </Button>
         </PermissionGate>
-        <PermissionGate v-if="method?.is_active" permission="payment_methods.manage">
-          <Button variant="destructive" @click="confirmOpen = true">Desativar</Button>
-        </PermissionGate>
-        <PermissionGate v-else-if="method" permission="payment_methods.manage">
+        <PermissionGate v-if="method && !(method?.is_active)" permission="payment_methods.manage">
           <Button variant="secondary" :loading="reactivating" @click="reactivate()"
             >Reativar</Button
           >

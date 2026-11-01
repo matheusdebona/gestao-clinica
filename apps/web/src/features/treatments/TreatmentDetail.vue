@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import MoneyDisplay from '@/components/patterns/MoneyDisplay.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
@@ -124,7 +125,7 @@ function sessionMeta(item: TreatmentSessionSummary) {
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="treatment?.client?.name ?? 'Tratamento'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
       </template>
     </PageHeader>
@@ -243,29 +244,31 @@ function sessionMeta(item: TreatmentSessionSummary) {
                   <MoneyDisplay :value="item.total_cost" />
                 </p>
               </div>
-              <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+              <ActionBar>
                 <Button mobile-block variant="secondary" @click="openAppointment(item.id)">Ver sessão</Button>
                 <PermissionGate v-if="item.status === 'in_progress'" permission="treatments.consume">
                   <Button mobile-block @click="openConsume(item.id)">Registrar consumo</Button>
                 </PermissionGate>
-              </div>
+              </ActionBar>
             </li>
           </ul>
         </SurfaceCard>
       </div>
 
-      <div v-if="isOpen" class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+      <ActionBar v-if="isOpen">
+        <template #negative>
+          <PermissionGate v-if="!hasCompletedSession" permission="treatments.cancel">
+            <Button mobile-block variant="destructive" @click="cancelOpen = true">
+              Cancelar tratamento
+            </Button>
+          </PermissionGate>
+        </template>
         <PermissionGate permission="treatments.complete">
           <Button mobile-block :disabled="hasActiveSession" @click="completeOpen = true">
             Concluir tratamento
           </Button>
         </PermissionGate>
-        <PermissionGate v-if="!hasCompletedSession" permission="treatments.cancel">
-          <Button mobile-block variant="destructive" @click="cancelOpen = true">
-            Cancelar tratamento
-          </Button>
-        </PermissionGate>
-      </div>
+      </ActionBar>
     </template>
 
     <ConfirmDialog

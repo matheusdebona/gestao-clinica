@@ -153,7 +153,7 @@ function submit() {
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
       title="Equipamentos"
       description="Laser, autoclave, macas… depreciados todo mês pela vida útil. A depreciação entra nas despesas e no DRE."
@@ -187,9 +187,6 @@ function submit() {
           title="Nenhum equipamento"
           description="Cadastre os equipamentos com valor de compra e vida útil para o DRE considerar o desgaste."
         >
-          <template v-if="canManage" #action>
-            <Button mobile-block @click="openNew">Novo equipamento</Button>
-          </template>
         </EmptyState>
         <div v-else class="mt-2 divide-y divide-border-divider">
           <ListCard
@@ -206,11 +203,12 @@ function submit() {
     </template>
 
     <AppDialog
+      size="lg"
       v-model:open="open"
       :title="editing ? 'Editar equipamento' : 'Novo equipamento'"
       description="Depreciação linear: (compra − residual) ÷ vida útil."
     >
-      <form class="flex flex-col gap-4" @submit.prevent="submit">
+      <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submit">
         <FormField label="Nome" :error="errors.name" html-for="eq-name">
           <template #default="{ invalid }">
             <Input id="eq-name" v-model="form.name" type="text" :invalid="invalid" />
@@ -222,8 +220,7 @@ function submit() {
           </template>
         </FormField>
         <FormField
-          label="Valor residual"
-          hint="Quanto vale no fim da vida útil. Opcional."
+          label="Valor residual (opcional)" hint="Quanto vale no fim da vida útil."
           :error="errors.residual_value"
           html-for="eq-residual"
         >
@@ -250,19 +247,21 @@ function submit() {
         <FormField label="Começa a depreciar em" html-for="eq-start">
           <MonthSelect id="eq-start" v-model="form.start" :past="120" />
         </FormField>
-        <FormField label="Data da compra" hint="Opcional." html-for="eq-purchased">
+        <FormField label="Data da compra (opcional)" html-for="eq-purchased">
           <DatePicker id="eq-purchased" v-model="form.purchased_on" />
         </FormField>
-        <FormField label="Observações" html-for="eq-notes">
+        <FormField class="md:col-span-2" label="Observações" html-for="eq-notes">
           <Textarea id="eq-notes" v-model="form.notes" />
         </FormField>
-        <Switch v-if="editing" v-model="form.is_active" label="Ativo" />
-        <p v-if="preview !== null" class="text-[15px] text-title">
+        <Switch class="md:col-span-2" v-if="editing" v-model="form.is_active" label="Ativo" />
+        <p v-if="preview !== null" class="md:col-span-2 text-[15px] text-title">
           Depreciação: <strong>{{ formatBRL(preview) }}/mês</strong>
         </p>
       </form>
-      <template #footer>
+      <template #footer-negative>
         <Button variant="ghost" type="button" @click="open = false">Cancelar</Button>
+      </template>
+      <template #footer>
         <Button type="button" :loading="saving" @click="submit">Salvar</Button>
       </template>
     </AppDialog>

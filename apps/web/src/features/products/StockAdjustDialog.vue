@@ -122,11 +122,12 @@ defineExpose({ setErrors })
 
 <template>
   <AppDialog
+      size="lg"
     v-model:open="open"
     title="Ajustar estoque"
     description="Entrada recalcula o custo médio. Saída não altera o custo."
   >
-    <form class="flex flex-col gap-4" @submit.prevent="onSubmit">
+    <form class="grid gap-4 md:grid-cols-2" @submit.prevent="onSubmit">
       <FormField label="Movimento" :error="errors.type" html-for="stock-type">
         <template #default="{ invalid }">
           <Select id="stock-type" v-model="type" :options="typeOptions" :invalid="invalid" />
@@ -175,12 +176,14 @@ defineExpose({ setErrors })
       <FormField label="Motivo" :error="errors.reason" html-for="stock-reason">
         <Input id="stock-reason" v-model="reason" v-bind="reasonAttrs" type="text" />
       </FormField>
-      <FormField label="Notas" :error="errors.notes" html-for="stock-notes">
+      <FormField class="md:col-span-2" label="Notas" :error="errors.notes" html-for="stock-notes">
         <Textarea id="stock-notes" v-model="notes" v-bind="notesAttrs" />
       </FormField>
     </form>
-    <template #footer>
+    <template #footer-negative>
       <Button variant="ghost" type="button" @click="open = false">Cancelar</Button>
+    </template>
+    <template #footer>
       <Button type="button" :loading="props.loading" @click="onSubmit">Confirmar</Button>
     </template>
   </AppDialog>

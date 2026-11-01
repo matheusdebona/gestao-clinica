@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import ItemLineRow from '@/components/patterns/ItemLineRow.vue'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import Banner from '@/components/ui/Banner.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import FormField from '@/components/ui/FormField.vue'
@@ -246,7 +247,7 @@ const completePending = computed(() => completeMutation.isPending.value)
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
     <PageHeader :title="appointment?.client?.name ?? 'Consumo'">
-      <template #actions>
+      <template #actions-negative>
         <Button variant="ghost" @click="goBack">Voltar</Button>
       </template>
     </PageHeader>
@@ -398,7 +399,7 @@ const completePending = computed(() => completeMutation.isPending.value)
 
         <InlineAlert v-if="formError">{{ formError }}</InlineAlert>
 
-        <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+        <ActionBar>
           <Button variant="secondary" :loading="savePending" :disabled="saving" @click="saveMutation.mutate()">
             Salvar consumo
           </Button>
@@ -412,7 +413,7 @@ const completePending = computed(() => completeMutation.isPending.value)
               Concluir sem produtos
             </Button>
           </PermissionGate>
-        </div>
+        </ActionBar>
       </template>
     </template>
 

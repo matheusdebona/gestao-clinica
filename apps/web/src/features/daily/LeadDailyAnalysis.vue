@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import InfoTip from '@/components/ui/InfoTip.vue'
 import { keepPreviousData, useQuery } from '@tanstack/vue-query'
 import { SlidersHorizontal } from '@lucide/vue'
 import { computed, ref } from 'vue'
@@ -179,13 +180,9 @@ const showCheckin = computed(
 
       <SurfaceCard v-if="data.follow_up.budgets && data.follow_up.budgets.count > 0">
         <div class="flex items-baseline justify-between gap-3">
-          <h2>Orçamentos esquecidos</h2>
+          <div class="flex items-center gap-1.5"><h2>Orçamentos esquecidos</h2><InfoTip text="Enviados e sem resposta além de um prazo. Cobrar pelo WhatsApp tira da fila até o próximo prazo." label="Sobre: Orçamentos esquecidos" /></div>
           <p class="text-[13px] text-muted">{{ data.follow_up.budgets.count }} para cobrar</p>
         </div>
-        <p class="mt-1 text-[13px] text-muted">
-          Enviados e sem resposta além de um prazo. Cobrar pelo WhatsApp tira da fila até o próximo
-          prazo.
-        </p>
         <div class="mt-3">
           <ForgottenBudgetsList :items="data.follow_up.budgets.items" />
         </div>

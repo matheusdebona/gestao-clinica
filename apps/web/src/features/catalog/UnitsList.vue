@@ -41,9 +41,9 @@ const total = computed(() => listData.value?.meta.total ?? 0)
 
 <template>
   <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
-    <PageHeader title="Unidades" :description="total ? `${total} na clínica` : undefined">
+    <PageHeader
+      :back="{ label: 'Produtos', to: { name: 'products' } }" title="Unidades" :description="total ? `${total} na clínica` : undefined">
       <template #actions>
-        <Button variant="ghost" @click="router.push({ name: 'products' })">Produtos</Button>
         <PermissionGate permission="units.manage">
           <Button @click="router.push({ name: 'units-new' })">Nova</Button>
         </PermissionGate>

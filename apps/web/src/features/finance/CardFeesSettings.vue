@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import SectionTitle from '@/components/ui/SectionTitle.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
-import Badge from '@/components/ui/Badge.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
 import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
@@ -33,9 +32,9 @@ import { emptyToMoney, formatBRL } from '@/lib/formatters'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
 import type { CardFeeRule } from '@/types/finance'
+import type { CardOperator } from '@/types/sale'
 import { ApiError } from '@/types/user'
 
-const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
@@ -116,55 +115,95 @@ function ruleDescription(rule: CardFeeRule): string {
 }
 
 /* ---------- Antecipação por operadora ---------- */
-const anticipation = reactive<Record<number, { auto: boolean; rate: string; error: string }>>({})
+// Lives on card_operators (auto_anticipate + anticipation_rate_percent). The list only shows the
+// operators the clinic configured; "adicionar" picks one of the others, "remover" clears both.
+const ANTICIPATION_HINT =
+  'Se a operadora antecipa os recebíveis do crédito, informe a taxa ao mês. Para n parcelas, o desconto é a taxa × (n + 1) ÷ 2 meses sobre o valor já sem a taxa da maquininha.'
 
-watch(
-  () => operatorsQuery.data.value,
-  (operators) => {
-    for (const op of operators ?? []) {
-      anticipation[op.id] = {
-        auto: op.auto_anticipate,
-        rate: percentToInput(op.anticipation_rate_percent ?? null),
-        error: '',
-      }
-    }
-  },
-  { immediate: true },
+const configuredOperators = computed(() =>
+  (operatorsQuery.data.value ?? []).filter(
+    (op) => op.auto_anticipate || Number(op.anticipation_rate_percent ?? 0) > 0,
+  ),
 )
 
-const savingOperator = ref<number | null>(null)
-const { mutate: saveAnticipation } = useMutation({
-  mutationFn: (id: number) =>
-    updateOperatorAnticipation(id, {
-      auto_anticipate: anticipation[id]!.auto,
-      anticipation_rate_percent: toPercent(anticipation[id]!.rate),
+function anticipationDescription(op: CardOperator): string {
+  const rate =
+    Number(op.anticipation_rate_percent ?? 0) > 0
+      ? `${formatFeePercent(op.anticipation_rate_percent!)} ao mês`
+      : 'Sem taxa informada'
+  return `${rate} · ${op.auto_anticipate ? 'automática' : 'desligada'}`
+}
+
+const anticipationOpen = ref(false)
+const anticipationEditing = ref<CardOperator | null>(null)
+const anticipationForm = reactive({ operator: '', rate: '', auto: true })
+const anticipationErrors = reactive({ operator: '', rate: '' })
+const confirmRemoveAnticipation = ref(false)
+
+const anticipationOperatorOptions = computed(() => {
+  const taken = new Set(configuredOperators.value.map((op) => op.id))
+  return (operatorsQuery.data.value ?? [])
+    .filter((op) => !taken.has(op.id) || op.id === anticipationEditing.value?.id)
+    .map((op) => ({ value: String(op.id), label: op.name }))
+})
+
+function openNewAnticipation() {
+  anticipationEditing.value = null
+  Object.assign(anticipationForm, { operator: '', rate: '', auto: true })
+  Object.assign(anticipationErrors, { operator: '', rate: '' })
+  anticipationOpen.value = true
+}
+
+function openEditAnticipation(op: CardOperator) {
+  anticipationEditing.value = op
+  Object.assign(anticipationForm, {
+    operator: String(op.id),
+    rate: percentToInput(op.anticipation_rate_percent ?? null),
+    auto: op.auto_anticipate,
+  })
+  Object.assign(anticipationErrors, { operator: '', rate: '' })
+  anticipationOpen.value = true
+}
+
+const { mutate: saveAnticipation, isPending: savingAnticipation } = useMutation({
+  mutationFn: (payload: { id: number; auto: boolean; rate: string | null }) =>
+    updateOperatorAnticipation(payload.id, {
+      auto_anticipate: payload.auto,
+      anticipation_rate_percent: payload.rate,
     }),
-  onMutate: (id) => {
-    savingOperator.value = id
-  },
-  onSuccess: async () => {
+  onSuccess: async (_data, payload) => {
+    anticipationOpen.value = false
     await queryClient.invalidateQueries({ queryKey: ['finance', 'card-operators'] })
-    toast.success('Antecipação salva')
+    toast.success(payload.rate === null && !payload.auto ? 'Antecipação removida' : 'Antecipação salva')
   },
-  onError: (err, id) => {
-    anticipation[id]!.error =
+  onError: (err) => {
+    anticipationErrors.rate =
       err instanceof ApiError
         ? err.first('anticipation_rate_percent') || err.message
         : 'Não foi possível salvar.'
   },
-  onSettled: () => {
-    savingOperator.value = null
-  },
 })
 
-function submitAnticipation(id: number) {
-  const row = anticipation[id]!
-  row.error = ''
-  if (!isValidPercent(row.rate)) {
-    row.error = 'Informe um percentual entre 0 e 100.'
-    return
+function submitAnticipation() {
+  Object.assign(anticipationErrors, { operator: '', rate: '' })
+  if (!anticipationForm.operator) anticipationErrors.operator = 'Escolha a operadora.'
+  const rate = toPercent(anticipationForm.rate)
+  if (!isValidPercent(anticipationForm.rate) || rate === null || Number(rate) <= 0)
+    anticipationErrors.rate = 'Informe a taxa ao mês, entre 0 e 100.'
+  if (anticipationErrors.operator || anticipationErrors.rate) return
+  const id = Number(anticipationForm.operator)
+  // Switching operator while editing: clear the old one first.
+  const previous = anticipationEditing.value
+  if (previous && previous.id !== id) {
+    updateOperatorAnticipation(previous.id, { auto_anticipate: false, anticipation_rate_percent: null })
   }
-  saveAnticipation(id)
+  saveAnticipation({ id, auto: anticipationForm.auto, rate })
+}
+
+function removeAnticipation() {
+  const op = anticipationEditing.value
+  if (!op) return
+  saveAnticipation({ id: op.id, auto: false, rate: null })
 }
 
 /* ---------- Regra de taxa ---------- */
@@ -291,15 +330,13 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
+      :back="{ label: 'Configurações', to: { name: 'settings' } }"
       title="Taxas de cartão"
       description="Taxa da maquininha por método, operadora, bandeira e parcelas, e taxa de antecipação. Entram na margem de contribuição de cada venda."
     >
       <template #actions>
-        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })">
-          Configurações
-        </Button>
         <Button v-if="canManage" mobile-block @click="openNew">Nova regra</Button>
       </template>
     </PageHeader>
@@ -325,20 +362,16 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
       </Banner>
 
       <SurfaceCard>
-        <h2>Regras de taxa</h2>
-        <p class="mt-1 text-[13px] text-muted">
-          Cadastre uma regra para cada combinação que a clínica usa (ex.: Crédito · Stone · Visa ·
-          3x · 4,99%).
-        </p>
+        <SectionTitle
+          title="Regras de taxa"
+          hint="Cadastre uma regra para cada combinação que a clínica usa (ex.: Crédito · Stone · Visa · 3x · 4,99%)."
+        />
         <EmptyState
           v-if="rules.length === 0"
           class="mt-4"
           title="Nenhuma regra cadastrada"
           description="Sem regras, os pagamentos de cartão ficam com taxa zero e a margem fica maior do que a real."
         >
-          <template #action>
-            <Button mobile-block @click="openNew">Nova regra</Button>
-          </template>
         </EmptyState>
         <div v-else class="mt-2 divide-y divide-border-divider">
           <ListCard
@@ -354,67 +387,40 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
       </SurfaceCard>
 
       <SurfaceCard>
-        <h2>Antecipação</h2>
-        <p class="mt-1 text-[13px] text-muted">
-          Se a operadora antecipa os recebíveis do crédito, informe a taxa ao mês. Para n parcelas,
-          o desconto é a taxa × (n + 1) ÷ 2 meses sobre o valor já sem a taxa da maquininha.
-        </p>
-        <p
-          v-if="(operatorsQuery.data.value ?? []).length === 0"
-          class="mt-4 text-[15px] text-muted"
-        >
-          Nenhuma operadora ativa.
-        </p>
-        <div class="mt-4 flex flex-col divide-y divide-border-divider">
-          <div
-            v-for="operator in operatorsQuery.data.value ?? []"
-            :key="operator.id"
-            class="flex flex-col gap-3 py-4 first:pt-0 last:pb-0"
-          >
-            <template v-if="anticipation[operator.id]">
-              <div class="flex items-center justify-between gap-3">
-                <h3>{{ operator.name }}</h3>
-                <Badge v-if="anticipation[operator.id]!.auto" variant="purple">Antecipa</Badge>
-              </div>
-              <Switch v-model="anticipation[operator.id]!.auto" label="Antecipa automaticamente" />
-              <FormField
-                label="Taxa de antecipação (% ao mês)"
-                :error="anticipation[operator.id]!.error"
-                :html-for="`anticipation-${operator.id}`"
-              >
-                <template #default="{ invalid }">
-                  <Input
-                    :id="`anticipation-${operator.id}`"
-                    v-model="anticipation[operator.id]!.rate"
-                    type="text"
-                    inputmode="decimal"
-                    placeholder="Ex.: 1,99"
-                    :disabled="!anticipation[operator.id]!.auto"
-                    :invalid="invalid"
-                  />
-                </template>
-              </FormField>
-              <div class="flex sm:justify-end">
-                <Button
-                  mobile-block
-                  variant="secondary"
-                  :loading="savingOperator === operator.id"
-                  @click="submitAnticipation(operator.id)"
-                >
-                  Salvar antecipação
-                </Button>
-              </div>
-            </template>
-          </div>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <SectionTitle
+            title="Antecipação"
+            :hint="ANTICIPATION_HINT"
+            description="Só as operadoras que antecipam o crédito."
+          />
+          <Button mobile-block variant="secondary" @click="openNewAnticipation">
+            + Adicionar antecipação
+          </Button>
+        </div>
+        <EmptyState
+          v-if="configuredOperators.length === 0"
+          title="Nenhuma antecipação"
+          description="Adicione quando usar uma operadora que antecipa os recebíveis."
+        />
+        <div v-else class="mt-2 divide-y divide-border-divider">
+          <ListCard
+            v-for="op in configuredOperators"
+            :key="op.id"
+            :title="op.name"
+            :description="anticipationDescription(op)"
+            :badge="op.auto_anticipate ? 'Antecipa' : ''"
+            badge-variant="purple"
+            show-chevron
+            @action="openEditAnticipation(op)"
+          />
         </div>
       </SurfaceCard>
 
       <SurfaceCard>
-        <h2>Recalcular pagamentos</h2>
-        <p class="mt-1 text-[13px] text-muted">
-          Novos pagamentos já usam as regras atuais. Use isto depois de cadastrar ou corrigir taxas
-          para aplicá-las também às vendas antigas.
-        </p>
+        <SectionTitle
+          title="Recalcular pagamentos"
+          hint="Novos pagamentos já usam as regras atuais. Use isto depois de cadastrar ou corrigir taxas para aplicá-las também às vendas antigas."
+        />
         <div class="mt-4 flex sm:justify-end">
           <Button
             mobile-block
@@ -429,11 +435,12 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
     </template>
 
     <AppDialog
+      size="lg"
       v-model:open="dialogOpen"
       :title="editing ? 'Editar regra' : 'Nova regra'"
       description="A taxa vale para pagamentos com exatamente esta combinação."
     >
-      <form class="flex flex-col gap-4" @submit.prevent="submitRule">
+      <form class="grid gap-4 md:grid-cols-2" @submit.prevent="submitRule">
         <FormField label="Método" :error="formErrors.payment_method_id" html-for="rule-method">
           <template #default="{ invalid }">
             <Select
@@ -494,8 +501,7 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
           </template>
         </FormField>
         <FormField
-          label="Taxa fixa por transação"
-          hint="Opcional."
+          label="Taxa fixa por transação (opcional)"
           :error="formErrors.fee_fixed"
           html-for="rule-fixed"
         >
@@ -504,7 +510,7 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
           </template>
         </FormField>
       </form>
-      <template #footer>
+      <template #footer-negative>
         <Button
           v-if="editing"
           variant="ghost"
@@ -515,6 +521,8 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
           {{ editing.is_active ? 'Desativar' : 'Reativar' }}
         </Button>
         <Button variant="ghost" type="button" @click="dialogOpen = false">Cancelar</Button>
+      </template>
+      <template #footer>
         <Button type="button" :loading="savingRule" @click="submitRule">Salvar</Button>
       </template>
     </AppDialog>
@@ -526,6 +534,67 @@ const { mutate: recalc, isPending: recalculating } = useMutation({
       confirm-label="Recalcular"
       confirm-variant="primary"
       @confirm="recalc()"
+    />
+
+    <AppDialog
+      size="md"
+      v-model:open="anticipationOpen"
+      :title="anticipationEditing ? 'Editar antecipação' : 'Adicionar antecipação'"
+      description="Vale para pagamentos no crédito com esta operadora."
+    >
+      <form class="flex flex-col gap-4" @submit.prevent="submitAnticipation">
+        <FormField label="Operadora" :error="anticipationErrors.operator" html-for="ant-operator">
+          <Select
+            id="ant-operator"
+            v-model="anticipationForm.operator"
+            :options="anticipationOperatorOptions"
+            placeholder="Escolha a operadora"
+            :invalid="Boolean(anticipationErrors.operator)"
+          />
+        </FormField>
+        <FormField
+          label="Taxa ao mês (%)"
+          :hint="ANTICIPATION_HINT"
+          :error="anticipationErrors.rate"
+          html-for="ant-rate"
+        >
+          <template #default="{ invalid }">
+            <Input
+              id="ant-rate"
+              v-model="anticipationForm.rate"
+              type="text"
+              inputmode="decimal"
+              placeholder="Ex.: 1,99"
+              :invalid="invalid"
+            />
+          </template>
+        </FormField>
+        <Switch v-model="anticipationForm.auto" label="Antecipa automaticamente" />
+      </form>
+      <template #footer-negative>
+        <Button
+          v-if="anticipationEditing"
+          variant="ghost"
+          type="button"
+          @click="confirmRemoveAnticipation = true"
+        >
+          Remover
+        </Button>
+        <Button variant="ghost" type="button" @click="anticipationOpen = false">Cancelar</Button>
+      </template>
+      <template #footer>
+        <Button type="button" :loading="savingAnticipation" @click="submitAnticipation">
+          Salvar
+        </Button>
+      </template>
+    </AppDialog>
+
+    <ConfirmDialog
+      v-model:open="confirmRemoveAnticipation"
+      title="Remover antecipação?"
+      :description="`Novos pagamentos com ${anticipationEditing?.name ?? 'a operadora'} deixam de descontar antecipação. Use Recalcular para aplicar às vendas antigas.`"
+      confirm-label="Remover"
+      @confirm="removeAnticipation"
     />
   </div>
 </template>

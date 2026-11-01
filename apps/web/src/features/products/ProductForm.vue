@@ -4,6 +4,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import PermissionGate from '@/components/patterns/PermissionGate.vue'
 import AppDialog from '@/components/ui/AppDialog.vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
@@ -472,14 +473,16 @@ defineExpose({ setErrors })
 
     <Switch v-model="isActive" label="Ativo" />
 
-    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button mobile-block variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
-        Cancelar
-      </Button>
+    <ActionBar class="mt-2">
+      <template #negative>
+        <Button mobile-block variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">
+          Cancelar
+        </Button>
+      </template>
       <Button mobile-block type="submit" :loading="loading">
         {{ submitLabel ?? 'Salvar' }}
       </Button>
-    </div>
+    </ActionBar>
   </form>
 
   <AppDialog v-model:open="brandDialog" title="Nova marca" description="A marca fica disponível no cadastro de produtos.">
@@ -488,8 +491,10 @@ defineExpose({ setErrors })
         <Input id="new-brand-name" v-model="newBrandName" type="text" :invalid="invalid" />
       </template>
     </FormField>
-    <template #footer>
+    <template #footer-negative>
       <Button variant="ghost" type="button" @click="brandDialog = false">Cancelar</Button>
+    </template>
+    <template #footer>
       <Button
         type="button"
         :loading="creatingBrand"
@@ -507,8 +512,10 @@ defineExpose({ setErrors })
         <Input id="new-type-name" v-model="newTypeName" type="text" :invalid="invalid" />
       </template>
     </FormField>
-    <template #footer>
+    <template #footer-negative>
       <Button variant="ghost" type="button" @click="typeDialog = false">Cancelar</Button>
+    </template>
+    <template #footer>
       <Button
         type="button"
         :loading="creatingType"
@@ -531,8 +538,10 @@ defineExpose({ setErrors })
         </template>
       </FormField>
     </div>
-    <template #footer>
+    <template #footer-negative>
       <Button variant="ghost" type="button" @click="unitDialog = false">Cancelar</Button>
+    </template>
+    <template #footer>
       <Button
         type="button"
         :loading="creatingUnit"

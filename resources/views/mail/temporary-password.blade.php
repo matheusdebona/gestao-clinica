@@ -31,8 +31,9 @@
                     </tr>
                     <tr>
                         <td align="center" style="padding:20px 28px;">
-                            <div style="display:inline-block;padding:16px 22px;border-radius:14px;background:#eef0f7;border:1px solid #d9dbee;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono',monospace;font-size:24px;font-weight:700;letter-spacing:0.08em;color:#4a4791;">{{ $temporaryPassword }}</div>
-                            <p style="margin:10px 0 0;font-size:13px;color:#6b6a80;">Válida por {{ $expiresInMinutes }} minutos.</p>
+                            <p style="margin:0 0 8px;font-size:13px;color:#6b6a80;">Senha temporária</p>
+                            <div style="display:inline-block;padding:18px 26px;border-radius:14px;background:#eef0f7;border:1px solid #d9dbee;font-family:'SFMono-Regular',Menlo,Consolas,'Liberation Mono','Courier New',monospace;font-size:32px;line-height:1.2;font-weight:700;letter-spacing:0.18em;color:#4a4791;white-space:nowrap;-webkit-user-select:all;user-select:all;">{{ $temporaryPassword }}</div>
+                            <p style="margin:10px 0 0;font-size:13px;color:#6b6a80;">Só letras maiúsculas e números. Válida por {{ $expiresInMinutes }} minutos.</p>
                         </td>
                     </tr>
                     <tr>
@@ -43,7 +44,7 @@
                     <tr>
                         <td style="padding:0 28px 28px;">
                             <p style="margin:0;padding-top:20px;border-top:1px solid #ececf4;font-size:13px;line-height:1.6;color:#6b6a80;">
-                                Não pediu? Ignore este e-mail. Sua senha atual continua valendo e ninguém consegue entrar sem esta senha temporária.
+                                Não pediu? Por segurança, sua senha anterior deixou de valer. Entre com esta senha temporária e crie uma nova.
                             </p>
                         </td>
                     </tr>

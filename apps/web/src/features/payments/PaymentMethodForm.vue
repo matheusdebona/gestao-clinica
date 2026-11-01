@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useForm } from 'vee-validate'
 import { computed, ref, watch } from 'vue'
+import ActionBar from '@/components/ui/ActionBar.vue'
 import Button from '@/components/ui/Button.vue'
 import FormField from '@/components/ui/FormField.vue'
 import Input from '@/components/ui/Input.vue'
@@ -110,8 +111,7 @@ defineExpose({ setErrors })
     </FormField>
     <template v-if="!isCardKind && canManageFees">
       <FormField
-        label="Taxa percentual"
-        hint="Opcional. Deixe vazio se não houver taxa."
+        label="Taxa percentual (opcional)" hint="Deixe vazio se não houver taxa."
         :error="errors.fee_percent"
         html-for="method-fee-percent"
       >
@@ -128,8 +128,7 @@ defineExpose({ setErrors })
         </template>
       </FormField>
       <FormField
-        label="Taxa fixa"
-        hint="Opcional. Ex.: boleto."
+        label="Taxa fixa (opcional)" hint="Ex.: boleto."
         :error="errors.fee_fixed"
         html-for="method-fee-fixed"
       >
@@ -144,11 +143,13 @@ defineExpose({ setErrors })
       </FormField>
     </template>
     <Switch v-model="isActive" label="Ativo" />
-    <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')"
-        >Cancelar</Button
-      >
+    <ActionBar class="mt-2">
+      <template #negative>
+        <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')"
+          >Cancelar</Button
+        >
+      </template>
       <Button type="submit" :loading="loading">{{ submitLabel ?? 'Salvar' }}</Button>
-    </div>
+    </ActionBar>
   </form>
 </template>

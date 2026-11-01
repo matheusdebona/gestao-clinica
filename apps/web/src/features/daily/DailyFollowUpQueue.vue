@@ -135,7 +135,7 @@ function onComment() {
           </PermissionGate>
         </div>
         <PermissionGate v-if="nextQuickMilestone(item)" permission="leads.manage">
-          <div class="flex px-2 pb-3">
+          <div class="flex px-2 pb-3 sm:justify-end">
             <Button
               mobile-block
               variant="secondary"
@@ -151,14 +151,17 @@ function onComment() {
 
     <LeadStatusDialog v-model:open="statusOpen" :lead="statusLead" :statuses="statuses" />
 
-    <AppDialog v-model:open="commentOpen" stack-footer title="Comentar" :description="commentLead?.name ?? ''">
+    <AppDialog
+      size="md" v-model:open="commentOpen" stack-footer title="Comentar" :description="commentLead?.name ?? ''">
       <FormField label="Comentário" html-for="daily-comment" :error="commentError">
         <template #default="{ invalid }">
           <Textarea id="daily-comment" v-model="comment" :invalid="invalid" placeholder="Ex.: liguei, pediu retorno sexta." />
         </template>
       </FormField>
-      <template #footer>
+      <template #footer-negative>
         <Button mobile-block variant="ghost" type="button" @click="commentOpen = false">Cancelar</Button>
+      </template>
+      <template #footer>
         <Button mobile-block type="button" :loading="commenting" @click="onComment">Comentar</Button>
       </template>
     </AppDialog>

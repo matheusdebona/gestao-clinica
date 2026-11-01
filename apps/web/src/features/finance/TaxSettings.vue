@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import MonthSelect from '@/components/patterns/MonthSelect.vue'
 import Banner from '@/components/ui/Banner.vue'
 import Button from '@/components/ui/Button.vue'
@@ -12,6 +11,7 @@ import ListCard from '@/components/ui/ListCard.vue'
 import PageHeader from '@/components/ui/PageHeader.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
+import SectionTitle from '@/components/ui/SectionTitle.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Textarea from '@/components/ui/Textarea.vue'
 import {
@@ -29,7 +29,6 @@ import { useToastStore } from '@/stores/toast'
 import type { TaxRegime, TaxSetting, TaxSettingPayload } from '@/types/finance'
 import { ApiError } from '@/types/user'
 
-const router = useRouter()
 const auth = useAuthStore()
 const toast = useToastStore()
 const queryClient = useQueryClient()
@@ -164,16 +163,12 @@ const { mutate: remove } = useMutation({
 </script>
 
 <template>
-  <div class="mx-auto flex w-full max-w-[720px] flex-col gap-6">
+  <div class="mx-auto flex w-full max-w-[960px] flex-col gap-6">
     <PageHeader
+      :back="{ label: 'Configurações', to: { name: 'settings' } }"
       title="Impostos"
       description="Regime tributário e alíquotas sobre a receita, por mês de competência. Entram na margem de contribuição e no DRE."
     >
-      <template #actions>
-        <Button mobile-block variant="ghost" @click="router.push({ name: 'settings' })">
-          Configurações
-        </Button>
-      </template>
     </PageHeader>
 
     <Banner v-if="!canView" variant="danger" title="Sem permissão">
@@ -199,11 +194,10 @@ const { mutate: remove } = useMutation({
       </Banner>
 
       <SurfaceCard v-if="canManage">
-        <h2>Nova vigência</h2>
-        <p class="mt-1 text-[13px] text-muted">
-          Vale a partir do mês escolhido até a próxima vigência. Salvar o mesmo mês substitui a
-          anterior.
-        </p>
+        <SectionTitle
+          title="Nova vigência"
+          hint="Vale a partir do mês escolhido até a próxima vigência. Salvar o mesmo mês substitui a anterior."
+        />
         <form class="mt-4 flex flex-col gap-4" @submit.prevent="submit">
           <FormField
             label="A partir de (mês de competência)"
