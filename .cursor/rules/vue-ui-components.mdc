@@ -45,7 +45,8 @@ When editing Vue in `apps/web`, reuse these components. Do not recreate their lo
 - `PageHeader` — `sticky` opcional (glass)
 - `SurfaceCard` — `glass-regular`
 - `ListCard` — grouped row + chevron (no pastel variants)
-- `SidebarNavItem` — item da nav (shell)
+- `SidebarNavItem` — item da nav (shell; `nested` / `compact` / `tone` `inverse`|`default`)
+- `SidebarNavGroup` — grupo colapsável da nav (`aria-expanded`; flyout em `compact`)
 - `ClinicShell` — `components/patterns` (sidebar `glass-dark` flutuante + tab bar cápsula)
 - `PermissionGate` — `components/patterns`; slot só com a permission
 - `ClientSearchBar` — `components/patterns`; busca com debounce (`search`)
