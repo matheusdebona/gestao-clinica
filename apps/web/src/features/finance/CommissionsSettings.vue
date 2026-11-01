@@ -17,6 +17,7 @@ import Skeleton from '@/components/ui/Skeleton.vue'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import GoalRemunerationsCard from '@/features/finance/GoalRemunerationsCard.vue'
+import RevenueRemunerationsCard from '@/features/finance/RevenueRemunerationsCard.vue'
 import {
   isValidPercent,
   listCommissionRules,
@@ -272,8 +273,8 @@ function unpayUser(userId: number) {
     <PageHeader
       :back="{ label: 'Configurações', to: { name: 'settings' } }"
       title="Comissões"
-      description="Comissões de vendas e sessões e a remuneração por meta."
-      hint="Regras para vendedores (por venda) e profissionais (por sessão realizada), mais o valor por meta (ex.: por novo agendamento). Os lançamentos são gerados ao confirmar vendas, concluir sessões e marcar as metas. Comissões de venda e sessão entram na margem de contribuição."
+      description="Comissões de vendas e sessões e a remuneração por meta e faturamento."
+      hint="Regras para vendedores (por venda) e profissionais (por sessão realizada), mais o valor por meta (ex.: por novo agendamento) e as faixas por faturamento da clínica. Os lançamentos são gerados ao confirmar vendas, concluir sessões e marcar as metas. Todas as comissões entram como custo na margem de contribuição e na DRE."
     >
       <template #actions>
         <Button v-if="canManage" mobile-block @click="openNew">Nova regra</Button>
@@ -290,7 +291,7 @@ function unpayUser(userId: number) {
           <div>
             <h2>Lançamentos do mês</h2>
             <p class="mt-1 text-[13px] text-muted">
-              Por mês de competência da venda, sessão ou meta.
+              Por mês de competência da venda, sessão, meta ou faturamento.
             </p>
           </div>
           <div class="sm:w-48">
@@ -339,7 +340,7 @@ function unpayUser(userId: number) {
           <EmptyState
             v-if="meta.by_user.length === 0"
             title="Nenhuma comissão no mês"
-            description="Cadastre regras ou a remuneração por meta. Para meses anteriores, use Recalcular mês."
+            description="Cadastre regras, a remuneração por meta ou por faturamento. Para meses anteriores, use Recalcular mês."
           />
 
           <div v-else class="mt-4 flex flex-col divide-y divide-border-divider">
@@ -372,7 +373,10 @@ function unpayUser(userId: number) {
                 >
                   <span class="min-w-0">
                     <span class="block truncate text-body">{{ entryTitle(entry) }}</span>
-                    <span class="block truncate text-muted">
+                    <span
+                      class="block text-muted"
+                      :class="entry.goal_kind === 'tier' ? 'break-words' : 'truncate'"
+                    >
                       {{ entrySubtitle(entry, formatIsoDate(entry.occurred_at?.slice(0, 10))) }}
                     </span>
                   </span>
@@ -441,6 +445,8 @@ function unpayUser(userId: number) {
       </SurfaceCard>
 
       <GoalRemunerationsCard :can-manage="canManage" />
+
+      <RevenueRemunerationsCard :can-manage="canManage" />
     </template>
 
     <AppDialog

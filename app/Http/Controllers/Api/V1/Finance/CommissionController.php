@@ -104,6 +104,7 @@ class CommissionController extends Controller
                 'origin' => $this->origin($e),
                 'goal_metric' => $e->goal_metric,
                 'goal_kind' => $e->goal_kind,
+                'tier_threshold' => $e->tier_threshold,
                 'lead_id' => $e->lead_id,
                 'client_name' => $e->appointment?->client?->name ?? $e->sale?->client?->name ?? $e->lead?->client?->name ?? $e->lead?->name,
                 'occurred_at' => $e->appointment?->finished_at ?? $e->sale?->sold_at ?? $this->goalOccurredAt($e),
@@ -186,11 +187,15 @@ class CommissionController extends Controller
         return $data;
     }
 
-    /** sales = comissão de venda, sessions = comissão de sessão, goals = remuneração por meta. */
+    /**
+     * sales = comissão de venda, sessions = comissão de sessão, goals = remuneração por meta,
+     * revenue = remuneração por faturamento da clínica.
+     */
     private function origin(CommissionEntry $e): string
     {
         return match ($e->role) {
             CommissionEntry::ROLE_GOAL => 'goals',
+            CommissionEntry::ROLE_REVENUE => 'revenue',
             CommissionRule::ROLE_PROFESSIONAL => 'sessions',
             default => 'sales',
         };
@@ -207,11 +212,11 @@ class CommissionController extends Controller
 
     /**
      * @param  Collection<int, CommissionEntry>  $rows
-     * @return array{sales: string, sessions: string, goals: string}
+     * @return array{sales: string, sessions: string, goals: string, revenue: string}
      */
     private function byOrigin($rows): array
     {
-        $out = ['sales' => 0.0, 'sessions' => 0.0, 'goals' => 0.0];
+        $out = ['sales' => 0.0, 'sessions' => 0.0, 'goals' => 0.0, 'revenue' => 0.0];
         foreach ($rows as $row) {
             $out[$this->origin($row)] += (float) $row->amount;
         }

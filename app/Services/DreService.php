@@ -13,6 +13,8 @@ use Carbon\CarbonImmutable;
  * Receita e custos variáveis vêm da margem de contribuição (vendas confirmadas no mês; insumos,
  * taxas, antecipação, impostos e comissões dessas vendas; perdas de estoque do mês). Despesas
  * vêm do módulo de despesas pelo mês de competência, agrupadas pela natureza da categoria.
+ * Remuneração por metas e por faturamento (lançamentos de comissão sem venda) entra nos custos
+ * variáveis pelo mês de competência, pendente ou paga, como as comissões de venda/sessão.
  *
  * Ponto de equilíbrio = despesas do mês (exceto variáveis) ÷ margem de contribuição %.
  */
@@ -97,7 +99,8 @@ class DreService
 
         $otherVariable = array_sum($byKind[ExpenseCategory::KIND_VARIABLE] ?? []);
         $variable = (float) $cm['supplies'] + (float) $cm['card_fees'] + (float) $cm['anticipation']
-            + (float) $cm['taxes'] + (float) $cm['commissions'] + (float) $cm['losses'] + $otherVariable;
+            + (float) $cm['taxes'] + (float) $cm['commissions'] + (float) $cm['goal_commissions']
+            + (float) $cm['losses'] + $otherVariable;
         $contribution = $netRevenue - $variable;
 
         $lines = [
@@ -109,6 +112,7 @@ class DreService
             'anticipation' => (float) $cm['anticipation'],
             'taxes' => (float) $cm['taxes'],
             'commissions' => (float) $cm['commissions'],
+            'goal_commissions' => (float) $cm['goal_commissions'],
             'losses' => (float) $cm['losses'],
             'other_variable' => $otherVariable,
             'variable_costs' => $variable,

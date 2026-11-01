@@ -224,18 +224,128 @@ class GoalRemunerationTest extends TestCase
         $this->assertSame([$paidId], $this->goalEntries()->pluck('id')->all());
     }
 
-    public function test_approached_leads_count_even_if_the_lead_is_cancelled_later(): void
+    public function test_cancelled_lead_no_longer_pays_approached_but_paid_entries_stay(): void
     {
         $this->configure('approached', '5.50');
         $lead = $this->newLead();
+        $kept = $this->newLead();
+        $paidLead = $this->newLead();
         Sanctum::actingAs($this->seller);
-        $this->postJson("/api/v1/leads/{$lead->id}/milestones/approached")->assertOk();
+        foreach ([$lead, $kept, $paidLead] as $l) {
+            $this->postJson("/api/v1/leads/{$l->id}/milestones/approached")->assertOk();
+        }
         // Marcar "Respondeu" não paga de novo (o abordado já existia).
         $this->postJson("/api/v1/leads/{$lead->id}/milestones/replied")->assertOk();
-        $this->postJson("/api/v1/leads/{$lead->id}/cancel")->assertOk();
+        $this->assertSame(['5.50', '5.50', '5.50'], $this->goalEntries()->pluck('amount')->all());
 
-        $this->assertSame(['5.50'], $this->goalEntries()->pluck('amount')->all());
-        $this->assertSame('approached', $this->goalEntries()->first()->goal_metric);
+        // Paga a abordagem de um deles antes do cancelamento.
+        Sanctum::actingAs($this->admin);
+        $paidId = $this->goalEntries()->firstWhere('lead_id', $paidLead->id)->id;
+        $this->postJson('/api/v1/finance/commissions/mark-paid', ['ids' => [$paidId], 'paid' => true])->assertOk();
+
+        Sanctum::actingAs($this->seller);
+        $this->postJson("/api/v1/leads/{$lead->id}/cancel")->assertOk();
+        $this->postJson("/api/v1/leads/{$paidLead->id}/cancel")->assertOk();
+
+        // O pendente do lead cancelado sai; o pago fica; o outro lead segue pagando.
+        $entries = $this->goalEntries()->sortBy('lead_id')->values();
+        $this->assertSame([$kept->id, $paidLead->id], $entries->pluck('lead_id')->map(fn ($id) => (int) $id)->all());
+        $this->assertSame([CommissionEntry::STATUS_PENDING, CommissionEntry::STATUS_PAID], $entries->pluck('status')->all());
+
+        // "Recalcular mês" chega ao mesmo resultado e nunca mexe no pago.
+        Sanctum::actingAs($this->admin);
+        $this->postJson('/api/v1/finance/commissions/rebuild', ['month' => '2026-10'])->assertOk();
+        $this->assertSame([$kept->id, $paidLead->id], $this->goalEntries()->sortBy('lead_id')->pluck('lead_id')->map(fn ($id) => (int) $id)->values()->all());
+        $this->assertSame(CommissionEntry::STATUS_PAID, CommissionEntry::query()->find($paidId)->status);
+
+        // A tela de Metas usa a mesma contagem: só o lead não cancelado.
+        Sanctum::actingAs($this->seller);
+        $metrics = collect($this->getJson('/api/v1/goals/me?month=2026-10')->assertOk()->json('data.metrics'))->keyBy('key');
+        $this->assertSame(1, $metrics['approached']['actual']);
+    }
+
+    public function test_recalculation_drops_pending_approach_of_a_lead_cancelled_without_hooks(): void
+    {
+        GoalRemuneration::query()->create(['clinic_id' => $this->clinic->id, 'metric' => 'approached', 'per_occurrence_amount' => '5']);
+        $lead = $this->newLead(['approached_at' => '2026-10-10 12:00:00', 'approached_by_user_id' => $this->seller->id]);
+        $service = app(GoalRemunerationService::class);
+        $service->syncUserMonth($this->clinic->id, $this->seller->id, '2026-10');
+        $this->assertCount(1, $this->goalEntries());
+
+        // Cancelado direto no banco (dados antigos): o "Recalcular mês" tira o pendente.
+        Lead::query()->whereKey($lead->id)->update(['cancelled_at' => now()]);
+        $service->syncMonth($this->clinic->id, '2026-10');
+        $this->assertCount(0, $this->goalEntries());
+    }
+
+    public function test_conversion_without_prior_approach_pays_only_the_appointment(): void
+    {
+        $this->configure('approached', '5.00');
+        $this->configure('appointments', '80.00');
+
+        // Converteu direto (sem "Abordado" antes): só o agendamento.
+        [$direct] = $this->convertAsSeller();
+        $this->assertNotNull($direct->approached_at, 'a conversão continua marcando o funil inteiro');
+        $this->assertSame([['appointments', '80.00']], $this->goalEntries()->map(fn ($e) => [$e->goal_metric, $e->amount])->all());
+
+        // Abordado antes pela mesma pessoa e depois convertido: paga os dois.
+        $approachedFirst = $this->newLead();
+        Sanctum::actingAs($this->seller);
+        $this->postJson("/api/v1/leads/{$approachedFirst->id}/milestones/approached")->assertOk();
+        Carbon::setTestNow('2026-10-15 16:00:00');
+        CarbonImmutable::setTestNow('2026-10-15 16:00:00');
+        $this->postJson("/api/v1/leads/{$approachedFirst->id}/convert", [
+            'scheduled_at' => now()->addDays(3)->setTime(11, 0)->toIso8601String(),
+            'professional_user_id' => $this->admin->id,
+            'create_new_client' => true,
+        ])->assertCreated();
+
+        $byMetric = $this->goalEntries()->groupBy('goal_metric')->map->count()->all();
+        ksort($byMetric);
+        $this->assertSame(['appointments' => 2, 'approached' => 1], $byMetric);
+        $this->assertSame($approachedFirst->id, (int) $this->goalEntries()->firstWhere('goal_metric', 'approached')->lead_id);
+
+        // Abordado por outra pessoa e convertido pelo vendedor: a abordagem é de quem abordou.
+        $other = $this->newLead(['approached_at' => '2026-10-15 16:00:00', 'approached_by_user_id' => $this->receptionist->id,
+            'booked_at' => '2026-10-15 16:00:00', 'booked_by_user_id' => $this->seller->id]);
+        app(GoalRemunerationService::class)->syncUserMonth($this->clinic->id, $this->receptionist->id, '2026-10');
+        $this->assertSame([$other->id], $this->goalEntries($this->receptionist->id)->pluck('lead_id')->map(fn ($id) => (int) $id)->all());
+
+        // Metas segue a mesma regra: 1 abordado (o anterior), 3 agendamentos (as conversões contam).
+        $metrics = collect($this->getJson('/api/v1/goals/me?month=2026-10')->assertOk()->json('data.metrics'))->keyBy('key');
+        $this->assertSame(1, $metrics['approached']['actual']);
+        $this->assertSame(3, $metrics['appointments']['actual']);
+        Sanctum::actingAs($this->receptionist);
+        $metrics = collect($this->getJson('/api/v1/goals/me?month=2026-10')->assertOk()->json('data.metrics'))->keyBy('key');
+        $this->assertSame(1, $metrics['approached']['actual']);
+    }
+
+    public function test_goals_screen_excludes_cancelled_evaluations_like_the_payout(): void
+    {
+        UserGoal::query()->create(['clinic_id' => $this->clinic->id, 'user_id' => $this->seller->id, 'month' => '2026-10', 'appointments_target' => 2]);
+        $this->configure('appointments', '80.00');
+        [, $first] = $this->convertAsSeller();
+        $this->convertAsSeller();
+
+        Sanctum::actingAs($this->seller);
+        $metrics = collect($this->getJson('/api/v1/goals/me')->assertOk()->json('data.metrics'))->keyBy('key');
+        $this->assertSame(2, $metrics['appointments']['actual']);
+        $this->assertSame(100, $metrics['appointments']['percent']);
+
+        Sanctum::actingAs($this->admin);
+        $this->postJson("/api/v1/appointments/{$first}/cancel")->assertOk();
+
+        Sanctum::actingAs($this->seller);
+        $metrics = collect($this->getJson('/api/v1/goals/me')->assertOk()->json('data.metrics'))->keyBy('key');
+        $this->assertSame(1, $metrics['appointments']['actual']);
+        $this->assertSame(1, $metrics['appointments']['remaining']);
+        // Mesmo número que o pagamento.
+        $this->assertCount(1, $this->goalEntries()->where('goal_metric', 'appointments'));
+
+        // Visão da equipe (admin) também.
+        Sanctum::actingAs($this->admin);
+        $row = collect($this->getJson('/api/v1/goals?month=2026-10')->assertOk()->json('data'))->firstWhere('user.id', $this->seller->id);
+        $this->assertSame(1, collect($row['metrics'])->firstWhere('key', 'appointments')['actual']);
     }
 
     public function test_month_boundaries_follow_sao_paulo_time(): void

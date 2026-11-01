@@ -2,21 +2,26 @@
 
 namespace App\Services;
 
+use App\Models\Appointment;
 use App\Models\Lead;
 use App\Models\Sale;
 use App\Models\User;
 use App\Models\UserGoal;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 /**
  * Metas mensais por colaborador.
  *
- * Realizado no mês (America/Sao_Paulo), pelas mesmas regras do Resumo do dia:
- *  - agendamentos: leads marcados como "Agendou" pelo usuário (leads.booked_at/booked_by_user_id);
+ * Realizado no mês (America/Sao_Paulo), com as mesmas regras da remuneração por meta
+ * (ver milestoneQuery, usada pela tela e pelo pagamento):
+ *  - agendamentos: leads marcados como "Agendou" pelo usuário (leads.booked_at/booked_by_user_id),
+ *    exceto quando a avaliação marcada na conversão foi cancelada;
  *  - vendas: soma do valor efetivo das vendas confirmadas do usuário (sold_by_user_id, sold_at);
- *  - leads abordados: leads marcados como "Abordado" pelo usuário (approached_at/approached_by_user_id).
+ *  - leads abordados: leads marcados como "Abordado" pelo usuário (approached_at/approached_by_user_id),
+ *    exceto lead cancelado e o "Abordado" implícito da conversão (marcado junto com o "Agendou").
  *
  * Um mês sem meta própria herda a meta mais recente anterior (a administração define uma vez e
  * só muda quando precisar). Quem não vê leads/vendas não recebe esses números.
@@ -160,10 +165,41 @@ class UserGoalService
 
     private function milestoneCount(string $step, int $userId, CarbonImmutable $start, CarbonImmutable $end): int
     {
-        return Lead::query()
+        return self::milestoneQuery((int) CurrentClinic::id(), $step, $userId, $start, $end)->count();
+    }
+
+    /**
+     * Leads que contam para o colaborador no mês, no marco "booked" (Agendou) ou "approached"
+     * (Abordado). Única regra de contagem: usada pela tela de Metas e pela remuneração por meta.
+     *
+     *  - Agendou: não conta se a avaliação marcada na conversão foi cancelada.
+     *  - Abordado: não conta se o lead foi cancelado, nem quando o "Abordado" só existe porque a
+     *    conversão o marcou junto (mesmo instante e mesma pessoa do "Agendou"): converter não é
+     *    uma abordagem. Abordado antes (ou por outra pessoa) continua contando.
+     */
+    public static function milestoneQuery(int $clinicId, string $step, int $userId, CarbonImmutable $start, CarbonImmutable $end): Builder
+    {
+        if (! in_array($step, ['booked', 'approached'], true)) {
+            throw new \InvalidArgumentException("Unknown goal milestone {$step}");
+        }
+
+        $query = Lead::query()->withoutGlobalScope('clinic')
+            ->where('leads.clinic_id', $clinicId)
             ->where("leads.{$step}_by_user_id", $userId)
-            ->whereBetween("leads.{$step}_at", [$start, $end])
-            ->count();
+            ->whereBetween("leads.{$step}_at", [$start, $end]);
+
+        if ($step === 'booked') {
+            return $query->where(fn (Builder $q) => $q->whereNull('leads.booked_appointment_id')
+                ->orWhereNotExists(fn ($sub) => $sub->selectRaw('1')->from('appointments')
+                    ->whereColumn('appointments.id', 'leads.booked_appointment_id')
+                    ->where('appointments.status', Appointment::STATUS_CANCELLED)));
+        }
+
+        return $query->whereNull('leads.cancelled_at')
+            ->where(fn (Builder $q) => $q->whereNull('leads.booked_at')
+                ->orWhereNull('leads.booked_by_user_id')
+                ->orWhereColumn('leads.booked_at', '!=', 'leads.approached_at')
+                ->orWhereColumn('leads.booked_by_user_id', '!=', 'leads.approached_by_user_id'));
     }
 
     private function salesTotal(int $userId, CarbonImmutable $start, CarbonImmutable $end): float

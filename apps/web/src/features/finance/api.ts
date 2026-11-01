@@ -10,6 +10,8 @@ import type {
   CommissionRulesResponse,
   GoalRemunerationPayload,
   GoalRemunerationRow,
+  RemunerationTierPayload,
+  RevenueRemunerationsResponse,
   ContributionMargin,
   EquipmentAsset,
   EquipmentPayload,
@@ -250,4 +252,18 @@ export async function saveGoalRemuneration(
     { method: 'PUT', body },
   )
   return payload.data
+}
+
+export async function listRevenueRemunerations(): Promise<RevenueRemunerationsResponse> {
+  return api<RevenueRemunerationsResponse>('/finance/revenue-remunerations')
+}
+
+export async function saveRevenueRemuneration(
+  userId: number,
+  tiers: RemunerationTierPayload[],
+): Promise<RevenueRemunerationsResponse> {
+  return api<RevenueRemunerationsResponse>(`/finance/revenue-remunerations/${userId}`, {
+    method: 'PUT',
+    body: { tiers },
+  })
 }

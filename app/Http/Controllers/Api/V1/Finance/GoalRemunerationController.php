@@ -4,14 +4,17 @@ namespace App\Http\Controllers\Api\V1\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Models\GoalRemuneration;
+use App\Models\RemunerationTier;
 use App\Services\GoalRemunerationService;
 use App\Services\UserGoalService;
 use App\Support\CurrentClinic;
+use App\Support\RemunerationTierInput;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 /**
- * Remuneração por tipo de meta (valor por ocorrência e bônus ao bater a meta).
+ * Remuneração por tipo de meta (valor por ocorrência, bônus ao bater a meta e, em novo
+ * agendamento, faixas por quantidade).
  * Lê quem vê comissões (finance.view); altera quem gerencia comissões (finance.manage).
  */
 class GoalRemunerationController extends Controller
@@ -48,7 +51,20 @@ class GoalRemunerationController extends Controller
             '*.decimal' => 'Use no máximo duas casas decimais.',
         ]);
 
+        $tiers = null;
+        if ($metric === GoalRemuneration::METRIC_APPOINTMENTS && $request->has('tiers')) {
+            $tiers = RemunerationTierInput::validate($request, RemunerationTier::KIND_APPOINTMENTS);
+        } elseif ($request->has('tiers') && $request->input('tiers') !== []) {
+            abort(response()->json([
+                'message' => 'Faixas só existem para novo agendamento.',
+                'errors' => ['tiers' => ['Faixas só existem para novo agendamento.']],
+            ], 422));
+        }
+
         $clinicId = (int) CurrentClinic::id();
+        if ($tiers !== null) {
+            $this->service->replaceTiers($clinicId, RemunerationTier::KIND_APPOINTMENTS, null, $tiers, $request->user()->id);
+        }
         GoalRemuneration::query()->updateOrCreate(
             ['clinic_id' => $clinicId, 'metric' => $metric],
             [
@@ -69,7 +85,10 @@ class GoalRemunerationController extends Controller
      */
     private function payload(): array
     {
-        return $this->service->config((int) CurrentClinic::id())
+        $clinicId = (int) CurrentClinic::id();
+        $appointmentTiers = RemunerationTierInput::payload($this->service->tiers($clinicId, RemunerationTier::KIND_APPOINTMENTS));
+
+        return $this->service->config($clinicId)
             ->map(fn (GoalRemuneration $r, string $metric) => [
                 'metric' => $metric,
                 'label' => self::LABELS[$metric]['label'],
@@ -77,6 +96,8 @@ class GoalRemunerationController extends Controller
                 'supports_per_occurrence' => in_array($metric, GoalRemuneration::PER_OCCURRENCE_METRICS, true),
                 'per_occurrence_amount' => number_format((float) $r->per_occurrence_amount, 2, '.', ''),
                 'target_bonus_amount' => number_format((float) $r->target_bonus_amount, 2, '.', ''),
+                'supports_tiers' => $metric === GoalRemuneration::METRIC_APPOINTMENTS,
+                'tiers' => $metric === GoalRemuneration::METRIC_APPOINTMENTS ? $appointmentTiers : [],
             ])
             ->values()
             ->all();

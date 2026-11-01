@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\Finance\DreController;
 use App\Http\Controllers\Api\V1\Finance\ExpenseController;
 use App\Http\Controllers\Api\V1\Finance\FinanceSettingsController;
 use App\Http\Controllers\Api\V1\Finance\GoalRemunerationController;
+use App\Http\Controllers\Api\V1\Finance\RevenueRemunerationController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
 use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
@@ -393,6 +394,10 @@ Route::prefix('v1')->group(function (): void {
         Route::get('finance/goal-remunerations', [GoalRemunerationController::class, 'index'])
             ->middleware('permission:finance.view');
         Route::put('finance/goal-remunerations/{metric}', [GoalRemunerationController::class, 'update'])
+            ->middleware('permission:finance.manage');
+        Route::get('finance/revenue-remunerations', [RevenueRemunerationController::class, 'index'])
+            ->middleware('permission:finance.view');
+        Route::put('finance/revenue-remunerations/{user}', [RevenueRemunerationController::class, 'update'])
             ->middleware('permission:finance.manage');
         Route::get('finance/commissions', [CommissionController::class, 'entries'])
             ->middleware('permission:finance.view');

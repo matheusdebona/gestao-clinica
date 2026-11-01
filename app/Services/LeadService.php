@@ -274,7 +274,7 @@ class LeadService
      */
     public function cancel(Lead $lead, ?string $reason, User $user): Lead
     {
-        return DB::transaction(function () use ($lead, $reason, $user): Lead {
+        $cancelledLead = DB::transaction(function () use ($lead, $reason, $user): Lead {
             /** @var Lead $locked */
             $locked = Lead::query()->whereKey($lead->id)->lockForUpdate()->firstOrFail();
             $this->assertNotCancelled($locked);
@@ -303,6 +303,11 @@ class LeadService
 
             return $locked;
         });
+
+        // Lead cancelado não paga "Lead abordado" (só pendentes são refeitos).
+        app(GoalRemunerationService::class)->onLeadCancelled($cancelledLead);
+
+        return $cancelledLead;
     }
 
     /**

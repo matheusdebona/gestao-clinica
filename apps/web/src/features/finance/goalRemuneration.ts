@@ -1,4 +1,8 @@
-import { formatBRL } from "@/lib/formatters";
+import {
+    summarizeTiers,
+    thresholdLabel,
+} from "@/features/finance/remunerationTiers";
+import { formatBRL, formatPercent } from "@/lib/formatters";
 import type {
     CommissionByOrigin,
     CommissionEntryRow,
@@ -16,6 +20,7 @@ export const ORIGIN_LABELS: Record<CommissionOrigin, string> = {
     sales: "Vendas",
     sessions: "Sessões",
     goals: "Metas",
+    revenue: "Faturamento",
 };
 
 const OCCURRENCE_LABELS: Record<GoalMetric, string> = {
@@ -41,7 +46,7 @@ function positive(value: string | null | undefined): boolean {
     return Number(value ?? 0) > 0;
 }
 
-/** "R$ 80,00 por agendamento · bônus de R$ 300,00 ao bater a meta" ou "Sem remuneração". */
+/** "R$ 80,00 por agendamento · bônus de R$ 300,00 ao bater a meta · 2 faixas…" ou "Sem remuneração". */
 export function describeRemuneration(row: GoalRemunerationRow): string {
     const parts: string[] = [];
     if (row.supports_per_occurrence && positive(row.per_occurrence_amount)) {
@@ -53,20 +58,27 @@ export function describeRemuneration(row: GoalRemunerationRow): string {
         const bonus = `${formatBRL(row.target_bonus_amount)} ao bater a meta`;
         parts.push(parts.length ? `bônus de ${bonus}` : `Bônus de ${bonus}`);
     }
+    if (row.supports_tiers && row.tiers?.length) {
+        const tiers = summarizeTiers(row.tiers, "appointments");
+        parts.push(parts.length ? tiers.charAt(0).toLowerCase() + tiers.slice(1) : tiers);
+    }
     return parts.length ? parts.join(" · ") : "Sem remuneração";
 }
 
 export function hasRemuneration(row: GoalRemunerationRow): boolean {
     return (
         (row.supports_per_occurrence && positive(row.per_occurrence_amount)) ||
-        positive(row.target_bonus_amount)
+        positive(row.target_bonus_amount) ||
+        Boolean(row.supports_tiers && row.tiers?.length)
     );
 }
 
 /** Primeira linha de um lançamento no extrato da pessoa. */
 export function entryTitle(entry: CommissionEntryRow): string {
+    if (entry.origin === "revenue") return "Faturamento da clínica";
     if (entry.origin === "goals" && entry.goal_metric) {
         if (entry.goal_kind === "bonus") return BONUS_LABELS[entry.goal_metric];
+        if (entry.goal_kind === "tier") return "Faixa de agendamentos";
         return `${OCCURRENCE_LABELS[entry.goal_metric]} · ${entry.client_name ?? "—"}`;
     }
     return `${entry.origin === "sessions" ? "Sessão" : "Venda"} · ${entry.client_name ?? "—"}`;
@@ -74,6 +86,19 @@ export function entryTitle(entry: CommissionEntryRow): string {
 
 /** Segunda linha: protocolo (vendas/sessões) ou o tipo de meta. */
 export function entrySubtitle(entry: CommissionEntryRow, date: string): string {
+    if (entry.goal_kind === "tier") {
+        const kind = entry.origin === "revenue" ? "revenue" : "appointments";
+        const parts = [`Faixa: ${thresholdLabel(entry.tier_threshold ?? 0, kind)}`];
+        if (entry.origin === "revenue" && !positive(entry.rate_percent)) {
+            parts.push(`faturamento ${formatBRL(entry.base_amount)}`);
+        }
+        if (positive(entry.rate_percent)) {
+            parts.push(
+                `${formatPercent(entry.rate_percent)} de ${formatBRL(entry.base_amount)}`,
+            );
+        }
+        return parts.join(" · ");
+    }
     if (entry.origin === "goals") {
         if (entry.goal_kind === "bonus") {
             const target =
@@ -87,7 +112,7 @@ export function entrySubtitle(entry: CommissionEntryRow, date: string): string {
     return `${entry.protocol_name ?? "Geral"} · ${date}`;
 }
 
-/** Origens com valor, na ordem Vendas, Sessões, Metas. */
+/** Origens com valor, na ordem Vendas, Sessões, Metas, Faturamento. */
 export function originBreakdown(
     byOrigin: CommissionByOrigin | undefined,
 ): { key: CommissionOrigin; label: string; amount: string }[] {
@@ -105,6 +130,7 @@ const ORIGIN_ORDER: Record<CommissionOrigin, number> = {
     sales: 0,
     sessions: 1,
     goals: 2,
+    revenue: 3,
 };
 const METRIC_ORDER: Record<GoalMetric, number> = {
     appointments: 0,
@@ -124,9 +150,9 @@ export function sortEntries(
                 METRIC_ORDER[a.goal_metric ?? "sales"] -
                 METRIC_ORDER[b.goal_metric ?? "sales"];
             if (byMetric) return byMetric;
-            const byKind =
-                (a.goal_kind === "bonus" ? 0 : 1) -
-                (b.goal_kind === "bonus" ? 0 : 1);
+            const kindOrder = (k: CommissionEntryRow["goal_kind"]) =>
+                k === "tier" ? 0 : k === "bonus" ? 1 : 2;
+            const byKind = kindOrder(a.goal_kind) - kindOrder(b.goal_kind);
             if (byKind) return byKind;
         }
         return (

@@ -9,6 +9,7 @@ import MoneyInput from "@/components/ui/MoneyInput.vue";
 import SectionTitle from "@/components/ui/SectionTitle.vue";
 import Skeleton from "@/components/ui/Skeleton.vue";
 import SurfaceCard from "@/components/ui/SurfaceCard.vue";
+import TierListEditor from "@/features/finance/TierListEditor.vue";
 import {
     listGoalRemunerations,
     saveGoalRemuneration,
@@ -19,6 +20,14 @@ import {
     hasRemuneration,
     perOccurrenceLabel,
 } from "@/features/finance/goalRemuneration";
+import {
+    apiTierErrors,
+    formToPayload,
+    tiersToForm,
+    validateTiers,
+    type TierErrors,
+    type TierFormRow,
+} from "@/features/finance/remunerationTiers";
 import { emptyToMoney } from "@/lib/formatters";
 import { useToastStore } from "@/stores/toast";
 import type { GoalRemunerationRow } from "@/types/finance";
@@ -39,7 +48,7 @@ const COUNT_HINT: Record<GoalRemunerationRow["metric"], string> = {
     appointments:
         'Conta cada lead que a pessoa converteu em paciente com avaliação marcada (marco "Agendou") no mês. Se a avaliação for cancelada, deixa de contar.',
     approached:
-        'Conta cada lead marcado como "Abordado" pela pessoa no mês, mesmo que o lead seja cancelado depois.',
+        'Conta cada lead marcado como "Abordado" pela pessoa no mês. Não conta se o lead for cancelado, nem quando a pessoa converte o lead sem ter marcado "Abordado" antes (aí paga só o agendamento). Igual à contagem de Metas.',
     sales: "O bônus sai quando a soma das vendas confirmadas da pessoa no mês chega à meta. Comissão por venda fica nas regras acima.",
 };
 
@@ -47,6 +56,8 @@ const dialogOpen = ref(false);
 const editing = ref<GoalRemunerationRow | null>(null);
 const form = reactive({ per: "", bonus: "" });
 const errors = reactive<{ per?: string; bonus?: string }>({});
+const tiers = ref<TierFormRow[]>([]);
+const tierErrors = ref<TierErrors>({});
 
 function openEdit(row: GoalRemunerationRow) {
     if (!props.canManage) return;
@@ -57,6 +68,8 @@ function openEdit(row: GoalRemunerationRow) {
         Number(row.target_bonus_amount) > 0 ? row.target_bonus_amount : "";
     delete errors.per;
     delete errors.bonus;
+    tiers.value = tiersToForm(row.tiers);
+    tierErrors.value = {};
     dialogOpen.value = true;
 }
 
@@ -83,6 +96,9 @@ const { mutate: save, isPending: saving } = useMutation({
                   }
                 : {}),
             target_bonus_amount: emptyToMoney(String(form.bonus)) ?? "0",
+            ...(row.supports_tiers
+                ? { tiers: formToPayload(tiers.value, "appointments") }
+                : {}),
         });
     },
     onSuccess: async (data) => {
@@ -97,10 +113,13 @@ const { mutate: save, isPending: saving } = useMutation({
     },
     onError: (err) => {
         if (err instanceof ApiError) {
+            tierErrors.value = apiTierErrors(err.errors);
             errors.per = err.first("per_occurrence_amount") || undefined;
             errors.bonus =
                 err.first("target_bonus_amount") ||
-                (errors.per ? undefined : err.message);
+                (errors.per || Object.keys(tierErrors.value).length
+                    ? undefined
+                    : err.message);
         } else {
             errors.bonus = "Não foi possível salvar.";
         }
@@ -110,6 +129,10 @@ const { mutate: save, isPending: saving } = useMutation({
 function submit() {
     delete errors.per;
     delete errors.bonus;
+    tierErrors.value = editing.value?.supports_tiers
+        ? validateTiers(tiers.value, "appointments")
+        : {};
+    if (Object.keys(tierErrors.value).length) return;
     save();
 }
 </script>
@@ -118,8 +141,8 @@ function submit() {
     <SurfaceCard>
         <SectionTitle
             title="Remuneração por meta"
-            description="Valor por ocorrência e bônus ao bater a meta do mês."
-            hint="Para cada tipo de meta, defina quanto a pessoa ganha por ocorrência (ex.: R$ 80,00 por novo agendamento) e, se quiser, um bônus quando bater a meta do mês definida em Metas. Os ganhos entram nos lançamentos acima, na origem Metas. Mês civil de São Paulo. Lançamentos já pagos não mudam."
+            description="Valor por ocorrência, bônus ao bater a meta e faixas."
+            hint="Para cada tipo de meta, defina quanto a pessoa ganha por ocorrência (ex.: R$ 80,00 por novo agendamento) e, se quiser, um bônus quando bater a meta do mês definida em Metas. Em novo agendamento também dá para usar faixas pela quantidade no mês (vale a maior faixa atingida; paga junto com o valor por ocorrência). Os ganhos entram nos lançamentos acima, na origem Metas, e na DRE como custo. Mês civil de São Paulo. Lançamentos já pagos não mudam."
         />
         <div v-if="query.isPending.value" class="mt-4">
             <Skeleton class="h-12" />
@@ -192,6 +215,24 @@ function submit() {
             >
                 Comissão por venda continua nas regras de comissão.
             </p>
+            <section
+                v-if="editing.supports_tiers"
+                class="flex flex-col gap-3 border-t border-border-divider pt-4"
+                aria-label="Faixas por quantidade"
+            >
+                <SectionTitle
+                    as="h3"
+                    title="Faixas por quantidade"
+                    description="Opcional. Vale só a maior faixa atingida no mês."
+                    hint="Pelo número de novos agendamentos da pessoa no mês (mesma contagem de Metas), paga a maior faixa atingida: valor fixo, % das vendas confirmadas no mês dos pacientes desses agendamentos, ou os dois. Soma-se ao valor por agendamento, se houver."
+                />
+                <TierListEditor
+                    v-model="tiers"
+                    kind="appointments"
+                    id-prefix="gr-tier"
+                    :errors="tierErrors"
+                />
+            </section>
         </form>
         <template #footer-negative>
             <Button variant="ghost" type="button" @click="dialogOpen = false"

@@ -132,6 +132,12 @@ class CommissionService
      */
     public function rebuildMonth(int $clinicId, CarbonImmutable $month): int
     {
+        // Faturamento e faixas são refeitos uma vez no fim (syncMonth), não a cada venda.
+        return GoalRemunerationService::deferringSaleFanout(fn () => $this->rebuildMonthEntries($clinicId, $month));
+    }
+
+    private function rebuildMonthEntries(int $clinicId, CarbonImmutable $month): int
+    {
         $from = $month->startOfMonth();
         $to = $month->endOfMonth();
         $count = 0;

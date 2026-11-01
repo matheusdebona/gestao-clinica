@@ -26,7 +26,10 @@ use Illuminate\Support\Collection;
  * − comissões lançadas (vendedor e profissionais) da venda
  * = margem de contribuição da venda
  *
- * Total da clínica = soma das vendas − perdas de estoque valorizadas no período.
+ * Total da clínica = soma das vendas − perdas de estoque valorizadas no período − remuneração
+ * por metas e por faturamento (lançamentos sem venda, role goal/revenue) dos meses do período.
+ * Esses lançamentos seguem a mesma base das comissões de venda/sessão: competência (pendentes e
+ * pagos; cancelados fora), pelo mês de competência (mês civil de São Paulo).
  */
 class ContributionMarginService
 {
@@ -117,8 +120,10 @@ class ContributionMarginService
             ->map(fn ($v) => (float) $v);
         $lossTotal = (float) $losses->sum();
 
+        $goalCommissions = $this->goalCommissions($from, $to);
+
         $total = $this->format($totals);
-        $clinicMargin = $totals['contribution_margin'] - $lossTotal;
+        $clinicMargin = $totals['contribution_margin'] - $lossTotal - $goalCommissions;
 
         return [
             'from' => $fromStart->toDateString(),
@@ -132,6 +137,7 @@ class ContributionMarginService
                     StockMovement::LOSS_DAMAGED => $this->money($losses[StockMovement::LOSS_DAMAGED] ?? 0),
                     StockMovement::LOSS_OTHER => $this->money($losses[StockMovement::LOSS_OTHER] ?? 0),
                 ],
+                'goal_commissions' => $this->money($goalCommissions),
                 'clinic_contribution_margin' => $this->money($clinicMargin),
                 'clinic_contribution_margin_percent' => $totals['revenue'] > 0
                     ? number_format($clinicMargin / $totals['revenue'] * 100, 2, '.', '')
@@ -151,6 +157,20 @@ class ContributionMarginService
                     ->count(),
             ],
         ];
+    }
+
+    /**
+     * Remuneração por metas e faturamento com competência num mês que toca o período
+     * (do mês de $from até $to), pendente ou paga, como as comissões de venda.
+     */
+    public function goalCommissions(CarbonImmutable $from, CarbonImmutable $to): float
+    {
+        return (float) CommissionEntry::query()
+            ->whereIn('role', CommissionEntry::MONTHLY_ROLES)
+            ->where('status', '!=', CommissionEntry::STATUS_CANCELLED)
+            ->whereDate('competence_month', '>=', $from->startOfMonth()->toDateString())
+            ->whereDate('competence_month', '<=', $to->toDateString())
+            ->sum('amount');
     }
 
     /**
