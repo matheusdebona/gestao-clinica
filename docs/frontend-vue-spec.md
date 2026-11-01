@@ -287,7 +287,8 @@ Motion: duração curta; respeitar `prefers-reduced-motion` e `prefers-reduced-t
 | Componente | Propósito | Estados | Breakpoints |
 | --- | --- | --- | --- |
 | `AppShell` / `ClinicShell` | Canvas + mesh + nav **flutuante** em glass + `ThemeToggle` | loading skeleton | **&lt; md:** tab bar cápsula `glass-regular` + header sticky glass; **≥ md:** sidebar `glass-dark` flutuante (não edge-to-edge) |
-| `SidebarNavItem` | Item de navegação | default / hover / active | Active: brand tint, peso 500 |
+| `SidebarNavItem` | Item de navegação | default / hover / active / nested / compact | Active: brand tint, peso 500 |
+| `SidebarNavGroup` | Grupo colapsável da nav | closed / open / active child / compact flyout | `aria-expanded`; abre o grupo da rota ativa |
 | `NavBadge` | Contagem (ex. inbox) | — | Pill sólido danger (leitura) |
 | `Page` | Conteúdo principal | — | Padding 24; gap 20 entre blocos |
 | `PageHeader` | H1 título + ações; `sticky` opcional | — | Phone: título acima; ações empilham; sticky = `glass-clear` |

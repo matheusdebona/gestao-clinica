@@ -1,196 +1,89 @@
 <script setup lang="ts">
 import { useQuery } from '@tanstack/vue-query'
-import { computed, ref, watch, type Component } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import {
-  Bell,
-  CalendarDays,
-  ClipboardList,
-  CreditCard,
-  FileText,
-  LayoutDashboard,
-  Ellipsis,
-  LogOut,
-  Megaphone,
-  Package,
-  Receipt,
-  Settings,
-  Stethoscope,
-  UserCog,
-  Users,
-  RotateCcw,
-  ChartNoAxesCombined,
-  Wallet,
-} from '@lucide/vue'
+import { Bell, Ellipsis, LogOut } from '@lucide/vue'
 import AppSheet from '@/components/ui/AppSheet.vue'
 import BrandMark from '@/components/ui/BrandMark.vue'
 import Button from '@/components/ui/Button.vue'
 import IconButton from '@/components/ui/IconButton.vue'
-import ListCard from '@/components/ui/ListCard.vue'
 import NavBadge from '@/components/ui/NavBadge.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import ShellNavEntries from '@/components/patterns/ShellNavEntries.vue'
 import { getUnreadNotificationCount } from '@/features/notifications/api'
-import { PAYMENT_CATALOG_PERMISSIONS, paymentCatalogHome } from '@/features/payments/access'
+import { paymentCatalogHome } from '@/features/payments/access'
 import { APP_NAME } from '@/lib/brand'
+import {
+  SHELL_ALERT_PERMISSIONS,
+  buildVisibleNav,
+  groupContainingPath,
+  isAlertsItem,
+  isNavActive,
+  persistOpenGroups,
+  readStoredOpenGroups,
+  splitMobileNav,
+  toggleGroupOpen,
+  withActiveGroupOpen,
+  type ShellNavItemDef,
+} from '@/lib/shell-nav'
 import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 
-type ShellNavItem = {
-  to: string
-  label: string
-  icon: Component
-  permission?: string
-  anyPermission?: string[]
-  /** daily = rotina da recepção/atendimento; internal = gestão/equipe (fica embaixo). */
-  group: 'daily' | 'internal'
-  aliases?: string[]
-}
-
-/** Alertas: estoque (products.view) e resumo de leads parados (leads.manage). */
-const ALERT_PERMISSIONS = ['products.view', 'leads.manage'] as const
-
-const SETTINGS_PERMISSIONS = [
-  'lead_statuses.manage',
-  'client_origins.manage',
-  'campaigns.manage',
-  'clinics.branding',
-  'finance.view',
-]
-
-/** Max items in the mobile tab bar, including "Mais". */
-const MOBILE_SLOTS = 5
-
-const items = computed(() => {
-  const paymentsHome = paymentCatalogHome((name) => auth.can(name))
-  const all: ShellNavItem[] = [
-    { to: '/', label: 'Início', icon: LayoutDashboard, group: 'daily' },
-    { to: '/leads', label: 'Leads', icon: Megaphone, permission: 'leads.view', group: 'daily' },
-    {
-      to: '/appointments',
-      label: 'Agenda',
-      icon: CalendarDays,
-      permission: 'appointments.view',
-      group: 'daily',
-    },
-    { to: '/clients', label: 'Pacientes', icon: Users, permission: 'clients.view', group: 'daily' },
-    { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', group: 'daily' },
-    {
-      to: '/budgets',
-      label: 'Orçamentos',
-      icon: FileText,
-      permission: 'budgets.view',
-      group: 'daily',
-    },
-    {
-      to: '/retornos',
-      label: 'Retornos',
-      icon: RotateCcw,
-      permission: 'sales.view',
-      group: 'daily',
-    },
-    {
-      to: '/treatments',
-      label: 'Tratamentos',
-      icon: Stethoscope,
-      permission: 'treatments.view',
-      group: 'daily',
-    },
-    {
-      to: '/protocols',
-      label: 'Protocolos',
-      icon: ClipboardList,
-      permission: 'protocols.view',
-      group: 'daily',
-    },
-    {
-      to: '/products',
-      label: 'Produtos',
-      icon: Package,
-      permission: 'products.view',
-      group: 'internal',
-    },
-    {
-      to: '/notifications',
-      label: 'Alertas',
-      icon: Bell,
-      anyPermission: [...ALERT_PERMISSIONS],
-      group: 'internal',
-    },
-    {
-      to: '/metrics',
-      label: 'Métricas',
-      icon: ChartNoAxesCombined,
-      permission: 'metrics.view',
-      group: 'internal',
-    },
-    {
-      to: '/financeiro',
-      label: 'Financeiro',
-      icon: Wallet,
-      permission: 'finance.view',
-      group: 'internal',
-    },
-    { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view', group: 'internal' },
-    {
-      to: `/${paymentsHome}`,
-      label: 'Pagamentos',
-      icon: CreditCard,
-      anyPermission: [...PAYMENT_CATALOG_PERMISSIONS],
-      group: 'internal',
-      aliases: ['/payment-methods', '/card-brands', '/card-operators'],
-    },
-    {
-      to: '/settings',
-      label: 'Configurações',
-      icon: Settings,
-      anyPermission: SETTINGS_PERMISSIONS,
-      group: 'internal',
-      aliases: ['/client-origins', '/campaigns'],
-    },
-  ]
-
-  return all.filter((item) => {
-    if (auth.permissions.length === 0) {
-      return true
-    }
-    if (item.anyPermission?.length) {
-      return item.anyPermission.some((name) => auth.can(name))
-    }
-    return !item.permission || auth.can(item.permission)
-  })
-})
-
-const dailyItems = computed(() => items.value.filter((item) => item.group === 'daily'))
-const internalItems = computed(() => items.value.filter((item) => item.group === 'internal'))
-
-const needsMore = computed(() => items.value.length > MOBILE_SLOTS)
-const mobileItems = computed(() =>
-  needsMore.value ? items.value.slice(0, MOBILE_SLOTS - 1) : items.value,
+const items = computed(() =>
+  buildVisibleNav(auth.permissions, paymentCatalogHome((name) => auth.can(name))),
 )
-const moreItems = computed(() => (needsMore.value ? items.value.slice(MOBILE_SLOTS - 1) : []))
+
+const mobileNav = computed(() => splitMobileNav(items.value))
 const moreOpen = ref(false)
 const moreActive = computed(() =>
-  moreItems.value.some((item) => isNavActive(item.to, item.aliases ?? [])),
+  mobileNav.value.more.some((entry) => {
+    if (entry.kind === 'item') {
+      return isNavActive(route.path, entry.to, entry.aliases)
+    }
+    return entry.items.some((item) => isNavActive(route.path, item.to, item.aliases))
+  }),
 )
+
+const openGroups = ref<Record<string, boolean>>(readStoredOpenGroups())
 
 watch(
-  () => route.fullPath,
-  () => {
+  () => route.path,
+  (path) => {
     moreOpen.value = false
+    const groupId = groupContainingPath(items.value, path)
+    const next = withActiveGroupOpen(openGroups.value, groupId)
+    if (next !== openGroups.value) {
+      openGroups.value = next
+      persistOpenGroups(next)
+    }
   },
+  { immediate: true },
 )
 
-function openFromMore(item: ShellNavItem) {
+watch(items, (nav) => {
+  const groupId = groupContainingPath(nav, route.path)
+  const next = withActiveGroupOpen(openGroups.value, groupId)
+  if (next !== openGroups.value) {
+    openGroups.value = next
+    persistOpenGroups(next)
+  }
+})
+
+function onToggleGroup(groupId: string) {
+  openGroups.value = toggleGroupOpen(openGroups.value, groupId)
+  persistOpenGroups(openGroups.value)
+}
+
+function onNavigate(_item: ShellNavItemDef) {
   moreOpen.value = false
-  void router.push(item.to)
 }
 
 const canAlerts = computed(
-  () => ALERT_PERMISSIONS.some((name) => auth.can(name)) || auth.permissions.length === 0,
+  () => SHELL_ALERT_PERMISSIONS.some((name) => auth.can(name)) || auth.permissions.length === 0,
 )
 
 const { data: unreadCount } = useQuery({
@@ -200,16 +93,6 @@ const { data: unreadCount } = useQuery({
 })
 
 const alertCount = computed(() => unreadCount.value ?? 0)
-
-function isNavActive(to: string, aliases: string[] = []) {
-  const paths = [to, ...aliases]
-  return paths.some((path) => {
-    if (path === '/') {
-      return route.path === '/'
-    }
-    return route.path === path || route.path.startsWith(`${path}/`)
-  })
-}
 
 function openAlerts() {
   void router.push({ name: 'notifications' })
@@ -244,26 +127,14 @@ async function onLogout() {
           {{ auth.clinicName || APP_NAME }}
         </p>
       </div>
-      <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto">
-        <RouterLink v-for="item in dailyItems" :key="item.to" :to="item.to">
-          <SidebarNavItem
-            :label="item.label"
-            :icon="item.icon"
-            :active="isNavActive(item.to, item.aliases ?? [])"
-          />
-        </RouterLink>
-        <p v-if="internalItems.length" class="px-3 pt-4 pb-1 text-[13px] text-inverse/50">Gestão</p>
-        <RouterLink v-for="item in internalItems" :key="item.to" :to="item.to">
-          <SidebarNavItem
-            :label="item.label"
-            :icon="item.icon"
-            :active="isNavActive(item.to, item.aliases ?? [])"
-          >
-            <template v-if="item.to === '/notifications'" #badge>
-              <NavBadge :count="alertCount" />
-            </template>
-          </SidebarNavItem>
-        </RouterLink>
+      <nav class="flex flex-1 flex-col overflow-y-auto" aria-label="Principal">
+        <ShellNavEntries
+          :entries="items"
+          :open-groups="openGroups"
+          :current-path="route.path"
+          :alert-count="alertCount"
+          @toggle="onToggleGroup"
+        />
       </nav>
       <div class="mt-4 flex items-center gap-1">
         <button type="button" class="min-w-0 flex-1 text-left" @click="onLogout">
@@ -299,29 +170,28 @@ async function onLogout() {
 
       <nav
         class="glass-regular fixed inset-x-3 bottom-3 z-30 flex justify-around rounded-full px-2 py-2 md:hidden"
+        aria-label="Principal"
       >
         <RouterLink
-          v-for="item in mobileItems"
-          :key="item.to"
+          v-for="item in mobileNav.pins"
+          :key="item.id"
           :to="item.to"
           class="relative flex flex-col items-center gap-1 rounded-full px-2 py-1 text-[11px]"
-          :class="isNavActive(item.to, item.aliases ?? []) ? 'text-brand' : 'text-muted'"
+          :class="isNavActive(route.path, item.to, item.aliases) ? 'text-brand' : 'text-muted'"
         >
           <component :is="item.icon" class="size-5" :stroke-width="1.75" />
-          <span
-            v-if="item.to === '/notifications'"
-            class="pointer-events-none absolute right-1 top-0"
-          >
+          <span v-if="isAlertsItem(item)" class="pointer-events-none absolute right-1 top-0">
             <NavBadge :count="alertCount" />
           </span>
           {{ item.label }}
         </RouterLink>
         <button
-          v-if="needsMore"
+          v-if="mobileNav.needsMore"
           type="button"
           class="relative flex flex-col items-center gap-1 rounded-full px-2 py-1 text-[11px]"
           :class="moreActive || moreOpen ? 'text-brand' : 'text-muted'"
           :aria-expanded="moreOpen"
+          aria-haspopup="dialog"
           @click="moreOpen = true"
         >
           <Ellipsis class="size-5" :stroke-width="1.75" />
@@ -330,16 +200,17 @@ async function onLogout() {
       </nav>
 
       <AppSheet v-model:open="moreOpen" title="Mais">
-        <div class="divide-y divide-border-divider">
-          <ListCard
-            v-for="item in moreItems"
-            :key="item.to"
-            :title="item.label"
-            :badge="item.to === '/notifications' && alertCount ? String(alertCount) : ''"
-            badge-variant="danger"
-            @action="openFromMore(item)"
+        <nav aria-label="Mais">
+          <ShellNavEntries
+            :entries="mobileNav.more"
+            :open-groups="openGroups"
+            :current-path="route.path"
+            :alert-count="alertCount"
+            tone="default"
+            @toggle="onToggleGroup"
+            @navigate="onNavigate"
           />
-        </div>
+        </nav>
       </AppSheet>
     </div>
   </div>

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Bell, CalendarDays, Handshake, HeartPulse, LayoutDashboard, Users } from '@lucide/vue'
 import { ref } from 'vue'
 import AgendaEventCard from '@/components/patterns/AgendaEventCard.vue'
 import ClientSearchBar from '@/components/patterns/ClientSearchBar.vue'
@@ -40,6 +41,7 @@ import SearchField from '@/components/ui/SearchField.vue'
 import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import Spinner from '@/components/ui/Spinner.vue'
+import SidebarNavGroup from '@/components/ui/SidebarNavGroup.vue'
 import SidebarNavItem from '@/components/ui/SidebarNavItem.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import Switch from '@/components/ui/Switch.vue'
@@ -94,6 +96,9 @@ const sheetOpen = ref(false)
 const confirmOpen = ref(false)
 const confirmPrimaryOpen = ref(false)
 const page = ref(2)
+const navGroupOpen = ref(false)
+const navGroupExpanded = ref(true)
+const navCompactOpen = ref(true)
 
 const selectOptions = [
   { value: 'protocolo-a', label: 'Protocolo A' },
@@ -707,14 +712,52 @@ function simulateLoading() {
         <p class="section-label">Navegação</p>
         <GlassSurface material="dark" padding>
           <div class="flex flex-col gap-0.5">
-            <SidebarNavItem label="Início" active />
-            <SidebarNavItem label="Alertas">
+            <SidebarNavItem label="Início" :icon="LayoutDashboard" active />
+            <SidebarNavItem label="Alertas" :icon="Bell">
               <template #badge>
                 <NavBadge :count="3" />
               </template>
             </SidebarNavItem>
-            <SidebarNavItem label="Pacientes" />
+            <SidebarNavItem label="Pacientes" :icon="Users" />
             <SidebarNavItem label="Sair" disabled />
+            <SidebarNavGroup
+              label="Atendimento"
+              :icon="HeartPulse"
+              :open="navGroupOpen"
+              @toggle="navGroupOpen = !navGroupOpen"
+            >
+              <SidebarNavItem label="Agenda" :icon="CalendarDays" nested />
+              <SidebarNavItem label="Pacientes" :icon="Users" nested />
+            </SidebarNavGroup>
+            <SidebarNavGroup
+              label="Comercial"
+              :icon="Handshake"
+              :open="navGroupExpanded"
+              active
+              @toggle="navGroupExpanded = !navGroupExpanded"
+            >
+              <SidebarNavItem label="Leads" nested />
+              <SidebarNavItem label="Vendas" nested active />
+            </SidebarNavGroup>
+          </div>
+        </GlassSurface>
+        <GlassSurface material="dark" padding class="overflow-visible">
+          <p class="mb-3 text-[13px] text-inverse/50">Ícone só (sidebar recolhida)</p>
+          <div class="flex w-12 flex-col gap-0.5">
+            <SidebarNavItem label="Início" :icon="LayoutDashboard" compact active />
+            <SidebarNavGroup
+              label="Atendimento"
+              :icon="HeartPulse"
+              compact
+              :open="navCompactOpen"
+              active
+              @toggle="navCompactOpen = !navCompactOpen"
+            >
+              <template #default="{ childTone }">
+                <SidebarNavItem label="Agenda" :icon="CalendarDays" :tone="childTone" />
+                <SidebarNavItem label="Pacientes" :icon="Users" :tone="childTone" active />
+              </template>
+            </SidebarNavGroup>
           </div>
         </GlassSurface>
       </section>
