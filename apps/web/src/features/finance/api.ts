@@ -3,6 +3,11 @@ import type { DataEnvelope, Paginated } from '@/types/pagination'
 import type {
   CardFeeRule,
   CardFeeRulePayload,
+  CommissionEntriesResponse,
+  CommissionRulePayload,
+  CommissionRuleRow,
+  CommissionRulesResponse,
+  ContributionMargin,
   TaxSetting,
   TaxSettingPayload,
 } from '@/types/finance'
@@ -94,4 +99,53 @@ export function percentToInput(value: string | null | undefined): string {
   if (value === null || value === undefined || value === '') return ''
   const n = Number(value)
   return Number.isFinite(n) ? String(n).replace('.', ',') : ''
+}
+
+export async function getContributionMargin(params: {
+  from: string
+  to: string
+}): Promise<ContributionMargin> {
+  const payload = await api<DataEnvelope<ContributionMargin>>('/metrics/contribution-margin', {
+    query: params,
+  })
+  return payload.data
+}
+
+export function listCommissionRules(): Promise<CommissionRulesResponse> {
+  return api<CommissionRulesResponse>('/finance/commission-rules')
+}
+
+export async function saveCommissionRule(
+  body: CommissionRulePayload,
+  id?: number,
+): Promise<CommissionRuleRow> {
+  const payload = await api<DataEnvelope<CommissionRuleRow>>(
+    id ? `/finance/commission-rules/${id}` : '/finance/commission-rules',
+    { method: id ? 'PUT' : 'POST', body },
+  )
+  return payload.data
+}
+
+export async function setCommissionRuleActive(id: number, active: boolean): Promise<void> {
+  await api(`/finance/commission-rules/${id}`, { method: 'PUT', body: { is_active: active } })
+}
+
+export function listCommissions(month: string): Promise<CommissionEntriesResponse> {
+  return api<CommissionEntriesResponse>('/finance/commissions', { query: { month } })
+}
+
+export async function rebuildCommissions(month: string): Promise<number> {
+  const payload = await api<DataEnvelope<{ processed: number }>>('/finance/commissions/rebuild', {
+    method: 'POST',
+    body: { month },
+  })
+  return payload.data.processed
+}
+
+export async function markCommissionsPaid(ids: number[], paid: boolean): Promise<number> {
+  const payload = await api<DataEnvelope<{ updated: number }>>('/finance/commissions/mark-paid', {
+    method: 'POST',
+    body: { ids, paid },
+  })
+  return payload.data.updated
 }

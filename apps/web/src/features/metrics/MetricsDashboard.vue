@@ -8,6 +8,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import AcquisitionSection from '@/features/metrics/AcquisitionSection.vue'
 import CommercialSection from '@/features/metrics/CommercialSection.vue'
+import ContributionMarginSection from '@/features/finance/ContributionMarginSection.vue'
 import InventoryOpsSection from '@/features/metrics/InventoryOpsSection.vue'
 import LeadsSection from '@/features/metrics/LeadsSection.vue'
 import MarginSection from '@/features/metrics/MarginSection.vue'
@@ -53,8 +54,7 @@ const {
   isError: acquisitionError,
 } = useQuery({
   queryKey: ['metrics', 'acquisition', from, to, groupBy],
-  queryFn: () =>
-    getAcquisitionMetrics({ from: from.value, to: to.value, group_by: groupBy.value }),
+  queryFn: () => getAcquisitionMetrics({ from: from.value, to: to.value, group_by: groupBy.value }),
   enabled: canLoad,
 })
 
@@ -89,6 +89,7 @@ const {
 })
 
 const canSeeLeads = computed(() => auth.can('leads.view'))
+const canSeeFinance = computed(() => auth.can('finance.view'))
 const canLoadLeads = computed(() => canLoad.value && canSeeLeads.value)
 
 const {
@@ -158,12 +159,7 @@ const heroPending = computed(
           :error="acquisitionError"
         />
 
-        <SalesFunnelSection
-          v-if="canSeeLeads"
-          :from="from"
-          :to="to"
-          :enabled="canLoadLeads"
-        />
+        <SalesFunnelSection v-if="canSeeLeads" :from="from" :to="to" :enabled="canLoadLeads" />
 
         <LeadsSection
           v-if="canSeeLeads"
@@ -177,6 +173,13 @@ const heroPending = computed(
           :data="margin"
           :pending="marginPending"
           :error="marginError"
+        />
+
+        <ContributionMarginSection
+          v-if="canSeeFinance"
+          :from="from"
+          :to="to"
+          :enabled="canLoad && canSeeFinance"
         />
 
         <InventoryOpsSection

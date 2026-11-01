@@ -218,6 +218,7 @@ class SalePricingService
         ]);
         // Taxas vigentes no momento da confirmação (regras podem ter mudado desde o rascunho).
         app(PaymentFeeService::class)->applyToSale($sale);
+        app(CommissionService::class)->syncSale($sale->fresh());
         app(PatientReturnService::class)->onSaleConfirmed($sale);
 
         return $sale->fresh(['items.product', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser']);
@@ -232,6 +233,7 @@ class SalePricingService
         }
 
         $sale->update(['status' => Sale::STATUS_CANCELLED]);
+        app(CommissionService::class)->syncSale($sale->fresh());
         app(PatientReturnService::class)->onSaleCancelled($sale);
 
         return $sale->fresh(['items.product', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser']);

@@ -107,6 +107,12 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/TaxSettingsPage.vue'),
         },
         {
+          path: 'settings/comissoes',
+          name: 'settings-commissions',
+          meta: { title: 'Comissões', permission: 'finance.view' },
+          component: () => import('@/pages/CommissionsSettingsPage.vue'),
+        },
+        {
           path: 'settings/lead-statuses',
           name: 'lead-statuses',
           meta: { title: 'Status de leads', permission: 'lead_statuses.manage' },

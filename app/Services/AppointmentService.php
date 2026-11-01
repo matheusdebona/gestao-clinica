@@ -348,6 +348,8 @@ class AppointmentService
                 $this->treatments->recalculateTotalCost($locked->treatment);
             }
 
+            app(CommissionService::class)->syncAppointment($locked->fresh());
+
             return $locked->fresh(['consumptions.product', 'consumptions.salePayment', 'treatment', 'client', 'professionalUser']);
         });
     }
