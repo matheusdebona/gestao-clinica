@@ -1,7 +1,7 @@
 import { api } from '@/lib/api'
 import type { DataEnvelope } from '@/types/pagination'
 
-export type WhatsAppTemplateKey = 'appointment_confirmation' | 'lead_follow_up'
+export type WhatsAppTemplateKey = 'appointment_confirmation' | 'lead_follow_up' | 'patient_return'
 
 export interface ClinicSettings {
   clinic_name: string

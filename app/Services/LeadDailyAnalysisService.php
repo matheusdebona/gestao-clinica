@@ -81,6 +81,10 @@ class LeadDailyAnalysisService
             'follow_up' => [
                 'count' => $queue['count'],
                 'leads' => $queue['leads'],
+                // Patient returns due soon/overdue (only for users who see sales).
+                'returns' => $viewer->can('sales.view')
+                    ? app(PatientReturnService::class)->dueSummary(self::QUEUE_LIMIT, $filters['user_ids'] ?? [])
+                    : null,
             ],
             'suggestions' => [],
         ];

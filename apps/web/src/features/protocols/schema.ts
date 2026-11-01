@@ -21,6 +21,8 @@ export type ProtocolFormValues = {
   suggested_price: string
   min_price: string
   special_price: string
+  /** Retorno sugerido em X dias (vazio = sem retorno). */
+  return_after_days: string
   is_active: boolean
 }
 
@@ -31,6 +33,14 @@ export const protocolFormSchema = toTypedSchema(
     suggested_price: z.string(),
     min_price: z.string(),
     special_price: z.string(),
+    return_after_days: z
+      .string()
+      .refine(
+        (value) =>
+          value.trim() === '' ||
+          (/^\d+$/.test(value.trim()) && Number(value) >= 1 && Number(value) <= 730),
+        'Informe de 1 a 730 dias, ou deixe vazio.',
+      ),
     is_active: z.boolean(),
   }),
 )
@@ -41,6 +51,7 @@ export const emptyProtocolForm = (): ProtocolFormValues => ({
   suggested_price: '',
   min_price: '',
   special_price: '',
+  return_after_days: '',
   is_active: true,
 })
 
@@ -51,6 +62,7 @@ export function protocolToFormValues(protocol: Protocol): ProtocolFormValues {
     suggested_price: protocol.suggested_price ?? '',
     min_price: protocol.min_price ?? '',
     special_price: protocol.special_price ?? '',
+    return_after_days: protocol.return_after_days ? String(protocol.return_after_days) : '',
     is_active: protocol.is_active,
   }
 }
@@ -124,6 +136,9 @@ export function toProtocolSavePayload(
     description: emptyToNull(values.description),
     is_active: values.is_active,
     special_price: emptyToMoney(values.special_price),
+    return_after_days: values.return_after_days.trim()
+      ? Number(values.return_after_days.trim())
+      : null,
   }
 
   if (flags.suggestedDirty) {

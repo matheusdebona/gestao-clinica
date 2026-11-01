@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
 use App\Http\Controllers\Api\V1\LeadStatusController;
 use App\Http\Controllers\Api\V1\MetricsController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\PatientReturnController;
 use App\Http\Controllers\Api\V1\Payments\CardBrandController;
 use App\Http\Controllers\Api\V1\Payments\CardFeeRuleController;
 use App\Http\Controllers\Api\V1\Payments\CardOperatorController;
@@ -208,6 +209,14 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:leads.manage');
         Route::post('leads/{lead}/convert', [LeadController::class, 'convert'])
             ->middleware('permission:leads.manage');
+
+        // Retornos come from sales: estoque/profissional (no sales.view) do not see them.
+        Route::get('patient-returns', [PatientReturnController::class, 'index'])
+            ->middleware(['permission:clients.view', 'permission:sales.view']);
+        Route::post('patient-returns/{patientReturn}/done', [PatientReturnController::class, 'done'])
+            ->middleware(['permission:clients.update', 'permission:sales.view']);
+        Route::post('patient-returns/{patientReturn}/whatsapp', [PatientReturnController::class, 'whatsapp'])
+            ->middleware(['permission:clients.update', 'permission:sales.view']);
 
         Route::get('clients', [ClientController::class, 'index'])
             ->middleware('permission:clients.view');

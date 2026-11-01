@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
+use Database\Factories\ProtocolFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Protocol extends Model
 {
-    /** @use HasFactory<\Database\Factories\ProtocolFactory> */
+    /** @use HasFactory<ProtocolFactory> */
     use BelongsToClinic, HasFactory;
 
     protected $fillable = [
@@ -24,6 +25,7 @@ class Protocol extends Model
         'min_price_is_manual',
         'special_price',
         'is_active',
+        'return_after_days',
     ];
 
     protected function casts(): array

@@ -203,6 +203,7 @@ class SalePricingService
             'status' => Sale::STATUS_CONFIRMED,
             'sold_at' => $sale->sold_at ?? now(),
         ]);
+        app(PatientReturnService::class)->onSaleConfirmed($sale);
 
         return $sale->fresh(['items.product', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser']);
     }
@@ -216,6 +217,7 @@ class SalePricingService
         }
 
         $sale->update(['status' => Sale::STATUS_CANCELLED]);
+        app(PatientReturnService::class)->onSaleCancelled($sale);
 
         return $sale->fresh(['items.product', 'items.sourceProtocol', 'payments.paymentMethod', 'client', 'soldByUser']);
     }

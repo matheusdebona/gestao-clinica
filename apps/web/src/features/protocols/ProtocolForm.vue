@@ -81,6 +81,7 @@ const [description, descriptionAttrs] = defineField('description')
 const [suggestedPrice] = defineField('suggested_price')
 const [minPrice] = defineField('min_price')
 const [specialPrice, specialAttrs] = defineField('special_price')
+const [returnDays, returnDaysAttrs] = defineField('return_after_days')
 const [isActive] = defineField('is_active')
 
 const totals = computed(() => computedTotals(items.value))
@@ -122,6 +123,7 @@ function applyDraft(draft: ProtocolDraft) {
       suggested_price: draft.suggested_price,
       min_price: draft.min_price,
       special_price: draft.special_price,
+      return_after_days: draft.return_after_days ?? '',
       is_active: draft.is_active,
     },
   })
@@ -232,6 +234,7 @@ function snapshotDraft(): ProtocolDraft {
     suggested_price: values.suggested_price ?? '',
     min_price: values.min_price ?? '',
     special_price: values.special_price ?? '',
+    return_after_days: values.return_after_days ?? '',
     is_active: Boolean(values.is_active),
     suggestedDirty: suggestedDirty.value,
     minDirty: minDirty.value,
@@ -461,6 +464,24 @@ defineExpose({
           id="protocol-special"
           v-model="specialPrice"
           v-bind="specialAttrs"
+          :invalid="invalid"
+        />
+      </template>
+    </FormField>
+
+    <FormField
+      label="Retorno sugerido (dias)"
+      hint="Opcional. Ex.: 120 para toxina. Ao confirmar a venda (ou concluir o tratamento) o paciente entra em Retornos."
+      :error="errors.return_after_days"
+      html-for="protocol-return-days"
+    >
+      <template #default="{ invalid }">
+        <Input
+          id="protocol-return-days"
+          v-model="returnDays"
+          v-bind="returnDaysAttrs"
+          inputmode="numeric"
+          placeholder="Sem retorno"
           :invalid="invalid"
         />
       </template>

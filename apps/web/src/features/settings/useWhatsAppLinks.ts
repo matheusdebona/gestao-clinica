@@ -1,11 +1,6 @@
 import { computed } from 'vue'
 import { useClinicSettings } from '@/features/settings/useClinicSettings'
-import {
-  firstName,
-  renderWhatsAppTemplate,
-  whatsappDateParts,
-  whatsappUrl,
-} from '@/lib/whatsapp'
+import { firstName, renderWhatsAppTemplate, whatsappDateParts, whatsappUrl } from '@/lib/whatsapp'
 import { useAuthStore } from '@/stores/auth'
 
 /** Builds wa.me links from the clinic templates (falls back to the defaults while loading). */
@@ -18,7 +13,7 @@ export function useWhatsAppLinks() {
     usuario: firstName(auth.user?.name),
   }))
 
-  function template(key: 'appointment_confirmation' | 'lead_follow_up'): string {
+  function template(key: keyof typeof FALLBACKS): string {
     return settings.value?.whatsapp_templates[key] ?? FALLBACKS[key]
   }
 
@@ -47,7 +42,25 @@ export function useWhatsAppLinks() {
     return whatsappUrl(appointment.client.whatsapp, text)
   }
 
-  return { leadUrl, appointmentUrl }
+  function returnUrl(item: {
+    label: string
+    due_on: string
+    client?: { name: string; whatsapp: string } | null
+  }): string | null {
+    if (!item.client) {
+      return null
+    }
+    const [y, m, d] = item.due_on.split('-')
+    const text = renderWhatsAppTemplate(template('patient_return'), {
+      ...base.value,
+      paciente: firstName(item.client.name),
+      procedimento: item.label,
+      data: y && m && d ? `${d}/${m}` : item.due_on,
+    })
+    return whatsappUrl(item.client.whatsapp, text)
+  }
+
+  return { leadUrl, appointmentUrl, returnUrl }
 }
 
 const FALLBACKS = {
@@ -55,4 +68,6 @@ const FALLBACKS = {
     'Olá, {paciente}! Aqui é da {clinica}. Passando para confirmar seu horário no dia {data} às {hora} com {profissional}. Podemos confirmar?',
   lead_follow_up:
     'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Vi seu interesse e queria saber se posso te ajudar a agendar uma avaliação.',
+  patient_return:
+    'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Já está chegando a hora do seu retorno de {procedimento} (previsto para {data}). Vamos agendar?',
 } as const

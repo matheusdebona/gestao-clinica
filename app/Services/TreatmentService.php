@@ -122,6 +122,7 @@ class TreatmentService
 
         $treatment->status = Treatment::STATUS_COMPLETED;
         $treatment->save();
+        app(PatientReturnService::class)->onTreatmentCompleted($treatment);
 
         return $treatment->fresh(['appointments.consumptions', 'client', 'sale']);
     }

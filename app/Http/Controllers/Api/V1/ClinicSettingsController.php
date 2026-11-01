@@ -19,11 +19,11 @@ class ClinicSettingsController extends Controller
 
     public function update(Request $request): JsonResponse
     {
-        $data = $request->validate([
-            'whatsapp_templates' => ['sometimes', 'array'],
-            'whatsapp_templates.'.ClinicSettings::TEMPLATE_APPOINTMENT_CONFIRMATION => ['sometimes', 'nullable', 'string', 'max:1000'],
-            'whatsapp_templates.'.ClinicSettings::TEMPLATE_LEAD_FOLLOW_UP => ['sometimes', 'nullable', 'string', 'max:1000'],
-        ], [
+        $rules = ['whatsapp_templates' => ['sometimes', 'array']];
+        foreach (array_keys(ClinicSettings::DEFAULT_WHATSAPP_TEMPLATES) as $key) {
+            $rules['whatsapp_templates.'.$key] = ['sometimes', 'nullable', 'string', 'max:1000'];
+        }
+        $data = $request->validate($rules, [
             'whatsapp_templates.*.max' => 'Mensagem muito longa (máximo de 1000 caracteres).',
         ]);
 

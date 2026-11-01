@@ -18,6 +18,7 @@ import {
   Stethoscope,
   UserCog,
   Users,
+  RotateCcw,
   ChartNoAxesCombined,
 } from '@lucide/vue'
 import AppSheet from '@/components/ui/AppSheet.vue'
@@ -65,6 +66,7 @@ const items = computed(() => {
     { to: '/clients', label: 'Pacientes', icon: Users, permission: 'clients.view', group: 'daily' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', group: 'daily' },
     { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view', group: 'daily' },
+    { to: '/retornos', label: 'Retornos', icon: RotateCcw, permission: 'sales.view', group: 'daily' },
     { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view', group: 'daily' },
     { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view', group: 'daily' },
     { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', group: 'internal' },

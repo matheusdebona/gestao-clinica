@@ -13,6 +13,7 @@ use App\Models\SalePayment;
 use App\Models\Treatment;
 use App\Models\User;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
@@ -84,6 +85,8 @@ class AppointmentService
                 'duration_minutes' => $duration,
                 'notes' => $data['notes'] ?? null,
             ]);
+
+            app(PatientReturnService::class)->onAppointmentCreated($appointment);
 
             $warnings = [];
             if ($treatment !== null) {
@@ -408,7 +411,7 @@ class AppointmentService
 
         $startsAt = $scheduledAt instanceof CarbonInterface
             ? $scheduledAt->copy()
-            : \Illuminate\Support\Carbon::parse($scheduledAt);
+            : Carbon::parse($scheduledAt);
         $endsAt = $startsAt->copy()->addMinutes($durationMinutes);
 
         $candidates = Appointment::query()

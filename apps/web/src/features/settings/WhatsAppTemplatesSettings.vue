@@ -35,11 +35,17 @@ const sections: { key: WhatsAppTemplateKey; title: string; description: string }
     title: 'Contato com lead',
     description: 'Usada no botão “Chamar no WhatsApp” dos leads.',
   },
+  {
+    key: 'patient_return',
+    title: 'Retorno do paciente',
+    description: 'Usada no botão “Chamar no WhatsApp” da lista de Retornos.',
+  },
 ]
 
 const drafts = ref<Record<WhatsAppTemplateKey, string>>({
   appointment_confirmation: '',
   lead_follow_up: '',
+  patient_return: '',
 })
 const errors = ref<Partial<Record<WhatsAppTemplateKey, string>>>({})
 
@@ -59,6 +65,7 @@ const sample = computed(() => ({
   data: '05/11',
   hora: '14:30',
   profissional: 'Dra. Paula',
+  procedimento: 'Toxina botulínica',
   usuario: auth.user?.name?.split(' ')[0] ?? 'Rita',
 }))
 
@@ -79,10 +86,9 @@ const { mutate: save, isPending: saving } = useMutation({
   },
   onError: (error) => {
     if (error instanceof ApiError && error.status === 422) {
-      errors.value = {
-        appointment_confirmation: error.first('whatsapp_templates.appointment_confirmation'),
-        lead_follow_up: error.first('whatsapp_templates.lead_follow_up'),
-      }
+      errors.value = Object.fromEntries(
+        sections.map((section) => [section.key, error.first(`whatsapp_templates.${section.key}`)]),
+      )
       return
     }
     toast.error(error instanceof ApiError ? error.message : 'Não foi possível salvar.')

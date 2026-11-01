@@ -14,16 +14,20 @@ class ClinicSettings
 
     public const TEMPLATE_LEAD_FOLLOW_UP = 'lead_follow_up';
 
+    public const TEMPLATE_PATIENT_RETURN = 'patient_return';
+
     /** @var array<string, string> */
     public const DEFAULT_WHATSAPP_TEMPLATES = [
         self::TEMPLATE_APPOINTMENT_CONFIRMATION => 'Olá, {paciente}! Aqui é da {clinica}. Passando para confirmar seu horário no dia {data} às {hora} com {profissional}. Podemos confirmar?',
         self::TEMPLATE_LEAD_FOLLOW_UP => 'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Vi seu interesse e queria saber se posso te ajudar a agendar uma avaliação.',
+        self::TEMPLATE_PATIENT_RETURN => 'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Já está chegando a hora do seu retorno de {procedimento} (previsto para {data}). Vamos agendar?',
     ];
 
     /** @var array<string, list<string>> */
     public const WHATSAPP_PLACEHOLDERS = [
         self::TEMPLATE_APPOINTMENT_CONFIRMATION => ['{paciente}', '{clinica}', '{data}', '{hora}', '{profissional}', '{usuario}'],
         self::TEMPLATE_LEAD_FOLLOW_UP => ['{paciente}', '{clinica}', '{usuario}'],
+        self::TEMPLATE_PATIENT_RETURN => ['{paciente}', '{clinica}', '{usuario}', '{procedimento}', '{data}'],
     ];
 
     /**

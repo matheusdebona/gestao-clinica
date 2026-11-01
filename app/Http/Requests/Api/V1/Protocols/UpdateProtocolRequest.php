@@ -19,6 +19,7 @@ class UpdateProtocolRequest extends FormRequest
             'suggested_price' => ['sometimes', 'numeric', 'min:0'],
             'min_price' => ['sometimes', 'numeric', 'min:0'],
             'special_price' => ['nullable', 'numeric', 'min:0'],
+            'return_after_days' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:730'],
             'is_active' => ['sometimes', 'boolean'],
             'recalculate_from_products' => ['sometimes', 'boolean'],
             'reset_suggested_price' => ['sometimes', 'boolean'],

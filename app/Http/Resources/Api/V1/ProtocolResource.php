@@ -2,10 +2,11 @@
 
 namespace App\Http\Resources\Api\V1;
 
+use App\Models\Protocol;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-/** @mixin \App\Models\Protocol */
+/** @mixin Protocol */
 class ProtocolResource extends JsonResource
 {
     public function toArray(Request $request): array
@@ -22,6 +23,7 @@ class ProtocolResource extends JsonResource
             'min_price' => $this->min_price,
             'min_price_is_manual' => $this->min_price_is_manual,
             'special_price' => $this->special_price,
+            'return_after_days' => $this->return_after_days,
             'margin_at_suggested' => $this->marginAtSuggested(),
             'margin_at_min' => $this->marginAtMin(),
             'margin_at_special' => $this->marginAtSpecial(),

@@ -22,6 +22,7 @@ class StoreProtocolRequest extends FormRequest
             'suggested_price' => ['nullable', 'numeric', 'min:0'],
             'min_price' => ['nullable', 'numeric', 'min:0'],
             'special_price' => ['nullable', 'numeric', 'min:0'],
+            'return_after_days' => ['sometimes', 'nullable', 'integer', 'min:1', 'max:730'],
             'is_active' => ['sometimes', 'boolean'],
             'items' => ['sometimes', 'array', 'min:1'],
             'items.*.product_id' => [

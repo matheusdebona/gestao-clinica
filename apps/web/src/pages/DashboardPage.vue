@@ -7,6 +7,7 @@ import PageHeader from '@/components/ui/PageHeader.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
 import ConfirmTomorrowCard from '@/features/appointments/ConfirmTomorrowCard.vue'
 import StaleLeadsCard from '@/features/leads/StaleLeadsCard.vue'
+import PatientReturnsCard from '@/features/returns/PatientReturnsCard.vue'
 import { PAYMENT_CATALOG_PERMISSIONS, paymentCatalogHome } from '@/features/payments/access'
 import { useAuthStore } from '@/stores/auth'
 
@@ -71,6 +72,9 @@ function openShortcut(to: { name: string }) {
     />
     <PermissionGate permission="appointments.view">
       <ConfirmTomorrowCard :limit="3" show-agenda-link />
+    </PermissionGate>
+    <PermissionGate :permission="['clients.view', 'sales.view']" mode="all">
+      <PatientReturnsCard />
     </PermissionGate>
     <PermissionGate permission="leads.view">
       <StaleLeadsCard />
