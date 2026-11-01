@@ -85,6 +85,10 @@ class LeadDailyAnalysisService
                 'returns' => $viewer->can('sales.view')
                     ? app(PatientReturnService::class)->dueSummary(self::QUEUE_LIMIT, $filters['user_ids'] ?? [])
                     : null,
+                // Orçamentos esquecidos que precisam de cobrança (só para quem vê orçamentos).
+                'budgets' => $viewer->can('budgets.view')
+                    ? app(BudgetFollowUpService::class)->queueSummary(self::QUEUE_LIMIT, $filters['user_ids'] ?? [])
+                    : null,
             ],
             'suggestions' => [],
         ];

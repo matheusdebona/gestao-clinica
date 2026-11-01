@@ -2,6 +2,7 @@ import { api } from '@/lib/api'
 import type { LeadFunnel } from '@/features/leads/funnel'
 import type { DataEnvelope } from '@/types/pagination'
 import type { LeadStatusColor } from '@/types/lead'
+import type { ForgottenBudgetRow } from '@/features/budgets/forgotten'
 import type { PatientReturn } from '@/features/returns/api'
 
 export interface DailyKpis {
@@ -69,6 +70,8 @@ export interface DailyAnalysis {
     leads: DailyQueueItem[]
     /** Retornos de pacientes a vencer/atrasados; null sem sales.view. */
     returns?: { count: number; overdue: number; items: PatientReturn[] } | null
+    /** Orçamentos esquecidos que precisam de cobrança; null sem budgets.view. */
+    budgets?: { count: number; total: number; items: ForgottenBudgetRow[] } | null
   }
   suggestions: { kind: 'warning' | 'info' | 'success'; text: string }[]
   team_rows?: DailyTeamRow[]

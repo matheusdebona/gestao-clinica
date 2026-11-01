@@ -8,6 +8,15 @@ export type BudgetStatus =
   | 'expired'
   | 'superseded'
 
+export interface BudgetForgotten {
+  days: number
+  tier: number
+  tier_index: number
+  tiers: number
+  reached_on: string
+  needs_follow_up: boolean
+}
+
 export interface BudgetItem {
   id: number
   product_id: number
@@ -38,6 +47,10 @@ export interface Budget {
   sent_at: string | null
   accepted_at: string | null
   rejected_at: string | null
+  follow_up_sent_at?: string | null
+  follow_up_count?: number
+  /** Enviado e sem resposta além de um prazo da clínica; null caso contrário. */
+  forgotten?: BudgetForgotten | null
   items?: BudgetItem[]
   client?: Client | null
   created_at: string

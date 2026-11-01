@@ -40,13 +40,19 @@ const entries: SettingsEntry[] = [
   {
     name: 'settings-whatsapp',
     title: 'Mensagens do WhatsApp',
-    description: 'Textos de confirmação de sessão e de contato com leads.',
+    description: 'Textos de confirmação de sessão, contato com leads, retornos e orçamentos.',
     permissions: ['clinics.branding', 'clinics.manage'],
   },
   {
     name: 'settings-follow-up-tiers',
     title: 'Alertas de acompanhamento',
     description: 'Prazos sem contato (ex.: 3, 7, 30 e 60 dias) para avisar sobre leads parados.',
+    permissions: ['clinics.branding', 'clinics.manage'],
+  },
+  {
+    name: 'settings-budget-follow-up',
+    title: 'Orçamentos esquecidos',
+    description: 'Prazos sem resposta (ex.: 2, 5 e 10 dias) para cobrar orçamentos enviados.',
     permissions: ['clinics.branding', 'clinics.manage'],
   },
 ]

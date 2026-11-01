@@ -8,14 +8,19 @@ use App\Http\Requests\Api\V1\Budgets\UpdateBudgetRequest;
 use App\Http\Resources\Api\V1\BudgetResource;
 use App\Models\Budget;
 use App\Models\Sale;
+use App\Services\BudgetFollowUpService;
 use App\Services\BudgetService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Validation\ValidationException;
 
 class BudgetController extends Controller
 {
-    public function __construct(private readonly BudgetService $budgets) {}
+    public function __construct(
+        private readonly BudgetService $budgets,
+        private readonly BudgetFollowUpService $followUps,
+    ) {}
 
     /**
      * Inbox of budgets in the current clinic.
@@ -37,7 +42,10 @@ class BudgetController extends Controller
             $query->where('client_id', $request->integer('client_id'));
         }
 
-        if ($request->filled('status')) {
+        if ($request->boolean('forgotten')) {
+            // Orçamentos esquecidos: enviados e sem resposta além do menor prazo da clínica.
+            $query = $this->followUps->forgottenQuery()->with(['items', 'client', 'sale']);
+        } elseif ($request->filled('status')) {
             $query->where('status', $request->string('status')->toString());
         } elseif (! $request->boolean('include_superseded')) {
             $query->where('status', '!=', Budget::STATUS_SUPERSEDED);
@@ -81,6 +89,18 @@ class BudgetController extends Controller
         $budget = $this->budgets->updateDraft($budget, $request->validated());
 
         return new BudgetResource($budget);
+    }
+
+    /** Registra a cobrança pelo WhatsApp (o link wa.me é aberto no navegador). */
+    public function followUpWhatsApp(Request $request, Budget $budget): BudgetResource
+    {
+        if ($budget->status !== Budget::STATUS_SENT) {
+            throw ValidationException::withMessages([
+                'status' => ['Só orçamentos enviados podem ser cobrados.'],
+            ]);
+        }
+
+        return new BudgetResource($this->followUps->logWhatsApp($budget, $request->user())->load(['items', 'sale']));
     }
 
     public function send(Budget $budget): BudgetResource

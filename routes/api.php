@@ -328,6 +328,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:budgets.update');
         Route::post('budgets/{budget}/accept', [BudgetController::class, 'accept'])
             ->middleware('permission:budgets.convert');
+        Route::post('budgets/{budget}/follow-up-whatsapp', [BudgetController::class, 'followUpWhatsApp'])
+            ->middleware('permission:budgets.update');
         Route::post('budgets/{budget}/reject', [BudgetController::class, 'reject'])
             ->middleware('permission:budgets.update');
         Route::post('budgets/{budget}/expire', [BudgetController::class, 'expire'])

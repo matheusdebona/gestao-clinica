@@ -28,6 +28,7 @@ import {
   type DailyTab,
 } from '@/features/daily/filters'
 import LeadFunnelSection from '@/features/leads/LeadFunnelSection.vue'
+import ForgottenBudgetsList from '@/features/budgets/ForgottenBudgetsList.vue'
 import PatientReturnsList from '@/features/returns/PatientReturnsList.vue'
 import { rankRatio } from '@/features/metrics/chart'
 import { formatIsoDate } from '@/lib/formatters'
@@ -170,6 +171,29 @@ const showCheckin = computed(
       <LeadFunnelSection :funnel="data.funnel" :show-users="data.team" />
 
       <DailyFollowUpQueue :items="data.follow_up.leads" :count="data.follow_up.count" />
+
+      <SurfaceCard v-if="data.follow_up.budgets && data.follow_up.budgets.count > 0">
+        <div class="flex items-baseline justify-between gap-3">
+          <h2>Orçamentos esquecidos</h2>
+          <p class="text-[13px] text-muted">{{ data.follow_up.budgets.count }} para cobrar</p>
+        </div>
+        <p class="mt-1 text-[13px] text-muted">
+          Enviados e sem resposta além de um prazo. Cobrar pelo WhatsApp tira da fila até o próximo
+          prazo.
+        </p>
+        <div class="mt-3">
+          <ForgottenBudgetsList :items="data.follow_up.budgets.items" />
+        </div>
+        <div class="mt-3">
+          <Button
+            mobile-block
+            variant="ghost"
+            @click="router.push({ name: 'budgets', query: { esquecidos: '1' } })"
+          >
+            Ver orçamentos esquecidos
+          </Button>
+        </div>
+      </SurfaceCard>
 
       <SurfaceCard v-if="data.follow_up.returns && data.follow_up.returns.count > 0">
         <div class="flex items-baseline justify-between gap-3">
