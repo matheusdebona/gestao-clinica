@@ -1,3 +1,4 @@
+import type { PatientTierRef } from '@/features/clients/tiers'
 import type { Lead } from './lead'
 
 export interface ClientOrigin {
@@ -44,6 +45,10 @@ export interface Client {
   lead_id?: number | null
   initial_consultation_amount: string | null
   is_active: boolean
+  /** Faixa pelo total comprado em 12 meses (lista e detalhe). null = sem faixa. */
+  tier?: PatientTierRef | null
+  /** Total das vendas confirmadas nos últimos 12 meses (só com permissão de vendas). */
+  purchases_12m?: string
   client_origin?: ClientOrigin | null
   campaign?: Campaign | null
   /** Lead this patient came from (history kept on conversion). */

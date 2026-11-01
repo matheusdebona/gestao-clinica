@@ -38,6 +38,12 @@ const entries: SettingsEntry[] = [
     permissions: ['campaigns.manage'],
   },
   {
+    name: 'settings-patient-tiers',
+    title: 'Faixas de paciente',
+    description: 'Bronze, Prata, Ouro… pelo total comprado nos últimos 12 meses.',
+    permissions: ['clinics.branding', 'clinics.manage'],
+  },
+  {
     name: 'settings-whatsapp',
     title: 'Mensagens do WhatsApp',
     description: 'Textos de confirmação de sessão, contato com leads, retornos e orçamentos.',

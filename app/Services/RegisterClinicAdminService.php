@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
 use App\Support\EnsureDefaultExpenseCategories;
 use App\Support\EnsureDefaultFollowUpTiers;
+use App\Support\EnsureDefaultPatientTiers;
 use App\Support\EnsureDefaultLeadStatuses;
 use App\Support\EnsureDefaultPaymentCatalog;
 use App\Support\EnsureDefaultUnitsOfMeasure;
@@ -36,6 +37,7 @@ class RegisterClinicAdminService
             EnsureDefaultClientOrigins::run($clinic);
             EnsureDefaultLeadStatuses::run($clinic);
             EnsureDefaultFollowUpTiers::run($clinic);
+            EnsureDefaultPatientTiers::run($clinic);
             EnsureDefaultPaymentCatalog::run($clinic);
             EnsureDefaultExpenseCategories::run($clinic);
             EnsureDefaultUnitsOfMeasure::run($clinic);
