@@ -1,0 +1,97 @@
+---
+import { showcases } from '../content/site'
+import MockAgenda from './mocks/MockAgenda.astro'
+import MockDre from './mocks/MockDre.astro'
+import PhoneFrame from './PhoneFrame.astro'
+
+const dre = showcases.find((item) => item.id === 'lucro')
+const funnel = showcases.find((item) => item.id === 'funil')
+const agenda = showcases.find((item) => item.id === 'agenda')
+
+if (!dre || !funnel || !agenda) {
+  throw new Error('Product showcase copy is incomplete.')
+}
+
+const funnelStages = [
+  { label: 'Lead criado', count: 42, width: '100%' },
+  { label: 'Abordado', count: 36, width: '86%' },
+  { label: 'Respondeu', count: 24, width: '57%' },
+  { label: 'Agendou', count: 18, width: '43%' },
+  { label: 'Compareceu', count: 15, width: '36%' },
+  { label: 'Orçamento', count: 11, width: '26%' },
+  { label: 'Venda', count: 8, width: '19%' },
+]
+---
+
+<section id="lucro" class="site-anchor hero-solid py-16 sm:py-24" aria-labelledby="lucro-title">
+  <div class="site-wrap grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-20">
+    <div class="max-w-lg text-inverse" data-reveal>
+      <p class="kicker text-inverse/55">{dre.kicker}</p>
+      <h2 id="lucro-title" class="section-title mt-4 text-inverse">{dre.title}</h2>
+      <p class="mt-5 text-[16px] leading-7 text-inverse/72">{dre.copy}</p>
+      <ul class="mt-6 grid list-none gap-3 border-t border-white/10 p-0 pt-5">
+        {dre.points.map((point) => (
+          <li class="text-[15px] leading-6 text-inverse/72">{point}</li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="flex justify-center lg:justify-end" data-reveal>
+      <PhoneFrame label="DRE do mês, tela de exemplo">
+        <MockDre />
+      </PhoneFrame>
+    </div>
+  </div>
+</section>
+
+<section id="funil" class="site-anchor py-16 sm:py-24" aria-labelledby="funil-title">
+  <div class="site-wrap max-w-2xl" data-reveal>
+    <p class="kicker">{funnel.kicker}</p>
+    <h2 id="funil-title" class="section-title mt-4 text-title">{funnel.title}</h2>
+    <p class="mt-5 text-[16px] leading-7 text-body">{funnel.copy}</p>
+    <ul class="mt-6 grid list-none gap-2 p-0 sm:grid-cols-3 sm:gap-6">
+      {funnel.points.map((point) => (
+        <li class="border-t border-border-divider pt-3 text-[14px] leading-6 text-body">{point}</li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="site-wrap mt-10" data-reveal>
+    <ol class="funnel-strip" aria-label="Funil de vendas, números de demonstração">
+      {
+        funnelStages.map((stage) => (
+          <li class="funnel-chip">
+            <p class="mock-quiet text-[11px]">{stage.label}</p>
+            <p class="mock-ink mt-1 text-[22px] font-semibold tabular-nums tracking-[-0.04em]">
+              {stage.count}
+            </p>
+            <div class="funnel-chip-bar" aria-hidden="true">
+              <span style={`width: ${stage.width}`}></span>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<section id="agenda" class="site-anchor py-16 sm:py-24" aria-labelledby="agenda-title">
+  <div class="site-wrap grid items-center gap-12 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-20">
+    <div class="flex justify-center lg:justify-start" data-reveal>
+      <PhoneFrame label="Agenda, tela de exemplo">
+        <MockAgenda />
+      </PhoneFrame>
+    </div>
+
+    <div class="max-w-lg lg:justify-self-end" data-reveal>
+      <p class="kicker">{agenda.kicker}</p>
+      <h2 id="agenda-title" class="section-title mt-4 text-title">{agenda.title}</h2>
+      <p class="mt-5 text-[16px] leading-7 text-body">{agenda.copy}</p>
+      <ul class="mt-6 grid list-none gap-3 border-t border-border-divider p-0 pt-5">
+        {agenda.points.map((point) => (
+          <li class="text-[15px] leading-6 text-body">{point}</li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</section>

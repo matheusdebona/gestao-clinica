@@ -1,29 +1,14 @@
 ---
-import { clinicLabels } from '../content/site'
+import { CLINICS_KICKER, CLINICS_TITLE, clinicLine } from '../content/site'
 ---
 
 <section id="clinicas" class="site-anchor py-16 sm:py-20">
-  <div class="site-wrap">
-    <div class="max-w-2xl" data-reveal>
-      <p class="eyebrow glass-chip text-muted">Para clínicas</p>
-      <h2 class="section-title mt-4 text-title">Feito para quem aplica, não só para quem administra.</h2>
-      <p class="mt-4 max-w-xl text-[16px] leading-7 text-body">
-        Harmonização, estética e especialidades que vivem de sessão, lote e retorno — no celular
-        da equipe e no consultório.
-      </p>
-    </div>
-
-    <ul class="mt-8 flex list-none flex-wrap gap-2 p-0" data-reveal-stagger>
-      {
-        clinicLabels.map((label) => (
-          <li
-            class="glass-chip glass-chip-brand rounded-full px-3.5 py-2 text-[13px] font-medium text-brand"
-            data-reveal-item
-          >
-            {label}
-          </li>
-        ))
-      }
-    </ul>
+  <div class="site-wrap max-w-3xl" data-reveal>
+    <p class="kicker">{CLINICS_KICKER}</p>
+    <h2 class="section-title mt-4 text-title">{CLINICS_TITLE}</h2>
+    <p class="mt-5 text-[18px] leading-8 text-body">
+      {clinicLine} Serve para quem aplica e para quem atende na recepção, não só para quem
+      administra.
+    </p>
   </div>
 </section>

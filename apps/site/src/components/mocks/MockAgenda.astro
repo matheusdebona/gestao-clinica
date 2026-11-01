@@ -1,0 +1,54 @@
+---
+const events = [
+  { time: '09:00', title: 'Avaliação', meta: 'Paciente · retorno', status: 'Confirmado', tone: 'ok' },
+  { time: '14:00', title: 'Harmonização · sessão 2', meta: 'Tratamento', status: 'Aguardando', tone: 'warn' },
+  { time: '16:30', title: 'Retorno', meta: 'Previsto nesta semana', status: 'Confirmado', tone: 'ok' },
+]
+---
+
+<div class="mock-app">
+  <header class="mock-app-head">
+    <p class="mock-kicker">Agenda</p>
+    <h3 class="mock-title">Amanhã</h3>
+    <p class="mock-meta">Confirmar no WhatsApp</p>
+  </header>
+
+  <div class="mock-card">
+    <div class="flex items-center justify-between gap-2">
+      <div>
+        <p class="mock-ink text-[12px] font-semibold tracking-[-0.02em]">Confirmar amanhã</p>
+        <p class="mock-quiet mt-0.5 text-[10px] leading-4">1 aguardando · 2 confirmados</p>
+      </div>
+      <span class="grid size-8 place-items-center rounded-full bg-brand text-[11px] font-semibold text-inverse">
+        3
+      </span>
+    </div>
+    <p class="mt-1.5 rounded-[10px] bg-brand px-3 py-1.5 text-center text-[11px] font-semibold text-inverse">
+      Abrir WhatsApp
+    </p>
+  </div>
+
+  <ul class="mt-1.5 grid list-none gap-1.5 p-0">
+    {
+      events.map((event) => (
+        <li class="mock-card">
+          <div class="flex items-start justify-between gap-2">
+            <div class="min-w-0">
+              <p class="mock-ink text-[12px] font-semibold tracking-[-0.02em]">{event.title}</p>
+              <p class="mock-quiet mt-0.5 text-[10px]">{event.meta}</p>
+            </div>
+            <span class="mock-quiet shrink-0 text-[11px] tabular-nums">{event.time}</span>
+          </div>
+          <span
+            class:list={[
+              'mt-2 inline-flex rounded-full px-2 py-0.5 text-[10px] font-semibold',
+              event.tone === 'ok' ? 'glass-chip-success mock-ok' : 'glass-chip-warning mock-warn',
+            ]}
+          >
+            {event.status}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+</div>

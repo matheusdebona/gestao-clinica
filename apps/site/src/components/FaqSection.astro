@@ -1,32 +1,25 @@
 ---
-import { faqs } from '../content/site'
+import { FAQ_KICKER, FAQ_TITLE, faqs } from '../content/site'
 ---
 
-<section id="faq" class="site-anchor py-16 sm:py-24">
-  <div class="site-wrap grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
-    <div class="max-w-md" data-reveal>
-      <p class="eyebrow glass-chip glass-chip-brand text-brand">Perguntas</p>
-      <h2 class="section-title mt-4 text-title">Perguntas diretas.</h2>
-      <p class="mt-4 text-[16px] leading-7 text-body">
-        Estoque, orçamento, celular e planos. Se a dúvida for outra, crie a clínica e veja o
-        produto — o cadastro já abre o sistema.
-      </p>
+<section id="faq" class="site-anchor py-20 sm:py-28">
+  <div class="site-wrap grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
+    <div data-reveal>
+      <p class="kicker">{FAQ_KICKER}</p>
+      <h2 class="section-title mt-4 text-title">{FAQ_TITLE}</h2>
     </div>
 
-    <div class="grid gap-2" data-reveal-stagger>
+    <div class="border-t border-border-divider" data-reveal-stagger>
       {
-        faqs.map((item, index) => (
-          <details
-            class="faq-item overflow-hidden rounded-xl glass-regular"
-            open={index === 0}
-            data-reveal-item
-          >
-            <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-4 text-[15px] font-semibold tracking-[-0.02em] text-title sm:px-5">
-              <h3 class="m-0 text-[15px] font-semibold tracking-[-0.02em]">{item.q}</h3>
+        faqs.map((item) => (
+          <details class="faq-item border-b border-border-divider" data-reveal-item>
+            <summary class="flex min-h-12 cursor-pointer list-none items-baseline justify-between gap-6 py-5 text-title">
+              <h3 class="m-0 text-[17px] font-semibold tracking-[-0.02em]">{item.q}</h3>
+              <span class="shrink-0 text-[18px] font-light text-muted" aria-hidden="true">
+                +
+              </span>
             </summary>
-            <p class="border-t border-border-divider px-4 pb-4 pt-3 text-[15px] leading-6 text-body sm:px-5">
-              {item.a}
-            </p>
+            <p class="pb-5 pr-10 text-[15px] leading-7 text-body">{item.a}</p>
           </details>
         ))
       }

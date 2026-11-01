@@ -1,0 +1,47 @@
+---
+import { CTA_REGISTER_STRONG_LABEL, MOBILE_COPY, MOBILE_KICKER, MOBILE_TITLE } from '../content/site'
+import { APP_REGISTER_URL } from '../lib/urls'
+import MockDre from './mocks/MockDre.astro'
+import MockFollowUp from './mocks/MockFollowUp.astro'
+import MockFunnel from './mocks/MockFunnel.astro'
+import PhoneFrame from './PhoneFrame.astro'
+---
+
+<section id="celular" class="site-anchor overflow-hidden py-20 sm:py-28" aria-labelledby="celular-title">
+  <div class="site-wrap grid items-center gap-14 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-16">
+    <div class="phone-cluster mx-auto lg:mx-0" data-reveal>
+      <div class="phone-cluster-side phone-cluster-side-a" aria-hidden="true">
+        <PhoneFrame label="Funil de vendas, tela de exemplo">
+          <MockFunnel />
+        </PhoneFrame>
+      </div>
+      <div class="phone-cluster-main">
+        <PhoneFrame label="Fila do dia, tela de exemplo">
+          <MockFollowUp />
+        </PhoneFrame>
+      </div>
+      <div class="phone-cluster-side phone-cluster-side-b" aria-hidden="true">
+        <PhoneFrame label="DRE do mês, tela de exemplo">
+          <MockDre />
+        </PhoneFrame>
+      </div>
+    </div>
+
+    <div class="max-w-lg lg:justify-self-end" data-reveal>
+      <p class="kicker">{MOBILE_KICKER}</p>
+      <h2 id="celular-title" class="section-title mt-4 text-title">
+        {MOBILE_TITLE}
+      </h2>
+      <p class="mt-5 text-[16px] leading-7 text-body">
+        {MOBILE_COPY}
+      </p>
+      <a
+        class="site-cta-primary mt-8 w-full sm:w-auto"
+        href={APP_REGISTER_URL}
+        data-section-cta
+      >
+        {CTA_REGISTER_STRONG_LABEL}
+      </a>
+    </div>
+  </div>
+</section>

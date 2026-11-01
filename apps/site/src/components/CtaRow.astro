@@ -16,13 +16,11 @@ const {
   sectionCta = true,
 } = Astro.props
 
-const pair = secondary !== false
 ---
 
 <div
   class:list={[
-    'mt-6 grid w-full justify-center gap-3 md:flex md:w-auto md:flex-wrap md:items-center md:justify-start',
-    pair ? 'grid-cols-2' : 'grid-cols-1',
+    'mt-6 grid w-full grid-cols-1 justify-center gap-3 md:flex md:w-auto md:flex-wrap md:items-center md:justify-start',
   ]}
 >
   <a
@@ -33,7 +31,7 @@ const pair = secondary !== false
     {primary}
   </a>
   {
-    pair && (
+    secondary !== false && (
       <a
         class:list={[
           'site-cta-secondary w-full min-w-0 md:w-auto md:flex-none',

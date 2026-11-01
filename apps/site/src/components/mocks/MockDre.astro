@@ -1,0 +1,74 @@
+---
+import {
+  DRE_DEMO,
+  DRE_DEMO_MARGEM,
+  DRE_DEMO_RESULTADO,
+  formatDemoBrl,
+} from '../../content/site'
+
+const brl = (n: number) => `R$ ${formatDemoBrl(n)}`
+const minus = (n: number) => `− R$ ${formatDemoBrl(n)}`
+const resultado = brl(DRE_DEMO_RESULTADO)
+const margem = `${DRE_DEMO_MARGEM}%`
+
+const kpis = [
+  { label: 'Resultado', value: resultado, tone: 'ok' },
+  { label: 'Margem líquida', value: margem, tone: 'ink' },
+]
+
+const lines = [
+  { label: 'Receita bruta', value: brl(DRE_DEMO.receitaBruta) },
+  { label: 'Insumos', value: minus(DRE_DEMO.insumos) },
+  { label: 'Taxa da maquininha', value: minus(DRE_DEMO.taxaMaquininha) },
+  { label: 'Impostos sobre a receita', value: minus(DRE_DEMO.impostos) },
+  { label: 'Comissões', value: minus(DRE_DEMO.comissoes) },
+  { label: 'Despesas do mês', value: minus(DRE_DEMO.despesas) },
+]
+---
+
+<div class="mock-app mock-app-dre">
+  <header class="mock-app-head">
+    <p class="mock-kicker">Financeiro</p>
+    <h3 class="mock-title">DRE do mês</h3>
+    <p class="mock-meta">Novembro</p>
+  </header>
+
+  <div class="grid grid-cols-2 gap-1.5">
+    {
+      kpis.map((item) => (
+        <div class="mock-card">
+          <p class="mock-quiet text-[10px] leading-3">{item.label}</p>
+          <p
+            class:list={[
+              'mt-0.5 text-[15px] font-semibold tabular-nums tracking-[-0.03em]',
+              item.tone === 'ok' ? 'mock-ok' : 'mock-ink',
+            ]}
+          >
+            {item.value}
+          </p>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="mock-card mock-dre-lines mt-1.5 divide-y divide-border-divider">
+    {
+      lines.map((row) => (
+        <div class="flex items-center justify-between gap-2 py-1 first:pt-0 last:pb-0">
+          <span class="mock-copy text-[11px] leading-4">{row.label}</span>
+          <span class="mock-quiet shrink-0 text-[11px] tabular-nums">{row.value}</span>
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="mock-card mock-dre-net mt-1.5">
+    <div class="flex items-end justify-between gap-2">
+      <div>
+        <p class="mock-quiet text-[10px] leading-3">Resultado líquido</p>
+        <p class="mock-ok mt-0.5 text-[18px] font-semibold tabular-nums tracking-[-0.03em]">{resultado}</p>
+      </div>
+      <p class="mock-ink text-right text-[11px] font-semibold tabular-nums">{margem}</p>
+    </div>
+  </div>
+</div>

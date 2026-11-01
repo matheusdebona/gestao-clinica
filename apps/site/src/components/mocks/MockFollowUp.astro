@@ -1,0 +1,40 @@
+---
+const items = [
+  { name: 'Paciente · Instagram', meta: 'Ainda não abordado', action: 'Abrir WhatsApp' },
+  { name: 'Orçamento enviado', meta: 'Sem resposta há 2 dias', action: 'Cobrar no WhatsApp' },
+]
+---
+
+<div class="mock-app">
+  <header class="mock-app-head">
+    <p class="mock-kicker">Início</p>
+    <h3 class="mock-title">Fila do dia</h3>
+    <p class="mock-meta">Leads e orçamentos parados</p>
+  </header>
+
+  <div class="mock-card">
+    <div class="flex items-end justify-between gap-2">
+      <div>
+        <p class="mock-quiet text-[10px]">Leads parados</p>
+        <p class="mock-ink mt-0.5 text-[22px] font-semibold tabular-nums leading-none">3</p>
+      </div>
+      <p class="mock-quiet max-w-[9rem] text-right text-[10px] leading-4">
+        Sem contato. Essa fila aparece no início do expediente.
+      </p>
+    </div>
+  </div>
+
+  <ul class="mt-1.5 grid min-h-0 list-none gap-1.5 overflow-hidden p-0">
+    {
+      items.map((item) => (
+        <li class="mock-card">
+          <p class="mock-ink text-[12px] font-semibold tracking-[-0.02em]">{item.name}</p>
+          <p class="mock-quiet mt-0.5 text-[10px]">{item.meta}</p>
+          <p class="mt-1.5 rounded-[10px] bg-brand px-3 py-1.5 text-center text-[11px] font-semibold text-inverse">
+            {item.action}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</div>

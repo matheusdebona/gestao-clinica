@@ -1,32 +1,39 @@
 ---
 import BrandMark from './BrandMark.astro'
 import { APP_HOST, APP_LOGIN_URL, APP_NAME, APP_REGISTER_URL, MARKETING_HOST } from '../lib/urls'
-import { CTA_LOGIN_SHORT_LABEL, CTA_REGISTER_LABEL, SITE_ONE_LINER } from '../content/site'
+import {
+  CTA_LOGIN_SHORT_LABEL,
+  CTA_REGISTER_LABEL,
+  FOOTER_LUCRO_LABEL,
+  MOCK_CAPTION,
+  SITE_ONE_LINER,
+} from '../content/site'
 ---
 
 <footer class="site-footer-pad border-t border-border-divider pb-10 pt-14" data-site-footer>
-  <div class="site-wrap grid gap-10 sm:grid-cols-[1.2fr_0.8fr]">
+  <div class="site-wrap grid gap-12 sm:grid-cols-[1.3fr_0.7fr]">
     <div>
       <a href="#topo" class="inline-flex items-center gap-2.5 text-title">
         <BrandMark class="h-7 w-auto text-brand" decorative={false} />
         <span class="text-[15px] font-semibold tracking-[-0.03em]">{APP_NAME}</span>
       </a>
       <p class="mt-4 max-w-sm text-[15px] leading-6 text-body">
-        {SITE_ONE_LINER} Este site não pede login — o produto vive no sistema da clínica.
+        {SITE_ONE_LINER} O sistema da clínica fica em app.hofpay.com.br.
       </p>
     </div>
 
-    <div class="grid gap-6 sm:grid-cols-2">
+    <div class="grid gap-8 sm:grid-cols-2">
       <div>
-        <p class="text-[12px] font-semibold uppercase tracking-[0.06em] text-muted">Produto</p>
+        <p class="kicker">Produto</p>
         <ul class="mt-3 grid gap-2 text-[15px]">
           <li><a class="text-body hover:text-title" href={APP_REGISTER_URL}>{CTA_REGISTER_LABEL}</a></li>
           <li><a class="text-body hover:text-title" href={APP_LOGIN_URL}>{CTA_LOGIN_SHORT_LABEL}</a></li>
+          <li><a class="text-body hover:text-title" href="#lucro">{FOOTER_LUCRO_LABEL}</a></li>
           <li><a class="text-body hover:text-title" href="#faq">Perguntas</a></li>
         </ul>
       </div>
       <div>
-        <p class="text-[12px] font-semibold uppercase tracking-[0.06em] text-muted">Endereços</p>
+        <p class="kicker">Endereços</p>
         <ul class="mt-3 grid gap-2 text-[15px] text-body">
           <li>{MARKETING_HOST}</li>
           <li>{APP_HOST}</li>
@@ -34,8 +41,8 @@ import { CTA_LOGIN_SHORT_LABEL, CTA_REGISTER_LABEL, SITE_ONE_LINER } from '../co
       </div>
     </div>
   </div>
-  <div class="site-wrap mt-10 flex flex-wrap items-center justify-between gap-3 text-[13px] text-muted">
+  <div class="site-wrap mt-12 flex flex-wrap items-center justify-between gap-3 text-[13px] text-muted">
     <p>© {new Date().getFullYear()} {APP_NAME}</p>
-    <p>Estoque, protocolos, pacientes, agenda e números.</p>
+    <p class="max-w-xs text-[12px] leading-5 sm:text-right">{MOCK_CAPTION}</p>
   </div>
 </footer>

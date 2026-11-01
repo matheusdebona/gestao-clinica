@@ -1,26 +1,59 @@
 ---
-import { CTA_LOGIN_LABEL, CTA_REGISTER_STRONG_LABEL } from '../content/site'
+import {
+  ACCESS_COPY,
+  ACCESS_KICKER,
+  ACCESS_TITLE,
+  CTA_FREE_NOTE,
+  CTA_LOGIN_LABEL,
+  CTA_REGISTER_STRONG_LABEL,
+  DRE_DEMO_MARGEM,
+  DRE_DEMO_RESULTADO,
+  formatDemoBrl,
+} from '../content/site'
 import CtaRow from './CtaRow.astro'
+
+const resultado = `R$ ${formatDemoBrl(DRE_DEMO_RESULTADO)}`
+const margemLabel = `Resultado líquido · margem ${DRE_DEMO_MARGEM}%`
 ---
 
 <section id="acesso" class="site-anchor py-10 sm:py-16">
   <div class="site-wrap">
     <div
-      class="relative overflow-hidden rounded-chrome hero-mesh px-4 py-12 text-inverse sm:px-12 sm:py-16"
+      class="hero-solid overflow-hidden rounded-chrome px-5 py-14 sm:px-12 sm:py-16 lg:px-14 lg:py-16"
       data-reveal
     >
-      <div class="relative max-w-2xl">
-        <p class="eyebrow glass-dark text-inverse/80">Comece agora</p>
-        <h2 class="section-title mt-4 text-inverse">Crie a clínica. Planos em breve.</h2>
-        <p class="mt-4 max-w-xl text-[16px] leading-7 text-inverse/75">
-          Ainda não há tabela pública — e não inventamos valores. Enquanto os planos não
-          entram, você já pode criar a clínica e usar o produto no celular e no consultório.
-        </p>
-        <CtaRow
-          primary={CTA_REGISTER_STRONG_LABEL}
-          secondary={CTA_LOGIN_LABEL}
-          onDark
-        />
+      <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] lg:gap-16">
+        <div class="text-inverse">
+          <p class="kicker text-inverse/55">{ACCESS_KICKER}</p>
+          <h2 class="section-title mt-4 max-w-xl text-inverse">{ACCESS_TITLE}</h2>
+          <p class="mt-4 max-w-lg text-[16px] leading-7 text-inverse/70">
+            {ACCESS_COPY}
+          </p>
+          <CtaRow primary={CTA_REGISTER_STRONG_LABEL} secondary={CTA_LOGIN_LABEL} onDark />
+          <p class="mt-3 text-[13px] leading-5 text-inverse/50">{CTA_FREE_NOTE}</p>
+        </div>
+
+        <div class="access-visual hidden lg:block" aria-hidden="true">
+          <article class="access-visual-card">
+            <p class="text-[11px] font-medium text-inverse/50">Início · fila do dia</p>
+            <p class="mt-1 text-[22px] font-semibold tracking-[-0.04em] text-inverse">3 leads parados</p>
+            <p class="mt-1 text-[12px] leading-4 text-inverse/55">Orçamento enviado sem resposta.</p>
+          </article>
+          <article class="access-visual-card">
+            <p class="text-[11px] font-medium text-inverse/50">DRE · novembro</p>
+            <p class="mt-1 text-[28px] font-semibold tabular-nums tracking-[-0.04em] text-inverse">
+              {resultado}
+            </p>
+            <p class="mt-1 text-[12px] text-inverse/55">{margemLabel}</p>
+          </article>
+          <article class="access-visual-card">
+            <p class="text-[11px] font-medium text-inverse/50">WhatsApp</p>
+            <p class="mt-1 text-[16px] font-semibold tracking-[-0.03em] text-inverse">
+              Cobrar no WhatsApp
+            </p>
+            <p class="mt-1 text-[12px] text-inverse/55">Mensagem pronta. O contato fica registrado.</p>
+          </article>
+        </div>
       </div>
     </div>
   </div>
