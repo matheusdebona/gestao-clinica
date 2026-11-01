@@ -10,23 +10,25 @@ import {
   HERO_TITLE_LEAD,
 } from '../content/site'
 import { APP_LOGIN_URL, APP_REGISTER_URL } from '../lib/urls'
+import BrandMark from './BrandMark.astro'
 import MockDre from './mocks/MockDre.astro'
 import MockSpreadsheet from './mocks/MockSpreadsheet.astro'
 import PhoneFrame from './PhoneFrame.astro'
 ---
 
 <section id="topo" class="hero-solid relative overflow-hidden">
-  <div class="site-wrap relative grid gap-14 pb-24 pt-28 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,28rem)] lg:items-end lg:gap-16 lg:pb-24 lg:pt-36">
+  <div class="hero-grid site-wrap relative grid lg:grid-cols-[minmax(0,1fr)_minmax(20rem,28rem)] lg:items-end">
     <div class="hero-copy max-w-xl text-inverse">
-      <p class="kicker text-inverse/55">{HERO_KICKER}</p>
-      <h1 class="display-title mt-6 text-inverse">
+      <BrandMark class="hero-logo w-auto text-brand" decorative={false} />
+      <p class="hero-kicker kicker text-inverse/55">{HERO_KICKER}</p>
+      <h1 class="hero-title display-title text-inverse">
         {HERO_TITLE_LEAD}
         <span class="mt-2 block font-normal text-inverse/80">{HERO_TITLE_EMPHASIS}</span>
       </h1>
-      <p class="mt-6 max-w-[34rem] text-[17px] leading-7 text-inverse/72">
+      <p class="hero-lead max-w-[34rem] text-[17px] leading-7 text-inverse/72">
         {HERO_LEAD}
       </p>
-      <div class="mt-9 grid w-full grid-cols-1 gap-3 sm:max-w-sm">
+      <div class="hero-ctas grid w-full grid-cols-1 gap-3 sm:max-w-sm">
         <a
           class="site-cta-primary w-full"
           href={APP_REGISTER_URL}
@@ -55,7 +57,7 @@ import PhoneFrame from './PhoneFrame.astro'
           </PhoneFrame>
         </div>
       </div>
-      <p class="hero-stage-caption mt-5 text-[13px] leading-5 text-inverse/50">
+      <p class="hero-stage-caption text-[13px] leading-5 text-inverse/50">
         {HERO_STAGE_CAPTION}
       </p>
     </div>

@@ -173,6 +173,109 @@
     background-color: var(--sv-bg-sidebar);
   }
 
+  /* Navbar stays out of the first screen; SiteHeader adds .is-revealed after a short scroll. */
+  .site-header {
+    transition:
+      transform 0.34s cubic-bezier(0.2, 0.8, 0.2, 1),
+      opacity 0.24s ease,
+      visibility 0s linear 0s;
+  }
+
+  .site-header.is-hidden {
+    transform: translateY(calc(-100% - 0.75rem));
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      transform 0.28s ease-in,
+      opacity 0.2s ease,
+      visibility 0s linear 0.28s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .site-header,
+    .site-header.is-hidden {
+      transform: none;
+      transition:
+        opacity 0.01s linear,
+        visibility 0s linear;
+    }
+  }
+
+  /* Hero sized to the first viewport (no navbar above it). */
+  .hero-grid {
+    row-gap: clamp(2.5rem, 6svh, 3.5rem);
+    padding-top: clamp(1.75rem, 5svh, 3rem);
+    padding-bottom: clamp(3rem, 8svh, 5rem);
+  }
+
+  .hero-logo {
+    height: clamp(1.9rem, 4.2svh, 2.4rem);
+  }
+
+  .hero-kicker {
+    margin-top: clamp(1rem, 3svh, 1.75rem);
+  }
+
+  .hero-copy .hero-title {
+    margin-top: clamp(0.85rem, 2.2svh, 1.5rem);
+    font-size: clamp(2.2rem, min(5.4vw, 7.2svh), 4.15rem);
+  }
+
+  .hero-lead {
+    margin-top: clamp(0.9rem, 2.4svh, 1.5rem);
+  }
+
+  .hero-ctas {
+    margin-top: clamp(1.25rem, 3.4svh, 2.25rem);
+  }
+
+  .hero-stage-caption {
+    margin-top: clamp(0.6rem, 1.6svh, 1.25rem);
+  }
+
+  @media (min-width: 1024px) {
+    .hero-grid {
+      column-gap: 4rem;
+      padding-top: clamp(1.5rem, 5.5svh, 4.5rem);
+      padding-bottom: clamp(1.5rem, 5.5svh, 4.5rem);
+    }
+
+    /* The phone mock is 612px tall: shrink it on shorter screens so it fits with the copy. */
+    .hero-swap {
+      zoom: var(--hero-stage-zoom, 1);
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 1000px) {
+    .hero-swap {
+      --hero-stage-zoom: 0.94;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 880px) {
+    .hero-swap {
+      --hero-stage-zoom: 0.86;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 790px) {
+    .hero-swap {
+      --hero-stage-zoom: 0.8;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 740px) {
+    .hero-swap {
+      --hero-stage-zoom: 0.76;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-height: 660px) {
+    .hero-swap {
+      --hero-stage-zoom: 0.68;
+    }
+  }
+
   .display-title {
     font-size: clamp(2.35rem, 5.4vw, 4.15rem);
     font-weight: 600;

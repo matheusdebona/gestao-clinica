@@ -13,7 +13,7 @@ export const SITE_TITLE = `${APP_NAME}: faturou, mas não sobrou nada no bolso?`
 export const SITE_ONE_LINER =
   'HOF Pay é o sistema da clínica de harmonização no celular: leads, agenda, orçamentos, estoque e financeiro, para você saber quanto sobra de verdade no fim do mês.'
 
-export const HERO_KICKER = 'Clínica de harmonização orofacial'
+export const HERO_KICKER = 'Clínica de harmonização e estética avançada'
 export const HERO_TITLE_LEAD = 'Faturou, mas não sobrou nada no bolso?'
 export const HERO_TITLE_EMPHASIS = 'O HOF Pay mostra onde está seu lucro.'
 export const HERO_LEAD =
@@ -218,7 +218,7 @@ export const rhythmSteps = [
 ] as const
 
 export const clinicLine =
-  'Harmonização orofacial, estética, dermatologia, odontologia e procedimentos injetáveis.'
+  'Harmonização e estética avançada, dermatologia, odontologia e procedimentos injetáveis.'
 
 export const faqs = [
   {
@@ -312,7 +312,7 @@ export const llmsTxt = `# ${APP_NAME}
 
 > ${SITE_ONE_LINER}
 
-HOF Pay é um sistema de gestão para clínicas de harmonização orofacial e estética. Este site não pede login e não se conecta ao sistema da clínica. O produto operacional está em app.hofpay.com.br.
+HOF Pay é um sistema de gestão para clínicas de harmonização e estética avançada. Este site não pede login e não se conecta ao sistema da clínica. O produto operacional está em app.hofpay.com.br.
 
 Idioma: pt-BR.
 
@@ -320,7 +320,7 @@ Mensagem central: faturou, mas não sobrou nada no bolso? O HOF Pay mostra onde 
 
 ## Para quem
 
-Clínicas de harmonização orofacial, estética, dermatologia, odontologia e procedimentos injetáveis. Profissional de harmonização, recepção e a equipe. No celular e no consultório.
+Clínicas de harmonização e estética avançada, dermatologia, odontologia e procedimentos injetáveis. Profissional de harmonização, recepção e a equipe. No celular e no consultório.
 
 Não use “cliente” para a pessoa atendida: no produto é paciente. Não descreva o público como “médico/médica”; use profissional de harmonização ou doutor·a.
 
