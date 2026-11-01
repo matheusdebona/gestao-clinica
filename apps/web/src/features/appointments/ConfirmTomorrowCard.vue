@@ -96,7 +96,7 @@ function sendWhatsApp(item: Appointment) {
 function meta(item: Appointment): string {
   const bits = [formatTime(item.scheduled_at), item.professional?.name ?? 'Profissional']
   if (item.confirmation_sent_at) {
-    bits.push('WhatsApp enviado')
+    bits.push('WhatsApp aberto')
   }
   return bits.join(' · ')
 }

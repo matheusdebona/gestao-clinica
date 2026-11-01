@@ -147,7 +147,7 @@ function eventMeta(item: Appointment): string {
   const time = formatTime(item.scheduled_at)
   const professional = item.professional?.name ?? 'Profissional'
   const treatment = item.treatment_id ? `Tratamento #${item.treatment_id}` : 'Avaliação'
-  const sent = item.confirmation_sent_at ? ' · WhatsApp enviado' : ''
+  const sent = item.confirmation_sent_at ? ' · WhatsApp aberto' : ''
   const answer =
     item.confirmation_status && item.confirmation_status !== 'pending'
       ? ` · ${CONFIRMATION_STATUS_LABELS[item.confirmation_status]}`

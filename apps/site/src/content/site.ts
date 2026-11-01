@@ -116,10 +116,10 @@ export const showcases = [
     id: 'funil',
     kicker: 'Leads',
     title: 'Nenhum paciente interessado fica sem resposta.',
-    copy: 'Do primeiro WhatsApp até a venda, o lead fica no funil: criado, abordado, respondeu, agendou, compareceu, orçamento e venda. A recepção cobra pelo WhatsApp com a mensagem pronta. Lead parado aparece na fila do dia.',
+    copy: 'Do primeiro WhatsApp até a venda, o lead fica no funil: criado, abordado, respondeu, agendou, compareceu, orçamento e venda. A recepção cobra o paciente com uma mensagem pronta, que abre direto no seu WhatsApp. Lead parado aparece na fila do dia.',
     points: [
       'Funil até a venda, com filtro por origem e por colaborador.',
-      'O WhatsApp abre com a mensagem pronta e o contato fica registrado.',
+      'Um toque abre a conversa no seu WhatsApp com o texto já escrito. Você envia e o contato fica registrado.',
       'A fila de acompanhamento mostra o lead que parou de responder.',
     ],
     mock: 'funnel' as const,
@@ -127,11 +127,11 @@ export const showcases = [
   {
     id: 'agenda',
     kicker: 'Agenda',
-    title: 'Menos faltas com confirmação pelo WhatsApp.',
-    copy: 'A agenda da sessão e do retorno fica no celular. A equipe envia a confirmação com a mensagem já escrita e vê quem confirmou, quem desmarcou e quem ainda não respondeu.',
+    title: 'Menos faltas com a mensagem de confirmação pronta.',
+    copy: 'A agenda da sessão e do retorno fica no celular. Um toque abre o seu WhatsApp com a mensagem de confirmação já escrita. A equipe envia e marca quem confirmou, quem desmarcou e quem ainda não respondeu.',
     points: [
-      'Na confirmação de amanhã, a conversa do WhatsApp já sai montada.',
-      'Retorno a vencer ou atrasado também é cobrado pelo WhatsApp.',
+      'Para as sessões de amanhã, a mensagem de confirmação abre pronta no seu WhatsApp.',
+      'Para retorno a vencer ou atrasado, também há mensagem pronta para chamar o paciente.',
       'A agenda mostra a sessão com paciente e procedimento, não só o horário.',
     ],
     mock: 'agenda' as const,
@@ -148,13 +148,13 @@ export const features = [
   {
     id: 'leads',
     title: 'Leads',
-    teaser: 'Funil até a venda e cobrança no WhatsApp quando o paciente para de responder.',
+    teaser: 'Funil até a venda e mensagem pronta para cobrar o paciente que parou de responder.',
     href: '#funil',
   },
   {
     id: 'agenda',
     title: 'Agenda',
-    teaser: 'Sessões, retornos e confirmação pelo WhatsApp.',
+    teaser: 'Sessões, retornos e mensagem pronta de confirmação, que abre no seu WhatsApp.',
     href: '#agenda',
   },
   {
@@ -197,8 +197,8 @@ export const rhythmSteps = [
   },
   {
     n: '02',
-    title: 'Agende a sessão e confirme pelo WhatsApp',
-    copy: 'A sessão entra na agenda. A equipe confirma pelo WhatsApp e vê quem ainda não respondeu.',
+    title: 'Agende a sessão e envie a confirmação pronta',
+    copy: 'A sessão entra na agenda. Um toque abre o seu WhatsApp com a mensagem de confirmação já escrita. A equipe envia e marca quem ainda não respondeu.',
   },
   {
     n: '03',
@@ -238,8 +238,8 @@ export const faqs = [
   },
   {
     id: 'whatsapp',
-    q: 'Como funciona a confirmação no WhatsApp?',
-    a: 'A equipe abre a conversa no WhatsApp com a mensagem pronta: confirmação de consulta, cobrança de lead, retorno do paciente ou orçamento parado. O contato fica registrado no sistema.',
+    q: 'O HOF Pay envia mensagens pelo WhatsApp sozinho?',
+    a: 'Não. O HOF Pay não é integrado ao WhatsApp e não envia mensagens automáticas. Ele deixa a mensagem pronta (confirmação de consulta, cobrança de lead, retorno do paciente ou orçamento parado) e, com um toque, abre a conversa no seu WhatsApp com o texto já escrito. Você revisa e envia. O contato fica registrado no sistema.',
   },
   {
     id: 'estoque',
@@ -326,10 +326,10 @@ Não use “cliente” para a pessoa atendida: no produto é paciente. Não desc
 
 ## Produto (o que existe hoje)
 
-- Leads: cadastro, funil (lead criado → abordado → respondeu → agendou → compareceu → orçamento → venda), follow-up pelo WhatsApp, prazos de lead parado.
-- Agenda: sessões e retornos; confirmação de consultas pelo WhatsApp (mensagem pronta); status de confirmação.
+- Leads: cadastro, funil (lead criado → abordado → respondeu → agendou → compareceu → orçamento → venda), follow-up com mensagem pronta que abre no WhatsApp, prazos de lead parado.
+- Agenda: sessões e retornos; mensagem pronta de confirmação de consulta, que abre no WhatsApp; status de confirmação marcado pela equipe.
 - Pacientes: cadastro, WhatsApp, origem, histórico de orçamentos, vendas e sessões.
-- Retornos: fila de retornos a vencer/atrasados, chamada no WhatsApp.
+- Retornos: fila de retornos a vencer/atrasados, com mensagem pronta para chamar o paciente no WhatsApp.
 - Orçamentos e vendas: orçamento em rascunho → aceite do paciente → venda confirmada. Follow-up de orçamento enviado sem resposta.
 - Protocolos: procedimento com produtos, sessões e preços (custo, sugerido, mínimo, especial).
 - Estoque: a baixa acontece no tratamento, não na venda. Custo real do que foi aplicado.
@@ -339,7 +339,7 @@ Não use “cliente” para a pessoa atendida: no produto é paciente. Não desc
 - Financeiro: taxas de cartão (maquininha), impostos, despesas (fixas, variáveis, marketing, pessoal, depreciação de equipamentos) e DRE mensal com margem de contribuição, margem líquida e ponto de equilíbrio.
 - Métricas: comercial, funil de vendas, operação e estoque no mesmo sistema.
 
-WhatsApp: o sistema abre a conversa (wa.me) com modelo de mensagem; não é disparo automático pago.
+WhatsApp: o HOF Pay não é integrado ao WhatsApp e não envia mensagens automáticas. Ele monta a mensagem pronta e abre a conversa (link wa.me) no WhatsApp de quem está usando; a pessoa revisa e toca em enviar. Não descreva como integração, API, disparo ou lembrete automático.
 
 ## Preço
 
@@ -351,7 +351,7 @@ Não há tabela pública de preços neste site. Não invente valores, planos, de
 - Comece grátis: ${APP_REGISTER_URL}
 - Entrar: ${APP_LOGIN_URL}
 - Sistema da clínica: https://${APP_HOST}
-- Integração interna (não é documentação pública): https://${API_HOST}
+- API interna do sistema (não é documentação pública): https://${API_HOST}
 
 ## Mais
 
@@ -364,7 +364,7 @@ export const llmsFullTxt = `${llmsTxt}
 ## Como o trabalho da clínica anda no sistema
 
 1. O lead entra no sistema, não no chat pessoal.
-2. Agendar a sessão e confirmar no WhatsApp.
+2. Agendar a sessão e enviar a confirmação: a mensagem pronta abre no WhatsApp da equipe.
 3. Enviar o orçamento; quando o paciente aceita, a venda é confirmada. O produto ainda não sai do estoque.
 4. No tratamento, informar o que foi aplicado. Aí o estoque e o custo fecham.
 5. Fechar o mês no DRE: margem de contribuição, margem líquida e ponto de equilíbrio.
