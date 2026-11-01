@@ -1,17 +1,16 @@
 ---
-import { rhythmSteps } from '../content/site'
+import { RHYTHM_KICKER, RHYTHM_LEAD, RHYTHM_TITLE, rhythmSteps } from '../content/site'
 ---
 
 <section id="ritmo" class="site-anchor py-20 sm:py-28" aria-labelledby="ritmo-title">
   <div class="site-wrap grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
     <div data-reveal>
-      <p class="kicker">Do WhatsApp ao DRE</p>
+      <p class="kicker">{RHYTHM_KICKER}</p>
       <h2 id="ritmo-title" class="section-title mt-4 text-title">
-        Vender não baixa estoque. Fechar o mês não é somar aba.
+        {RHYTHM_TITLE}
       </h2>
       <p class="mt-5 max-w-md text-[16px] leading-7 text-body">
-        O produto só sai quando a sessão acontece. O DRE só fecha quando taxa, comissão e despesa
-        entram junto com a receita.
+        {RHYTHM_LEAD}
       </p>
     </div>
 

@@ -1,5 +1,5 @@
 ---
-import { CTA_REGISTER_STRONG_LABEL } from '../content/site'
+import { CTA_REGISTER_STRONG_LABEL, MOBILE_COPY, MOBILE_KICKER, MOBILE_TITLE } from '../content/site'
 import { APP_REGISTER_URL } from '../lib/urls'
 import MockDre from './mocks/MockDre.astro'
 import MockFollowUp from './mocks/MockFollowUp.astro'
@@ -28,13 +28,12 @@ import PhoneFrame from './PhoneFrame.astro'
     </div>
 
     <div class="max-w-lg lg:justify-self-end" data-reveal>
-      <p class="kicker">No celular</p>
+      <p class="kicker">{MOBILE_KICKER}</p>
       <h2 id="celular-title" class="section-title mt-4 text-title">
-        No bolso da doutor·a, não só no computador da recepção.
+        {MOBILE_TITLE}
       </h2>
       <p class="mt-5 text-[16px] leading-7 text-body">
-        Confirma a sessão no corredor. Cobra o orçamento no balcão. Abre o DRE no sofá. A clínica
-        cabe no telefone: fila do dia, paciente que esfriou, quanto sobrou no mês.
+        {MOBILE_COPY}
       </p>
       <a
         class="site-cta-primary mt-8 w-full sm:w-auto"

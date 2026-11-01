@@ -1,13 +1,13 @@
 ---
-import { clinicLine } from '../content/site'
+import { CLINICS_KICKER, CLINICS_TITLE, clinicLine } from '../content/site'
 ---
 
 <section id="clinicas" class="site-anchor py-16 sm:py-20">
   <div class="site-wrap max-w-3xl" data-reveal>
-    <p class="kicker">Para quem aplica</p>
-    <h2 class="section-title mt-4 text-title">Clínica de sessão, lote e retorno.</h2>
+    <p class="kicker">{CLINICS_KICKER}</p>
+    <h2 class="section-title mt-4 text-title">{CLINICS_TITLE}</h2>
     <p class="mt-5 text-[18px] leading-8 text-body">
-      {clinicLine} Feito para quem aplica e para quem atende na recepção, não só para quem
+      {clinicLine} Serve para quem aplica e para quem atende na recepção, não só para quem
       administra.
     </p>
   </div>

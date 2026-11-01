@@ -1,12 +1,12 @@
 ---
-import { faqs } from '../content/site'
+import { FAQ_KICKER, FAQ_TITLE, faqs } from '../content/site'
 ---
 
 <section id="faq" class="site-anchor py-20 sm:py-28">
   <div class="site-wrap grid gap-12 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
     <div data-reveal>
-      <p class="kicker">Perguntas</p>
-      <h2 class="section-title mt-4 text-title">O que a dona da clínica pergunta.</h2>
+      <p class="kicker">{FAQ_KICKER}</p>
+      <h2 class="section-title mt-4 text-title">{FAQ_TITLE}</h2>
     </div>
 
     <div class="border-t border-border-divider" data-reveal-stagger>

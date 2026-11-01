@@ -1,13 +1,13 @@
 ---
-import { painItems } from '../content/site'
+import { PAIN_KICKER, PAIN_TITLE, painItems } from '../content/site'
 ---
 
 <section id="dor" class="site-anchor py-20 sm:py-28" aria-labelledby="dor-title">
   <div class="site-wrap grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
     <div data-reveal>
-      <p class="kicker">Antes do sistema</p>
+      <p class="kicker">{PAIN_KICKER}</p>
       <h2 id="dor-title" class="section-title mt-4 text-title">
-        Domingo à noite, planilha aberta, ninguém sabe se sobrou.
+        {PAIN_TITLE}
       </h2>
     </div>
 

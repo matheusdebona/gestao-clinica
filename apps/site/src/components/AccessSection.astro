@@ -1,5 +1,8 @@
 ---
 import {
+  ACCESS_COPY,
+  ACCESS_KICKER,
+  ACCESS_TITLE,
   CTA_LOGIN_LABEL,
   CTA_REGISTER_STRONG_LABEL,
   DRE_DEMO_MARGEM,
@@ -20,10 +23,10 @@ const margemLabel = `Resultado líquido · margem ${DRE_DEMO_MARGEM}%`
     >
       <div class="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(16rem,22rem)] lg:gap-16">
         <div class="text-inverse">
-          <p class="kicker text-inverse/55">Começar</p>
-          <h2 class="section-title mt-4 max-w-xl text-inverse">Cria a clínica. Abre o DRE do mês.</h2>
+          <p class="kicker text-inverse/55">{ACCESS_KICKER}</p>
+          <h2 class="section-title mt-4 max-w-xl text-inverse">{ACCESS_TITLE}</h2>
           <p class="mt-4 max-w-lg text-[16px] leading-7 text-inverse/70">
-            Sai da planilha. O cadastro já abre o sistema: lead, agenda e o fechamento no celular.
+            {ACCESS_COPY}
           </p>
           <CtaRow primary={CTA_REGISTER_STRONG_LABEL} secondary={CTA_LOGIN_LABEL} onDark />
         </div>
@@ -46,7 +49,7 @@ const margemLabel = `Resultado líquido · margem ${DRE_DEMO_MARGEM}%`
             <p class="mt-1 text-[16px] font-semibold tracking-[-0.03em] text-inverse">
               Cobrar no WhatsApp
             </p>
-            <p class="mt-1 text-[12px] text-inverse/55">Mensagem pronta. O toque fica no histórico.</p>
+            <p class="mt-1 text-[12px] text-inverse/55">Mensagem pronta. O contato fica registrado.</p>
           </article>
         </div>
       </div>

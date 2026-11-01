@@ -1,12 +1,12 @@
 ---
-import { features } from '../content/site'
+import { FEATURES_KICKER, FEATURES_TITLE, features } from '../content/site'
 ---
 
 <section id="produto" class="site-anchor py-20 sm:py-28">
   <div class="site-wrap grid gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-20">
     <div data-reveal>
-      <p class="kicker">O sistema</p>
-      <h2 class="section-title mt-4 text-title">O que a planilha tentava fazer, e não fazia.</h2>
+      <p class="kicker">{FEATURES_KICKER}</p>
+      <h2 class="section-title mt-4 text-title">{FEATURES_TITLE}</h2>
     </div>
 
     <ul class="m-0 grid list-none border-t border-border-divider p-0" data-reveal-stagger>
