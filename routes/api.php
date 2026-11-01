@@ -13,6 +13,8 @@ use App\Http\Controllers\Api\V1\ClinicBrandingController;
 use App\Http\Controllers\Api\V1\ClinicController;
 use App\Http\Controllers\Api\V1\ClinicSettingsController;
 use App\Http\Controllers\Api\V1\DocumentController;
+use App\Http\Controllers\Api\V1\Finance\CommissionController;
+use App\Http\Controllers\Api\V1\Finance\ContributionMarginController;
 use App\Http\Controllers\Api\V1\Finance\FinanceSettingsController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
@@ -365,6 +367,23 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:finance.manage');
         Route::post('finance/payment-fees/recalculate', [FinanceSettingsController::class, 'recalculatePaymentFees'])
             ->middleware('permission:finance.manage');
+
+        Route::get('finance/commission-rules', [CommissionController::class, 'rules'])
+            ->middleware('permission:finance.view');
+        Route::post('finance/commission-rules', [CommissionController::class, 'storeRule'])
+            ->middleware('permission:finance.manage');
+        Route::put('finance/commission-rules/{commission_rule}', [CommissionController::class, 'updateRule'])
+            ->middleware('permission:finance.manage');
+        Route::delete('finance/commission-rules/{commission_rule}', [CommissionController::class, 'destroyRule'])
+            ->middleware('permission:finance.manage');
+        Route::get('finance/commissions', [CommissionController::class, 'entries'])
+            ->middleware('permission:finance.view');
+        Route::post('finance/commissions/rebuild', [CommissionController::class, 'rebuild'])
+            ->middleware('permission:finance.manage');
+        Route::post('finance/commissions/mark-paid', [CommissionController::class, 'markPaid'])
+            ->middleware('permission:finance.manage');
+        Route::get('metrics/contribution-margin', ContributionMarginController::class)
+            ->middleware(['permission:metrics.view', 'permission:finance.view']);
 
         Route::get('metrics/commercial', [MetricsController::class, 'commercial'])
             ->middleware('permission:metrics.view');

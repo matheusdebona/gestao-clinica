@@ -67,6 +67,12 @@ const entries: SettingsEntry[] = [
     description: 'Regime tributário e alíquota sobre a receita por mês de competência.',
     permissions: ['finance.view'],
   },
+  {
+    name: 'settings-commissions',
+    title: 'Comissões',
+    description: 'Regras de vendedores e profissionais, lançamentos do mês e pagamentos.',
+    permissions: ['finance.view'],
+  },
 ]
 
 const visible = computed(() => entries.filter((entry) => entry.permissions.some((name) => auth.can(name))))
