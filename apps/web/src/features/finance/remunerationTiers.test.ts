@@ -90,7 +90,7 @@ function entry(partial: Partial<CommissionEntryRow>): CommissionEntryRow {
     return {
         id: 1, user_id: 1, user_name: "Rita", role: "revenue", origin: "revenue", goal_metric: null,
         goal_kind: "tier", tier_threshold: "100000.00", lead_id: null, sale_id: null, appointment_id: null,
-        client_name: null, occurred_at: null, protocol_name: null, base_amount: "120000.00",
+        client_name: null, occurred_at: null, occurred_on: null, protocol_name: null, base_amount: "120000.00",
         rate_percent: "1.0000", amount: "1700.00", status: "pending", paid_at: null,
         ...partial,
     } as CommissionEntryRow;

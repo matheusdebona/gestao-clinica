@@ -43,7 +43,7 @@ class FinanceSettingsController extends Controller
             'simples_rate_percent.required_if' => 'Informe a alíquota efetiva do Simples.',
         ]);
 
-        $from = CarbonImmutable::createFromFormat('Y-m', $data['effective_month'])->startOfMonth()->toDateString();
+        $from = CarbonImmutable::createFromFormat('!Y-m', $data['effective_month'])->startOfMonth()->toDateString();
         unset($data['effective_month']);
 
         $setting = TaxSetting::query()->updateOrCreate(

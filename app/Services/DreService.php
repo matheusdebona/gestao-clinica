@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Sale;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 
 /**
@@ -58,16 +59,18 @@ class DreService
         $from = $month->startOfMonth();
         $to = $month->endOfMonth();
 
-        if ($from->lte(CarbonImmutable::now()->startOfMonth())) {
+        if ($from->format('Y-m') <= ClinicMonth::of()) {
             $this->generator->generateMonth($clinicId, $from);
         }
 
         $cm = $this->margin->summarize($from, $to, salesLimit: 0)['totals'];
 
+        // Mês civil de São Paulo, como a margem de contribuição e a remuneração por faturamento.
+        [$monthStart, $monthEnd] = ClinicMonth::bounds($from->format('Y-m'));
         $sales = Sale::query()
             ->where('status', Sale::STATUS_CONFIRMED)
             ->whereNotNull('sold_at')
-            ->whereBetween('sold_at', [$from->startOfDay(), $to->endOfDay()])
+            ->whereBetween('sold_at', [$monthStart, $monthEnd])
             ->with('items:id,sale_id,line_total,list_line_total')
             ->get(['id', 'effective_amount']);
         $netRevenue = (float) $cm['revenue'];

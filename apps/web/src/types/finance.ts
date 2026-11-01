@@ -160,6 +160,8 @@ export interface CommissionEntryRow {
   appointment_id: number | null
   client_name: string | null
   occurred_at: string | null
+  /** Data do evento no calendário de São Paulo (Y-m-d), a que a tela mostra. */
+  occurred_on: string | null
   protocol_name: string | null
   base_amount: string
   rate_percent: string | null

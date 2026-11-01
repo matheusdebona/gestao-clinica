@@ -12,6 +12,7 @@ use App\Models\TaxSetting;
 use App\Models\Treatment;
 use App\Models\User;
 use App\Services\Finance\SaleEconomics;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
@@ -42,8 +43,8 @@ class ContributionMarginService
      */
     public function summarize(CarbonImmutable $from, CarbonImmutable $to, int $salesLimit = 50): array
     {
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from e to são lidos como datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
 
         $sales = Sale::query()
             ->where('status', Sale::STATUS_CONFIRMED)
@@ -126,8 +127,8 @@ class ContributionMarginService
         $clinicMargin = $totals['contribution_margin'] - $lossTotal - $goalCommissions;
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'totals' => [
                 ...$total,
                 'supplies_estimated' => $this->money($totals['supplies_estimated']),

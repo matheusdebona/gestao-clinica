@@ -35,6 +35,7 @@ function entry(partial: Partial<CommissionEntryRow>): CommissionEntryRow {
         appointment_id: null,
         client_name: "Lia Mota",
         occurred_at: "2026-10-10T12:00:00Z",
+        occurred_on: "2026-10-10",
         protocol_name: null,
         base_amount: "80.00",
         rate_percent: null,

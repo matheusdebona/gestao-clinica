@@ -453,7 +453,7 @@ class GoalRemunerationTest extends TestCase
         $this->assertSame($appointmentId, (int) $lead->booked_appointment_id);
 
         Lead::query()->whereKey($lead->id)->update(['booked_appointment_id' => null]);
-        Artisan::call('migrate:rollback', ['--step' => 1]);
+        Artisan::call('migrate:rollback', ['--path' => 'database/migrations/2026_11_01_120000_add_goal_remunerations.php']);
         Artisan::call('migrate');
         $this->assertSame($appointmentId, (int) Lead::query()->find($lead->id)->booked_appointment_id);
     }

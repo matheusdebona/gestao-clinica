@@ -8,6 +8,7 @@ use App\Models\CommissionRule;
 use App\Models\Protocol;
 use App\Models\User;
 use App\Services\CommissionService;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
@@ -69,7 +70,7 @@ class CommissionController extends Controller
     public function entries(Request $request): JsonResponse
     {
         $data = $request->validate(['month' => ['required', 'date_format:Y-m']]);
-        $month = CarbonImmutable::createFromFormat('Y-m', $data['month'])->startOfMonth();
+        $month = CarbonImmutable::createFromFormat('!Y-m', $data['month'])->startOfMonth();
 
         $entries = CommissionEntry::query()
             ->whereDate('competence_month', $month->toDateString())
@@ -107,7 +108,9 @@ class CommissionController extends Controller
                 'tier_threshold' => $e->tier_threshold,
                 'lead_id' => $e->lead_id,
                 'client_name' => $e->appointment?->client?->name ?? $e->sale?->client?->name ?? $e->lead?->client?->name ?? $e->lead?->name,
-                'occurred_at' => $e->appointment?->finished_at ?? $e->sale?->sold_at ?? $this->goalOccurredAt($e),
+                'occurred_at' => $occurred = ($e->appointment?->finished_at ?? $e->sale?->sold_at ?? $this->goalOccurredAt($e)),
+                // Data do evento no calendário de São Paulo (a tela mostra esta, não a data UTC).
+                'occurred_on' => ClinicMonth::date($occurred),
                 'protocol_name' => $e->protocol?->name,
                 'base_amount' => $e->base_amount,
                 'rate_percent' => $e->rate_percent,
@@ -130,7 +133,7 @@ class CommissionController extends Controller
         $data = $request->validate(['month' => ['required', 'date_format:Y-m']]);
         $count = $service->rebuildMonth(
             (int) CurrentClinic::id(),
-            CarbonImmutable::createFromFormat('Y-m', $data['month'])->startOfMonth(),
+            CarbonImmutable::createFromFormat('!Y-m', $data['month'])->startOfMonth(),
         );
 
         return response()->json(['data' => ['processed' => $count]]);

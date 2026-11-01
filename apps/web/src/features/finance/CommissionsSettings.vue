@@ -377,7 +377,7 @@ function unpayUser(userId: number) {
                       class="block text-muted"
                       :class="entry.goal_kind === 'tier' ? 'break-words' : 'truncate'"
                     >
-                      {{ entrySubtitle(entry, formatIsoDate(entry.occurred_at?.slice(0, 10))) }}
+                      {{ entrySubtitle(entry, formatIsoDate(entry.occurred_on)) }}
                     </span>
                   </span>
                   <span class="flex shrink-0 items-center gap-2 tabular-nums text-title">

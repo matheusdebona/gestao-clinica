@@ -7,6 +7,7 @@ use App\Models\Lead;
 use App\Models\Sale;
 use App\Models\User;
 use App\Models\UserGoal;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,13 +29,13 @@ use Illuminate\Support\Collection;
  */
 class UserGoalService
 {
-    public const TZ = 'America/Sao_Paulo';
+    public const TZ = ClinicMonth::TZ;
 
     public const METRICS = ['appointments', 'sales', 'approached'];
 
     public static function currentMonth(): string
     {
-        return CarbonImmutable::now(self::TZ)->format('Y-m');
+        return ClinicMonth::of();
     }
 
     /**
@@ -42,9 +43,7 @@ class UserGoalService
      */
     public static function monthBounds(string $month): array
     {
-        $start = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $month.'-01 00:00:00', self::TZ);
-
-        return [$start->utc(), $start->endOfMonth()->utc()];
+        return ClinicMonth::bounds($month);
     }
 
     public function effectiveGoal(int $userId, string $month): ?UserGoal

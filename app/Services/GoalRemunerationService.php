@@ -8,6 +8,7 @@ use App\Models\GoalRemuneration;
 use App\Models\Lead;
 use App\Models\RemunerationTier;
 use App\Models\Sale;
+use App\Models\User;
 use App\Models\UserGoal;
 use App\Services\Finance\SaleEconomics;
 use Carbon\CarbonImmutable;
@@ -40,7 +41,15 @@ use Illuminate\Support\Facades\DB;
  * cobrados nas sessões delas), vale só a maior faixa: valor fixo + % do faturamento total.
  *
  * Como as comissões de venda: lançamentos pendentes são refeitos a cada sincronização; os pagos
- * nunca mudam e não são lançados de novo (faixa já paga no mês não gera diferença).
+ * nunca mudam e não são lançados de novo (faixa já paga no mês não gera diferença, mesmo que o
+ * realizado passe depois para uma faixa maior).
+ *
+ * Colaborador desativado não ganha (metas, faixas e faturamento): na sincronização os pendentes
+ * dele saem e nada novo é lançado; os pagos ficam.
+ *
+ * Cada evento conta no mês civil de São Paulo em que aconteceu: o agendamento no mês do "Agendou"
+ * e a venda no mês em que foi vendida (sold_at). A base do % da faixa de agendamentos de um mês só
+ * inclui vendas daquele mês; venda de outro mês de um paciente agendado antes não entra nela.
  */
 class GoalRemunerationService
 {
@@ -139,7 +148,9 @@ class GoalRemunerationService
         [$start, $end] = UserGoalService::monthBounds($month);
         $competence = $month.'-01';
 
-        DB::transaction(function () use ($clinicId, $userId, $month, $config, $start, $end, $competence): void {
+        $active = $this->isActive($userId);
+
+        DB::transaction(function () use ($clinicId, $userId, $month, $config, $start, $end, $competence, $active): void {
             $existing = CommissionEntry::query()->withoutGlobalScope('clinic')
                 ->where('clinic_id', $clinicId)
                 ->where('user_id', $userId)
@@ -147,6 +158,9 @@ class GoalRemunerationService
                 ->whereDate('competence_month', $competence);
 
             (clone $existing)->where('status', '!=', CommissionEntry::STATUS_PAID)->delete();
+            if (! $active) {
+                return; // Desativado não ganha; pagos ficam.
+            }
             $paid = (clone $existing)->where('status', CommissionEntry::STATUS_PAID)->get();
 
             $goal = $this->effectiveGoal($clinicId, $userId, $month);
@@ -244,8 +258,10 @@ class GoalRemunerationService
         }
 
         $revenue = $tiersByUser->isNotEmpty() ? $this->clinicRevenue($clinicId, $month) : 0.0;
+        $activeIds = User::query()->withoutGlobalScopes()->whereIn('id', $userIds)->where('is_active', true)
+            ->pluck('id')->map(fn ($id) => (int) $id)->all();
 
-        DB::transaction(function () use ($clinicId, $competence, $tiersByUser, $userIds, $revenue): void {
+        DB::transaction(function () use ($clinicId, $competence, $tiersByUser, $userIds, $revenue, $activeIds): void {
             foreach ($userIds as $userId) {
                 $existing = CommissionEntry::query()->withoutGlobalScope('clinic')
                     ->where('clinic_id', $clinicId)
@@ -253,8 +269,9 @@ class GoalRemunerationService
                     ->where('role', CommissionEntry::ROLE_REVENUE)
                     ->whereDate('competence_month', $competence);
                 (clone $existing)->where('status', '!=', CommissionEntry::STATUS_PAID)->delete();
-                if ((clone $existing)->where('status', CommissionEntry::STATUS_PAID)->exists()) {
-                    continue;
+                if (! in_array($userId, $activeIds, true)
+                    || (clone $existing)->where('status', CommissionEntry::STATUS_PAID)->exists()) {
+                    continue; // Desativado não ganha; faixa paga não gera diferença.
                 }
 
                 $tier = RemunerationTier::reached($tiersByUser->get($userId, collect()), $revenue);
@@ -378,6 +395,25 @@ class GoalRemunerationService
                 $this->syncUserMonth((int) $lead->clinic_id, (int) $userId, self::monthOf($at));
             }
         }
+    }
+
+    /**
+     * Colaborador ativado/desativado: refaz o mês atual (metas e faturamento). Meses anteriores
+     * só mudam com "Recalcular mês"; pagos nunca mudam.
+     */
+    public function onUserActiveChanged(User $user): void
+    {
+        if ($user->clinic_id === null) {
+            return;
+        }
+        $month = self::monthOf(now());
+        $this->syncUserMonth((int) $user->clinic_id, (int) $user->id, $month);
+        $this->syncRevenueMonth((int) $user->clinic_id, $month);
+    }
+
+    private function isActive(int $userId): bool
+    {
+        return (bool) User::query()->withoutGlobalScopes()->whereKey($userId)->value('is_active');
     }
 
     /** Lead cancelado: a abordagem dele deixa de pagar (pendentes saem; pagos ficam). */
