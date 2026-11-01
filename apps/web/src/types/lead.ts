@@ -51,6 +51,10 @@ export interface LeadActivity {
   from_status?: LeadStatus | null
   to_status?: LeadStatus | null
   created_at: string
+  /** Set when a comment was edited. */
+  edited_at?: string | null
+  /** Comments only: latest comment and the user is its author or an admin. */
+  can_edit?: boolean
 }
 
 export interface Lead {
