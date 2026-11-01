@@ -1,0 +1,35 @@
+---
+import { CTA_REGISTER_STRONG_LABEL, MOCK_CAPTION } from '../content/site'
+import { APP_REGISTER_URL } from '../lib/urls'
+import MockAgenda from './mocks/MockAgenda.astro'
+import PhoneFrame from './PhoneFrame.astro'
+---
+
+<section id="celular" class="site-anchor py-20 sm:py-28" aria-labelledby="celular-title">
+  <div class="site-wrap grid items-center gap-14 lg:grid-cols-[auto_minmax(0,1fr)] lg:gap-24">
+    <div class="flex flex-col items-start" data-reveal>
+      <PhoneFrame label="Agenda no celular, tela de exemplo">
+        <MockAgenda />
+      </PhoneFrame>
+      <p class="mt-3 max-w-[18rem] text-[12px] leading-5 text-muted">{MOCK_CAPTION}</p>
+    </div>
+
+    <div class="max-w-lg" data-reveal>
+      <p class="kicker">No celular</p>
+      <h2 id="celular-title" class="section-title mt-4 text-title">
+        No bolso da doutor·a, não só no computador da recepção.
+      </h2>
+      <p class="mt-5 text-[16px] leading-7 text-body">
+        Confirma a sessão no corredor. Cobra o orçamento no balcão. Abre o DRE no sofá. A clínica
+        cabe no telefone: agenda do dia, paciente que esfriou, quanto sobrou no mês.
+      </p>
+      <a
+        class="site-cta-primary mt-8 w-full sm:w-auto"
+        href={APP_REGISTER_URL}
+        data-section-cta
+      >
+        {CTA_REGISTER_STRONG_LABEL}
+      </a>
+    </div>
+  </div>
+</section>

@@ -9,157 +9,198 @@ import {
 } from '../lib/urls'
 
 export const SITE_URL = `https://${MARKETING_HOST}`
-export const SITE_TITLE = `${APP_NAME} — estoque, pacientes e agenda da clínica`
+export const SITE_TITLE = `${APP_NAME}: saia da planilha. A clínica no celular.`
 export const SITE_ONE_LINER =
-  'HOF Pay reúne estoque, protocolos, pacientes, agenda e números da clínica — no celular e no consultório.'
+  'HOF Pay é o sistema da clínica de harmonização no celular. Lead, agenda, sessão e o fechamento do mês. Dá para ver se sobrou ou faltou.'
+
+export const HERO_KICKER = 'Clínica de harmonização orofacial'
+export const HERO_TITLE_LEAD = 'A planilha não fecha o mês.'
+export const HERO_TITLE_EMPHASIS = 'O celular fecha.'
+export const HERO_LEAD =
+  'Você aplica, a maquininha passa, a comissão sai. No domingo a célula amarela não diz se deu lucro ou prejuízo. HOF Pay junta lead, agenda e o DRE: margem líquida, no bolso.'
 
 export const CTA_REGISTER_LABEL = 'Criar clínica'
 export const CTA_REGISTER_STRONG_LABEL = 'Criar minha clínica'
 export const CTA_LOGIN_LABEL = 'Já tenho acesso'
 export const CTA_LOGIN_SHORT_LABEL = 'Entrar'
 
+export const MOCK_CAPTION = 'Tela de exemplo. Números de demonstração, não são de clínica nenhuma.'
+export const HERO_STAGE_CAPTION = 'A planilha vira o DRE no celular.'
+
+export const painItems = [
+  {
+    id: 'planilha',
+    title: 'O fechamento no chute',
+    copy: 'Taxa da maquininha, imposto, comissão, aluguel, toxina. Cada um numa aba. No fim do mês ninguém sabe se sobrou ou faltou.',
+  },
+  {
+    id: 'leads',
+    title: 'O paciente que sumiu',
+    copy: 'Mandou mensagem no WhatsApp da recepção. Caiu no chat pessoal. Ninguém cobrou, ninguém anotou. Sumiu.',
+  },
+  {
+    id: 'agenda',
+    title: 'A cadeira vazia',
+    copy: 'A sessão de amanhã está na agenda. Ninguém confirmou. O retorno previsto ficou no caderninho. A cadeira fica vazia.',
+  },
+] as const
+
+export const showcases = [
+  {
+    id: 'lucro',
+    kicker: 'Fechamento',
+    title: 'Quanto sobrou. Sem aba amarela.',
+    copy: 'O DRE do mês junta o que a planilha espalha: receita, insumo, taxa da maquininha, imposto, comissão e despesa. Sai margem de contribuição, margem líquida e ponto de equilíbrio.',
+    points: [
+      'Taxa da maquininha e imposto entram na conta, não ficam de fora',
+      'Comissão, despesa do mês e depreciação de equipamento no mesmo demonstrativo',
+      'Margem de contribuição, margem líquida e ponto de equilíbrio',
+    ],
+    mock: 'dre' as const,
+  },
+  {
+    id: 'funil',
+    kicker: 'Leads',
+    title: 'O paciente que mandou mensagem não some.',
+    copy: 'Do primeiro WhatsApp até a venda: lead criado, abordado, respondeu, agendou, compareceu, orçamento, venda. A recepção cobra pelo WhatsApp. Lead parado aparece no início do dia.',
+    points: [
+      'Funil até a venda, por origem e por colaborador',
+      'WhatsApp com a mensagem pronta. O toque fica no histórico',
+      'Fila de acompanhamento quando o lead esfria',
+    ],
+    mock: 'funnel' as const,
+  },
+  {
+    id: 'agenda',
+    kicker: 'Agenda',
+    title: 'Confirma amanhã no WhatsApp.',
+    copy: 'Sessão, retorno e o dia do profissional de harmonização no celular. A equipe manda a confirmação com a mensagem pronta e marca quem confirmou, quem desmarcou e quem ainda não respondeu.',
+    points: [
+      'Confirmar amanhã: a conversa do WhatsApp já sai montada',
+      'Retorno a vencer e atrasado, também no WhatsApp',
+      'Agenda da sessão, não um calendário vazio',
+    ],
+    mock: 'agenda' as const,
+  },
+] as const
+
 export const features = [
   {
-    id: 'estoque',
-    title: 'Estoque',
-    teaser: 'A baixa só acontece no tratamento, não na venda.',
-    headline: 'A baixa só acontece no tratamento',
-    copy: 'Lotes, validade e reposição acompanham a sessão. O frasco só sai do registro quando o profissional de harmonização informa o que foi aplicado.',
-    points: [
-      'Lote, validade e custo real do que entra na clínica',
-      'Reposição no ritmo do consumo, não do caixa',
-      'Venda e contrato primeiro; baixa só na sessão',
-    ],
+    id: 'financeiro',
+    title: 'Financeiro',
+    teaser: 'DRE do mês. Taxa da maquininha, imposto, comissão, despesa. Quanto sobrou.',
+    href: '#lucro',
   },
   {
-    id: 'protocolos',
-    title: 'Protocolos',
-    teaser: 'Procedimento com produtos, sessões e preço — sem improviso na poltrona.',
-    headline: 'Procedimento com composição e preço',
-    copy: 'O serviço deixa de ser “a gosto”. Cada protocolo junta produtos, sessões e quatro preços: custo, sugerido, mínimo e especial.',
-    points: [
-      'Composição com o que a clínica realmente usa',
-      'Custo, sugerido, mínimo e especial no mesmo lugar',
-      'Sessões do tratamento já entram no protocolo',
-    ],
-  },
-  {
-    id: 'pacientes',
-    title: 'Pacientes',
-    teaser: 'Cadastro, origem e o tratamento em andamento.',
-    headline: 'A recepção encontra a pessoa certa',
-    copy: 'Cadastro, WhatsApp, origem e histórico de orçamentos, vendas e sessões. A equipe não perde o fio da conversa; o profissional de harmonização vê o que já foi aplicado.',
-    points: [
-      'Cadastro, WhatsApp e origem da indicação',
-      'Histórico de orçamentos, vendas e sessões',
-      'Tratamento em andamento visível para a equipe',
-    ],
+    id: 'leads',
+    title: 'Leads',
+    teaser: 'Funil, cobrança no WhatsApp e o paciente que ia esfriar.',
+    href: '#funil',
   },
   {
     id: 'agenda',
     title: 'Agenda',
-    teaser: 'Sessões, retornos e o dia do profissional de harmonização.',
-    headline: 'Sessões e retornos no celular',
-    copy: 'O dia da clínica em um olhar: sessões do tratamento, retornos e o que falta aplicar. Feita para o celular, também no consultório.',
-    points: [
-      'Sessões do tratamento, não só um calendário vazio',
-      'Retornos visíveis no dia do profissional de harmonização',
-      'Uso no celular da equipe, sem depender só da recepção',
-    ],
+    teaser: 'Sessão, retorno e confirmação pelo WhatsApp.',
+    href: '#agenda',
   },
   {
-    id: 'metricas',
-    title: 'Métricas',
-    teaser: 'Margem, comercial e operação no mesmo sistema.',
-    headline: 'Margem verdadeira, sem planilha paralela',
-    copy: 'Números da clínica depois da baixa no tratamento: margem, funil de orçamento até a venda, estoque e operação. Sem aba à parte para “o que realmente foi usado”.',
-    points: [
-      'Margem depois da baixa na sessão',
-      'Orçamento aceito até a venda confirmada',
-      'Estoque e operação no mesmo olhar',
-    ],
-  },
-] as const
-
-export const proofPoints = [
-  {
-    title: 'Orçamento → aceitar → venda',
-    copy: 'A venda só se confirma quando o paciente aceita o orçamento.',
+    id: 'pacientes',
+    title: 'Pacientes',
+    teaser: 'Cadastro, origem, histórico e tratamento em andamento.',
+    href: '#produto',
   },
   {
-    title: 'Estoque na sessão',
-    copy: 'A baixa acontece no tratamento, não no caixa.',
+    id: 'vendas',
+    title: 'Orçamentos e vendas',
+    teaser: 'Orçamento aceito vira venda. O que ficou parado entra na fila de cobrança.',
+    href: '#produto',
   },
   {
-    title: 'Agenda no celular',
-    copy: 'Sessões e retornos no dia do profissional de harmonização.',
+    id: 'protocolos',
+    title: 'Protocolos',
+    teaser: 'Produto, sessão e preço. Sem inventar na poltrona.',
+    href: '#produto',
+  },
+  {
+    id: 'estoque',
+    title: 'Estoque',
+    teaser: 'A baixa é no tratamento, não na venda. O frasco só sai quando aplica.',
+    href: '#produto',
+  },
+  {
+    id: 'equipe',
+    title: 'Comissão e meta',
+    teaser: 'Regra de comissão e meta do mês por colaborador.',
+    href: '#produto',
   },
 ] as const
 
 export const rhythmSteps = [
   {
     n: '01',
-    title: 'Cadastrar produtos',
-    copy: 'O que entra na clínica fica registrado: lote, validade, custo real.',
+    title: 'O lead entra no sistema, não no chat pessoal',
+    copy: 'WhatsApp, prazo e quem é o responsável ficam visíveis. O paciente não some.',
   },
   {
     n: '02',
-    title: 'Montar protocolos',
-    copy: 'O procedimento vira um serviço com composição, sessões e preço.',
+    title: 'Agenda e confirma',
+    copy: 'A sessão entra na agenda. A equipe confirma pelo WhatsApp e vê quem ainda não respondeu.',
   },
   {
     n: '03',
-    title: 'Orçar, aceitar e vender',
-    copy: 'O orçamento sai da venda em rascunho. Com o aceite do paciente, a venda fecha — o frasco ainda não saiu da geladeira.',
+    title: 'Orça, o paciente aceita, a venda fecha',
+    copy: 'O orçamento sai da venda em rascunho. Com o aceite, a venda fecha. O frasco ainda está na geladeira.',
   },
   {
     n: '04',
-    title: 'Tratar e baixar o que foi usado',
-    copy: 'Na sessão, o profissional de harmonização informa o que foi aplicado. Aí sim o estoque e a margem fecham.',
+    title: 'Aplica e baixa o que usou',
+    copy: 'Na sessão, o profissional de harmonização informa o que foi aplicado. Aí o estoque e o custo fecham.',
+  },
+  {
+    n: '05',
+    title: 'Fecha o mês no DRE',
+    copy: 'Receita, taxa da maquininha, imposto, comissão e despesa no mesmo lugar. Margem líquida: sobrou ou faltou.',
   },
 ] as const
 
-export const clinicLabels = [
-  'Estética',
-  'Dermatologia',
-  'Harmonização',
-  'Odontologia',
-  'Procedimentos injetáveis',
-  'Medicina integrativa',
-  'Clínicas boutique',
-  'Multiunidade',
-] as const
+export const clinicLine =
+  'Harmonização orofacial, estética, dermatologia, odontologia e procedimentos injetáveis.'
 
 export const faqs = [
   {
     id: 'planilha',
-    q: 'O HOF Pay substitui a planilha da clínica?',
-    a: 'Sim. Estoque, protocolos, vendas, tratamentos e margem ficam no mesmo ritmo — sem aba paralela para “o que realmente foi usado”.',
+    q: 'Substitui a planilha da clínica?',
+    a: 'Sim. Lead, agenda, paciente, orçamento, venda, estoque, comissão, despesa e o DRE do mês ficam no mesmo sistema, no celular. Não tem aba paralela para “o que realmente fechou”.',
+  },
+  {
+    id: 'lucro',
+    q: 'Como eu sei se sobrou ou faltou no mês?',
+    a: 'Pelo DRE. Entram receita, insumo, taxa da maquininha, imposto, comissão, perda de estoque e despesa. O resultado traz margem de contribuição, margem líquida e ponto de equilíbrio.',
   },
   {
     id: 'celular',
     q: 'Funciona no celular?',
-    a: 'Sim. O sistema da clínica foi feito para o celular. Profissionais de harmonização e a equipe usam no dia a dia, não só no computador da recepção.',
+    a: 'Sim. Foi feito para o celular. A doutor·a, a recepção e a equipe usam no dia: agenda, confirmação, lead e o DRE. Não depende do computador da recepção.',
+  },
+  {
+    id: 'whatsapp',
+    q: 'Como funciona a confirmação no WhatsApp?',
+    a: 'A equipe abre a conversa no WhatsApp com a mensagem pronta: confirmação de consulta, cobrança de lead, retorno do paciente ou orçamento parado. O toque fica registrado no sistema.',
   },
   {
     id: 'estoque',
     q: 'A venda já baixa o estoque?',
-    a: 'Não. A venda e o contrato acontecem primeiro. A baixa é no tratamento, quando o profissional de harmonização informa o que foi de fato aplicado.',
+    a: 'Não. A venda acontece primeiro. A baixa é no tratamento, quando o profissional de harmonização informa o que foi de fato aplicado.',
   },
   {
     id: 'orcamento',
     q: 'Como o orçamento vira venda?',
-    a: 'O orçamento sai da venda em rascunho. Quando o paciente aceita, a venda pode ser confirmada. Agenda e consumo ficam na etapa de tratamento.',
-  },
-  {
-    id: 'preco',
-    q: 'Quanto custa?',
-    a: 'Planos em breve. Ainda não há tabela pública — e não publicamos valores inventados. Crie a clínica para começar; a oferta comercial entra quando estiver pronta.',
+    a: 'O orçamento sai da venda em rascunho. Quando o paciente aceita, a venda pode ser confirmada. Agenda e consumo ficam na etapa de tratamento. Orçamento enviado sem resposta entra na fila de cobrança.',
   },
   {
     id: 'acesso',
-    q: 'Como entro no sistema?',
-    a: 'Pelo sistema em app.hofpay.com.br. O cadastro cria a clínica e o primeiro usuário administrador. Quem já tem conta entra pelo login.',
+    q: 'Como eu começo?',
+    a: 'Crie a clínica em app.hofpay.com.br. O cadastro abre o sistema e o primeiro usuário administrador. Quem já tem conta entra pelo login.',
   },
 ] as const
 
@@ -217,25 +258,38 @@ export const llmsTxt = `# ${APP_NAME}
 
 > ${SITE_ONE_LINER}
 
-HOF Pay é um sistema de gestão para clínicas (estoque, protocolos, pacientes, agenda e números). Este site não pede login e não se conecta ao sistema da clínica. O produto operacional está em app.hofpay.com.br.
+HOF Pay é um sistema de gestão para clínicas de harmonização orofacial e estética. Este site não pede login e não se conecta ao sistema da clínica. O produto operacional está em app.hofpay.com.br.
 
 Idioma: pt-BR.
 
+Mensagem central: sair da planilha, tocar a clínica no celular e saber no fechamento do mês se sobrou ou faltou (margem líquida).
+
 ## Para quem
 
-Clínicas (estética, dermatologia, harmonização, odontologia, procedimentos injetáveis, medicina integrativa, multiunidade). Profissionais de harmonização e a equipe, no celular e no consultório.
+Clínicas de harmonização orofacial, estética, dermatologia, odontologia e procedimentos injetáveis. Profissional de harmonização, recepção e a equipe. No celular e no consultório.
 
-## Produto
+Não use “cliente” para a pessoa atendida: no produto é paciente. Não descreva o público como “médico/médica”; use profissional de harmonização ou doutor·a.
 
-- Estoque: lotes, validade, reposição. A baixa acontece no tratamento, não na venda.
-- Protocolos: procedimentos com produtos, sessões e preços (custo, sugerido, mínimo, especial).
-- Pacientes: cadastro, WhatsApp, origem e histórico de orçamentos, vendas e sessões.
-- Agenda: sessões e retornos no dia do profissional de harmonização.
-- Métricas: margem, comercial e operação — sem planilha paralela.
+## Produto (o que existe hoje)
+
+- Leads: cadastro, funil (lead criado → abordado → respondeu → agendou → compareceu → orçamento → venda), follow-up pelo WhatsApp, prazos de lead parado.
+- Agenda: sessões e retornos; confirmação de consultas pelo WhatsApp (mensagem pronta); status de confirmação.
+- Pacientes: cadastro, WhatsApp, origem, histórico de orçamentos, vendas e sessões.
+- Retornos: fila de retornos a vencer/atrasados, chamada no WhatsApp.
+- Orçamentos e vendas: orçamento em rascunho → aceite do paciente → venda confirmada. Follow-up de orçamento enviado sem resposta.
+- Protocolos: procedimento com produtos, sessões e preços (custo, sugerido, mínimo, especial).
+- Estoque: a baixa acontece no tratamento, não na venda. Custo real do que foi aplicado.
+- Tratamentos: o profissional informa o que foi aplicado na sessão.
+- Comissões: regras por vendedor ou profissional; lançamentos do mês.
+- Metas: metas por colaborador no mês (agenda, vendas, leads abordados).
+- Financeiro: taxas de cartão (maquininha), impostos, despesas (fixas, variáveis, marketing, pessoal, depreciação de equipamentos) e DRE mensal com margem de contribuição, margem líquida e ponto de equilíbrio.
+- Métricas: comercial, funil de vendas, operação e estoque no mesmo sistema.
+
+WhatsApp: o sistema abre a conversa (wa.me) com modelo de mensagem; não é disparo automático pago.
 
 ## Preço
 
-Planos em breve. Não há tabela pública. Não inventamos valores. Para começar: criar a clínica no sistema.
+Não há tabela pública de preços neste site. Não invente valores, planos, descontos, depoimentos, logos de clientes nem estatísticas. Para começar: criar a clínica no sistema.
 
 ## URLs
 
@@ -255,12 +309,11 @@ export const llmsFullTxt = `${llmsTxt}
 
 ## O ritmo da clínica
 
-Vender não baixa estoque. Ordem:
-
-1. Cadastrar produtos (lote, validade, custo real).
-2. Montar protocolos (serviço com composição, sessões e preço).
-3. Orçar, o paciente aceita, a venda fecha — o produto ainda não sai da geladeira.
-4. No tratamento, informar o que foi aplicado. Aí o estoque e a margem fecham.
+1. O lead entra no sistema, não no chat pessoal.
+2. Agendar e confirmar no WhatsApp.
+3. Orçar, o paciente aceita, a venda fecha. O produto ainda não sai da geladeira.
+4. No tratamento, informar o que foi aplicado. Aí o estoque e o custo fecham.
+5. Fechar o mês no DRE: margem de contribuição, margem líquida, ponto de equilíbrio.
 
 ## Perguntas frequentes
 

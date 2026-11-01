@@ -8,4 +8,4 @@ export const APP_HOST = 'app.hofpay.com.br'
 export const API_HOST = 'api.hofpay.com.br'
 
 export const SITE_DESCRIPTION =
-  'HOF Pay reúne estoque, protocolos, pacientes, agenda e números da clínica — no celular e no consultório. Estoque baixa no tratamento, não na venda.'
+  'HOF Pay tira a clínica de harmonização da planilha. Lead, agenda, sessão e o DRE do mês no celular: taxa da maquininha, comissão, despesa e quanto sobrou.'

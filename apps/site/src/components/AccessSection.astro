@@ -5,23 +5,13 @@ import CtaRow from './CtaRow.astro'
 
 <section id="acesso" class="site-anchor py-10 sm:py-16">
   <div class="site-wrap">
-    <div
-      class="relative overflow-hidden rounded-chrome hero-mesh px-4 py-12 text-inverse sm:px-12 sm:py-16"
-      data-reveal
-    >
-      <div class="relative max-w-2xl">
-        <p class="eyebrow glass-dark text-inverse/80">Comece agora</p>
-        <h2 class="section-title mt-4 text-inverse">Crie a clínica. Planos em breve.</h2>
-        <p class="mt-4 max-w-xl text-[16px] leading-7 text-inverse/75">
-          Ainda não há tabela pública — e não inventamos valores. Enquanto os planos não
-          entram, você já pode criar a clínica e usar o produto no celular e no consultório.
-        </p>
-        <CtaRow
-          primary={CTA_REGISTER_STRONG_LABEL}
-          secondary={CTA_LOGIN_LABEL}
-          onDark
-        />
-      </div>
+    <div class="hero-solid rounded-chrome px-5 py-14 text-inverse sm:px-12 sm:py-16" data-reveal>
+      <p class="kicker text-inverse/55">Começar</p>
+      <h2 class="section-title mt-4 max-w-xl text-inverse">Cria a clínica. Abre o DRE do mês.</h2>
+      <p class="mt-4 max-w-lg text-[16px] leading-7 text-inverse/70">
+        Sai da planilha. O cadastro já abre o sistema: lead, agenda e o fechamento no celular.
+      </p>
+      <CtaRow primary={CTA_REGISTER_STRONG_LABEL} secondary={CTA_LOGIN_LABEL} onDark />
     </div>
   </div>
 </section>

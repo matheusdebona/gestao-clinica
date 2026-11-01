@@ -1,0 +1,52 @@
+---
+const stages = [
+  { label: 'Lead criado', count: 42, width: '100%' },
+  { label: 'Abordado', count: 36, width: '86%' },
+  { label: 'Respondeu', count: 24, width: '57%' },
+  { label: 'Agendou', count: 18, width: '43%' },
+  { label: 'Compareceu', count: 15, width: '36%' },
+  { label: 'Orçamento criado', count: 11, width: '26%' },
+  { label: 'Venda', count: 8, width: '19%' },
+]
+---
+
+<div class="mock-app">
+  <header class="mock-app-head">
+    <p class="mock-kicker">Métricas</p>
+    <h3 class="mock-title">Funil de vendas</h3>
+    <p class="mock-meta">Lead até a venda. Tela de exemplo.</p>
+  </header>
+
+  <div class="mock-card">
+    <div class="flex items-baseline justify-between gap-2">
+      <p class="text-[11px] font-medium text-muted">Conversão do funil</p>
+      <p class="text-[18px] font-semibold tabular-nums tracking-[-0.03em] text-title">19%</p>
+    </div>
+    <div class="mt-3 grid gap-2.5">
+      {
+        stages.map((stage) => (
+          <div>
+            <div class="flex items-center justify-between gap-2 text-[11px]">
+              <span class="text-title">{stage.label}</span>
+              <span class="tabular-nums text-muted">{stage.count}</span>
+            </div>
+            <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-surface-muted">
+              <div class="h-full rounded-full bg-brand" style={`width: ${stage.width}`}></div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="mt-1.5 grid grid-cols-2 gap-1.5">
+    <div class="mock-card">
+      <p class="text-[10px] text-muted">Leads parados</p>
+      <p class="mt-1 text-[13px] font-semibold text-title">Fila no início do dia</p>
+    </div>
+    <div class="mock-card">
+      <p class="text-[10px] text-muted">WhatsApp</p>
+      <p class="mt-1 text-[13px] font-semibold text-title">Toque no histórico</p>
+    </div>
+  </div>
+</div>

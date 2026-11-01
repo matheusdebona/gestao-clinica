@@ -1,0 +1,54 @@
+---
+import { MOCK_CAPTION, showcases } from '../content/site'
+import MockAgenda from './mocks/MockAgenda.astro'
+import MockDre from './mocks/MockDre.astro'
+import MockFunnel from './mocks/MockFunnel.astro'
+import PhoneFrame from './PhoneFrame.astro'
+---
+
+{
+  showcases.map((item, index) => (
+    <section
+      id={item.id}
+      class="site-anchor py-16 sm:py-24"
+      aria-labelledby={`${item.id}-title`}
+    >
+      <div
+        class:list={[
+          'site-wrap grid items-center gap-12 lg:gap-20',
+          index % 2 === 0
+            ? 'lg:grid-cols-[minmax(0,1fr)_auto]'
+            : 'lg:grid-cols-[auto_minmax(0,1fr)]',
+        ]}
+      >
+        <div class:list={[index % 2 === 1 && 'lg:order-2', 'max-w-lg']} data-reveal>
+          <p class="kicker">{item.kicker}</p>
+          <h2 id={`${item.id}-title`} class="section-title mt-4 text-title">
+            {item.title}
+          </h2>
+          <p class="mt-5 text-[16px] leading-7 text-body">{item.copy}</p>
+          <ul class="mt-6 grid list-none gap-3 border-t border-border-divider p-0 pt-5">
+            {item.points.map((point) => (
+              <li class="text-[15px] leading-6 text-body">{point}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div
+          class:list={[
+            'flex flex-col',
+            index % 2 === 1 ? 'lg:order-1 items-start' : 'items-start lg:items-end',
+          ]}
+          data-reveal
+        >
+          <PhoneFrame label={`${item.kicker}, tela de exemplo`}>
+            {item.mock === 'dre' && <MockDre />}
+            {item.mock === 'funnel' && <MockFunnel />}
+            {item.mock === 'agenda' && <MockAgenda />}
+          </PhoneFrame>
+          <p class="mt-3 max-w-[18rem] text-[12px] leading-5 text-muted">{MOCK_CAPTION}</p>
+        </div>
+      </div>
+    </section>
+  ))
+}

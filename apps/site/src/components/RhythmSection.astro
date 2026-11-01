@@ -2,36 +2,30 @@
 import { rhythmSteps } from '../content/site'
 ---
 
-<section id="ritmo" class="site-anchor pb-8 sm:pb-12" aria-labelledby="ritmo-title">
-  <div class="site-wrap">
-    <div class="glass-regular overflow-hidden rounded-chrome px-5 py-10 sm:px-10 sm:py-14">
-      <div class="max-w-2xl" data-reveal>
-        <p class="eyebrow glass-chip glass-chip-brand text-brand">O ritmo</p>
-        <h2 id="ritmo-title" class="section-title mt-4 text-title">Vender não é baixar estoque.</h2>
-        <p class="mt-4 max-w-xl text-[16px] leading-7 text-body">
-          Na clínica, o produto só sai quando a sessão acontece. HOF Pay respeita essa ordem —
-          orçar, aceitar, vender; baixar só no tratamento.
-        </p>
-      </div>
-
-      <ol class="relative mt-10 grid list-none gap-4 p-0" data-reveal-stagger>
-        {
-          rhythmSteps.map((step) => (
-            <li
-              class="relative grid gap-2 rounded-xl glass-clear px-4 py-4 sm:grid-cols-[auto_1fr] sm:items-start sm:gap-5 sm:px-5"
-              data-reveal-item
-            >
-              <span class="grid size-8 place-items-center rounded-full bg-brand text-[12px] font-semibold text-inverse">
-                {step.n}
-              </span>
-              <div>
-                <h3 class="text-[17px] font-semibold tracking-[-0.02em] text-title">{step.title}</h3>
-                <p class="mt-1 text-[15px] leading-6 text-body">{step.copy}</p>
-              </div>
-            </li>
-          ))
-        }
-      </ol>
+<section id="ritmo" class="site-anchor py-20 sm:py-28" aria-labelledby="ritmo-title">
+  <div class="site-wrap grid gap-12 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-20">
+    <div data-reveal>
+      <p class="kicker">Do WhatsApp ao DRE</p>
+      <h2 id="ritmo-title" class="section-title mt-4 text-title">
+        Vender não baixa estoque. Fechar o mês não é somar aba.
+      </h2>
+      <p class="mt-5 max-w-md text-[16px] leading-7 text-body">
+        O produto só sai quando a sessão acontece. O DRE só fecha quando taxa, comissão e despesa
+        entram junto com a receita.
+      </p>
     </div>
+
+    <ol class="m-0 grid list-none gap-0 border-l border-border-divider p-0 pl-6 sm:pl-8" data-reveal-stagger>
+      {
+        rhythmSteps.map((step) => (
+          <li class="relative py-5 first:pt-0 last:pb-0" data-reveal-item>
+            <span class="absolute -left-6 top-6 size-2 -translate-x-1/2 rounded-full bg-brand sm:-left-8" />
+            <p class="font-mono text-[12px] tabular-nums text-muted">{step.n}</p>
+            <h3 class="mt-1 text-[18px] font-semibold tracking-[-0.02em] text-title">{step.title}</h3>
+            <p class="mt-1.5 max-w-md text-[15px] leading-6 text-body">{step.copy}</p>
+          </li>
+        ))
+      }
+    </ol>
   </div>
 </section>

@@ -1,0 +1,55 @@
+---
+const rows = [
+  { n: '2', item: 'Aluguel', value: '4.800', note: 'ok' },
+  { n: '3', item: 'Taxa da maquininha', value: '???', note: 'outra aba' },
+  { n: '4', item: 'Comissão da Marina', value: '', note: 'combinado no zap' },
+  { n: '5', item: 'Imposto', value: '', note: 'contador manda' },
+  { n: '6', item: 'Toxina (compra)', value: '2.140', note: 'nota na gaveta' },
+  { n: '7', item: 'Ads', value: '1.200', note: 'cartão pessoal' },
+  { n: '8', item: 'Quanto sobrou', value: '', note: '?', highlight: true },
+]
+---
+
+<div class="sheet" role="img" aria-label="Planilha de fechamento incompleta">
+  <div class="sheet-chrome">
+    <span class="sheet-dots" aria-hidden="true">
+      <i></i><i></i><i></i>
+    </span>
+    <p class="sheet-file">fechamento_novembro.xlsx</p>
+  </div>
+  <div class="sheet-formula">
+    <span>fx</span>
+    <p>=B2+B3+B4+B5+B6+B7 &nbsp; #REF!</p>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th></th>
+        <th>A</th>
+        <th>B</th>
+        <th>C</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th>1</th>
+        <td>Item</td>
+        <td>Valor</td>
+        <td>Onde está</td>
+      </tr>
+      {
+        rows.map((row) => (
+          <tr class:list={[row.highlight && 'sheet-highlight']}>
+            <th>{row.n}</th>
+            <td>{row.item}</td>
+            <td class:list={[(!row.value || row.value === '???') && 'sheet-empty']}>
+              {row.value || '—'}
+            </td>
+            <td>{row.note}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <p class="sheet-foot">A célula do fechamento está vazia. De novo.</p>
+</div>

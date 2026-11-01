@@ -3,9 +3,11 @@ import AccessSection from '../components/AccessSection.astro'
 import ClinicsSection from '../components/ClinicsSection.astro'
 import FaqSection from '../components/FaqSection.astro'
 import FeatureBento from '../components/FeatureBento.astro'
-import FeatureModules from '../components/FeatureModules.astro'
-import HeroStage from '../components/HeroStage.vue'
-import ProofStrip from '../components/ProofStrip.astro'
+import HeroMotion from '../components/HeroMotion.vue'
+import HeroSection from '../components/HeroSection.astro'
+import MobileHandSection from '../components/MobileHandSection.astro'
+import PainSection from '../components/PainSection.astro'
+import ProductShowcase from '../components/ProductShowcase.astro'
 import RhythmSection from '../components/RhythmSection.astro'
 import ScrollReveal from '../components/ScrollReveal.vue'
 import SiteFooter from '../components/SiteFooter.astro'
@@ -16,12 +18,15 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 <BaseLayout>
   <SiteHeader client:load />
   <main>
-    <HeroStage client:load />
+    <HeroMotion client:load>
+      <HeroSection />
+    </HeroMotion>
     <ScrollReveal client:visible>
-      <ProofStrip />
+      <PainSection />
+      <ProductShowcase />
       <FeatureBento />
-      <FeatureModules />
       <RhythmSection />
+      <MobileHandSection />
       <ClinicsSection />
       <FaqSection />
       <AccessSection />

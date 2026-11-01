@@ -1,19 +1,27 @@
 <script setup lang="ts">
 import { Menu, X } from '@lucide/vue'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import {
-  CTA_LOGIN_SHORT_LABEL,
-  CTA_REGISTER_LABEL,
-} from '../content/site'
+import { CTA_LOGIN_SHORT_LABEL, CTA_REGISTER_LABEL } from '../content/site'
 import { APP_LOGIN_URL, APP_NAME, APP_REGISTER_URL } from '../lib/urls'
 import BrandMark from './BrandMark.vue'
+
+const nav = [
+  { href: '#lucro', label: 'Fechamento' },
+  { href: '#funil', label: 'Leads' },
+  { href: '#agenda', label: 'Agenda' },
+  { href: '#produto', label: 'O sistema' },
+  { href: '#faq', label: 'Perguntas' },
+] as const
 
 const open = ref(false)
 const condensed = ref(false)
 const sectionCtaInView = ref(true)
 const footerNear = ref(false)
 
-const showSticky = computed(() => !open.value && !sectionCtaInView.value && !footerNear.value)
+const showSticky = computed(
+  () => condensed.value && !open.value && !sectionCtaInView.value && !footerNear.value,
+)
+const onHero = computed(() => !condensed.value)
 
 let ctaIo: IntersectionObserver | null = null
 let footerIo: IntersectionObserver | null = null
@@ -64,28 +72,40 @@ onUnmounted(() => {
 <template>
   <header class="pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
     <div
-      class="pointer-events-auto mx-auto flex max-w-[1120px] items-center justify-between gap-3 rounded-chrome px-3 py-2 transition-[background-color,box-shadow,border-color] duration-200"
-      :class="condensed ? 'glass-regular' : 'glass-clear'"
+      class="pointer-events-auto mx-auto flex max-w-[1120px] items-center justify-between gap-3 rounded-chrome px-3 py-2 transition-[background-color,box-shadow,border-color,color] duration-200"
+      :class="condensed ? 'glass-regular text-title' : 'glass-dark text-inverse'"
     >
       <a href="#topo" class="inline-flex items-center px-1 py-0.5" :aria-label="APP_NAME">
         <BrandMark class="h-10 w-auto text-brand sm:h-11" />
       </a>
 
-      <nav class="hidden items-center gap-1 md:flex" aria-label="Seções">
-        <a class="site-cta-ghost" href="#produto">Produto</a>
-        <a class="site-cta-ghost" href="#clinicas">Clínicas</a>
-        <a class="site-cta-ghost" href="#acesso">Acesso</a>
-        <a class="site-cta-ghost" href="#faq">Perguntas</a>
+      <nav class="hidden items-center gap-1 lg:flex" aria-label="Seções">
+        <a
+          v-for="item in nav"
+          :key="item.href"
+          class="site-cta-ghost"
+          :class="onHero ? 'text-inverse/85 hover:text-inverse' : ''"
+          :href="item.href"
+        >
+          {{ item.label }}
+        </a>
       </nav>
 
       <div class="hidden items-center gap-2 md:flex">
-        <a class="site-cta-ghost" :href="APP_LOGIN_URL">{{ CTA_LOGIN_SHORT_LABEL }}</a>
+        <a
+          class="site-cta-ghost"
+          :class="onHero ? 'text-inverse/85 hover:text-inverse' : ''"
+          :href="APP_LOGIN_URL"
+        >
+          {{ CTA_LOGIN_SHORT_LABEL }}
+        </a>
         <a class="site-cta-primary" :href="APP_REGISTER_URL">{{ CTA_REGISTER_LABEL }}</a>
       </div>
 
       <button
         type="button"
-        class="grid size-10 place-items-center rounded-[12px] text-title md:hidden glass-clear"
+        class="grid size-10 place-items-center rounded-[12px] md:hidden"
+        :class="onHero ? 'glass-dark text-inverse' : 'glass-clear text-title'"
         :aria-expanded="open"
         aria-controls="site-menu"
         :aria-label="open ? 'Fechar menu' : 'Abrir menu'"
@@ -101,19 +121,20 @@ onUnmounted(() => {
       id="site-menu"
       class="pointer-events-auto mx-auto mt-2 max-w-[1120px] rounded-xl p-3 md:hidden glass-regular"
     >
-      <nav class="grid gap-1 text-[15px]" aria-label="Menu móvel">
-        <a class="rounded-[12px] px-3 py-2.5 text-title" href="#produto" @click="open = false">Produto</a>
-        <a class="rounded-[12px] px-3 py-2.5 text-title" href="#clinicas" @click="open = false">Clínicas</a>
-        <a class="rounded-[12px] px-3 py-2.5 text-title" href="#acesso" @click="open = false">Acesso</a>
-        <a class="rounded-[12px] px-3 py-2.5 text-title" href="#faq" @click="open = false">Perguntas</a>
+      <nav class="grid gap-1 text-[16px]" aria-label="Menu móvel">
+        <a
+          v-for="item in nav"
+          :key="item.href"
+          class="flex min-h-10 items-center rounded-[12px] px-3 py-2.5 text-title"
+          :href="item.href"
+          @click="open = false"
+        >
+          {{ item.label }}
+        </a>
       </nav>
-      <div class="mt-3 grid w-full grid-cols-2 justify-center gap-2">
-        <a class="site-cta-secondary w-full min-w-0" :href="APP_LOGIN_URL">{{
-          CTA_LOGIN_SHORT_LABEL
-        }}</a>
-        <a class="site-cta-primary w-full min-w-0" :href="APP_REGISTER_URL">{{
-          CTA_REGISTER_LABEL
-        }}</a>
+      <div class="mt-3 grid w-full grid-cols-1 gap-2">
+        <a class="site-cta-primary w-full" :href="APP_REGISTER_URL">{{ CTA_REGISTER_LABEL }}</a>
+        <a class="site-cta-secondary w-full" :href="APP_LOGIN_URL">{{ CTA_LOGIN_SHORT_LABEL }}</a>
       </div>
     </div>
   </header>

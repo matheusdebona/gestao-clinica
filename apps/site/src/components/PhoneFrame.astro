@@ -1,0 +1,27 @@
+---
+interface Props {
+  label?: string
+  class?: string
+}
+
+const { label = 'HOF Pay', class: className } = Astro.props
+---
+
+<figure class:list={['phone-frame', className]}>
+  <div class="phone-bezel">
+    <div class="phone-island" aria-hidden="true"></div>
+    <div class="phone-status" aria-hidden="true">
+      <span>9:41</span>
+      <span class="phone-status-end">
+        <span></span>
+        <span></span>
+        <span></span>
+      </span>
+    </div>
+    <div class="phone-screen">
+      <slot />
+    </div>
+    <div class="phone-home" aria-hidden="true"></div>
+  </div>
+  <figcaption class="sr-only">{label}</figcaption>
+</figure>
