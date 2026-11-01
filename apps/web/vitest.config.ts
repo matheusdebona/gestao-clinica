@@ -12,5 +12,7 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    // Fuso do "aparelho" diferente de Brasília: datas da tela e filtros têm de seguir São Paulo.
+    env: { TZ: 'Asia/Tokyo' },
   },
 })

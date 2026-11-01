@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\AppointmentConsumption;
 use App\Models\Sale;
 use App\Models\Treatment;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -36,16 +37,16 @@ class MarginMetricsService
             $mode = self::MODE_PERIOD;
         }
 
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from/to são datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
 
         $kpis = $mode === self::MODE_COHORT_SALE
             ? $this->cohortSale($fromStart, $toEnd)
             : $this->period($fromStart, $toEnd);
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'mode' => $mode,
             'kpis' => $kpis,
             'notes' => $this->notesFor($mode),

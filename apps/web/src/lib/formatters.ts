@@ -1,3 +1,5 @@
+import { CLINIC_TZ } from '@/lib/clinic-time'
+
 export function formatBRL(value: string | number | null | undefined): string {
   if (value === null || value === undefined || value === '') {
     return '—'
@@ -60,6 +62,7 @@ export function formatDateTime(value: string | null | undefined): string {
     return '—'
   }
   return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: CLINIC_TZ,
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(parsed)
@@ -95,22 +98,31 @@ export function formatTime(value: string | null | undefined): string {
     return '—'
   }
   return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: CLINIC_TZ,
     hour: '2-digit',
     minute: '2-digit',
   }).format(parsed)
 }
 
+/** Data (dd/mm/aaaa) de um instante no calendário de São Paulo; data pura fica como está. */
 export function formatDate(value: string | null | undefined): string {
   if (!value) {
     return '—'
+  }
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value.trim())) {
+    return formatIsoDate(value)
   }
   const parsed = new Date(value)
   if (Number.isNaN(parsed.getTime())) {
     return '—'
   }
-  return new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short' }).format(parsed)
+  return new Intl.DateTimeFormat('pt-BR', { timeZone: CLINIC_TZ, dateStyle: 'short' }).format(parsed)
 }
 
+/**
+ * Data de calendário ("2026-10-31", ou coluna de data serializada com hora 00:00) sem conversão de
+ * fuso. Para instantes (created_at, sold_at…) use formatDate ou clinicDateOf.
+ */
 export function formatIsoDate(value: string | null | undefined): string {
   if (!value) {
     return '—'

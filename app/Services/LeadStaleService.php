@@ -8,6 +8,7 @@ use App\Models\LeadFollowUpAlert;
 use App\Models\LeadFollowUpTier;
 use App\Models\User;
 use App\Notifications\StaleLeadsDigestNotification;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -235,7 +236,8 @@ class LeadStaleService
         return DB::table('notifications')
             ->where('notifiable_type', User::class)
             ->where('notifiable_id', $user->id)
-            ->whereDate('created_at', $now->toDateString())
+            // "Hoje" é o dia de São Paulo.
+            ->whereBetween('created_at', ClinicMonth::dayBounds(ClinicMonth::date($now), ClinicMonth::date($now)))
             ->where('data->type', StaleLeadsDigestNotification::TYPE)
             ->exists();
     }

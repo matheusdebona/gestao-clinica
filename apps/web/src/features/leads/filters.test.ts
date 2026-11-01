@@ -42,7 +42,7 @@ describe('lead filters', () => {
     expect(filters.statusIds).toEqual([4])
     expect(filters.originId).toBe('')
     expect(filters.page).toBe(1)
-    const params = toLeadListParams(filters, new Date(2026, 9, 31))
+    const params = toLeadListParams(filters, new Date('2026-10-31T12:00:00-03:00'))
     expect(params.from).toBe('2026-10-25')
     expect(params.to).toBe('2026-10-31')
     expect(params.lead_status_ids).toEqual([4])

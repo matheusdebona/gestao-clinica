@@ -7,6 +7,7 @@ use App\Jobs\NotifyForgottenBudgetsJob;
 use App\Jobs\NotifyStaleLeadsJob;
 use App\Services\ExpenseGenerator;
 use App\Services\TemporaryPasswordService;
+use App\Support\ClinicMonth;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
@@ -15,19 +16,21 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::job(new CheckLowStockProductsJob)->dailyAt('01:00');
+// Horários em Brasília (America/Sao_Paulo), não em UTC.
+// 22:00: estoque baixo e estoque previsto para os atendimentos de amanhã.
+Schedule::job(new CheckLowStockProductsJob)->dailyAt('22:00')->timezone(ClinicMonth::TZ);
 
-// 11:00 UTC = 08:00 em Brasília: resumo diário de leads parados.
-Schedule::job(new NotifyStaleLeadsJob)->dailyAt('11:00');
+// 08:00: resumo diário de leads parados.
+Schedule::job(new NotifyStaleLeadsJob)->dailyAt('08:00')->timezone(ClinicMonth::TZ);
 
-// 11:00 UTC = 08:00 em Brasília: sessões de amanhã ainda sem confirmação (só aviso interno; o WhatsApp é por link).
-Schedule::job(new NotifyAppointmentConfirmationsJob)->dailyAt('11:00');
+// 08:00: sessões de amanhã ainda sem confirmação (só aviso interno; o WhatsApp é por link).
+Schedule::job(new NotifyAppointmentConfirmationsJob)->dailyAt('08:00')->timezone(ClinicMonth::TZ);
 
-// 11:00 UTC = 08:00 em Brasília: orçamentos enviados sem resposta que passaram de um prazo.
-Schedule::job(new NotifyForgottenBudgetsJob)->dailyAt('11:00');
+// 08:00: orçamentos enviados sem resposta que passaram de um prazo.
+Schedule::job(new NotifyForgottenBudgetsJob)->dailyAt('08:00')->timezone(ClinicMonth::TZ);
 
-// 21:00 UTC = 18:00 em Brasília: lembrete de fim de dia (acompanhamentos pendentes / check-in).
-Schedule::job(new NotifyDailyReviewJob)->dailyAt('21:00');
+// 18:00: lembrete de fim de dia (acompanhamentos pendentes / check-in).
+Schedule::job(new NotifyDailyReviewJob)->dailyAt('18:00')->timezone(ClinicMonth::TZ);
 
 Artisan::command('auth:prune-temporary-passwords', function (TemporaryPasswordService $service) {
     $this->info('Senhas temporárias expiradas removidas: '.$service->pruneExpired());
@@ -39,5 +42,5 @@ Artisan::command('finance:generate-expenses', function (ExpenseGenerator $genera
     $this->info('Despesas geradas: '.$generator->generateCurrentMonthForAll());
 })->purpose('Gera as despesas recorrentes e a depreciação do mês corrente');
 
-// 03:00 UTC = 00:00 em Brasília: despesas recorrentes e depreciação do mês (idempotente).
-Schedule::command('finance:generate-expenses')->dailyAt('03:00');
+// 00:05: despesas recorrentes e depreciação do mês de Brasília (idempotente).
+Schedule::command('finance:generate-expenses')->dailyAt('00:05')->timezone(ClinicMonth::TZ);

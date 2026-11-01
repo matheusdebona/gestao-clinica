@@ -1,3 +1,4 @@
+import { clinicDatetimeLocalToIso, isoToClinicDatetimeLocal } from '@/lib/clinic-time'
 import { toTypedSchema } from '@vee-validate/zod'
 import { z } from 'zod'
 import { emptyToInt, emptyToNull } from '@/lib/formatters'
@@ -36,21 +37,16 @@ export const emptyAppointmentForm = (): AppointmentFormValues => ({
   notes: '',
 })
 
+/** Data/hora digitada é horário de Brasília, qualquer que seja o fuso do aparelho. */
 export function datetimeLocalToIso(value: string): string {
-  const parsed = new Date(value)
-  return parsed.toISOString()
+  return clinicDatetimeLocalToIso(value)
 }
 
 export function isoToDatetimeLocal(value: string | null | undefined): string {
   if (!value) {
     return ''
   }
-  const parsed = new Date(value)
-  if (Number.isNaN(parsed.getTime())) {
-    return ''
-  }
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${parsed.getFullYear()}-${pad(parsed.getMonth() + 1)}-${pad(parsed.getDate())}T${pad(parsed.getHours())}:${pad(parsed.getMinutes())}`
+  return isoToClinicDatetimeLocal(value)
 }
 
 export function toAppointmentPayload(values: AppointmentFormValues): AppointmentPayload {

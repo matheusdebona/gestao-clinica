@@ -9,7 +9,8 @@ import {
   rangeForPreset,
 } from '@/features/metrics/period'
 
-const now = new Date(2026, 8, 6)
+// 06/09 12:00 em Brasília (o calendário é o de São Paulo, qualquer que seja o fuso do aparelho).
+const now = new Date('2026-09-06T12:00:00-03:00')
 
 describe('metrics period', () => {
   it('defaults the current month from the first to the last day', () => {

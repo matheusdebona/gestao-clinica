@@ -1,3 +1,4 @@
+import { clinicMonthIso } from '@/lib/clinic-time'
 import { api } from '@/lib/api'
 import type { DataEnvelope } from '@/types/pagination'
 
@@ -69,12 +70,7 @@ export function monthLabel(month: string): string {
 }
 
 export function currentMonth(): string {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/Sao_Paulo',
-    year: 'numeric',
-    month: '2-digit',
-  }).format(new Date())
-  return parts.slice(0, 7)
+  return clinicMonthIso()
 }
 
 export function shiftMonth(month: string, delta: number): string {

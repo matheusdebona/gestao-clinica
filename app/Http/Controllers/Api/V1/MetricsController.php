@@ -17,7 +17,7 @@ use App\Services\LeadMetricsService;
 use App\Services\MarginMetricsService;
 use App\Services\OperationsMetricsService;
 use App\Services\SalesFunnelMetricsService;
-use Carbon\CarbonImmutable;
+use App\Support\ClinicMonth;
 use Illuminate\Http\JsonResponse;
 
 class MetricsController extends Controller
@@ -34,8 +34,8 @@ class MetricsController extends Controller
 
     public function commercial(CommercialMetricsRequest $request): JsonResponse
     {
-        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
-        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+        $from = ClinicMonth::parseDate($request->string('from')->toString());
+        $to = ClinicMonth::parseDate($request->string('to')->toString());
         $granularity = $request->filled('granularity')
             ? $request->string('granularity')->toString()
             : null;
@@ -47,8 +47,8 @@ class MetricsController extends Controller
 
     public function acquisition(AcquisitionMetricsRequest $request): JsonResponse
     {
-        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
-        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+        $from = ClinicMonth::parseDate($request->string('from')->toString());
+        $to = ClinicMonth::parseDate($request->string('to')->toString());
         $groupBy = $request->filled('group_by')
             ? $request->string('group_by')->toString()
             : AcquisitionMetricsService::GROUP_BY_ORIGIN;
@@ -60,8 +60,8 @@ class MetricsController extends Controller
 
     public function margin(MarginMetricsRequest $request): JsonResponse
     {
-        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
-        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+        $from = ClinicMonth::parseDate($request->string('from')->toString());
+        $to = ClinicMonth::parseDate($request->string('to')->toString());
         $mode = $request->filled('mode')
             ? $request->string('mode')->toString()
             : MarginMetricsService::MODE_PERIOD;
@@ -74,10 +74,10 @@ class MetricsController extends Controller
     public function inventory(InventoryMetricsRequest $request): JsonResponse
     {
         $to = $request->filled('to')
-            ? CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay()
-            : CarbonImmutable::now()->startOfDay();
+            ? ClinicMonth::parseDate($request->string('to')->toString())
+            : ClinicMonth::parseDate(ClinicMonth::todayDate()); // hoje em São Paulo
         $from = $request->filled('from')
-            ? CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay()
+            ? ClinicMonth::parseDate($request->string('from')->toString())
             : $to->subDays(29);
 
         return response()->json([
@@ -87,8 +87,8 @@ class MetricsController extends Controller
 
     public function operations(OperationsMetricsRequest $request): JsonResponse
     {
-        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
-        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+        $from = ClinicMonth::parseDate($request->string('from')->toString());
+        $to = ClinicMonth::parseDate($request->string('to')->toString());
 
         return response()->json([
             'data' => $this->operationsMetrics->summarize($from, $to),
@@ -97,8 +97,8 @@ class MetricsController extends Controller
 
     public function leads(LeadMetricsRequest $request): JsonResponse
     {
-        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
-        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+        $from = ClinicMonth::parseDate($request->string('from')->toString());
+        $to = ClinicMonth::parseDate($request->string('to')->toString());
 
         return response()->json([
             'data' => $this->leadMetrics->summarize($from, $to),
@@ -111,8 +111,8 @@ class MetricsController extends Controller
      */
     public function salesFunnel(SalesFunnelMetricsRequest $request): JsonResponse
     {
-        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
-        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+        $from = ClinicMonth::parseDate($request->string('from')->toString());
+        $to = ClinicMonth::parseDate($request->string('to')->toString());
 
         return response()->json([
             'data' => $this->salesFunnel->summarize($from, $to, [

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { clinicDayEndIso, clinicDayStartIso, clinicWallClock } from '@/lib/clinic-time'
 import { useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -27,7 +28,6 @@ import { useWhatsAppLinks } from '@/features/settings/useWhatsAppLinks'
 import { openWhatsApp } from '@/lib/whatsapp'
 import {
   addDays,
-  endOfDay,
   formatDayHeading,
   formatWeekdayDate,
   fromDateInput,
@@ -50,7 +50,8 @@ const router = useRouter()
 const auth = useAuthStore()
 
 const view = ref('day')
-const cursor = ref(startOfDay(new Date()))
+// Dias da agenda = calendário de São Paulo (campos locais do Date = relógio de Brasília).
+const cursor = ref(startOfDay(clinicWallClock()))
 const status = ref('')
 const professionalId = ref('')
 const q = ref('')
@@ -82,11 +83,14 @@ const dateInput = computed({
 const range = computed(() => {
   if (view.value === 'week') {
     const start = startOfWeekMonday(cursor.value)
-    return { from: start.toISOString(), to: endOfDay(addDays(start, 6)).toISOString() }
+    return {
+      from: clinicDayStartIso(toDateInput(start)),
+      to: clinicDayEndIso(toDateInput(addDays(start, 6))),
+    }
   }
   return {
-    from: startOfDay(cursor.value).toISOString(),
-    to: endOfDay(cursor.value).toISOString(),
+    from: clinicDayStartIso(toDateInput(cursor.value)),
+    to: clinicDayEndIso(toDateInput(cursor.value)),
   }
 })
 
@@ -139,7 +143,7 @@ function eventsOn(day: Date): Appointment[] {
     if (!item.scheduled_at) {
       return false
     }
-    return isSameDay(new Date(item.scheduled_at), day)
+    return isSameDay(clinicWallClock(new Date(item.scheduled_at)), day)
   })
 }
 
@@ -182,7 +186,7 @@ function shift(amount: number) {
 }
 
 function goToday() {
-  cursor.value = startOfDay(new Date())
+  cursor.value = startOfDay(clinicWallClock())
 }
 
 function onClientSearch(value: string) {
@@ -293,7 +297,7 @@ function onClientSearch(value: string) {
           v-for="day in days"
           :key="day.toISOString()"
           :padding="false"
-          :class="isSameDay(day, new Date()) ? 'border-brand' : ''"
+          :class="isSameDay(day, clinicWallClock()) ? 'border-brand' : ''"
         >
           <div class="border-b border-border-divider px-3 py-2">
             <p class="text-[13px] font-medium text-title">{{ formatWeekdayDate(day) }}</p>

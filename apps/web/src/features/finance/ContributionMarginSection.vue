@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { clinicDateOf } from '@/lib/clinic-time'
 import { useQuery } from '@tanstack/vue-query'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -272,7 +273,7 @@ const warnings = computed(() => {
               </span>
             </div>
             <span class="text-[13px] text-muted">
-              {{ formatIsoDate(sale.sold_at?.slice(0, 10)) }} · {{ sale.seller_name ?? '—' }} ·
+              {{ formatIsoDate(clinicDateOf(sale.sold_at)) }} · {{ sale.seller_name ?? '—' }} ·
               receita {{ formatBRL(sale.revenue) }} ·
               {{ formatPercent(sale.contribution_margin_percent) }}
             </span>

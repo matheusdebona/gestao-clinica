@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\V1\Finance;
 
 use App\Http\Controllers\Controller;
 use App\Services\ContributionMarginService;
-use Carbon\CarbonImmutable;
+use App\Support\ClinicMonth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -18,8 +18,8 @@ class ContributionMarginController extends Controller
             'to' => ['required', 'date_format:Y-m-d', 'after_or_equal:from'],
         ]);
 
-        $from = CarbonImmutable::createFromFormat('Y-m-d', $data['from'])->startOfDay();
-        $to = CarbonImmutable::createFromFormat('Y-m-d', $data['to'])->startOfDay();
+        $from = ClinicMonth::parseDate($data['from']);
+        $to = ClinicMonth::parseDate($data['to']);
         if ($from->diffInDays($to) > 400) {
             throw ValidationException::withMessages(['to' => ['Período máximo de 400 dias.']]);
         }

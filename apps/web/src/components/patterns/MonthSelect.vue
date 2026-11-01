@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { clinicWallClock } from '@/lib/clinic-time'
 import { computed } from 'vue'
 import Select from '@/components/ui/Select.vue'
 import { formatMonthLabel } from '@/features/finance/labels'
@@ -24,7 +25,7 @@ function shift(base: Date, months: number): string {
 }
 
 const options = computed(() => {
-  const now = new Date()
+  const now = clinicWallClock() // mês atual de São Paulo
   const values = new Set<string>()
   for (let i = props.future; i >= -props.past; i -= 1) {
     values.add(shift(now, i))

@@ -45,7 +45,7 @@ class ProjectedLowStockNotification extends Notification implements ShouldQueue
             'projected_quantity' => $this->projectedQuantity,
             'day' => $date,
             'title' => 'Estoque projetado baixo',
-            'message' => "Após os atendimentos de {$date}, o estoque de {$this->product->name} deve ficar em {$this->projectedQuantity} (mínimo {$this->product->min_stock}). Consumo previsto: {$this->plannedQuantity}.",
+            'message' => "Após os atendimentos de {$this->day->format('d/m/Y')}, o estoque de {$this->product->name} deve ficar em {$this->projectedQuantity} (mínimo {$this->product->min_stock}). Consumo previsto: {$this->plannedQuantity}.",
         ];
     }
 

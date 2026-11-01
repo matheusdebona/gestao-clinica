@@ -1,3 +1,5 @@
+import { clinicWallClock } from '@/lib/clinic-time'
+
 export function startOfDay(date: Date): Date {
   const next = new Date(date)
   next.setHours(0, 0, 0, 0)
@@ -36,7 +38,7 @@ export function toDateInput(date: Date): string {
 
 export function fromDateInput(value: string): Date {
   const parsed = new Date(`${value}T00:00:00`)
-  return Number.isNaN(parsed.getTime()) ? new Date() : parsed
+  return Number.isNaN(parsed.getTime()) ? clinicWallClock() : parsed
 }
 
 export function isSameDay(left: Date, right: Date): boolean {

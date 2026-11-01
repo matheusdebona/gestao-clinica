@@ -1,3 +1,5 @@
+import { clinicWallClock } from '@/lib/clinic-time'
+
 export type PeriodPreset = '7d' | '30d' | 'month' | 'custom'
 
 export const MAX_PERIOD_DAYS = 1825
@@ -15,14 +17,18 @@ export function parseIsoDate(value: string): Date {
   return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]))
 }
 
+/** "Este mês" no calendário de São Paulo. */
 export function currentMonthRange(now = new Date()): { from: string; to: string } {
-  const from = new Date(now.getFullYear(), now.getMonth(), 1)
-  const to = new Date(now.getFullYear(), now.getMonth() + 1, 0)
+  const wall = clinicWallClock(now)
+  const from = new Date(wall.getFullYear(), wall.getMonth(), 1)
+  const to = new Date(wall.getFullYear(), wall.getMonth() + 1, 0)
   return { from: toIsoDate(from), to: toIsoDate(to) }
 }
 
+/** Últimos N dias até hoje (inclusive), no calendário de São Paulo. */
 export function lastDaysRange(days: number, now = new Date()): { from: string; to: string } {
-  const to = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const wall = clinicWallClock(now)
+  const to = new Date(wall.getFullYear(), wall.getMonth(), wall.getDate())
   const from = new Date(to)
   from.setDate(from.getDate() - (days - 1))
   return { from: toIsoDate(from), to: toIsoDate(to) }

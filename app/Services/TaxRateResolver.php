@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\TaxSetting;
+use App\Support\ClinicMonth;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
@@ -16,7 +17,8 @@ class TaxRateResolver
 
     public function settingFor(int $clinicId, CarbonInterface $date): ?TaxSetting
     {
-        $month = $date->copy()->startOfMonth()->toDateString();
+        // $date é o instante da venda: a competência é o mês de São Paulo.
+        $month = ClinicMonth::competence($date);
 
         return $this->settings($clinicId)
             ->first(fn (TaxSetting $setting) => $setting->effective_from->toDateString() <= $month);

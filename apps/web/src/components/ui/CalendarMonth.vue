@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { clinicWallClock } from '@/lib/clinic-time'
 import { ChevronLeft, ChevronRight } from '@lucide/vue'
 import { computed, nextTick, ref, watch } from 'vue'
 import IconButton from '@/components/ui/IconButton.vue'
@@ -24,7 +25,7 @@ const emit = defineEmits<{
 
 const gridRef = ref<HTMLElement | null>(null)
 const weekdays = weekdayHeaders('pt-BR')
-const cursor = ref(parseIsoDate(props.selectedIso ?? '') ?? new Date())
+const cursor = ref(parseIsoDate(props.selectedIso ?? '') ?? clinicWallClock())
 const activeIso = ref(props.selectedIso || todayIso())
 
 const heading = computed(() => monthHeading(cursor.value))

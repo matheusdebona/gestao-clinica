@@ -1,3 +1,4 @@
+import { clinicMonthIso } from '@/lib/clinic-time'
 import { api } from '@/lib/api'
 import type { DataEnvelope, Paginated } from '@/types/pagination'
 import type {
@@ -228,9 +229,9 @@ export async function saveEquipment(
   return payload.data
 }
 
+/** Mês atual de São Paulo ("2026-10"). */
 export function currentMonthKey(): string {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  return clinicMonthIso()
 }
 
 export async function getDre(month: string): Promise<DreReport> {

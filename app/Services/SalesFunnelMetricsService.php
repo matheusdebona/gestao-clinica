@@ -7,6 +7,7 @@ use App\Models\Budget;
 use App\Models\Client;
 use App\Models\Lead;
 use App\Models\Sale;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Collection;
@@ -53,8 +54,8 @@ class SalesFunnelMetricsService
      */
     public function summarize(CarbonImmutable $from, CarbonImmutable $to, array $filters = []): array
     {
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from/to são datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
         $originId = $filters['origin_id'] ?? null;
         $userId = $filters['user_id'] ?? null;
 
@@ -66,8 +67,8 @@ class SalesFunnelMetricsService
         $directTotals = $this->aggregate($direct);
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'filters' => ['origin_id' => $originId, 'user_id' => $userId],
             'definition' => 'Leads criados no período; cada etapa conta uma vez por lead, mesmo se acontecer depois do período. Origem e colaborador são os do lead (quem cadastrou). Pacientes cadastrados sem lead aparecem em "Sem lead".',
             'stages' => $this->stages($leadTotals),

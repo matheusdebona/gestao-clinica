@@ -13,11 +13,11 @@ use App\Models\Treatment;
 use App\Services\AppointmentConfirmationService;
 use App\Services\AppointmentService;
 use App\Support\CaseInsensitiveSearch;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -199,16 +199,9 @@ class AppointmentController extends Controller
         return new AppointmentResource($this->appointments->cancel($appointment));
     }
 
-    private function boundDate(mixed $value, bool $startOfDay): Carbon
+    /** Data pura = dia inteiro de São Paulo; instante com fuso é respeitado; hora sem fuso é de São Paulo. */
+    private function boundDate(mixed $value, bool $startOfDay): CarbonImmutable
     {
-        $parsed = Carbon::parse($value);
-        $raw = is_string($value) ? $value : $parsed->toIso8601String();
-        $hasTime = str_contains($raw, 'T') || preg_match('/\d{2}:\d{2}/', $raw) === 1;
-
-        if ($hasTime) {
-            return $parsed;
-        }
-
-        return $startOfDay ? $parsed->startOfDay() : $parsed->endOfDay();
+        return ClinicMonth::boundary((string) $value, $startOfDay);
     }
 }

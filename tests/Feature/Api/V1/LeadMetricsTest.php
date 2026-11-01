@@ -83,12 +83,12 @@ class LeadMetricsTest extends TestCase
         $this->lead('Instagram', 'Virou paciente', $this->reception, '2026-10-02 10:00:00', '2026-10-04 10:00:00');
         $this->lead('Instagram', 'Virou paciente', $this->admin, '2026-10-10 09:00:00', '2026-11-03 09:00:00');
         $this->lead('Instagram', 'Novo', $this->reception, '2026-10-12 09:00:00');
-        $this->lead('Google', 'Perdido', $this->reception, '2026-10-31 23:00:00');
+        $this->lead('Google', 'Perdido', $this->reception, '2026-11-01 02:30:00'); // 31/10 23:30 em São Paulo → conta
         $cancelled = $this->lead('Google', 'Cancelado', $this->reception, '2026-10-20 10:00:00');
         $cancelled->forceFill(['cancelled_at' => '2026-10-21 10:00:00'])->save();
         // Outside the period.
-        $this->lead('Google', 'Novo', $this->admin, '2026-09-30 23:59:00');
-        $this->lead('Google', 'Novo', $this->admin, '2026-11-01 00:00:00');
+        $this->lead('Google', 'Novo', $this->admin, '2026-10-01 02:59:00'); // 30/09 23:59 em São Paulo → fora
+        $this->lead('Google', 'Novo', $this->admin, '2026-11-01 03:00:00'); // 01/11 00:00 em São Paulo → fora
 
         // Another clinic's leads never leak in.
         $other = Clinic::factory()->create();

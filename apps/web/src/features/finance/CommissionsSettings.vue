@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { clinicMonthIso } from '@/lib/clinic-time'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { computed, reactive, ref } from 'vue'
 import MonthSelect from '@/components/patterns/MonthSelect.vue'
@@ -47,9 +48,9 @@ const queryClient = useQueryClient()
 const canView = computed(() => auth.can('finance.view'))
 const canManage = computed(() => auth.can('finance.manage'))
 
+/** Mês atual de São Paulo. */
 function currentMonth(): string {
-  const now = new Date()
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  return clinicMonthIso()
 }
 const month = ref(currentMonth())
 
