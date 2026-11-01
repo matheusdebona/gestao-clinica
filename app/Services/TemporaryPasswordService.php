@@ -63,6 +63,13 @@ class TemporaryPasswordService
             && $user->temporary_password_expires_at->isFuture();
     }
 
+    /** Accepts the typed temporary password with stray spaces or lowercase letters. */
+    public function checksAsTemporary(User $user, string $typed): bool
+    {
+        return $this->passwordIsTemporary($user)
+            && Hash::check(TemporaryPasswordGenerator::normalize($typed), $user->password);
+    }
+
     /** True while the account password is still the issued temporary password. */
     public function passwordIsTemporary(User $user): bool
     {
@@ -74,7 +81,8 @@ class TemporaryPasswordService
     public function matches(User $user, string $plain): bool
     {
         return $this->hasValidTemporaryPassword($user)
-            && Hash::check($plain, $user->temporary_password_hash);
+            && (Hash::check($plain, $user->temporary_password_hash)
+                || Hash::check(TemporaryPasswordGenerator::normalize($plain), $user->temporary_password_hash));
     }
 
     /** Drop an expired temporary password (lazy cleanup). */

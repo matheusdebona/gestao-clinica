@@ -42,7 +42,7 @@ class AuthController extends Controller
         $password = $request->string('password')->toString();
         $usedTemporary = false;
 
-        if ($user && Hash::check($password, $user->password)) {
+        if ($user && (Hash::check($password, $user->password) || $temporaryPasswords->checksAsTemporary($user, $password))) {
             if ($temporaryPasswords->passwordIsTemporary($user)) {
                 // The password is the one e-mailed by "Esqueci a senha".
                 if (! $temporaryPasswords->hasValidTemporaryPassword($user)) {

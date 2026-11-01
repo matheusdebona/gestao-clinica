@@ -136,16 +136,36 @@ class ForgotPasswordTest extends TestCase
         $this->loginWith(self::NEW_PASSWORD)->assertOk()->assertJsonPath('user.must_change_password', false);
     }
 
-    public function test_temporary_password_is_readable_and_strong(): void
+    public function test_temporary_password_is_short_and_readable(): void
     {
-        for ($i = 0; $i < 50; $i++) {
+        $seen = [];
+        for ($i = 0; $i < 300; $i++) {
             $plain = TemporaryPasswordGenerator::generate();
-            $this->assertMatchesRegularExpression('/^[A-Za-z0-9]{4}-[A-Za-z0-9]{4}-[A-Za-z0-9]{4}$/', $plain);
-            $this->assertDoesNotMatchRegularExpression('/[0O1lIoS5Z2]/', $plain);
-            $this->assertMatchesRegularExpression('/[A-Z]/', $plain);
-            $this->assertMatchesRegularExpression('/[a-z]/', $plain);
-            $this->assertMatchesRegularExpression('/\d/', $plain);
+            $this->assertMatchesRegularExpression('/^[A-Z2-9]{8}$/', $plain);
+            $this->assertDoesNotMatchRegularExpression('/[0O1IL]/', $plain);
+            $seen[$plain] = true;
         }
+        $this->assertCount(300, $seen);
+    }
+
+    public function test_temporary_password_login_tolerates_spaces_and_lowercase(): void
+    {
+        $this->makeUser();
+        $plain = $this->requestTemporaryPassword();
+        $typed = '  '.strtolower(substr($plain, 0, 4)).' '.substr($plain, 4).' ';
+
+        $this->loginWith('SenhaAtual#2026')->assertStatus(422);
+        $token = $this->loginWith($typed)->assertOk()->assertJsonPath('user.must_change_password', true)->json('token');
+
+        $this->withToken($token)->postJson('/api/v1/auth/change-temporary-password', [
+            'temporary_password' => strtolower($plain).' ',
+            'password' => self::NEW_PASSWORD,
+            'password_confirmation' => self::NEW_PASSWORD,
+        ])->assertOk();
+        $this->app['auth']->forgetGuards();
+
+        $this->loginWith($typed)->assertStatus(422);
+        $this->loginWith(self::NEW_PASSWORD)->assertOk();
     }
 
     public function test_email_is_ptbr_branded_and_links_to_frontend(): void
