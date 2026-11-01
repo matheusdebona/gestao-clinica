@@ -347,6 +347,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:metrics.view');
         Route::get('metrics/leads', [MetricsController::class, 'leads'])
             ->middleware(['permission:metrics.view', 'permission:leads.view']);
+        Route::get('metrics/sales-funnel', [MetricsController::class, 'salesFunnel'])
+            ->middleware(['permission:metrics.view', 'permission:leads.view']);
 
         Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
         Route::get('notifications', [NotificationController::class, 'index']);
