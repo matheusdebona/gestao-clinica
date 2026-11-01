@@ -9,15 +9,15 @@ import {
 } from '../lib/urls'
 
 export const SITE_URL = `https://${MARKETING_HOST}`
-export const SITE_TITLE = `${APP_NAME}: saia das planilhas e saiba se a clínica está dando lucro`
+export const SITE_TITLE = `${APP_NAME}: saia das planilhas e veja quanto a clínica está sobrando`
 export const SITE_ONE_LINER =
-  'HOF Pay é o sistema da clínica de harmonização no celular: leads, agenda, orçamentos, estoque e financeiro, para você saber se o mês deu lucro ou prejuízo.'
+  'HOF Pay é o sistema da clínica de harmonização no celular: leads, agenda, orçamentos, estoque e financeiro, para você saber quanto sobra de verdade no fim do mês.'
 
 export const HERO_KICKER = 'Clínica de harmonização orofacial'
-export const HERO_TITLE_LEAD = 'Saia das planilhas e saiba se a sua clínica está dando lucro.'
-export const HERO_TITLE_EMPHASIS = 'Você acompanha a clínica pelo celular.'
+export const HERO_TITLE_LEAD = 'Faturou bem, mas não sabe pra onde foi o dinheiro?'
+export const HERO_TITLE_EMPHASIS = 'O HOF Pay mostra o que sobrou.'
 export const HERO_LEAD =
-  'Você cuida de leads, agenda, orçamentos, estoque e financeiro pelo telefone. No fim do mês o DRE mostra o lucro de verdade: receita menos taxa da maquininha, impostos, comissões e despesas.'
+  'Com o HOF Pay você sai das planilhas, gerencia a clínica pelo celular e vê quanto sobra de verdade depois da maquininha, impostos, comissões e despesas.'
 
 export const CTA_REGISTER_LABEL = 'Criar clínica'
 export const CTA_REGISTER_STRONG_LABEL = 'Criar minha clínica'
@@ -28,7 +28,7 @@ export const MOCK_CAPTION = 'Tela de exemplo. Números de demonstração, não s
 export const HERO_STAGE_CAPTION = 'No lugar da planilha de fechamento, o DRE do mês no celular.'
 
 export const PAIN_KICKER = 'O problema hoje'
-export const PAIN_TITLE = 'Sem o sistema, o fechamento fica na planilha e você não sabe se deu lucro.'
+export const PAIN_TITLE = 'O faturamento entra, mas a planilha não diz o que sobrou.'
 
 export const FEATURES_KICKER = 'O sistema'
 export const FEATURES_TITLE = 'Lead, agenda, estoque e financeiro no mesmo sistema.'
@@ -315,7 +315,7 @@ HOF Pay é um sistema de gestão para clínicas de harmonização orofacial e es
 
 Idioma: pt-BR.
 
-Mensagem central: sair das planilhas, gerenciar a clínica pelo celular e saber, de fato, se o mês deu lucro ou prejuízo (margem líquida no DRE).
+Mensagem central: faturou, mas não sabe o que sobrou? Sair das planilhas, gerenciar a clínica pelo celular e ver o lucro real depois da maquininha, impostos, comissões e despesas (margem líquida no DRE).
 
 ## Para quem
 
