@@ -171,6 +171,82 @@
 
   .hero-solid {
     background-color: var(--sv-bg-sidebar);
+    /* Hero fills exactly the first screen. min-height (never height) so it can grow instead of clipping. */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100svh;
+  }
+
+  /* iOS Safari < 15.4 has no svh and its 100vh is the tall (toolbar-hidden) viewport. */
+  @supports (-webkit-touch-callout: none) and (not (height: 100svh)) {
+    .hero-solid {
+      min-height: -webkit-fill-available;
+    }
+  }
+
+  .hero-solid > .hero-grid {
+    flex: 1 0 auto;
+    align-content: center;
+  }
+
+  /* Small scroll cue at the bottom of the hero. */
+  .hero-scroll-cue {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(0.75rem, 2.4svh, 1.5rem);
+    display: grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-left: -1.25rem;
+    border-radius: 999px;
+    color: color-mix(in srgb, var(--sv-text-inverse) 42%, transparent);
+    transition: color 150ms ease;
+  }
+
+  .hero-scroll-cue:hover,
+  .hero-scroll-cue:focus-visible {
+    color: color-mix(in srgb, var(--sv-text-inverse) 80%, transparent);
+  }
+
+  .hero-scroll-cue svg {
+    animation: hero-cue-bob 2.6s ease-in-out infinite;
+  }
+
+  @keyframes hero-cue-bob {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(4px);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-scroll-cue svg {
+      animation: none;
+    }
+  }
+
+  /* Only where there is room under the content: desktop, or mobile once the mock moved below. */
+  @media (max-height: 699.98px) {
+    .hero-scroll-cue {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1023.98px) {
+    .hero-solid:not(.hero-copy-only) .hero-scroll-cue {
+      display: none;
+    }
+  }
+
+  @media (max-width: 1023.98px) and (min-height: 700px) {
+    .hero-copy-only .hero-grid {
+      padding-bottom: 4.25rem;
+    }
   }
 
   /* Navbar stays out of the first screen; SiteHeader adds .is-revealed after a short scroll. */
@@ -203,9 +279,9 @@
 
   /* Hero sized to the first viewport (no navbar above it). */
   .hero-grid {
-    row-gap: clamp(2.5rem, 6svh, 3.5rem);
-    padding-top: clamp(1.75rem, 5svh, 3rem);
-    padding-bottom: clamp(3rem, 8svh, 5rem);
+    row-gap: clamp(1.25rem, 3.2svh, 2.5rem);
+    padding-top: clamp(1.5rem, 4.5svh, 3rem);
+    padding-bottom: clamp(1.25rem, 3.5svh, 2.5rem);
   }
 
   .hero-logo {
@@ -235,15 +311,37 @@
 
   @media (min-width: 1024px) {
     .hero-grid {
+      row-gap: clamp(2.5rem, 6svh, 3.5rem);
       column-gap: 4rem;
       padding-top: clamp(1.5rem, 5.5svh, 4.5rem);
       padding-bottom: clamp(1.5rem, 5.5svh, 4.5rem);
     }
+  }
 
-    /* The phone mock is 612px tall: shrink it on shorter screens so it fits with the copy. */
-    .hero-swap {
-      zoom: var(--hero-stage-zoom, 1);
+  /* Leave room for the scroll cue under the content. */
+  @media (min-width: 1024px) and (min-height: 700px) {
+    .hero-grid {
+      padding-bottom: clamp(4.25rem, 8svh, 5.5rem);
     }
+  }
+
+  /*
+    The phone mock is 572/612px tall: shrink it on shorter screens so it fits with the copy.
+    Desktop uses the height steps below; on mobile HeroSection's script sets the zoom from the
+    space left under the CTAs (and hides the mock in the hero when it would be too small).
+  */
+  .hero-swap {
+    zoom: var(--hero-stage-zoom, 1);
+  }
+
+  /* Mobile only: holds the mock when it does not fit in the first screen (see HeroSection). */
+  .hero-solid-band {
+    background-color: var(--sv-bg-sidebar);
+    padding: 0.5rem 1rem 3rem;
+  }
+
+  .hero-solid-band:empty {
+    display: none;
   }
 
   @media (min-width: 1024px) and (max-height: 1000px) {
