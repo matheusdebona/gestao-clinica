@@ -275,3 +275,51 @@ export interface SalesFunnelMetrics {
   by_origin: SalesFunnelRow[]
   by_user: SalesFunnelRow[]
 }
+
+export interface ProductSalesRow {
+  product_id: number
+  product_name: string
+  product_type_id: number | null
+  product_type_name: string | null
+  unit_symbol: string | null
+  units: string
+  revenue: string
+  sales_count: number
+  avg_unit_price: string | null
+  share_percent: string | null
+  list_total: string
+  discount_total: string
+  protocol_revenue: string
+}
+
+export interface ProductSalesProtocolRow {
+  protocol_id: number | null
+  protocol_name: string | null
+  revenue: string
+  sales_count: number
+  products_count: number
+  share_percent: string | null
+}
+
+export interface ProductSalesMetrics {
+  from: string
+  to: string
+  date_field: 'sold_at'
+  filters: { product_type_id: number | null; product_id: number | null }
+  totals: {
+    units: string
+    revenue: string
+    products_count: number
+    sales_count: number
+    share_percent: string | null
+    unallocated_revenue: string
+    period_revenue: string
+    period_sales_count: number
+  }
+  products: ProductSalesRow[]
+  protocols: ProductSalesProtocolRow[]
+  options: {
+    product_types: { id: number; name: string }[]
+    products: { id: number; name: string; product_type_id: number | null }[]
+  }
+}
