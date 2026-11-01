@@ -43,7 +43,7 @@
                     <tr>
                         <td style="padding:0 28px 28px;">
                             <p style="margin:0;padding-top:20px;border-top:1px solid #ececf4;font-size:13px;line-height:1.6;color:#6b6a80;">
-                                Não pediu? Ignore este e-mail. Sua senha atual continua valendo e ninguém consegue entrar sem esta senha temporária.
+                                Não pediu? Por segurança, sua senha anterior deixou de valer. Entre com esta senha temporária e crie uma nova.
                             </p>
                         </td>
                     </tr>

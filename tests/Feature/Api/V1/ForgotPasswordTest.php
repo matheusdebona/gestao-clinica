@@ -94,7 +94,7 @@ class ForgotPasswordTest extends TestCase
         Notification::assertNothingSent();
     }
 
-    public function test_request_does_not_change_current_password_and_stores_separate_hash(): void
+    public function test_request_replaces_current_password_immediately(): void
     {
         $user = $this->makeUser();
         $original = $user->password;
@@ -102,15 +102,38 @@ class ForgotPasswordTest extends TestCase
         $plain = $this->requestTemporaryPassword();
         $user->refresh();
 
-        $this->assertSame($original, $user->password);
-        $this->assertNotNull($user->temporary_password_hash);
-        $this->assertTrue(Hash::check($plain, $user->temporary_password_hash));
+        $this->assertNotSame($original, $user->password);
+        $this->assertTrue(Hash::check($plain, $user->password));
+        $this->assertFalse(Hash::check('SenhaAtual#2026', $user->password));
+        $this->assertSame($user->password, $user->temporary_password_hash);
         $this->assertEqualsWithDelta(60, now()->diffInMinutes($user->temporary_password_expires_at), 1);
-        $this->assertFalse($user->must_change_password);
+        $this->assertTrue($user->must_change_password);
 
-        $this->loginWith('SenhaAtual#2026')
-            ->assertOk()
-            ->assertJsonPath('user.must_change_password', false);
+        // Old password stops working; the e-mailed one works right away and forces a change.
+        $this->loginWith('SenhaAtual#2026')->assertStatus(422);
+        $this->loginWith($plain)->assertOk()->assertJsonPath('user.must_change_password', true);
+        // Still the temporary password after a failed attempt with the old one.
+        $this->loginWith($plain)->assertOk();
+    }
+
+    public function test_full_flow_old_password_dead_temporary_works_then_new_password(): void
+    {
+        $this->makeUser();
+        $plain = $this->requestTemporaryPassword();
+
+        $this->loginWith('SenhaAtual#2026')->assertStatus(422);
+        $token = $this->loginWith($plain)->assertOk()->json('token');
+
+        $this->withToken($token)->postJson('/api/v1/auth/change-temporary-password', [
+            'temporary_password' => $plain,
+            'password' => self::NEW_PASSWORD,
+            'password_confirmation' => self::NEW_PASSWORD,
+        ])->assertOk()->assertJsonPath('user.must_change_password', false);
+        $this->app['auth']->forgetGuards();
+
+        $this->loginWith($plain)->assertStatus(422);
+        $this->loginWith('SenhaAtual#2026')->assertStatus(422);
+        $this->loginWith(self::NEW_PASSWORD)->assertOk()->assertJsonPath('user.must_change_password', false);
     }
 
     public function test_temporary_password_is_readable_and_strong(): void
@@ -241,17 +264,19 @@ class ForgotPasswordTest extends TestCase
         );
     }
 
-    public function test_expired_temporary_password_cannot_login_and_is_cleared(): void
+    public function test_expired_temporary_password_cannot_login(): void
     {
-        $user = $this->makeUser();
+        $this->makeUser();
         $plain = $this->requestTemporaryPassword();
 
         $this->travel(61)->minutes();
 
-        $this->loginWith($plain)->assertStatus(422);
-        $user->refresh();
-        $this->assertNull($user->temporary_password_hash);
-        $this->assertNull($user->temporary_password_expires_at);
+        $this->loginWith($plain)->assertStatus(422)
+            ->assertJsonPath('errors.email.0', 'A senha temporária expirou. Peça uma nova em “Esqueci a senha”.');
+        $this->loginWith('SenhaAtual#2026')->assertStatus(422);
+
+        // A new request lets the person in again.
+        $this->postJson('/api/v1/auth/forgot-password', ['email' => 'admin@clinica.test'])->assertOk();
     }
 
     public function test_new_request_replaces_previous_temporary_password(): void
@@ -265,15 +290,15 @@ class ForgotPasswordTest extends TestCase
         $this->loginWith($second)->assertOk()->assertJsonPath('user.must_change_password', true);
     }
 
-    public function test_login_with_real_password_clears_pending_temporary_password(): void
+    public function test_password_set_elsewhere_clears_leftover_temporary_state(): void
     {
         $user = $this->makeUser();
-        $plain = $this->requestTemporaryPassword();
+        $this->requestTemporaryPassword();
+        // e.g. admin resets the password from the team screen
+        $user->refresh()->forceFill(['password' => 'OutraSenha#2026'])->save();
 
-        $this->loginWith('SenhaAtual#2026')->assertOk()->assertJsonPath('user.must_change_password', false);
-
+        $this->loginWith('OutraSenha#2026')->assertOk()->assertJsonPath('user.must_change_password', false);
         $this->assertNull($user->refresh()->temporary_password_hash);
-        $this->loginWith($plain)->assertStatus(422);
     }
 
     public function test_per_email_throttle_is_silent(): void
@@ -302,14 +327,17 @@ class ForgotPasswordTest extends TestCase
         $this->postJson('/api/v1/auth/forgot-password', ['email' => 'x9@clinica.test'])->assertStatus(429);
     }
 
-    public function test_prune_command_clears_expired_temporary_passwords(): void
+    public function test_prune_command_keeps_marker_while_password_is_the_expired_temporary(): void
     {
         $user = $this->makeUser();
         $this->requestTemporaryPassword();
         $this->travel(61)->minutes();
 
         $this->artisan('auth:prune-temporary-passwords')->assertSuccessful();
+        $this->assertNotNull($user->refresh()->temporary_password_hash);
 
+        $user->forceFill(['password' => 'OutraSenha#2026'])->save();
+        $this->artisan('auth:prune-temporary-passwords')->assertSuccessful();
         $this->assertNull($user->refresh()->temporary_password_hash);
     }
 }
