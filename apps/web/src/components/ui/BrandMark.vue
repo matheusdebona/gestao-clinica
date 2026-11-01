@@ -5,7 +5,7 @@ import { computed } from 'vue'
 const props = withDefaults(
   defineProps<{
     size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl'
-    tone?: 'brand' | 'title' | 'inverse' | 'current'
+    tone?: 'brand' | 'title' | 'inverse' | 'current' | 'shell'
     /** `draw` = loading: o traço se desenha em loop (não gira). */
     motion?: 'none' | 'draw'
     decorative?: boolean
@@ -45,6 +45,8 @@ const toneClass = computed(() => {
       return 'text-inverse'
     case 'current':
       return ''
+    case 'shell':
+      return 'text-[var(--sv-shell-brand)]'
     default:
       return 'text-brand'
   }

@@ -11,7 +11,7 @@ const props = withDefaults(
     icon?: Component
     nested?: boolean
     compact?: boolean
-    tone?: 'inverse' | 'default'
+    tone?: 'inverse' | 'default' | 'shell'
   }>(),
   {
     active: false,
@@ -23,6 +23,7 @@ const props = withDefaults(
 )
 
 const inverse = computed(() => props.tone === 'inverse')
+const shell = computed(() => props.tone === 'shell')
 
 const classes = computed(() =>
   cn(
@@ -30,7 +31,7 @@ const classes = computed(() =>
     props.compact ? 'relative justify-center px-2' : 'px-3',
     props.nested && !props.compact && 'pl-9',
     props.active && inverse.value && 'bg-brand/40 text-inverse',
-    props.active && !inverse.value && 'bg-brand/15 text-brand',
+    props.active && !inverse.value && !shell.value && 'bg-brand/15 text-brand',
     !props.active &&
       !props.disabled &&
       inverse.value &&
@@ -38,9 +39,17 @@ const classes = computed(() =>
     !props.active &&
       !props.disabled &&
       !inverse.value &&
+      !shell.value &&
       'text-title hover:bg-surface/35',
     props.disabled && inverse.value && 'cursor-not-allowed text-inverse/35',
-    props.disabled && !inverse.value && 'cursor-not-allowed text-muted',
+    props.disabled && !inverse.value && !shell.value && 'cursor-not-allowed text-muted',
+    // shell: theme-aware sidebar (light = white glass, dark = identical to inverse)
+    props.active && shell.value && 'bg-[var(--sv-shell-bg-active)] font-[var(--sv-shell-weight-active)] text-[var(--sv-shell-text-active)]',
+    !props.active &&
+      !props.disabled &&
+      shell.value &&
+      'text-[var(--sv-shell-text)] hover:bg-[var(--sv-shell-bg-hover)] hover:text-[var(--sv-shell-text-hover)]',
+    props.disabled && shell.value && 'cursor-not-allowed text-[var(--sv-shell-text-disabled)]',
   ),
 )
 </script>

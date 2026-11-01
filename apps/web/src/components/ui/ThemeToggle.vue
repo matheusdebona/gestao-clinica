@@ -9,7 +9,7 @@ import { useThemeStore } from '@/stores/theme'
 const props = withDefaults(
   defineProps<{
     variant?: 'icon' | 'segmented'
-    tone?: 'default' | 'inverse'
+    tone?: 'default' | 'inverse' | 'shell'
   }>(),
   {
     variant: 'icon',
@@ -55,7 +55,13 @@ function onCycle() {
   <IconButton
     v-else
     :label="iconLabel"
-    :class="tone === 'inverse' ? '!text-inverse hover:!bg-inverse/10' : undefined"
+    :class="
+      tone === 'inverse'
+        ? '!text-inverse hover:!bg-inverse/10'
+        : tone === 'shell'
+          ? '!text-[var(--sv-shell-text-hover)] hover:!bg-[var(--sv-shell-bg-hover)]'
+          : undefined
+    "
     @click="onCycle"
   >
     <Monitor v-if="theme.preference === 'system'" class="size-4" :stroke-width="1.75" />

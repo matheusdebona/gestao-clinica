@@ -57,6 +57,26 @@
   --sv-shadow-thumb: 0 1px 3px rgba(28, 28, 30, 0.2);
 
   --sv-sidebar-width: 240px;
+
+  /* Shell (sidebar) — light: white glass, dark text, brand-accent active */
+  --sv-sidebar-bg: rgba(255, 255, 255, 0.74);
+  --sv-sidebar-border: rgba(28, 28, 30, 0.07);
+  --sv-sidebar-shadow:
+    0 10px 36px rgba(28, 28, 30, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --sv-sidebar-text: var(--sv-text-title);
+  --sv-shell-text: #3a3a3c;
+  --sv-shell-text-hover: #1c1c1e;
+  --sv-shell-text-active: #4a4791;
+  --sv-shell-text-muted: #6c6c70;
+  --sv-shell-text-disabled: #8e8e93;
+  --sv-shell-bg-hover: rgba(89, 86, 166, 0.08);
+  --sv-shell-bg-active: rgba(89, 86, 166, 0.14);
+  --sv-shell-weight-active: 600;
+  --sv-shell-focus: var(--sv-brand-primary);
+  --sv-shell-focus-offset: -2px;
+  --sv-shell-brand: var(--sv-brand-primary);
+  --sv-tabbar-muted: #636366;
   --sv-page-gap: 24px;
   --sv-page-padding: 20px;
   --sv-chrome-inset: 12px;
@@ -113,6 +133,24 @@
 }
 
 html.dark {
+
+  /* Shell (sidebar) — dark: unchanged from glass-dark + inverse tone */
+  --sv-sidebar-bg: var(--sv-glass-dark-bg);
+  --sv-sidebar-border: var(--sv-glass-dark-border);
+  --sv-sidebar-shadow: var(--sv-shadow-glass-dark);
+  --sv-sidebar-text: var(--sv-text-inverse);
+  --sv-shell-text: color-mix(in oklab, var(--sv-text-inverse) 70%, transparent);
+  --sv-shell-text-hover: var(--sv-text-inverse);
+  --sv-shell-text-active: var(--sv-text-inverse);
+  --sv-shell-text-muted: color-mix(in oklab, var(--sv-text-inverse) 50%, transparent);
+  --sv-shell-text-disabled: color-mix(in oklab, var(--sv-text-inverse) 35%, transparent);
+  --sv-shell-bg-hover: color-mix(in oklab, var(--sv-text-inverse) 10%, transparent);
+  --sv-shell-bg-active: color-mix(in oklab, var(--sv-brand-primary) 40%, transparent);
+  --sv-shell-weight-active: 500;
+  --sv-shell-focus: color-mix(in srgb, var(--sv-brand-primary) 55%, transparent);
+  --sv-shell-focus-offset: 2px;
+  --sv-shell-brand: var(--sv-text-inverse);
+  --sv-tabbar-muted: var(--sv-text-muted);
   color-scheme: dark;
 
   --sv-brand-primary: #7a77c9;
@@ -239,6 +277,7 @@ html.dark {
 .glass-regular,
 .glass-clear,
 .glass-dark,
+.glass-sidebar,
 .glass-field,
 .glass-menu,
 .glass-chip,
@@ -270,6 +309,21 @@ html.dark {
   color: var(--sv-text-inverse);
   -webkit-backdrop-filter: var(--sv-glass-filter-dark);
   backdrop-filter: var(--sv-glass-filter-dark);
+}
+
+.glass-sidebar {
+  background-color: var(--sv-sidebar-bg);
+  border: 1px solid var(--sv-sidebar-border);
+  box-shadow: var(--sv-sidebar-shadow);
+  color: var(--sv-sidebar-text);
+  -webkit-backdrop-filter: var(--sv-glass-filter-dark);
+  backdrop-filter: var(--sv-glass-filter-dark);
+}
+
+/* Focus ring in the shell: solid brand on light glass (≥3:1), dark keeps the global ring. */
+.glass-sidebar :focus-visible {
+  outline-color: var(--sv-shell-focus);
+  outline-offset: var(--sv-shell-focus-offset);
 }
 
 .glass-field {

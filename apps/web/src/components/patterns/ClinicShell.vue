@@ -112,7 +112,7 @@ async function onLogout() {
       aria-hidden="true"
     />
     <aside
-      class="glass-dark fixed z-30 hidden flex-col overflow-hidden rounded-chrome px-3 py-5 text-inverse md:flex"
+      class="glass-sidebar fixed z-30 hidden flex-col overflow-hidden rounded-chrome px-3 py-5 md:flex"
       :style="{
         left: 'var(--sv-chrome-inset)',
         top: 'var(--sv-chrome-inset)',
@@ -121,8 +121,8 @@ async function onLogout() {
       }"
     >
       <div class="px-3 pb-5">
-        <BrandMark size="md" tone="inverse" />
-        <p class="mt-4 text-[13px] text-inverse/50">Clínica</p>
+        <BrandMark size="md" tone="shell" />
+        <p class="mt-4 text-[13px] text-[var(--sv-shell-text-muted)]">Clínica</p>
         <p class="mt-0.5 truncate text-[15px] font-semibold tracking-[-0.02em]">
           {{ auth.clinicName || APP_NAME }}
         </p>
@@ -133,14 +133,15 @@ async function onLogout() {
           :open-groups="openGroups"
           :current-path="route.path"
           :alert-count="alertCount"
+          tone="shell"
           @toggle="onToggleGroup"
         />
       </nav>
       <div class="mt-4 flex items-center gap-1">
         <button type="button" class="min-w-0 flex-1 text-left" @click="onLogout">
-          <SidebarNavItem label="Sair" :icon="LogOut" />
+          <SidebarNavItem label="Sair" :icon="LogOut" tone="shell" />
         </button>
-        <ThemeToggle tone="inverse" />
+        <ThemeToggle tone="shell" />
       </div>
     </aside>
 
@@ -177,7 +178,7 @@ async function onLogout() {
           :key="item.id"
           :to="item.to"
           class="relative flex flex-col items-center gap-1 rounded-full px-2 py-1 text-[11px]"
-          :class="isNavActive(route.path, item.to, item.aliases) ? 'text-brand' : 'text-muted'"
+          :class="isNavActive(route.path, item.to, item.aliases) ? 'text-brand' : 'text-[var(--sv-tabbar-muted)]'"
         >
           <component :is="item.icon" class="size-5" :stroke-width="1.75" />
           <span v-if="isAlertsItem(item)" class="pointer-events-none absolute right-1 top-0">
@@ -189,7 +190,7 @@ async function onLogout() {
           v-if="mobileNav.needsMore"
           type="button"
           class="relative flex flex-col items-center gap-1 rounded-full px-2 py-1 text-[11px]"
-          :class="moreActive || moreOpen ? 'text-brand' : 'text-muted'"
+          :class="moreActive || moreOpen ? 'text-brand' : 'text-[var(--sv-tabbar-muted)]'"
           :aria-expanded="moreOpen"
           aria-haspopup="dialog"
           @click="moreOpen = true"
