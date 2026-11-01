@@ -77,6 +77,8 @@ export const PERMISSION_LABELS: Record<string, string> = {
   'appointments.start': 'Iniciar sessões',
   'appointments.cancel': 'Cancelar sessões',
   'metrics.view': 'Ver métricas',
+  'finance.view': 'Ver custos, margens e DRE',
+  'finance.manage': 'Gerenciar despesas, impostos e comissões',
 }
 
 export function roleLabel(name: string): string {

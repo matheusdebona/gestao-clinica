@@ -38,6 +38,11 @@ export interface SalePayment {
   card_brand_id: number | null
   installments: number | null
   paid_at: string | null
+  /** Campos de custo: só vêm para quem tem finance.view. */
+  fee_source?: 'rule' | 'method' | 'none' | null
+  fee_amount?: string
+  anticipation_fee_amount?: string
+  net_amount?: string | null
   payment_method?: PaymentMethod | null
   card_operator?: CardOperator | null
   card_brand?: CardBrand | null
@@ -52,8 +57,9 @@ export interface PaymentMethod {
   code: string
   kind: string
   requires_card_meta: boolean
-  fee_percent: string | null
-  fee_fixed: string | null
+  /** Só vem para quem tem finance.view. */
+  fee_percent?: string | null
+  fee_fixed?: string | null
   is_active: boolean
 }
 
@@ -63,6 +69,8 @@ export interface CardOperator {
   name: string
   code: string | null
   auto_anticipate: boolean
+  /** % ao mês; só vem para quem tem finance.view. */
+  anticipation_rate_percent?: string | null
   is_active: boolean
 }
 

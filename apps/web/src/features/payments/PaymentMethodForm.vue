@@ -14,6 +14,7 @@ import {
   paymentMethodToFormValues,
   toPaymentMethodPayload,
 } from '@/features/payments/schema'
+import { useAuthStore } from '@/stores/auth'
 import type { PaymentMethod, PaymentMethodPayload } from '@/types/sale'
 
 const props = defineProps<{
@@ -27,6 +28,8 @@ const emit = defineEmits<{
   cancel: []
 }>()
 
+const auth = useAuthStore()
+const canManageFees = computed(() => auth.can('finance.manage'))
 const codeTouched = ref(Boolean(props.method))
 
 const { defineField, handleSubmit, errors, setErrors, resetForm, setFieldValue } = useForm({
@@ -64,7 +67,7 @@ function onCodeInput() {
 }
 
 const onSubmit = handleSubmit((values) => {
-  emit('submit', toPaymentMethodPayload(values))
+  emit('submit', toPaymentMethodPayload(values, canManageFees.value))
 })
 
 defineExpose({ setErrors })
@@ -105,7 +108,7 @@ defineExpose({ setErrors })
         />
       </template>
     </FormField>
-    <template v-if="!isCardKind">
+    <template v-if="!isCardKind && canManageFees">
       <FormField
         label="Taxa percentual"
         hint="Opcional. Deixe vazio se não houver taxa."
@@ -142,7 +145,9 @@ defineExpose({ setErrors })
     </template>
     <Switch v-model="isActive" label="Ativo" />
     <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-      <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')">Cancelar</Button>
+      <Button variant="ghost" type="button" :disabled="loading" @click="emit('cancel')"
+        >Cancelar</Button
+      >
       <Button type="submit" :loading="loading">{{ submitLabel ?? 'Salvar' }}</Button>
     </div>
   </form>

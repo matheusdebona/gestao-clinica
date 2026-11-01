@@ -77,6 +77,8 @@ class EnsureRolesAndPermissions
         'leads.view',
         'leads.manage',
         'lead_statuses.manage',
+        'finance.view',
+        'finance.manage',
     ];
 
     public static function run(): void
@@ -150,6 +152,8 @@ class EnsureRolesAndPermissions
             'leads.view',
             'leads.manage',
             'lead_statuses.manage',
+            'finance.view',
+            'finance.manage',
         ]);
 
         Role::findOrCreate('receptionist', self::GUARD)->syncPermissions([
@@ -194,7 +198,6 @@ class EnsureRolesAndPermissions
             'payment_methods.manage',
             'card_operators.manage',
             'card_brands.manage',
-            'card_fees.manage',
             'leads.view',
             'leads.manage',
         ]);
