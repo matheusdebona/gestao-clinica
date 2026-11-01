@@ -348,7 +348,7 @@ defineExpose({ setErrors })
     </PermissionGate>
 
     <FormField
-      label="Valor da avaliação (opcional)"
+      label="Valor da consulta (opcional)"
       :error="errors.initial_consultation_amount"
       html-for="client-consultation"
     >

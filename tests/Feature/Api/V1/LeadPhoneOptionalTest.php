@@ -17,7 +17,7 @@ use Tests\TestCase;
 
 /**
  * Telefone é opcional para cadastrar e editar o lead, e obrigatório para agendar
- * (converter o lead em paciente com avaliação) e para cadastrar paciente.
+ * (converter o lead em paciente com consulta) e para cadastrar paciente.
  */
 class LeadPhoneOptionalTest extends TestCase
 {

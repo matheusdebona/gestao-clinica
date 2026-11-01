@@ -154,7 +154,7 @@ function onConverted(result: LeadConvertResult) {
           <Button mobile-block variant="secondary" @click="goEdit">Editar</Button>
         </PermissionGate>
         <PermissionGate v-if="lead && !isFinal" permission="leads.manage">
-          <Button mobile-block @click="convertOpen = true">Agendar</Button>
+          <Button mobile-block @click="convertOpen = true">Agendar consulta</Button>
         </PermissionGate>
       </template>
     </PageHeader>

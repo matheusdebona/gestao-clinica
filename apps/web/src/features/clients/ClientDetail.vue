@@ -156,7 +156,7 @@ const { tiers } = usePatientTiers()
           <dd class="mt-0.5 text-[15px] text-title">{{ client.campaign?.name ?? '—' }}</dd>
         </div>
         <div>
-          <dt class="text-[13px] text-muted">Valor da avaliação</dt>
+          <dt class="text-[13px] text-muted">Valor da consulta</dt>
           <dd class="mt-0.5">
             <MoneyDisplay :value="client.initial_consultation_amount" />
           </dd>

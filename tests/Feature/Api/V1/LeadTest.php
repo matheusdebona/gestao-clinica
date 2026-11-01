@@ -268,7 +268,7 @@ class LeadTest extends TestCase
             'scheduled_at' => now()->addDay()->setTime(10, 0)->toIso8601String(),
             'professional_user_id' => $this->admin->id,
             'duration_minutes' => 45,
-            'notes' => 'Avaliação',
+            'notes' => 'Consulta',
         ])->assertCreated();
 
         $response->assertJsonPath('data.client_created', true)

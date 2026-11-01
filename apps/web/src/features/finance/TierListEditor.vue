@@ -30,7 +30,7 @@ const THRESHOLD_LABEL: Record<TierKind, string> = {
 };
 const THRESHOLD_HINT: Record<TierKind, string> = {
     appointments:
-        "Número de novos agendamentos da pessoa no mês, contados como em Metas (avaliação cancelada não conta).",
+        "Número de novos agendamentos da pessoa no mês, contados como em Metas (consulta cancelada não conta).",
     revenue:
         "Faturamento total da clínica no mês: vendas confirmadas (mesma receita da DRE), mês civil de São Paulo.",
 };

@@ -150,7 +150,7 @@ function eventsOn(day: Date): Appointment[] {
 function eventMeta(item: Appointment): string {
   const time = formatTime(item.scheduled_at)
   const professional = item.professional?.name ?? 'Profissional'
-  const treatment = item.treatment_id ? `Tratamento #${item.treatment_id}` : 'Avaliação'
+  const treatment = item.treatment_id ? `Tratamento #${item.treatment_id}` : 'Consulta'
   const sent = item.confirmation_sent_at ? ' · WhatsApp aberto' : ''
   const answer =
     item.confirmation_status && item.confirmation_status !== 'pending'

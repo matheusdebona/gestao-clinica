@@ -87,7 +87,7 @@ class GoalRemunerationTest extends TestCase
         ]);
     }
 
-    /** Converte um lead como o vendedor (marco "Agendou" + avaliação marcada). */
+    /** Converte um lead como o vendedor (marco "Agendou" + consulta marcada). */
     private function convertAsSeller(): array
     {
         $lead = $this->newLead();
@@ -394,7 +394,7 @@ class GoalRemunerationTest extends TestCase
         $this->assertSame('2.00', $bonus->base_amount);
         $this->assertSame('460.00', number_format((float) $this->goalEntries()->sum('amount'), 2, '.', ''));
 
-        // Cancelar uma avaliação tira o agendamento e o bônus.
+        // Cancelar uma consulta tira o agendamento e o bônus.
         Sanctum::actingAs($this->admin);
         $this->postJson("/api/v1/appointments/{$first}/cancel")->assertOk();
         $this->assertNull($this->goalEntries()->firstWhere('goal_kind', 'bonus'));

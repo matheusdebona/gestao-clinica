@@ -26,7 +26,7 @@ class ClinicSettings
     /** @var array<string, string> */
     public const DEFAULT_WHATSAPP_TEMPLATES = [
         self::TEMPLATE_APPOINTMENT_CONFIRMATION => 'Olá, {paciente}! Aqui é da {clinica}. Passando para confirmar seu horário no dia {data} às {hora} com {profissional}. Podemos confirmar?',
-        self::TEMPLATE_LEAD_FOLLOW_UP => 'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Vi seu interesse e queria saber se posso te ajudar a agendar uma avaliação.',
+        self::TEMPLATE_LEAD_FOLLOW_UP => 'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Vi seu interesse e queria saber se posso te ajudar a agendar uma consulta.',
         self::TEMPLATE_PATIENT_RETURN => 'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Já está chegando a hora do seu retorno de {procedimento} (previsto para {data}). Vamos agendar?',
         self::TEMPLATE_BUDGET_FOLLOW_UP => 'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Passando para saber se ficou alguma dúvida sobre o orçamento de {valor} que enviamos em {data}. Posso te ajudar a fechar?',
     ];

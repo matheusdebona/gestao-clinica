@@ -55,6 +55,8 @@ class WhatsappMessagesTest extends TestCase
             ->assertJsonPath('data.clinic_name', 'Clínica Bella')
             ->assertJsonPath('data.whatsapp_templates.appointment_confirmation', ClinicSettings::DEFAULT_WHATSAPP_TEMPLATES['appointment_confirmation'])
             ->assertJsonPath('data.whatsapp_templates.lead_follow_up', ClinicSettings::DEFAULT_WHATSAPP_TEMPLATES['lead_follow_up']);
+        // O termo é "consulta", não "avaliação".
+        $this->assertStringContainsString('agendar uma consulta', ClinicSettings::DEFAULT_WHATSAPP_TEMPLATES['lead_follow_up']);
         $this->putJson('/api/v1/clinic/settings', ['whatsapp_templates' => ['lead_follow_up' => 'Oi']])->assertForbidden();
 
         Sanctum::actingAs($this->admin);

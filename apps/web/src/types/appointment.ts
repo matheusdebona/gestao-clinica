@@ -59,7 +59,7 @@ export interface AppointmentConsumption {
 export interface Appointment {
   id: number
   clinic_id: number
-  /** null = avaliação (first visit, e.g. from a lead) without sale/treatment. */
+  /** null = consulta (first visit, e.g. from a lead) without sale/treatment. */
   treatment_id: number | null
   client_id: number
   professional_user_id: number | null

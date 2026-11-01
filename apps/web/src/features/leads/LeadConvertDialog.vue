@@ -143,8 +143,8 @@ const { mutate, isPending } = useMutation({
   onSuccess: async (result) => {
     toast.success(
       result.client_created
-        ? 'Lead virou paciente e avaliação agendada'
-        : 'Lead vinculado ao paciente e avaliação agendada',
+        ? 'Lead virou paciente e consulta agendada'
+        : 'Lead vinculado ao paciente e consulta agendada',
     )
     open.value = false
     await Promise.all([
@@ -183,8 +183,8 @@ function onConfirm() {
   <AppDialog
     v-model:open="open"
     size="lg"
-    title="Agendar avaliação"
-    description="Ao confirmar, o lead vira paciente (com nome, telefone, origem e histórico) e a avaliação entra na agenda."
+    title="Agendar consulta"
+    description="Ao confirmar, o lead vira paciente (com nome, telefone, origem e histórico) e a consulta entra na agenda."
   >
     <div class="grid gap-4 md:grid-cols-2">
       <Banner v-if="errors.lead" variant="danger" class="md:col-span-2">{{ errors.lead }}</Banner>

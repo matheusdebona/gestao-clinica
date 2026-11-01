@@ -44,7 +44,7 @@ class AppointmentService
     }
 
     /**
-     * First visit (avaliação) without a sale/treatment, e.g. when a lead becomes a patient.
+     * First visit (consulta) without a sale/treatment, e.g. when a lead becomes a patient.
      * Must run inside the caller transaction when combined with other writes.
      *
      * @param  array{scheduled_at?: string|null, professional_user_id: int, duration_minutes?: int|null, notes?: string|null}  $data
@@ -209,7 +209,7 @@ class AppointmentService
 
         if ($appointment->treatment === null && $lines !== []) {
             throw ValidationException::withMessages([
-                'consumptions' => ['Avaliação sem tratamento não registra consumo. Abra uma venda/tratamento para o paciente.'],
+                'consumptions' => ['Consulta sem tratamento não registra consumo. Abra uma venda/tratamento para o paciente.'],
             ]);
         }
 

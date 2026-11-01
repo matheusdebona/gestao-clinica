@@ -674,11 +674,11 @@ function simulateLoading() {
               @action="toast.info('Protocolo')"
             />
             <ListCard
-              title="Avaliação"
+              title="Consulta"
               meta="Ontem"
               badge="Concluído"
               badge-variant="success"
-              @action="toast.info('Avaliação')"
+              @action="toast.info('Consulta')"
             />
             <AgendaEventCard
               title="Maria Silva"

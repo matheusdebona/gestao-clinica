@@ -19,7 +19,7 @@ use Illuminate\Support\Collection;
  * Realizado no mês (America/Sao_Paulo), com as mesmas regras da remuneração por meta
  * (ver milestoneQuery, usada pela tela e pelo pagamento):
  *  - agendamentos: leads marcados como "Agendou" pelo usuário (leads.booked_at/booked_by_user_id),
- *    exceto quando a avaliação marcada na conversão foi cancelada;
+ *    exceto quando a consulta marcada na conversão foi cancelada;
  *  - vendas: soma do valor efetivo das vendas confirmadas do usuário (sold_by_user_id, sold_at);
  *  - leads abordados: leads marcados como "Abordado" pelo usuário (approached_at/approached_by_user_id),
  *    exceto lead cancelado e o "Abordado" implícito da conversão (marcado junto com o "Agendou").
@@ -171,7 +171,7 @@ class UserGoalService
      * Leads que contam para o colaborador no mês, no marco "booked" (Agendou) ou "approached"
      * (Abordado). Única regra de contagem: usada pela tela de Metas e pela remuneração por meta.
      *
-     *  - Agendou: não conta se a avaliação marcada na conversão foi cancelada.
+     *  - Agendou: não conta se a consulta marcada na conversão foi cancelada.
      *  - Abordado: não conta se o lead foi cancelado, nem quando o "Abordado" só existe porque a
      *    conversão o marcou junto (mesmo instante e mesma pessoa do "Agendou"): converter não é
      *    uma abordagem. Abordado antes (ou por outra pessoa) continua contando.

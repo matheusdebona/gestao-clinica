@@ -12,7 +12,7 @@ class GoalRemuneration extends Model
 {
     use BelongsToClinic;
 
-    /** Novo agendamento: lead convertido em paciente com avaliação marcada (marco "Agendou"). */
+    /** Novo agendamento: lead convertido em paciente com consulta marcada (marco "Agendou"). */
     public const METRIC_APPOINTMENTS = 'appointments';
 
     /** Lead abordado (marco "Abordado"). */
