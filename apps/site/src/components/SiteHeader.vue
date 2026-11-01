@@ -36,15 +36,13 @@ let ctaIo: IntersectionObserver | null = null
 let footerIo: IntersectionObserver | null = null
 
 function updateHeroLock() {
-  const stage =
-    document.querySelector<HTMLElement>('[data-hero-stage]') ??
-    document.querySelector<HTMLElement>('.hero-stage') ??
-    document.getElementById('topo')
-  if (!stage) {
+  // The hero is one full screen; the mock can be hidden in it on short phones, so track the section.
+  const hero = document.getElementById('topo')
+  if (!hero) {
     heroInView.value = true
     return
   }
-  const rect = stage.getBoundingClientRect()
+  const rect = hero.getBoundingClientRect()
   const stickyGuard = 120
   heroInView.value = rect.bottom > stickyGuard
 }

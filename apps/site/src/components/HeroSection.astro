@@ -62,4 +62,62 @@ import PhoneFrame from './PhoneFrame.astro'
       </p>
     </div>
   </div>
+
+  <a class="hero-scroll-cue" href="#dor" aria-label="Rolar para a próxima seção">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m6 9 6 6 6-6" />
+    </svg>
+  </a>
 </section>
+<div class="hero-after hero-solid-band" data-hero-after></div>
+
+<script>
+  // Mobile: the hero is exactly one screen (100svh). Scale the mock to the space left under the
+  // copy. If it would be too small to read, move it right below the hero instead of clipping it.
+  const MIN_ZOOM = 0.4
+  const hero = document.getElementById('topo')
+  const after = document.querySelector<HTMLElement>('[data-hero-after]')
+  const grid = hero?.querySelector<HTMLElement>('.hero-grid')
+  const copy = hero?.querySelector<HTMLElement>('.hero-copy')
+  const stage = hero?.querySelector<HTMLElement>('.hero-stage')
+  const swap = stage?.querySelector<HTMLElement>('.hero-swap')
+  const caption = stage?.querySelector<HTMLElement>('.hero-stage-caption')
+  const mobile = window.matchMedia('(max-width: 1023.98px)')
+  let lastKey = ''
+
+  function fitHeroStage(force = false) {
+    if (!hero || !after || !grid || !copy || !stage || !swap || !caption) return
+    const screen = parseFloat(getComputedStyle(hero).minHeight) || window.innerHeight
+    // iOS fires resize while the toolbar collapses on scroll; svh does not change then, so skip.
+    const key = `${window.innerWidth}x${screen}x${copy.offsetHeight}`
+    if (!force && key === lastKey) return
+    lastKey = key
+
+    if (stage.parentElement !== grid) grid.append(stage)
+    hero.classList.remove('hero-copy-only')
+    swap.style.removeProperty('--hero-stage-zoom')
+    if (!mobile.matches) return
+
+    const g = getComputedStyle(grid)
+    const other =
+      parseFloat(g.paddingTop) +
+      parseFloat(g.paddingBottom) +
+      parseFloat(g.rowGap) +
+      copy.offsetHeight +
+      caption.offsetHeight +
+      parseFloat(getComputedStyle(caption).marginTop)
+    const natural = parseFloat(getComputedStyle(swap).minHeight) || 572
+    const zoom = Math.min(1, Math.floor(((screen - other - 1) / natural) * 100) / 100)
+    if (zoom >= MIN_ZOOM) swap.style.setProperty('--hero-stage-zoom', String(zoom))
+    else {
+      hero.classList.add('hero-copy-only')
+      after.append(stage)
+    }
+  }
+
+  fitHeroStage(true)
+  window.addEventListener('resize', () => fitHeroStage(), { passive: true })
+  mobile.addEventListener('change', () => fitHeroStage(true))
+  if (copy && 'ResizeObserver' in window) new ResizeObserver(() => fitHeroStage()).observe(copy)
+  document.fonts?.ready.then(() => fitHeroStage(true))
+</script>
