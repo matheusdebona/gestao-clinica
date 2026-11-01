@@ -40,12 +40,18 @@ const sections: { key: WhatsAppTemplateKey; title: string; description: string }
     title: 'Retorno do paciente',
     description: 'Usada no botão “Chamar no WhatsApp” da lista de Retornos.',
   },
+  {
+    key: 'budget_follow_up',
+    title: 'Cobrança de orçamento',
+    description: 'Usada no botão “Cobrar no WhatsApp” dos orçamentos esquecidos.',
+  },
 ]
 
 const drafts = ref<Record<WhatsAppTemplateKey, string>>({
   appointment_confirmation: '',
   lead_follow_up: '',
   patient_return: '',
+  budget_follow_up: '',
 })
 const errors = ref<Partial<Record<WhatsAppTemplateKey, string>>>({})
 
@@ -66,6 +72,7 @@ const sample = computed(() => ({
   hora: '14:30',
   profissional: 'Dra. Paula',
   procedimento: 'Toxina botulínica',
+  valor: 'R$ 1.500,00',
   usuario: auth.user?.name?.split(' ')[0] ?? 'Rita',
 }))
 

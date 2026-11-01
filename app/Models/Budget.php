@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
+use Database\Factories\BudgetFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,7 +33,7 @@ class Budget extends Model
         self::STATUS_SUPERSEDED,
     ];
 
-    /** @use HasFactory<\Database\Factories\BudgetFactory> */
+    /** @use HasFactory<BudgetFactory> */
     use BelongsToClinic, HasFactory;
 
     protected $fillable = [
@@ -50,6 +51,9 @@ class Budget extends Model
         'sent_at',
         'accepted_at',
         'rejected_at',
+        'follow_up_sent_at',
+        'follow_up_sent_by_user_id',
+        'follow_up_count',
     ];
 
     /**
@@ -73,6 +77,8 @@ class Budget extends Model
             'sent_at' => 'datetime',
             'accepted_at' => 'datetime',
             'rejected_at' => 'datetime',
+            'follow_up_sent_at' => 'datetime',
+            'follow_up_count' => 'integer',
         ];
     }
 

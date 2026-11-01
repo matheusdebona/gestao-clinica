@@ -83,6 +83,12 @@ export const routes: RouteRecordRaw[] = [
           component: () => import('@/pages/WhatsAppSettingsPage.vue'),
         },
         {
+          path: 'settings/orcamentos-esquecidos',
+          name: 'settings-budget-follow-up',
+          meta: { title: 'Orçamentos esquecidos', permission: 'clinics.branding' },
+          component: () => import('@/pages/BudgetFollowUpSettingsPage.vue'),
+        },
+        {
           path: 'settings/alertas-acompanhamento',
           name: 'settings-follow-up-tiers',
           meta: { title: 'Alertas de acompanhamento', permission: 'clinics.branding' },

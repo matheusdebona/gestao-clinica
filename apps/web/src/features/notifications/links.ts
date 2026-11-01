@@ -38,6 +38,10 @@ export function notificationHref(item: ClinicNotification): string | null {
     return days !== null ? `/leads?parados=${days}` : '/leads?parados=todos'
   }
 
+  if (type === 'forgotten_budgets') {
+    return '/budgets?esquecidos=1'
+  }
+
   if (type === 'appointment_confirmations') {
     return '/appointments'
   }

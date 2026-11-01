@@ -1,5 +1,6 @@
 import { computed } from 'vue'
 import { useClinicSettings } from '@/features/settings/useClinicSettings'
+import { formatBRL } from '@/lib/formatters'
 import { firstName, renderWhatsAppTemplate, whatsappDateParts, whatsappUrl } from '@/lib/whatsapp'
 import { useAuthStore } from '@/stores/auth'
 
@@ -60,7 +61,24 @@ export function useWhatsAppLinks() {
     return whatsappUrl(item.client.whatsapp, text)
   }
 
-  return { leadUrl, appointmentUrl, returnUrl }
+  function budgetUrl(budget: {
+    effective_amount: string
+    sent_at: string | null
+    client?: { name: string; whatsapp: string } | null
+  }): string | null {
+    if (!budget.client) {
+      return null
+    }
+    const text = renderWhatsAppTemplate(template('budget_follow_up'), {
+      ...base.value,
+      paciente: firstName(budget.client.name),
+      valor: formatBRL(budget.effective_amount),
+      data: whatsappDateParts(budget.sent_at).data,
+    })
+    return whatsappUrl(budget.client.whatsapp, text)
+  }
+
+  return { leadUrl, appointmentUrl, returnUrl, budgetUrl }
 }
 
 const FALLBACKS = {
@@ -70,4 +88,6 @@ const FALLBACKS = {
     'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Vi seu interesse e queria saber se posso te ajudar a agendar uma avaliação.',
   patient_return:
     'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Já está chegando a hora do seu retorno de {procedimento} (previsto para {data}). Vamos agendar?',
+  budget_follow_up:
+    'Olá, {paciente}! Aqui é {usuario}, da {clinica}. Passando para saber se ficou alguma dúvida sobre o orçamento de {valor} que enviamos em {data}. Posso te ajudar a fechar?',
 } as const

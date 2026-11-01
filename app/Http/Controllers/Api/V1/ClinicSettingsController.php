@@ -23,14 +23,25 @@ class ClinicSettingsController extends Controller
         foreach (array_keys(ClinicSettings::DEFAULT_WHATSAPP_TEMPLATES) as $key) {
             $rules['whatsapp_templates.'.$key] = ['sometimes', 'nullable', 'string', 'max:1000'];
         }
+        $rules['budget_follow_up_days'] = ['sometimes', 'array', 'max:'.ClinicSettings::MAX_BUDGET_FOLLOW_UP_TIERS];
+        $rules['budget_follow_up_days.*'] = ['integer', 'min:1', 'max:365', 'distinct'];
         $data = $request->validate($rules, [
             'whatsapp_templates.*.max' => 'Mensagem muito longa (máximo de 1000 caracteres).',
+            'budget_follow_up_days.max' => 'Use no máximo '.ClinicSettings::MAX_BUDGET_FOLLOW_UP_TIERS.' prazos.',
+            'budget_follow_up_days.*.integer' => 'Informe dias inteiros.',
+            'budget_follow_up_days.*.min' => 'Informe de 1 a 365 dias.',
+            'budget_follow_up_days.*.max' => 'Informe de 1 a 365 dias.',
+            'budget_follow_up_days.*.distinct' => 'Não repita o mesmo prazo.',
         ]);
 
         $clinic = $this->currentClinic();
 
         if (array_key_exists('whatsapp_templates', $data)) {
             ClinicSettings::updateWhatsappTemplates($clinic, $data['whatsapp_templates']);
+        }
+
+        if (array_key_exists('budget_follow_up_days', $data)) {
+            ClinicSettings::updateBudgetFollowUpDays($clinic, $data['budget_follow_up_days']);
         }
 
         return response()->json(['data' => $this->payload($clinic->fresh())]);
@@ -46,6 +57,8 @@ class ClinicSettingsController extends Controller
             'whatsapp_templates' => ClinicSettings::whatsappTemplates($clinic),
             'whatsapp_template_defaults' => ClinicSettings::DEFAULT_WHATSAPP_TEMPLATES,
             'whatsapp_placeholders' => ClinicSettings::WHATSAPP_PLACEHOLDERS,
+            'budget_follow_up_days' => ClinicSettings::budgetFollowUpDays($clinic),
+            'budget_follow_up_days_default' => ClinicSettings::DEFAULT_BUDGET_FOLLOW_UP_DAYS,
         ];
     }
 

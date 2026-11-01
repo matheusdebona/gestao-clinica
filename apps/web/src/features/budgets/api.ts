@@ -8,6 +8,8 @@ export interface BudgetListParams {
   client_id?: number
   sale_id?: number
   include_superseded?: boolean
+  /** Só orçamentos esquecidos (enviados e sem resposta além do menor prazo). */
+  forgotten?: boolean
 }
 
 export async function listBudgets(params: BudgetListParams = {}): Promise<Paginated<Budget>> {
@@ -26,6 +28,9 @@ export async function listBudgets(params: BudgetListParams = {}): Promise<Pagina
   if (params.include_superseded) {
     query.include_superseded = 1
   }
+  if (params.forgotten) {
+    query.forgotten = 1
+  }
 
   return api<Paginated<Budget>>('/budgets', { query })
 }
@@ -38,6 +43,13 @@ export async function createBudget(saleId: number, body: BudgetCreatePayload = {
   const payload = await api<DataEnvelope<Budget>>(`/sales/${saleId}/budgets`, {
     method: 'POST',
     body,
+  })
+  return payload.data
+}
+
+export async function logBudgetFollowUpWhatsApp(id: number): Promise<Budget> {
+  const payload = await api<DataEnvelope<Budget>>(`/budgets/${id}/follow-up-whatsapp`, {
+    method: 'POST',
   })
   return payload.data
 }
