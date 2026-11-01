@@ -40,7 +40,7 @@ const doneMutation = useMutation({
 function meta(item: PatientReturn): string {
   const bits = [item.label, `previsto para ${formatIsoDate(item.due_on)}`]
   if (item.whatsapp_sent_at) {
-    bits.push('WhatsApp enviado')
+    bits.push('WhatsApp aberto')
   }
   return bits.join(' · ')
 }
