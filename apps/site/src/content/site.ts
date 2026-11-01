@@ -33,6 +33,8 @@ export const PAIN_TITLE = 'O faturamento entra, mas a planilha não diz o que so
 
 export const FEATURES_KICKER = 'O sistema'
 export const FEATURES_TITLE = 'Lead, agenda, estoque e financeiro no mesmo sistema.'
+export const FEATURES_LEAD =
+  'Para quem é dono da clínica: o lucro, a equipe e o estoque sob controle, sem planilha paralela.'
 
 export const RHYTHM_KICKER = 'Como funciona'
 export const RHYTHM_TITLE = 'Do primeiro WhatsApp até o fechamento do mês.'
@@ -146,6 +148,12 @@ export const features = [
     href: '#lucro',
   },
   {
+    id: 'resultado',
+    title: 'Vendas e margem',
+    teaser: 'Quanto cada produto vendeu e faturou no período, a margem de cada protocolo e quanto as cortesias custaram.',
+    href: '#lucro',
+  },
+  {
     id: 'leads',
     title: 'Leads',
     teaser: 'Funil até a venda e mensagens prontas e personalizáveis para cobrar o paciente que parou de responder.',
@@ -158,15 +166,21 @@ export const features = [
     href: '#agenda',
   },
   {
+    id: 'retornos',
+    title: 'Retornos',
+    teaser: 'O prazo de retorno do protocolo gera a data de volta de cada paciente. Você vê quem está para voltar e quem já passou do prazo.',
+    href: '#agenda',
+  },
+  {
     id: 'pacientes',
     title: 'Pacientes',
-    teaser: 'Cadastro, origem, histórico e tratamento em andamento.',
+    teaser: 'Cadastro, origem, histórico e faixa do paciente (Bronze, Prata, Ouro e Diamante) pelo quanto investiu na clínica nos últimos 12 meses.',
     href: '#produto',
   },
   {
     id: 'vendas',
     title: 'Orçamentos e vendas',
-    teaser: 'Orçamento aceito vira venda. O que ficou parado entra na fila de cobrança.',
+    teaser: 'Orçamento em PDF com a logo da clínica. Aceito, vira venda. O que ficou parado entra na fila de cobrança.',
     href: '#produto',
   },
   {
@@ -178,13 +192,19 @@ export const features = [
   {
     id: 'estoque',
     title: 'Estoque',
-    teaser: 'A baixa acontece no tratamento, quando o produto é aplicado, não na venda.',
+    teaser: 'A baixa acontece quando o produto é aplicado, não na venda. Você recebe aviso de estoque baixo e do que vai faltar para a agenda de amanhã.',
     href: '#produto',
   },
   {
     id: 'equipe',
-    title: 'Comissão e meta',
-    teaser: 'Regra de comissão e meta do mês por colaborador.',
+    title: 'Equipe e remuneração',
+    teaser: 'Comissão por venda, meta do mês e remuneração por meta batida ou por faixa de faturamento da clínica, calculadas para cada colaborador.',
+    href: '#produto',
+  },
+  {
+    id: 'acessos',
+    title: 'Acessos por função',
+    teaser: 'Recepção, vendas, estoque e profissional veem só o que precisam. Financeiro e faturamento ficam com o administrador.',
     href: '#produto',
   },
 ] as const
@@ -230,6 +250,16 @@ export const faqs = [
     id: 'lucro',
     q: 'Como eu sei se a clínica deu lucro ou prejuízo no mês?',
     a: 'Pelo DRE. Entram receita, insumo, taxa da maquininha, imposto, comissão, perda de estoque e despesa. O resultado mostra margem de contribuição, margem líquida e ponto de equilíbrio.',
+  },
+  {
+    id: 'remuneracao',
+    q: 'Dá para pagar a equipe por meta ou por faixa de faturamento?',
+    a: 'Sim. Você define a meta do mês de cada colaborador e quanto paga por meta batida, por agendamento ou por faixa de faturamento da clínica. O HOF Pay calcula o valor de cada pessoa no mês, junto com as comissões, e esse custo entra no DRE.',
+  },
+  {
+    id: 'permissoes',
+    q: 'A recepção vê o faturamento da clínica?',
+    a: 'Não. Cada pessoa entra com a sua função (recepção, vendas, estoque ou profissional) e vê só o que precisa no dia a dia. Financeiro, DRE e métricas de faturamento ficam com o administrador.',
   },
   {
     id: 'celular',
@@ -328,16 +358,17 @@ Não use “cliente” para a pessoa atendida: no produto é paciente. Não desc
 
 - Leads: cadastro, funil (lead criado → abordado → respondeu → agendou → compareceu → orçamento → venda), follow-up com mensagem pronta que abre no WhatsApp, prazos de lead parado.
 - Agenda: sessões e retornos; mensagem pronta de confirmação de consulta, que abre no WhatsApp; status de confirmação marcado pela equipe.
-- Pacientes: cadastro, WhatsApp, origem, histórico de orçamentos, vendas e sessões.
-- Retornos: fila de retornos a vencer/atrasados, com mensagem pronta para chamar o paciente no WhatsApp.
-- Orçamentos e vendas: orçamento em rascunho → aceite do paciente → venda confirmada. Follow-up de orçamento enviado sem resposta.
+- Pacientes: cadastro, WhatsApp, origem, histórico de orçamentos, vendas e sessões. Faixa do paciente (padrão Bronze, Prata, Ouro e Diamante, editáveis) pelo total de vendas confirmadas nos últimos 12 meses.
+- Retornos: a venda de um protocolo com prazo de retorno gera a data de volta do paciente; fila de retornos a vencer/atrasados, com mensagem pronta para chamar o paciente no WhatsApp.
+- Orçamentos e vendas: orçamento em rascunho → aceite do paciente → venda confirmada. Orçamento em PDF com a logo da clínica. Follow-up de orçamento enviado sem resposta.
 - Protocolos: procedimento com produtos, sessões e preços (custo, sugerido, mínimo, especial).
-- Estoque: a baixa acontece no tratamento, não na venda. Custo real do que foi aplicado.
+- Estoque: a baixa acontece no tratamento, não na venda. Custo real do que foi aplicado. Aviso no sistema de estoque baixo e de estoque projetado para a agenda do dia seguinte.
 - Tratamentos: o profissional informa o que foi aplicado na sessão.
 - Comissões: regras por vendedor ou profissional; lançamentos do mês.
-- Metas: metas por colaborador no mês (agenda, vendas, leads abordados).
+- Metas e remuneração: metas por colaborador no mês (agenda, vendas, leads abordados); remuneração por ocorrência, bônus por meta batida, faixas por agendamentos e faixas por faturamento da clínica, calculadas no mês e lançadas junto com as comissões (entram no DRE).
 - Financeiro: taxas de cartão (maquininha), impostos, despesas (fixas, variáveis, marketing, pessoal, depreciação de equipamentos) e DRE mensal com margem de contribuição, margem líquida e ponto de equilíbrio.
-- Métricas: comercial, funil de vendas, operação e estoque no mesmo sistema.
+- Métricas: comercial, funil de vendas, operação e estoque no mesmo sistema. Vendas por produto (unidades e faturamento de cada produto no período, já com descontos), margem de contribuição por protocolo, profissional, vendedor e origem, e custo das cortesias.
+- Usuários e permissões: cada pessoa entra com a sua função (recepção, vendas, estoque, profissional); financeiro, DRE e métricas de faturamento ficam com o administrador.
 
 WhatsApp: o HOF Pay não é integrado ao WhatsApp e não envia mensagens automáticas. Ele tem mensagens prontas e personalizáveis (a clínica edita os textos em Configurações > Mensagens do WhatsApp) e abre a conversa (link wa.me) no WhatsApp de quem está usando; a pessoa revisa e toca em enviar. Não descreva como integração, API, disparo ou lembrete automático.
 
