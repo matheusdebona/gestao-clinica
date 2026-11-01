@@ -9,13 +9,13 @@ import {
 } from '../lib/urls'
 
 export const SITE_URL = `https://${MARKETING_HOST}`
-export const SITE_TITLE = `${APP_NAME}: saia das planilhas e veja quanto a clínica está sobrando`
+export const SITE_TITLE = `${APP_NAME}: faturou, mas não sobrou nada no bolso?`
 export const SITE_ONE_LINER =
   'HOF Pay é o sistema da clínica de harmonização no celular: leads, agenda, orçamentos, estoque e financeiro, para você saber quanto sobra de verdade no fim do mês.'
 
 export const HERO_KICKER = 'Clínica de harmonização orofacial'
-export const HERO_TITLE_LEAD = 'Faturou bem, mas não sabe pra onde foi o dinheiro?'
-export const HERO_TITLE_EMPHASIS = 'O HOF Pay mostra o que sobrou.'
+export const HERO_TITLE_LEAD = 'Faturou, mas não sobrou nada no bolso?'
+export const HERO_TITLE_EMPHASIS = 'O HOF Pay mostra onde está seu lucro.'
 export const HERO_LEAD =
   'Com o HOF Pay você sai das planilhas, gerencia a clínica pelo celular e vê quanto sobra de verdade depois da maquininha, impostos, comissões e despesas.'
 
@@ -316,7 +316,7 @@ HOF Pay é um sistema de gestão para clínicas de harmonização orofacial e es
 
 Idioma: pt-BR.
 
-Mensagem central: faturou, mas não sabe o que sobrou? Sair das planilhas, gerenciar a clínica pelo celular e ver o lucro real depois da maquininha, impostos, comissões e despesas (margem líquida no DRE).
+Mensagem central: faturou, mas não sobrou nada no bolso? O HOF Pay mostra onde está o lucro. Sair das planilhas, gerenciar a clínica pelo celular e ver o lucro real depois da maquininha, impostos, comissões e despesas (margem líquida no DRE).
 
 ## Para quem
 
