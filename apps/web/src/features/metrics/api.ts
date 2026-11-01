@@ -10,6 +10,7 @@ import type {
   MarginMode,
   MetricsGranularity,
   OperationsMetrics,
+  SalesFunnelMetrics,
 } from '@/types/metrics'
 
 export interface MetricsPeriodParams {
@@ -60,6 +61,16 @@ export async function getOperationsMetrics(params: MetricsPeriodParams): Promise
 
 export async function getLeadMetrics(params: MetricsPeriodParams): Promise<LeadMetrics> {
   const payload = await api<DataEnvelope<LeadMetrics>>('/metrics/leads', {
+    query: params,
+  })
+  return payload.data
+}
+
+/** End-to-end funnel (lead → venda). Filters: origem and who registered the lead. */
+export async function getSalesFunnelMetrics(
+  params: MetricsPeriodParams & { client_origin_id?: number; user_id?: number },
+): Promise<SalesFunnelMetrics> {
+  const payload = await api<DataEnvelope<SalesFunnelMetrics>>('/metrics/sales-funnel', {
     query: params,
   })
   return payload.data

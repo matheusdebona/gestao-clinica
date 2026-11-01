@@ -207,3 +207,58 @@ export interface LeadMetrics {
   by_status: LeadMetricsStatusRow[]
   by_creator: LeadMetricsRow[]
 }
+
+export type SalesFunnelStageKey =
+  | 'leads'
+  | 'approached'
+  | 'replied'
+  | 'booked'
+  | 'attended'
+  | 'budgeted'
+  | 'sold'
+
+export interface SalesFunnelStage {
+  key: SalesFunnelStageKey
+  label: string
+  count: number
+  rate_from_previous: string | null
+  rate_from_start: string | null
+}
+
+export interface SalesFunnelRow {
+  id: number | null
+  key: string
+  label: string
+  leads: number
+  patients: number
+  approached: number
+  replied: number
+  booked: number
+  attended: number
+  budgeted: number
+  sold: number
+  sales_count: number
+  revenue: string
+  ticket_avg: string | null
+  conversion_rate: string | null
+}
+
+export interface SalesFunnelMetrics {
+  from: string
+  to: string
+  filters: { origin_id: number | null; user_id: number | null }
+  definition: string
+  stages: SalesFunnelStage[]
+  kpis: {
+    leads: number
+    sold: number
+    conversion_rate: string | null
+    revenue: string
+    sales_count: number
+    ticket_avg: string | null
+  }
+  no_lead: SalesFunnelRow
+  totals: SalesFunnelRow
+  by_origin: SalesFunnelRow[]
+  by_user: SalesFunnelRow[]
+}

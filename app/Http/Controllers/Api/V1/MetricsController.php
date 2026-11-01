@@ -9,12 +9,14 @@ use App\Http\Requests\Api\V1\Metrics\InventoryMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\LeadMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\MarginMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\OperationsMetricsRequest;
+use App\Http\Requests\Api\V1\Metrics\SalesFunnelMetricsRequest;
 use App\Services\AcquisitionMetricsService;
 use App\Services\CommercialMetricsService;
 use App\Services\InventoryMetricsService;
 use App\Services\LeadMetricsService;
 use App\Services\MarginMetricsService;
 use App\Services\OperationsMetricsService;
+use App\Services\SalesFunnelMetricsService;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 
@@ -27,6 +29,7 @@ class MetricsController extends Controller
         private readonly InventoryMetricsService $inventoryMetrics,
         private readonly OperationsMetricsService $operationsMetrics,
         private readonly LeadMetricsService $leadMetrics,
+        private readonly SalesFunnelMetricsService $salesFunnel,
     ) {}
 
     public function commercial(CommercialMetricsRequest $request): JsonResponse
@@ -99,6 +102,23 @@ class MetricsController extends Controller
 
         return response()->json([
             'data' => $this->leadMetrics->summarize($from, $to),
+        ]);
+    }
+
+    /**
+     * End-to-end funnel: lead → abordado → respondeu → agendou → compareceu → orçamento → venda (+ receita).
+     * Optional filters: client_origin_id, user_id (who registered the lead).
+     */
+    public function salesFunnel(SalesFunnelMetricsRequest $request): JsonResponse
+    {
+        $from = CarbonImmutable::createFromFormat('Y-m-d', $request->string('from')->toString())->startOfDay();
+        $to = CarbonImmutable::createFromFormat('Y-m-d', $request->string('to')->toString())->startOfDay();
+
+        return response()->json([
+            'data' => $this->salesFunnel->summarize($from, $to, [
+                'origin_id' => $request->filled('client_origin_id') ? $request->integer('client_origin_id') : null,
+                'user_id' => $request->filled('user_id') ? $request->integer('user_id') : null,
+            ]),
         ]);
     }
 }
