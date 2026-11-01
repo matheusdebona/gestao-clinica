@@ -438,6 +438,9 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('metrics/commercial', [MetricsController::class, 'commercial'])
             ->middleware('permission:metrics.view');
+        // Faturamento por produto: valor financeiro detalhado (como a margem de contribuição).
+        Route::get('metrics/product-sales', [MetricsController::class, 'productSales'])
+            ->middleware(['permission:metrics.view', 'permission:finance.view']);
         Route::get('metrics/acquisition', [MetricsController::class, 'acquisition'])
             ->middleware('permission:metrics.view');
         Route::get('metrics/margin', [MetricsController::class, 'margin'])

@@ -10,6 +10,7 @@ import type {
   MarginMode,
   MetricsGranularity,
   OperationsMetrics,
+  ProductSalesMetrics,
   SalesFunnelMetrics,
 } from '@/types/metrics'
 
@@ -71,6 +72,19 @@ export async function getSalesFunnelMetrics(
   params: MetricsPeriodParams & { client_origin_id?: number; user_id?: number },
 ): Promise<SalesFunnelMetrics> {
   const payload = await api<DataEnvelope<SalesFunnelMetrics>>('/metrics/sales-funnel', {
+    query: params,
+  })
+  return payload.data
+}
+
+export interface ProductSalesParams extends MetricsPeriodParams {
+  product_type_id?: number
+  product_id?: number
+}
+
+/** Vendas por produto (vendas confirmadas, dias de São Paulo). Requer metrics.view + finance.view. */
+export async function getProductSalesMetrics(params: ProductSalesParams): Promise<ProductSalesMetrics> {
+  const payload = await api<DataEnvelope<ProductSalesMetrics>>('/metrics/product-sales', {
     query: params,
   })
   return payload.data

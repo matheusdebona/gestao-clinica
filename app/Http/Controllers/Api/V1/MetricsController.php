@@ -9,6 +9,7 @@ use App\Http\Requests\Api\V1\Metrics\InventoryMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\LeadMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\MarginMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\OperationsMetricsRequest;
+use App\Http\Requests\Api\V1\Metrics\ProductSalesMetricsRequest;
 use App\Http\Requests\Api\V1\Metrics\SalesFunnelMetricsRequest;
 use App\Services\AcquisitionMetricsService;
 use App\Services\CommercialMetricsService;
@@ -16,6 +17,7 @@ use App\Services\InventoryMetricsService;
 use App\Services\LeadMetricsService;
 use App\Services\MarginMetricsService;
 use App\Services\OperationsMetricsService;
+use App\Services\ProductSalesMetricsService;
 use App\Services\SalesFunnelMetricsService;
 use App\Support\ClinicMonth;
 use Illuminate\Http\JsonResponse;
@@ -30,6 +32,7 @@ class MetricsController extends Controller
         private readonly OperationsMetricsService $operationsMetrics,
         private readonly LeadMetricsService $leadMetrics,
         private readonly SalesFunnelMetricsService $salesFunnel,
+        private readonly ProductSalesMetricsService $productSales,
     ) {}
 
     public function commercial(CommercialMetricsRequest $request): JsonResponse
@@ -102,6 +105,23 @@ class MetricsController extends Controller
 
         return response()->json([
             'data' => $this->leadMetrics->summarize($from, $to),
+        ]);
+    }
+
+    /**
+     * Vendas por produto: unidades e faturamento de cada produto (vendas confirmadas, dias de SP).
+     * Filtros opcionais: product_type_id, product_id.
+     */
+    public function productSales(ProductSalesMetricsRequest $request): JsonResponse
+    {
+        $from = ClinicMonth::parseDate($request->string('from')->toString());
+        $to = ClinicMonth::parseDate($request->string('to')->toString());
+
+        return response()->json([
+            'data' => $this->productSales->summarize($from, $to, [
+                'product_type_id' => $request->filled('product_type_id') ? $request->integer('product_type_id') : null,
+                'product_id' => $request->filled('product_id') ? $request->integer('product_id') : null,
+            ]),
         ]);
     }
 

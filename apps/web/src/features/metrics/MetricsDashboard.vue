@@ -13,6 +13,7 @@ import InventoryOpsSection from '@/features/metrics/InventoryOpsSection.vue'
 import LeadsSection from '@/features/metrics/LeadsSection.vue'
 import MarginSection from '@/features/metrics/MarginSection.vue'
 import PeriodControl from '@/features/metrics/PeriodControl.vue'
+import ProductSalesSection from '@/features/metrics/ProductSalesSection.vue'
 import SalesFunnelSection from '@/features/metrics/SalesFunnelSection.vue'
 import {
   getAcquisitionMetrics,
@@ -150,6 +151,13 @@ const heroPending = computed(
           :data="commercial"
           :pending="commercialPending"
           :error="commercialError"
+        />
+
+        <ProductSalesSection
+          v-if="canSeeFinance"
+          :from="from"
+          :to="to"
+          :enabled="canLoad && canSeeFinance"
         />
 
         <AcquisitionSection
