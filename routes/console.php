@@ -5,6 +5,7 @@ use App\Jobs\NotifyAppointmentConfirmationsJob;
 use App\Jobs\NotifyDailyReviewJob;
 use App\Jobs\NotifyForgottenBudgetsJob;
 use App\Jobs\NotifyStaleLeadsJob;
+use App\Services\ExpenseGenerator;
 use App\Services\TemporaryPasswordService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -33,3 +34,10 @@ Artisan::command('auth:prune-temporary-passwords', function (TemporaryPasswordSe
 })->purpose('Remove expired temporary passwords (Esqueceu a senha?)');
 
 Schedule::command('auth:prune-temporary-passwords')->hourly();
+
+Artisan::command('finance:generate-expenses', function (ExpenseGenerator $generator) {
+    $this->info('Despesas geradas: '.$generator->generateCurrentMonthForAll());
+})->purpose('Gera as despesas recorrentes e a depreciação do mês corrente');
+
+// 03:00 UTC = 00:00 em Brasília: despesas recorrentes e depreciação do mês (idempotente).
+Schedule::command('finance:generate-expenses')->dailyAt('03:00');

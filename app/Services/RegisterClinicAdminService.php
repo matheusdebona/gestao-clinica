@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Support\EnsureDefaultClientOrigins;
+use App\Support\EnsureDefaultExpenseCategories;
 use App\Support\EnsureDefaultFollowUpTiers;
 use App\Support\EnsureDefaultLeadStatuses;
 use App\Support\EnsureDefaultPaymentCatalog;
@@ -36,6 +37,7 @@ class RegisterClinicAdminService
             EnsureDefaultLeadStatuses::run($clinic);
             EnsureDefaultFollowUpTiers::run($clinic);
             EnsureDefaultPaymentCatalog::run($clinic);
+            EnsureDefaultExpenseCategories::run($clinic);
             EnsureDefaultUnitsOfMeasure::run($clinic);
 
             $user = User::query()->create([

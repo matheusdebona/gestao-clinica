@@ -20,6 +20,7 @@ import {
   Users,
   RotateCcw,
   ChartNoAxesCombined,
+  Wallet,
 } from '@lucide/vue'
 import AppSheet from '@/components/ui/AppSheet.vue'
 import BrandMark from '@/components/ui/BrandMark.vue'
@@ -52,7 +53,13 @@ type ShellNavItem = {
 /** Alertas: estoque (products.view) e resumo de leads parados (leads.manage). */
 const ALERT_PERMISSIONS = ['products.view', 'leads.manage'] as const
 
-const SETTINGS_PERMISSIONS = ['lead_statuses.manage', 'client_origins.manage', 'campaigns.manage']
+const SETTINGS_PERMISSIONS = [
+  'lead_statuses.manage',
+  'client_origins.manage',
+  'campaigns.manage',
+  'clinics.branding',
+  'finance.view',
+]
 
 /** Max items in the mobile tab bar, including "Mais". */
 const MOBILE_SLOTS = 5
@@ -62,14 +69,50 @@ const items = computed(() => {
   const all: ShellNavItem[] = [
     { to: '/', label: 'Início', icon: LayoutDashboard, group: 'daily' },
     { to: '/leads', label: 'Leads', icon: Megaphone, permission: 'leads.view', group: 'daily' },
-    { to: '/appointments', label: 'Agenda', icon: CalendarDays, permission: 'appointments.view', group: 'daily' },
+    {
+      to: '/appointments',
+      label: 'Agenda',
+      icon: CalendarDays,
+      permission: 'appointments.view',
+      group: 'daily',
+    },
     { to: '/clients', label: 'Pacientes', icon: Users, permission: 'clients.view', group: 'daily' },
     { to: '/sales', label: 'Vendas', icon: Receipt, permission: 'sales.view', group: 'daily' },
-    { to: '/budgets', label: 'Orçamentos', icon: FileText, permission: 'budgets.view', group: 'daily' },
-    { to: '/retornos', label: 'Retornos', icon: RotateCcw, permission: 'sales.view', group: 'daily' },
-    { to: '/treatments', label: 'Tratamentos', icon: Stethoscope, permission: 'treatments.view', group: 'daily' },
-    { to: '/protocols', label: 'Protocolos', icon: ClipboardList, permission: 'protocols.view', group: 'daily' },
-    { to: '/products', label: 'Produtos', icon: Package, permission: 'products.view', group: 'internal' },
+    {
+      to: '/budgets',
+      label: 'Orçamentos',
+      icon: FileText,
+      permission: 'budgets.view',
+      group: 'daily',
+    },
+    {
+      to: '/retornos',
+      label: 'Retornos',
+      icon: RotateCcw,
+      permission: 'sales.view',
+      group: 'daily',
+    },
+    {
+      to: '/treatments',
+      label: 'Tratamentos',
+      icon: Stethoscope,
+      permission: 'treatments.view',
+      group: 'daily',
+    },
+    {
+      to: '/protocols',
+      label: 'Protocolos',
+      icon: ClipboardList,
+      permission: 'protocols.view',
+      group: 'daily',
+    },
+    {
+      to: '/products',
+      label: 'Produtos',
+      icon: Package,
+      permission: 'products.view',
+      group: 'internal',
+    },
     {
       to: '/notifications',
       label: 'Alertas',
@@ -77,7 +120,20 @@ const items = computed(() => {
       anyPermission: [...ALERT_PERMISSIONS],
       group: 'internal',
     },
-    { to: '/metrics', label: 'Métricas', icon: ChartNoAxesCombined, permission: 'metrics.view', group: 'internal' },
+    {
+      to: '/metrics',
+      label: 'Métricas',
+      icon: ChartNoAxesCombined,
+      permission: 'metrics.view',
+      group: 'internal',
+    },
+    {
+      to: '/financeiro',
+      label: 'Financeiro',
+      icon: Wallet,
+      permission: 'finance.view',
+      group: 'internal',
+    },
     { to: '/users', label: 'Equipe', icon: UserCog, permission: 'users.view', group: 'internal' },
     {
       to: `/${paymentsHome}`,
@@ -189,11 +245,7 @@ async function onLogout() {
         </p>
       </div>
       <nav class="flex flex-1 flex-col gap-0.5 overflow-y-auto">
-        <RouterLink
-          v-for="item in dailyItems"
-          :key="item.to"
-          :to="item.to"
-        >
+        <RouterLink v-for="item in dailyItems" :key="item.to" :to="item.to">
           <SidebarNavItem
             :label="item.label"
             :icon="item.icon"
@@ -201,11 +253,7 @@ async function onLogout() {
           />
         </RouterLink>
         <p v-if="internalItems.length" class="px-3 pt-4 pb-1 text-[13px] text-inverse/50">Gestão</p>
-        <RouterLink
-          v-for="item in internalItems"
-          :key="item.to"
-          :to="item.to"
-        >
+        <RouterLink v-for="item in internalItems" :key="item.to" :to="item.to">
           <SidebarNavItem
             :label="item.label"
             :icon="item.icon"

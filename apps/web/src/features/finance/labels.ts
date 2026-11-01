@@ -1,4 +1,4 @@
-import type { TaxRegime } from '@/types/finance'
+import type { ExpenseKind, TaxRegime } from '@/types/finance'
 
 export const REGIME_LABELS: Record<TaxRegime, string> = {
   simples: 'Simples Nacional',
@@ -37,4 +37,35 @@ export function formatMonthLabel(month: string | null | undefined): string {
   if (!month || !/^\d{4}-\d{2}/.test(month)) return '—'
   const [year, m] = month.split('-')
   return `${MONTHS[Number(m) - 1] ?? m}/${year}`
+}
+
+export const EXPENSE_KIND_LABELS: Record<ExpenseKind, string> = {
+  fixed: 'Fixas',
+  personnel: 'Pessoal e pró-labore',
+  marketing: 'Marketing e mídia',
+  taxes: 'Impostos e taxas',
+  financial: 'Financeiras',
+  depreciation: 'Depreciação',
+  variable: 'Variáveis',
+}
+
+export const EXPENSE_KIND_ORDER: ExpenseKind[] = [
+  'fixed',
+  'personnel',
+  'marketing',
+  'taxes',
+  'financial',
+  'depreciation',
+  'variable',
+]
+
+export const EXPENSE_KIND_OPTIONS = EXPENSE_KIND_ORDER.map((value) => ({
+  value,
+  label: EXPENSE_KIND_LABELS[value],
+}))
+
+export function shiftMonth(month: string, delta: number): string {
+  const [y, m] = month.split('-').map(Number)
+  const d = new Date(y!, m! - 1 + delta, 1)
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
 }
