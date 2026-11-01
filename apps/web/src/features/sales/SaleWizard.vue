@@ -680,17 +680,17 @@ function pickClient(client: Client) {
           Aceite o orçamento para confirmar a venda.
         </InlineAlert>
         <PermissionGate permission="sales.confirm">
-          <Button :loading="saving" :disabled="!hasAcceptedBudget" @click="onConfirmClick">
+          <Button mobile-block :loading="saving" :disabled="!hasAcceptedBudget" @click="onConfirmClick">
             Confirmar venda
           </Button>
         </PermissionGate>
       </div>
 
       <div class="mt-2 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-        <Button variant="ghost" type="button" :disabled="saving" @click="goBack">
+        <Button mobile-block variant="ghost" type="button" :disabled="saving" @click="goBack">
           {{ step === SALE_WIZARD_STEP.client ? 'Cancelar' : 'Voltar' }}
         </Button>
-        <Button v-if="step < SALE_WIZARD_LAST_INDEX" :loading="saving" @click="goNext">
+        <Button mobile-block v-if="step < SALE_WIZARD_LAST_INDEX" :loading="saving" @click="goNext">
           Continuar
         </Button>
       </div>

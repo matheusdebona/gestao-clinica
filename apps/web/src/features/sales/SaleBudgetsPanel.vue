@@ -184,7 +184,7 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
           <FormField label="Notas do orçamento" html-for="budget-notes">
             <Textarea id="budget-notes" v-model="notes" />
           </FormField>
-          <Button :loading="creating" @click="createMutation.mutate()">
+          <Button mobile-block :loading="creating" @click="createMutation.mutate()">
             Gerar orçamento
           </Button>
         </div>
@@ -210,9 +210,10 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
             :badge="BUDGET_STATUS_LABELS[budget.status]"
             :badge-variant="BUDGET_STATUS_BADGE[budget.status]"
           />
-          <div class="mt-2 flex flex-wrap gap-2">
+          <div class="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
             <PermissionGate permission="documents.generate">
               <Button
+                mobile-block
                 variant="secondary"
                 :loading="pdfLoading"
                 @click="pdfMutation.mutate(budget)"
@@ -222,6 +223,7 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
             </PermissionGate>
             <PermissionGate v-if="budget.status === 'draft'" permission="budgets.update">
               <Button
+                mobile-block
                 variant="secondary"
                 :loading="sending"
                 @click="sendMutation.mutate(budget.id)"
@@ -233,7 +235,7 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
               v-if="canActOn(budget.status)"
               permission="budgets.update"
             >
-              <Button variant="ghost" @click="pendingAction = { id: budget.id, kind: 'expire' }">
+              <Button mobile-block variant="ghost" @click="pendingAction = { id: budget.id, kind: 'expire' }">
                 Expirar
               </Button>
             </PermissionGate>
@@ -241,12 +243,13 @@ const pdfLoading = computed(() => pdfMutation.isPending.value)
               v-if="canActOn(budget.status)"
               permission="budgets.update"
             >
-              <Button variant="ghost" @click="pendingAction = { id: budget.id, kind: 'reject' }">
+              <Button mobile-block variant="ghost" @click="pendingAction = { id: budget.id, kind: 'reject' }">
                 Recusar
               </Button>
             </PermissionGate>
             <PermissionGate v-if="canActOn(budget.status)" permission="budgets.convert">
               <Button
+                mobile-block
                 :loading="accepting"
                 @click="acceptMutation.mutate(budget.id)"
               >

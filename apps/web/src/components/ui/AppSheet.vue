@@ -21,7 +21,7 @@ const props = withDefaults(
   }>(),
   {
     description: '',
-    stackFooter: false,
+    stackFooter: true,
   },
 )
 </script>

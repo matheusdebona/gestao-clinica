@@ -6,12 +6,12 @@ const props = withDefaults(
     title: string
     description?: string
     sticky?: boolean
-    /** Actions stacked full width below `sm` (last action on top). Pair with Button `mobile-block`. */
+    /** Actions stacked full width below `sm` (last action on top); default on. Desktop layout is the same either way. */
     stackActions?: boolean
   }>(),
   {
     sticky: false,
-    stackActions: false,
+    stackActions: true,
   },
 )
 </script>

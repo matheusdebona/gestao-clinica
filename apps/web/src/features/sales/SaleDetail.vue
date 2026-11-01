@@ -203,7 +203,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
       </div>
 
       <PermissionGate v-if="isConfirmed && !sale.treatment_id" permission="treatments.start">
-        <Button :loading="startingTreatment" @click="treatmentMutation.mutate()">
+        <Button mobile-block :loading="startingTreatment" @click="treatmentMutation.mutate()">
           Abrir tratamento
         </Button>
       </PermissionGate>
@@ -211,9 +211,10 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
         <Banner variant="info" title="Tratamento aberto">
           O caso clínico já foi iniciado a partir desta venda.
         </Banner>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           <PermissionGate permission="treatments.view">
             <Button
+              mobile-block
               @click="router.push({ name: 'treatments-show', params: { id: String(sale.treatment_id) } })"
             >
               Ver tratamento
@@ -221,6 +222,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
           </PermissionGate>
           <PermissionGate permission="appointments.manage">
             <Button
+              mobile-block
               variant="secondary"
               @click="
                 router.push({
@@ -233,7 +235,7 @@ function itemUnit(item: { product?: { unit_of_measure?: { name: string; symbol: 
             </Button>
           </PermissionGate>
           <PermissionGate permission="appointments.view">
-            <Button variant="secondary" @click="router.push({ name: 'appointments' })">
+            <Button mobile-block variant="secondary" @click="router.push({ name: 'appointments' })">
               Ver agenda
             </Button>
           </PermissionGate>
