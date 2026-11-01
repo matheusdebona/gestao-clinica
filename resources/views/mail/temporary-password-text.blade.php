@@ -7,4 +7,4 @@ Válida por {{ $expiresInMinutes }} minutos.
 
 Entre em {{ $loginUrl }} com esta senha. Em seguida, você vai criar uma nova senha.
 
-Não pediu? Ignore este e-mail. Sua senha atual continua valendo.
+Não pediu? Por segurança, sua senha anterior deixou de valer. Entre com esta senha temporária e crie uma nova.

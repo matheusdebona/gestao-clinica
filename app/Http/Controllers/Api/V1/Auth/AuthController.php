@@ -43,12 +43,20 @@ class AuthController extends Controller
         $usedTemporary = false;
 
         if ($user && Hash::check($password, $user->password)) {
-            // Knowing the real password proves ownership: drop any pending
-            // temporary password and the forced-change flag.
-            if ($user->temporary_password_hash !== null || $user->must_change_password) {
+            if ($temporaryPasswords->passwordIsTemporary($user)) {
+                // The password is the one e-mailed by "Esqueci a senha".
+                if (! $temporaryPasswords->hasValidTemporaryPassword($user)) {
+                    throw ValidationException::withMessages([
+                        'email' => ['A senha temporária expirou. Peça uma nova em “Esqueci a senha”.'],
+                    ]);
+                }
+                $usedTemporary = true;
+            } elseif ($user->temporary_password_hash !== null || $user->must_change_password) {
+                // Password was set some other way: drop leftovers.
                 $temporaryPasswords->clear($user, alsoFlag: true);
             }
         } elseif ($user && $temporaryPasswords->matches($user, $password)) {
+            // Legacy pending temporary password issued before it replaced the password.
             $usedTemporary = true;
         } else {
             if ($user) {
@@ -100,7 +108,7 @@ class AuthController extends Controller
 
             throw ValidationException::withMessages([
                 'temporary_password' => [$expired
-                    ? 'A senha temporária expirou. Saia e peça uma nova em “Esqueceu a senha?”.'
+                    ? 'A senha temporária expirou. Saia e peça uma nova em “Esqueci a senha”.'
                     : 'Senha temporária incorreta.'],
             ]);
         }
