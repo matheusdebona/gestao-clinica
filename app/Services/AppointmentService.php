@@ -377,6 +377,8 @@ class AppointmentService
             $appointment->status = Appointment::STATUS_CANCELLED;
             $appointment->save();
 
+            app(GoalRemunerationService::class)->onAppointmentStatusChanged($appointment);
+
             return $appointment->fresh(['treatment', 'client', 'professionalUser']);
         });
     }

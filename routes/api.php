@@ -18,14 +18,15 @@ use App\Http\Controllers\Api\V1\Finance\ContributionMarginController;
 use App\Http\Controllers\Api\V1\Finance\DreController;
 use App\Http\Controllers\Api\V1\Finance\ExpenseController;
 use App\Http\Controllers\Api\V1\Finance\FinanceSettingsController;
+use App\Http\Controllers\Api\V1\Finance\GoalRemunerationController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
 use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
-use App\Http\Controllers\Api\V1\PatientTierController;
 use App\Http\Controllers\Api\V1\LeadStatusController;
 use App\Http\Controllers\Api\V1\MetricsController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\PatientReturnController;
+use App\Http\Controllers\Api\V1\PatientTierController;
 use App\Http\Controllers\Api\V1\Payments\CardBrandController;
 use App\Http\Controllers\Api\V1\Payments\CardFeeRuleController;
 use App\Http\Controllers\Api\V1\Payments\CardOperatorController;
@@ -388,6 +389,10 @@ Route::prefix('v1')->group(function (): void {
         Route::put('finance/commission-rules/{commission_rule}', [CommissionController::class, 'updateRule'])
             ->middleware('permission:finance.manage');
         Route::delete('finance/commission-rules/{commission_rule}', [CommissionController::class, 'destroyRule'])
+            ->middleware('permission:finance.manage');
+        Route::get('finance/goal-remunerations', [GoalRemunerationController::class, 'index'])
+            ->middleware('permission:finance.view');
+        Route::put('finance/goal-remunerations/{metric}', [GoalRemunerationController::class, 'update'])
             ->middleware('permission:finance.manage');
         Route::get('finance/commissions', [CommissionController::class, 'entries'])
             ->middleware('permission:finance.view');

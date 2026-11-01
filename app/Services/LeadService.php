@@ -247,6 +247,7 @@ class LeadService
                 'client_id' => $client->id,
                 'lead_status_id' => $converted->id,
                 'converted_at' => now(),
+                'booked_appointment_id' => $result['appointment']->id,
             ]);
 
             $this->markMilestone($locked, 'booked', $user);
@@ -431,7 +432,7 @@ class LeadService
         ];
         $chain = array_slice(Lead::MILESTONES, 0, array_search($milestone, Lead::MILESTONES, true) + 1);
 
-        return DB::transaction(function () use ($lead, $chain, $types, $user): array {
+        $set = DB::transaction(function () use ($lead, $chain, $types, $user): array {
             $locked = Lead::query()->whereKey($lead->id)->lockForUpdate()->firstOrFail();
             $set = [];
             $now = now();
@@ -450,6 +451,12 @@ class LeadService
 
             return $set;
         });
+
+        if ($set !== []) {
+            app(GoalRemunerationService::class)->onLeadMilestones($lead, $set);
+        }
+
+        return $set;
     }
 
     private function assertNotCancelled(Lead $lead): void

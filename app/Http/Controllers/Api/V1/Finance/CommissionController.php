@@ -12,6 +12,7 @@ use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Validation\Rule;
 
 class CommissionController extends Controller
@@ -73,7 +74,7 @@ class CommissionController extends Controller
         $entries = CommissionEntry::query()
             ->whereDate('competence_month', $month->toDateString())
             ->where('status', '!=', CommissionEntry::STATUS_CANCELLED)
-            ->with(['user:id,name', 'protocol:id,name', 'sale:id,client_id,sold_at', 'sale.client:id,name', 'appointment:id,client_id,finished_at', 'appointment.client:id,name'])
+            ->with(['user:id,name', 'protocol:id,name', 'sale:id,client_id,sold_at', 'sale.client:id,name', 'appointment:id,client_id,finished_at', 'appointment.client:id,name', 'lead:id,name,client_id,approached_at,booked_at', 'lead.client:id,name'])
             ->orderBy('user_id')
             ->orderByDesc('id')
             ->get();
@@ -88,6 +89,7 @@ class CommissionController extends Controller
                 'pending' => number_format((float) $rows->where('status', CommissionEntry::STATUS_PENDING)->sum('amount'), 2, '.', ''),
                 'paid' => number_format((float) $rows->where('status', CommissionEntry::STATUS_PAID)->sum('amount'), 2, '.', ''),
                 'count' => $rows->count(),
+                'by_origin' => $this->byOrigin($rows),
             ];
         })->sortByDesc('total')->values();
 
@@ -99,8 +101,12 @@ class CommissionController extends Controller
                 'role' => $e->role,
                 'sale_id' => $e->sale_id,
                 'appointment_id' => $e->appointment_id,
-                'client_name' => $e->appointment?->client?->name ?? $e->sale?->client?->name,
-                'occurred_at' => $e->appointment?->finished_at ?? $e->sale?->sold_at,
+                'origin' => $this->origin($e),
+                'goal_metric' => $e->goal_metric,
+                'goal_kind' => $e->goal_kind,
+                'lead_id' => $e->lead_id,
+                'client_name' => $e->appointment?->client?->name ?? $e->sale?->client?->name ?? $e->lead?->client?->name ?? $e->lead?->name,
+                'occurred_at' => $e->appointment?->finished_at ?? $e->sale?->sold_at ?? $this->goalOccurredAt($e),
                 'protocol_name' => $e->protocol?->name,
                 'base_amount' => $e->base_amount,
                 'rate_percent' => $e->rate_percent,
@@ -112,6 +118,7 @@ class CommissionController extends Controller
                 'month' => $month->format('Y-m'),
                 'total' => number_format((float) $entries->sum('amount'), 2, '.', ''),
                 'pending' => number_format((float) $entries->where('status', CommissionEntry::STATUS_PENDING)->sum('amount'), 2, '.', ''),
+                'by_origin' => $this->byOrigin($entries),
                 'by_user' => $byUser,
             ],
         ]);
@@ -177,6 +184,39 @@ class CommissionController extends Controller
         }
 
         return $data;
+    }
+
+    /** sales = comissão de venda, sessions = comissão de sessão, goals = remuneração por meta. */
+    private function origin(CommissionEntry $e): string
+    {
+        return match ($e->role) {
+            CommissionEntry::ROLE_GOAL => 'goals',
+            CommissionRule::ROLE_PROFESSIONAL => 'sessions',
+            default => 'sales',
+        };
+    }
+
+    private function goalOccurredAt(CommissionEntry $e): mixed
+    {
+        if ($e->role !== CommissionEntry::ROLE_GOAL || $e->lead === null) {
+            return null;
+        }
+
+        return $e->goal_metric === 'approached' ? $e->lead->approached_at : $e->lead->booked_at;
+    }
+
+    /**
+     * @param  Collection<int, CommissionEntry>  $rows
+     * @return array{sales: string, sessions: string, goals: string}
+     */
+    private function byOrigin($rows): array
+    {
+        $out = ['sales' => 0.0, 'sessions' => 0.0, 'goals' => 0.0];
+        foreach ($rows as $row) {
+            $out[$this->origin($row)] += (float) $row->amount;
+        }
+
+        return array_map(fn (float $v) => number_format($v, 2, '.', ''), $out);
     }
 
     /**

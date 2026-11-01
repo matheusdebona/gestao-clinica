@@ -30,6 +30,12 @@ class CommissionService
 
     public function syncSale(Sale $sale): void
     {
+        $this->syncSaleEntries($sale);
+        app(GoalRemunerationService::class)->onSaleChanged($sale);
+    }
+
+    private function syncSaleEntries(Sale $sale): void
+    {
         DB::transaction(function () use ($sale) {
             $sale->loadMissing(self::RELATIONS);
             $existing = CommissionEntry::query()->withoutGlobalScope('clinic')
@@ -152,6 +158,9 @@ class CommissionService
                     $count++;
                 }
             });
+
+        // Remuneração por meta do mês (mês civil de São Paulo, como nas metas).
+        $count += app(GoalRemunerationService::class)->syncMonth($clinicId, $month->format('Y-m'));
 
         return $count;
     }

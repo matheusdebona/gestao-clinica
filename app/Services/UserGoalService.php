@@ -56,7 +56,7 @@ class UserGoalService
      */
     public function save(User $user, string $month, array $targets, User $editor): UserGoal
     {
-        return UserGoal::query()->updateOrCreate(
+        $goal = UserGoal::query()->updateOrCreate(
             ['clinic_id' => CurrentClinic::id(), 'user_id' => $user->id, 'month' => $month],
             [
                 'appointments_target' => $targets['appointments_target'] ?? null,
@@ -65,6 +65,16 @@ class UserGoalService
                 'updated_by_user_id' => $editor->id,
             ],
         );
+
+        // A meta muda o bônus "ao bater a meta": refaz o mês editado e o atual (que pode herdá-la).
+        $remuneration = app(GoalRemunerationService::class);
+        foreach (array_unique([$month, self::currentMonth()]) as $affected) {
+            if ($affected >= $month) {
+                $remuneration->syncUserMonth((int) $goal->clinic_id, $user->id, $affected);
+            }
+        }
+
+        return $goal;
     }
 
     /**

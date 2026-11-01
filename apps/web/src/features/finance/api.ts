@@ -8,6 +8,8 @@ import type {
   CommissionRulePayload,
   CommissionRuleRow,
   CommissionRulesResponse,
+  GoalRemunerationPayload,
+  GoalRemunerationRow,
   ContributionMargin,
   EquipmentAsset,
   EquipmentPayload,
@@ -231,5 +233,21 @@ export function currentMonthKey(): string {
 
 export async function getDre(month: string): Promise<DreReport> {
   const payload = await api<DataEnvelope<DreReport>>(`/finance/dre?month=${month}`)
+  return payload.data
+}
+
+export async function listGoalRemunerations(): Promise<GoalRemunerationRow[]> {
+  const payload = await api<DataEnvelope<GoalRemunerationRow[]>>('/finance/goal-remunerations')
+  return payload.data
+}
+
+export async function saveGoalRemuneration(
+  metric: GoalRemunerationRow['metric'],
+  body: GoalRemunerationPayload,
+): Promise<GoalRemunerationRow[]> {
+  const payload = await api<DataEnvelope<GoalRemunerationRow[]>>(
+    `/finance/goal-remunerations/${metric}`,
+    { method: 'PUT', body },
+  )
   return payload.data
 }
