@@ -247,6 +247,7 @@ class LeadService
                 'client_id' => $client->id,
                 'lead_status_id' => $converted->id,
                 'converted_at' => now(),
+                'booked_appointment_id' => $result['appointment']->id,
             ]);
 
             $this->markMilestone($locked, 'booked', $user);
@@ -273,7 +274,7 @@ class LeadService
      */
     public function cancel(Lead $lead, ?string $reason, User $user): Lead
     {
-        return DB::transaction(function () use ($lead, $reason, $user): Lead {
+        $cancelledLead = DB::transaction(function () use ($lead, $reason, $user): Lead {
             /** @var Lead $locked */
             $locked = Lead::query()->whereKey($lead->id)->lockForUpdate()->firstOrFail();
             $this->assertNotCancelled($locked);
@@ -302,6 +303,11 @@ class LeadService
 
             return $locked;
         });
+
+        // Lead cancelado não paga "Lead abordado" (só pendentes são refeitos).
+        app(GoalRemunerationService::class)->onLeadCancelled($cancelledLead);
+
+        return $cancelledLead;
     }
 
     /**
@@ -431,7 +437,7 @@ class LeadService
         ];
         $chain = array_slice(Lead::MILESTONES, 0, array_search($milestone, Lead::MILESTONES, true) + 1);
 
-        return DB::transaction(function () use ($lead, $chain, $types, $user): array {
+        $set = DB::transaction(function () use ($lead, $chain, $types, $user): array {
             $locked = Lead::query()->whereKey($lead->id)->lockForUpdate()->firstOrFail();
             $set = [];
             $now = now();
@@ -450,6 +456,12 @@ class LeadService
 
             return $set;
         });
+
+        if ($set !== []) {
+            app(GoalRemunerationService::class)->onLeadMilestones($lead, $set);
+        }
+
+        return $set;
     }
 
     private function assertNotCancelled(Lead $lead): void

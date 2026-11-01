@@ -35,6 +35,7 @@ class Lead extends Model
         'replied_by_user_id',
         'booked_at',
         'booked_by_user_id',
+        'booked_appointment_id',
     ];
 
     /** Funnel milestones in order: Abordado → Respondeu → Agendou. */

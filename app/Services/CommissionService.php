@@ -7,6 +7,7 @@ use App\Models\CommissionEntry;
 use App\Models\CommissionRule;
 use App\Models\Sale;
 use App\Services\Finance\SaleEconomics;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -29,6 +30,12 @@ class CommissionService
     public function __construct(private readonly SaleEconomics $economics) {}
 
     public function syncSale(Sale $sale): void
+    {
+        $this->syncSaleEntries($sale);
+        app(GoalRemunerationService::class)->onSaleChanged($sale);
+    }
+
+    private function syncSaleEntries(Sale $sale): void
     {
         DB::transaction(function () use ($sale) {
             $sale->loadMissing(self::RELATIONS);
@@ -62,7 +69,7 @@ class CommissionService
                     'clinic_id' => $sale->clinic_id,
                     'role' => CommissionRule::ROLE_SELLER,
                     'sale_id' => $sale->id,
-                    'competence_month' => ($sale->sold_at ?? now())->copy()->startOfMonth()->toDateString(),
+                    'competence_month' => ClinicMonth::competence($sale->sold_at),
                 ],
             );
         });
@@ -115,7 +122,7 @@ class CommissionService
                     'role' => CommissionRule::ROLE_PROFESSIONAL,
                     'sale_id' => $sale?->id,
                     'appointment_id' => $appointment->id,
-                    'competence_month' => ($appointment->finished_at ?? now())->copy()->startOfMonth()->toDateString(),
+                    'competence_month' => ClinicMonth::competence($appointment->finished_at),
                 ],
             );
         });
@@ -126,8 +133,14 @@ class CommissionService
      */
     public function rebuildMonth(int $clinicId, CarbonImmutable $month): int
     {
-        $from = $month->startOfMonth();
-        $to = $month->endOfMonth();
+        // Faturamento e faixas são refeitos uma vez no fim (syncMonth), não a cada venda.
+        return GoalRemunerationService::deferringSaleFanout(fn () => $this->rebuildMonthEntries($clinicId, $month));
+    }
+
+    private function rebuildMonthEntries(int $clinicId, CarbonImmutable $month): int
+    {
+        // Mês civil de São Paulo (dia 1 ao último dia), como a competência dos lançamentos.
+        [$from, $to] = ClinicMonth::bounds($month->format('Y-m'));
         $count = 0;
 
         Sale::query()->withoutGlobalScope('clinic')
@@ -152,6 +165,9 @@ class CommissionService
                     $count++;
                 }
             });
+
+        // Remuneração por meta do mês (mês civil de São Paulo, como nas metas).
+        $count += app(GoalRemunerationService::class)->syncMonth($clinicId, $month->format('Y-m'));
 
         return $count;
     }

@@ -8,6 +8,10 @@ import type {
   CommissionRulePayload,
   CommissionRuleRow,
   CommissionRulesResponse,
+  GoalRemunerationPayload,
+  GoalRemunerationRow,
+  RemunerationTierPayload,
+  RevenueRemunerationsResponse,
   ContributionMargin,
   EquipmentAsset,
   EquipmentPayload,
@@ -232,4 +236,34 @@ export function currentMonthKey(): string {
 export async function getDre(month: string): Promise<DreReport> {
   const payload = await api<DataEnvelope<DreReport>>(`/finance/dre?month=${month}`)
   return payload.data
+}
+
+export async function listGoalRemunerations(): Promise<GoalRemunerationRow[]> {
+  const payload = await api<DataEnvelope<GoalRemunerationRow[]>>('/finance/goal-remunerations')
+  return payload.data
+}
+
+export async function saveGoalRemuneration(
+  metric: GoalRemunerationRow['metric'],
+  body: GoalRemunerationPayload,
+): Promise<GoalRemunerationRow[]> {
+  const payload = await api<DataEnvelope<GoalRemunerationRow[]>>(
+    `/finance/goal-remunerations/${metric}`,
+    { method: 'PUT', body },
+  )
+  return payload.data
+}
+
+export async function listRevenueRemunerations(): Promise<RevenueRemunerationsResponse> {
+  return api<RevenueRemunerationsResponse>('/finance/revenue-remunerations')
+}
+
+export async function saveRevenueRemuneration(
+  userId: number,
+  tiers: RemunerationTierPayload[],
+): Promise<RevenueRemunerationsResponse> {
+  return api<RevenueRemunerationsResponse>(`/finance/revenue-remunerations/${userId}`, {
+    method: 'PUT',
+    body: { tiers },
+  })
 }

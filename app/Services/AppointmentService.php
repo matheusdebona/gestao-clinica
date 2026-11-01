@@ -8,6 +8,7 @@ use App\Models\AppointmentConsumption;
 use App\Models\Client;
 use App\Models\PaymentMethod;
 use App\Models\Product;
+use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SalePayment;
 use App\Models\Treatment;
@@ -350,6 +351,14 @@ class AppointmentService
 
             app(CommissionService::class)->syncAppointment($locked->fresh());
 
+            // Extra cobrado na sessão entra na receita da venda (faturamento e faixas com %).
+            if ($totalCharged > 0 && $locked->treatment?->sale_id !== null) {
+                $sale = Sale::query()->withoutGlobalScope('clinic')->find($locked->treatment->sale_id);
+                if ($sale !== null && $sale->status === Sale::STATUS_CONFIRMED) {
+                    app(GoalRemunerationService::class)->onSaleRevenueChanged($sale);
+                }
+            }
+
             return $locked->fresh(['consumptions.product', 'consumptions.salePayment', 'treatment', 'client', 'professionalUser']);
         });
     }
@@ -376,6 +385,8 @@ class AppointmentService
 
             $appointment->status = Appointment::STATUS_CANCELLED;
             $appointment->save();
+
+            app(GoalRemunerationService::class)->onAppointmentStatusChanged($appointment);
 
             return $appointment->fresh(['treatment', 'client', 'professionalUser']);
         });

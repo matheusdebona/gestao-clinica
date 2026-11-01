@@ -16,6 +16,8 @@ import Select from '@/components/ui/Select.vue'
 import Skeleton from '@/components/ui/Skeleton.vue'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
 import SurfaceCard from '@/components/ui/SurfaceCard.vue'
+import GoalRemunerationsCard from '@/features/finance/GoalRemunerationsCard.vue'
+import RevenueRemunerationsCard from '@/features/finance/RevenueRemunerationsCard.vue'
 import {
   isValidPercent,
   listCommissionRules,
@@ -27,6 +29,12 @@ import {
   setCommissionRuleActive,
   toPercent,
 } from '@/features/finance/api'
+import {
+  entrySubtitle,
+  entryTitle,
+  originBreakdown,
+  sortEntries,
+} from '@/features/finance/goalRemuneration'
 import { emptyToMoney, formatBRL, formatIsoDate, formatPercent } from '@/lib/formatters'
 import { useAuthStore } from '@/stores/auth'
 import { useToastStore } from '@/stores/toast'
@@ -265,7 +273,8 @@ function unpayUser(userId: number) {
     <PageHeader
       :back="{ label: 'Configurações', to: { name: 'settings' } }"
       title="Comissões"
-      description="Regras para vendedores (por venda) e profissionais (por sessão realizada). Os lançamentos são gerados ao confirmar vendas e concluir sessões e entram na margem de contribuição."
+      description="Comissões de vendas e sessões e a remuneração por meta e faturamento."
+      hint="Regras para vendedores (por venda) e profissionais (por sessão realizada), mais o valor por meta (ex.: por novo agendamento) e as faixas por faturamento da clínica. Os lançamentos são gerados ao confirmar vendas, concluir sessões e marcar as metas. Todas as comissões entram como custo na margem de contribuição e na DRE."
     >
       <template #actions>
         <Button v-if="canManage" mobile-block @click="openNew">Nova regra</Button>
@@ -281,7 +290,9 @@ function unpayUser(userId: number) {
         <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h2>Lançamentos do mês</h2>
-            <p class="mt-1 text-[13px] text-muted">Por mês de competência da venda ou sessão.</p>
+            <p class="mt-1 text-[13px] text-muted">
+              Por mês de competência da venda, sessão, meta ou faturamento.
+            </p>
           </div>
           <div class="sm:w-48">
             <MonthSelect id="commission-month" v-model="month" :future="0" />
@@ -315,11 +326,21 @@ function unpayUser(userId: number) {
               </p>
             </div>
           </div>
+          <ul
+            v-if="originBreakdown(meta.by_origin).length"
+            class="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-[13px] text-muted"
+            aria-label="Total por origem"
+          >
+            <li v-for="o in originBreakdown(meta.by_origin)" :key="o.key">
+              {{ o.label }}
+              <span class="font-semibold tabular-nums text-title">{{ formatBRL(o.amount) }}</span>
+            </li>
+          </ul>
 
           <EmptyState
             v-if="meta.by_user.length === 0"
             title="Nenhuma comissão no mês"
-            description="Cadastre regras e confirme vendas ou conclua sessões. Para meses anteriores às regras, use Recalcular mês."
+            description="Cadastre regras, a remuneração por meta ou por faturamento. Para meses anteriores, use Recalcular mês."
           />
 
           <div v-else class="mt-4 flex flex-col divide-y divide-border-divider">
@@ -338,20 +359,25 @@ function unpayUser(userId: number) {
                 {{ person.count }} {{ person.count === 1 ? 'lançamento' : 'lançamentos' }} · a pagar
                 {{ formatBRL(person.pending) }} · pago {{ formatBRL(person.paid) }}
               </p>
+              <p v-if="originBreakdown(person.by_origin).length > 1" class="text-[13px] text-muted">
+                <template v-for="(o, i) in originBreakdown(person.by_origin)" :key="o.key">
+                  <template v-if="i > 0"> · </template>{{ o.label }}
+                  <span class="tabular-nums text-body">{{ formatBRL(o.amount) }}</span>
+                </template>
+              </p>
               <ul class="flex flex-col gap-2">
                 <li
-                  v-for="entry in entriesOf(person.user_id)"
+                  v-for="entry in sortEntries(entriesOf(person.user_id))"
                   :key="entry.id"
                   class="flex items-start justify-between gap-3 text-[13px]"
                 >
                   <span class="min-w-0">
-                    <span class="block truncate text-body">
-                      {{ entry.role === 'seller' ? 'Venda' : 'Sessão' }} ·
-                      {{ entry.client_name ?? '—' }}
-                    </span>
-                    <span class="block truncate text-muted">
-                      {{ entry.protocol_name ?? 'Geral' }} ·
-                      {{ formatIsoDate(entry.occurred_at?.slice(0, 10)) }}
+                    <span class="block truncate text-body">{{ entryTitle(entry) }}</span>
+                    <span
+                      class="block text-muted"
+                      :class="entry.goal_kind === 'tier' ? 'break-words' : 'truncate'"
+                    >
+                      {{ entrySubtitle(entry, formatIsoDate(entry.occurred_on)) }}
                     </span>
                   </span>
                   <span class="flex shrink-0 items-center gap-2 tabular-nums text-title">
@@ -417,6 +443,10 @@ function unpayUser(userId: number) {
           />
         </div>
       </SurfaceCard>
+
+      <GoalRemunerationsCard :can-manage="canManage" />
+
+      <RevenueRemunerationsCard :can-manage="canManage" />
     </template>
 
     <AppDialog

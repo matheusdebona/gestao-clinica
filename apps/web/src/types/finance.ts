@@ -86,6 +86,8 @@ export interface ContributionMargin {
     supplies_estimated: string
     losses: string
     losses_by_reason: { expired: string; damaged: string; other: string }
+    /** Remuneração por metas e por faturamento (sem venda) dos meses do período. */
+    goal_commissions: string
     clinic_contribution_margin: string
     clinic_contribution_margin_percent: string | null
     sales_count: number
@@ -136,15 +138,30 @@ export interface CommissionRulesResponse {
   }
 }
 
+/** Origem do lançamento: comissão de venda, de sessão, remuneração por meta ou por faturamento. */
+export type CommissionOrigin = 'sales' | 'sessions' | 'goals' | 'revenue'
+
+export type GoalMetric = 'appointments' | 'approached' | 'sales'
+
+export type CommissionByOrigin = Record<CommissionOrigin, string>
+
 export interface CommissionEntryRow {
   id: number
   user_id: number
   user_name: string | null
-  role: CommissionRole
+  role: CommissionRole | 'goal' | 'revenue'
+  origin: CommissionOrigin
+  goal_metric: GoalMetric | null
+  goal_kind: 'occurrence' | 'bonus' | 'tier' | null
+  /** Gatilho da faixa atingida (nº de agendamentos ou faturamento). */
+  tier_threshold?: string | null
+  lead_id: number | null
   sale_id: number | null
   appointment_id: number | null
   client_name: string | null
   occurred_at: string | null
+  /** Data do evento no calendário de São Paulo (Y-m-d), a que a tela mostra. */
+  occurred_on: string | null
   protocol_name: string | null
   base_amount: string
   rate_percent: string | null
@@ -159,6 +176,7 @@ export interface CommissionEntriesResponse {
     month: string
     total: string
     pending: string
+    by_origin: CommissionByOrigin
     by_user: {
       user_id: number
       user_name: string | null
@@ -166,7 +184,54 @@ export interface CommissionEntriesResponse {
       pending: string
       paid: string
       count: number
+      by_origin: CommissionByOrigin
     }[]
+  }
+}
+
+export interface GoalRemunerationRow {
+  metric: GoalMetric
+  label: string
+  unit_label: string | null
+  supports_per_occurrence: boolean
+  per_occurrence_amount: string
+  target_bonus_amount: string
+  /** Só novo agendamento aceita faixas por quantidade. */
+  supports_tiers?: boolean
+  tiers?: RemunerationTier[]
+}
+
+export interface GoalRemunerationPayload {
+  per_occurrence_amount?: string
+  target_bonus_amount: string
+  tiers?: RemunerationTierPayload[]
+}
+
+/** Faixa: gatilho (nº de agendamentos ou faturamento em R$), valor fixo e/ou %. */
+export interface RemunerationTier {
+  threshold: string | number
+  fixed_amount: string
+  percent: string
+}
+
+export interface RemunerationTierPayload {
+  threshold: string | number
+  fixed_amount: string | null
+  percent: string | null
+}
+
+export interface RevenueRemunerationRow {
+  user_id: number
+  user_name: string | null
+  tiers: RemunerationTier[]
+}
+
+export interface RevenueRemunerationsResponse {
+  data: RevenueRemunerationRow[]
+  meta: {
+    month: string
+    month_revenue: string
+    users: { id: number; name: string }[]
   }
 }
 
@@ -301,6 +366,7 @@ export type DreLineKey =
   | 'anticipation'
   | 'taxes'
   | 'commissions'
+  | 'goal_commissions'
   | 'losses'
   | 'other_variable'
   | 'variable_costs'

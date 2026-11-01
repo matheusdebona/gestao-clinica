@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Sale;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 
 /**
@@ -13,6 +14,8 @@ use Carbon\CarbonImmutable;
  * Receita e custos variáveis vêm da margem de contribuição (vendas confirmadas no mês; insumos,
  * taxas, antecipação, impostos e comissões dessas vendas; perdas de estoque do mês). Despesas
  * vêm do módulo de despesas pelo mês de competência, agrupadas pela natureza da categoria.
+ * Remuneração por metas e por faturamento (lançamentos de comissão sem venda) entra nos custos
+ * variáveis pelo mês de competência, pendente ou paga, como as comissões de venda/sessão.
  *
  * Ponto de equilíbrio = despesas do mês (exceto variáveis) ÷ margem de contribuição %.
  */
@@ -56,16 +59,18 @@ class DreService
         $from = $month->startOfMonth();
         $to = $month->endOfMonth();
 
-        if ($from->lte(CarbonImmutable::now()->startOfMonth())) {
+        if ($from->format('Y-m') <= ClinicMonth::of()) {
             $this->generator->generateMonth($clinicId, $from);
         }
 
         $cm = $this->margin->summarize($from, $to, salesLimit: 0)['totals'];
 
+        // Mês civil de São Paulo, como a margem de contribuição e a remuneração por faturamento.
+        [$monthStart, $monthEnd] = ClinicMonth::bounds($from->format('Y-m'));
         $sales = Sale::query()
             ->where('status', Sale::STATUS_CONFIRMED)
             ->whereNotNull('sold_at')
-            ->whereBetween('sold_at', [$from->startOfDay(), $to->endOfDay()])
+            ->whereBetween('sold_at', [$monthStart, $monthEnd])
             ->with('items:id,sale_id,line_total,list_line_total')
             ->get(['id', 'effective_amount']);
         $netRevenue = (float) $cm['revenue'];
@@ -97,7 +102,8 @@ class DreService
 
         $otherVariable = array_sum($byKind[ExpenseCategory::KIND_VARIABLE] ?? []);
         $variable = (float) $cm['supplies'] + (float) $cm['card_fees'] + (float) $cm['anticipation']
-            + (float) $cm['taxes'] + (float) $cm['commissions'] + (float) $cm['losses'] + $otherVariable;
+            + (float) $cm['taxes'] + (float) $cm['commissions'] + (float) $cm['goal_commissions']
+            + (float) $cm['losses'] + $otherVariable;
         $contribution = $netRevenue - $variable;
 
         $lines = [
@@ -109,6 +115,7 @@ class DreService
             'anticipation' => (float) $cm['anticipation'],
             'taxes' => (float) $cm['taxes'],
             'commissions' => (float) $cm['commissions'],
+            'goal_commissions' => (float) $cm['goal_commissions'],
             'losses' => (float) $cm['losses'],
             'other_variable' => $otherVariable,
             'variable_costs' => $variable,

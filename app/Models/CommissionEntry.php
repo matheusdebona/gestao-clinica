@@ -16,6 +16,24 @@ class CommissionEntry extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
+    /** Lançamento de remuneração por meta (role), ao lado de seller e professional. */
+    public const ROLE_GOAL = 'goal';
+
+    /** Valor por ocorrência (um lançamento por lead/evento). */
+    public const GOAL_KIND_OCCURRENCE = 'occurrence';
+
+    /** Bônus ao bater a meta do mês (um lançamento por métrica e mês). */
+    public const GOAL_KIND_BONUS = 'bonus';
+
+    /** Faixa atingida no mês (um lançamento por métrica/faturamento e mês). */
+    public const GOAL_KIND_TIER = 'tier';
+
+    /** Remuneração por faturamento total da clínica no mês (faixas por colaborador). */
+    public const ROLE_REVENUE = 'revenue';
+
+    /** Papéis que não vêm de uma venda/sessão (custo do mês por competência). */
+    public const MONTHLY_ROLES = [self::ROLE_GOAL, self::ROLE_REVENUE];
+
     protected $fillable = [
         'clinic_id',
         'user_id',
@@ -23,6 +41,10 @@ class CommissionEntry extends Model
         'role',
         'sale_id',
         'appointment_id',
+        'lead_id',
+        'goal_metric',
+        'goal_kind',
+        'tier_threshold',
         'protocol_id',
         'competence_month',
         'base_amount',
@@ -40,6 +62,7 @@ class CommissionEntry extends Model
     {
         return [
             'competence_month' => 'date',
+            'tier_threshold' => 'decimal:2',
             'base_amount' => 'decimal:2',
             'rate_percent' => 'decimal:4',
             'amount' => 'decimal:2',
@@ -65,6 +88,11 @@ class CommissionEntry extends Model
     public function appointment(): BelongsTo
     {
         return $this->belongsTo(Appointment::class);
+    }
+
+    public function lead(): BelongsTo
+    {
+        return $this->belongsTo(Lead::class);
     }
 
     public function protocol(): BelongsTo

@@ -49,6 +49,13 @@ const ROWS: Row[] = [
   { type: 'line', key: 'anticipation', label: 'Antecipação', sign: '−', costUp: true },
   { type: 'line', key: 'taxes', label: 'Impostos sobre a receita', sign: '−', costUp: true },
   { type: 'line', key: 'commissions', label: 'Comissões', sign: '−', costUp: true },
+  {
+    type: 'line',
+    key: 'goal_commissions',
+    label: 'Remuneração por metas e faturamento',
+    sign: '−',
+    costUp: true,
+  },
   { type: 'line', key: 'losses', label: 'Perdas de estoque', sign: '−', costUp: true },
   {
     type: 'line',

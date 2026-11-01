@@ -74,6 +74,16 @@ const lines = computed(() => {
       value: totals.losses,
       sign: '−',
     },
+    ...(Number(totals.goal_commissions ?? 0) !== 0
+      ? [
+          {
+            label: 'Remuneração por metas e faturamento',
+            hint: '',
+            value: totals.goal_commissions,
+            sign: '−',
+          },
+        ]
+      : []),
   ]
 })
 

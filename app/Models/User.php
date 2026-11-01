@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\BelongsToClinic;
+use App\Services\GoalRemunerationService;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
@@ -18,6 +19,16 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use BelongsToClinic, HasApiTokens, HasFactory, HasRoles, Notifiable;
+
+    protected static function booted(): void
+    {
+        // Desativado não ganha metas/faixas/faturamento: refaz o mês atual ao mudar o status.
+        static::updated(function (User $user): void {
+            if ($user->wasChanged('is_active')) {
+                app(GoalRemunerationService::class)->onUserActiveChanged($user);
+            }
+        });
+    }
 
     protected function casts(): array
     {

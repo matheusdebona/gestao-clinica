@@ -12,6 +12,7 @@ use App\Models\TaxSetting;
 use App\Models\Treatment;
 use App\Models\User;
 use App\Services\Finance\SaleEconomics;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 
@@ -26,7 +27,10 @@ use Illuminate\Support\Collection;
  * − comissões lançadas (vendedor e profissionais) da venda
  * = margem de contribuição da venda
  *
- * Total da clínica = soma das vendas − perdas de estoque valorizadas no período.
+ * Total da clínica = soma das vendas − perdas de estoque valorizadas no período − remuneração
+ * por metas e por faturamento (lançamentos sem venda, role goal/revenue) dos meses do período.
+ * Esses lançamentos seguem a mesma base das comissões de venda/sessão: competência (pendentes e
+ * pagos; cancelados fora), pelo mês de competência (mês civil de São Paulo).
  */
 class ContributionMarginService
 {
@@ -39,8 +43,8 @@ class ContributionMarginService
      */
     public function summarize(CarbonImmutable $from, CarbonImmutable $to, int $salesLimit = 50): array
     {
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from e to são lidos como datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
 
         $sales = Sale::query()
             ->where('status', Sale::STATUS_CONFIRMED)
@@ -117,12 +121,14 @@ class ContributionMarginService
             ->map(fn ($v) => (float) $v);
         $lossTotal = (float) $losses->sum();
 
+        $goalCommissions = $this->goalCommissions($from, $to);
+
         $total = $this->format($totals);
-        $clinicMargin = $totals['contribution_margin'] - $lossTotal;
+        $clinicMargin = $totals['contribution_margin'] - $lossTotal - $goalCommissions;
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'totals' => [
                 ...$total,
                 'supplies_estimated' => $this->money($totals['supplies_estimated']),
@@ -132,6 +138,7 @@ class ContributionMarginService
                     StockMovement::LOSS_DAMAGED => $this->money($losses[StockMovement::LOSS_DAMAGED] ?? 0),
                     StockMovement::LOSS_OTHER => $this->money($losses[StockMovement::LOSS_OTHER] ?? 0),
                 ],
+                'goal_commissions' => $this->money($goalCommissions),
                 'clinic_contribution_margin' => $this->money($clinicMargin),
                 'clinic_contribution_margin_percent' => $totals['revenue'] > 0
                     ? number_format($clinicMargin / $totals['revenue'] * 100, 2, '.', '')
@@ -151,6 +158,20 @@ class ContributionMarginService
                     ->count(),
             ],
         ];
+    }
+
+    /**
+     * Remuneração por metas e faturamento com competência num mês que toca o período
+     * (do mês de $from até $to), pendente ou paga, como as comissões de venda.
+     */
+    public function goalCommissions(CarbonImmutable $from, CarbonImmutable $to): float
+    {
+        return (float) CommissionEntry::query()
+            ->whereIn('role', CommissionEntry::MONTHLY_ROLES)
+            ->where('status', '!=', CommissionEntry::STATUS_CANCELLED)
+            ->whereDate('competence_month', '>=', $from->startOfMonth()->toDateString())
+            ->whereDate('competence_month', '<=', $to->toDateString())
+            ->sum('amount');
     }
 
     /**
