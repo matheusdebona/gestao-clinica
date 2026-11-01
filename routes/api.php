@@ -15,6 +15,8 @@ use App\Http\Controllers\Api\V1\ClinicSettingsController;
 use App\Http\Controllers\Api\V1\DocumentController;
 use App\Http\Controllers\Api\V1\Finance\CommissionController;
 use App\Http\Controllers\Api\V1\Finance\ContributionMarginController;
+use App\Http\Controllers\Api\V1\Finance\DreController;
+use App\Http\Controllers\Api\V1\Finance\ExpenseController;
 use App\Http\Controllers\Api\V1\Finance\FinanceSettingsController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
@@ -382,6 +384,34 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('permission:finance.manage');
         Route::post('finance/commissions/mark-paid', [CommissionController::class, 'markPaid'])
             ->middleware('permission:finance.manage');
+        Route::get('finance/expense-categories', [ExpenseController::class, 'categories'])
+            ->middleware('permission:finance.view');
+        Route::post('finance/expense-categories', [ExpenseController::class, 'storeCategory'])
+            ->middleware('permission:finance.manage');
+        Route::put('finance/expense-categories/{expense_category}', [ExpenseController::class, 'updateCategory'])
+            ->middleware('permission:finance.manage');
+        Route::get('finance/expenses', [ExpenseController::class, 'index'])
+            ->middleware('permission:finance.view');
+        Route::post('finance/expenses', [ExpenseController::class, 'store'])
+            ->middleware('permission:finance.manage');
+        Route::put('finance/expenses/{expense}', [ExpenseController::class, 'update'])
+            ->middleware('permission:finance.manage');
+        Route::delete('finance/expenses/{expense}', [ExpenseController::class, 'destroy'])
+            ->middleware('permission:finance.manage');
+        Route::get('finance/recurring-expenses', [ExpenseController::class, 'recurring'])
+            ->middleware('permission:finance.view');
+        Route::post('finance/recurring-expenses', [ExpenseController::class, 'storeRecurring'])
+            ->middleware('permission:finance.manage');
+        Route::put('finance/recurring-expenses/{recurring_expense}', [ExpenseController::class, 'updateRecurring'])
+            ->middleware('permission:finance.manage');
+        Route::get('finance/equipment', [ExpenseController::class, 'equipment'])
+            ->middleware('permission:finance.view');
+        Route::post('finance/equipment', [ExpenseController::class, 'storeEquipment'])
+            ->middleware('permission:finance.manage');
+        Route::put('finance/equipment/{equipment_asset}', [ExpenseController::class, 'updateEquipment'])
+            ->middleware('permission:finance.manage');
+        Route::get('finance/dre', DreController::class)
+            ->middleware('permission:finance.view');
         Route::get('metrics/contribution-margin', ContributionMarginController::class)
             ->middleware(['permission:metrics.view', 'permission:finance.view']);
 

@@ -169,3 +169,176 @@ export interface CommissionEntriesResponse {
     }[]
   }
 }
+
+export type ExpenseKind =
+  'fixed' | 'variable' | 'marketing' | 'personnel' | 'taxes' | 'financial' | 'depreciation'
+
+export interface ExpenseCategory {
+  id: number
+  name: string
+  kind: ExpenseKind
+  is_system: boolean
+  is_active: boolean
+}
+
+export interface ExpenseCategoriesResponse {
+  data: ExpenseCategory[]
+  meta: {
+    origins: { id: number; name: string }[]
+    campaigns: { id: number; name: string; client_origin_id: number | null }[]
+  }
+}
+
+export interface Expense {
+  id: number
+  expense_category_id: number
+  category_name: string | null
+  kind: ExpenseKind | null
+  description: string
+  amount: string
+  competence_month: string
+  due_on: string | null
+  paid_on: string | null
+  supplier: string | null
+  recurring_expense_id: number | null
+  equipment_asset_id: number | null
+  client_origin_id: number | null
+  client_origin_name: string | null
+  campaign_id: number | null
+  campaign_name: string | null
+  notes: string | null
+}
+
+export interface ExpensePayload {
+  expense_category_id: number
+  description: string
+  amount: string
+  competence_month: string
+  due_on: string | null
+  paid_on: string | null
+  supplier: string | null
+  client_origin_id: number | null
+  campaign_id: number | null
+  notes: string | null
+}
+
+export interface ExpensesResponse {
+  data: Expense[]
+  meta: {
+    month: string
+    total: string
+    paid: string
+    by_kind: Record<ExpenseKind, string>
+  }
+}
+
+export interface RecurringExpense {
+  id: number
+  expense_category_id: number
+  category_name: string | null
+  kind: ExpenseKind | null
+  description: string
+  amount: string
+  due_day: number | null
+  starts_month: string
+  ends_month: string | null
+  supplier: string | null
+  client_origin_id: number | null
+  client_origin_name: string | null
+  campaign_id: number | null
+  campaign_name: string | null
+  is_active: boolean
+}
+
+export interface RecurringExpensePayload {
+  expense_category_id: number
+  description: string
+  amount: string
+  due_day: number | null
+  starts_month: string
+  ends_month: string | null
+  supplier: string | null
+  client_origin_id: number | null
+  campaign_id: number | null
+  is_active: boolean
+}
+
+export interface EquipmentAsset {
+  id: number
+  expense_category_id: number
+  category_name: string | null
+  name: string
+  purchase_value: string
+  residual_value: string
+  purchased_on: string | null
+  useful_life_months: number
+  depreciation_start_month: string
+  depreciation_end_month: string
+  monthly_depreciation: string
+  months_elapsed: number
+  book_value: string
+  is_active: boolean
+  notes: string | null
+}
+
+export interface EquipmentPayload {
+  name: string
+  purchase_value: string
+  residual_value: string | null
+  purchased_on: string | null
+  useful_life_months: number
+  depreciation_start_month: string
+  is_active: boolean
+  notes: string | null
+}
+
+export type DreLineKey =
+  | 'gross_revenue'
+  | 'discounts'
+  | 'net_revenue'
+  | 'supplies'
+  | 'card_fees'
+  | 'anticipation'
+  | 'taxes'
+  | 'commissions'
+  | 'losses'
+  | 'other_variable'
+  | 'variable_costs'
+  | 'contribution_margin'
+  | 'fixed'
+  | 'personnel'
+  | 'marketing'
+  | 'expense_taxes'
+  | 'financial'
+  | 'depreciation'
+  | 'operating_expenses'
+  | 'net_result'
+
+export type DreBreakdownKey =
+  | 'fixed'
+  | 'personnel'
+  | 'marketing'
+  | 'expense_taxes'
+  | 'financial'
+  | 'depreciation'
+  | 'other_variable'
+
+export interface DrePeriod {
+  lines: Record<DreLineKey, string>
+  breakdown: Record<DreBreakdownKey, { name: string; amount: string }[]>
+  contribution_margin_percent: string | null
+  net_margin_percent: string | null
+  break_even_revenue: string | null
+  break_even_gap: string | null
+  supplies_estimated: string
+  sales_count: number
+  expenses_count: number
+}
+
+export interface DreReport {
+  month: string
+  previous_month: string
+  current: DrePeriod
+  previous: DrePeriod
+  checks: { tax_configured: boolean }
+}

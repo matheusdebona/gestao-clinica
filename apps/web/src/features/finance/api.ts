@@ -2,12 +2,23 @@ import { api } from '@/lib/api'
 import type { DataEnvelope, Paginated } from '@/types/pagination'
 import type {
   CardFeeRule,
+  DreReport,
   CardFeeRulePayload,
   CommissionEntriesResponse,
   CommissionRulePayload,
   CommissionRuleRow,
   CommissionRulesResponse,
   ContributionMargin,
+  EquipmentAsset,
+  EquipmentPayload,
+  Expense,
+  ExpenseCategoriesResponse,
+  ExpenseCategory,
+  ExpenseKind,
+  ExpensePayload,
+  ExpensesResponse,
+  RecurringExpense,
+  RecurringExpensePayload,
   TaxSetting,
   TaxSettingPayload,
 } from '@/types/finance'
@@ -148,4 +159,77 @@ export async function markCommissionsPaid(ids: number[], paid: boolean): Promise
     body: { ids, paid },
   })
   return payload.data.updated
+}
+
+export function listExpenseCategories(): Promise<ExpenseCategoriesResponse> {
+  return api<ExpenseCategoriesResponse>('/finance/expense-categories')
+}
+
+export async function saveExpenseCategory(
+  body: { name?: string; kind?: ExpenseKind; is_active?: boolean },
+  id?: number,
+): Promise<ExpenseCategory> {
+  const payload = await api<DataEnvelope<ExpenseCategory>>(
+    id ? `/finance/expense-categories/${id}` : '/finance/expense-categories',
+    { method: id ? 'PUT' : 'POST', body },
+  )
+  return payload.data
+}
+
+export function listExpenses(month: string): Promise<ExpensesResponse> {
+  return api<ExpensesResponse>('/finance/expenses', { query: { month } })
+}
+
+export async function saveExpense(body: ExpensePayload, id?: number): Promise<Expense> {
+  const payload = await api<DataEnvelope<Expense>>(
+    id ? `/finance/expenses/${id}` : '/finance/expenses',
+    { method: id ? 'PUT' : 'POST', body },
+  )
+  return payload.data
+}
+
+export async function deleteExpense(id: number): Promise<void> {
+  await api(`/finance/expenses/${id}`, { method: 'DELETE' })
+}
+
+export async function listRecurringExpenses(): Promise<RecurringExpense[]> {
+  const payload = await api<DataEnvelope<RecurringExpense[]>>('/finance/recurring-expenses')
+  return payload.data
+}
+
+export async function saveRecurringExpense(
+  body: Partial<RecurringExpensePayload>,
+  id?: number,
+): Promise<RecurringExpense> {
+  const payload = await api<DataEnvelope<RecurringExpense>>(
+    id ? `/finance/recurring-expenses/${id}` : '/finance/recurring-expenses',
+    { method: id ? 'PUT' : 'POST', body },
+  )
+  return payload.data
+}
+
+export async function listEquipment(): Promise<EquipmentAsset[]> {
+  const payload = await api<DataEnvelope<EquipmentAsset[]>>('/finance/equipment')
+  return payload.data
+}
+
+export async function saveEquipment(
+  body: Partial<EquipmentPayload>,
+  id?: number,
+): Promise<EquipmentAsset> {
+  const payload = await api<DataEnvelope<EquipmentAsset>>(
+    id ? `/finance/equipment/${id}` : '/finance/equipment',
+    { method: id ? 'PUT' : 'POST', body },
+  )
+  return payload.data
+}
+
+export function currentMonthKey(): string {
+  const now = new Date()
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+}
+
+export async function getDre(month: string): Promise<DreReport> {
+  const payload = await api<DataEnvelope<DreReport>>(`/finance/dre?month=${month}`)
+  return payload.data
 }
