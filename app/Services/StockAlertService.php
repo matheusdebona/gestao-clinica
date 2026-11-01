@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\AppointmentStockWarningNotification;
 use App\Notifications\LowStockProductNotification;
 use App\Notifications\ProjectedLowStockNotification;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -73,7 +74,8 @@ class StockAlertService
 
     public function runDailyChecks(?CarbonImmutable $day = null): void
     {
-        $day ??= CarbonImmutable::now();
+        // Padrão: atendimentos de amanhã (o job roda às 22:00 de Brasília).
+        $day ??= ClinicMonth::today()->addDay();
 
         Clinic::query()->orderBy('id')->each(function (Clinic $clinic) use ($day): void {
             $this->checkClinic($clinic, $day);
@@ -160,8 +162,8 @@ class StockAlertService
      */
     public function plannedUsageForDay(int $clinicId, CarbonImmutable $day): array
     {
-        $dayStart = $day->startOfDay();
-        $dayEnd = $day->endOfDay();
+        // Dia de calendário de São Paulo.
+        [$dayStart, $dayEnd] = ClinicMonth::dayBounds($day->format('Y-m-d'), $day->format('Y-m-d'));
 
         $treatmentIds = Appointment::query()
             ->where('clinic_id', $clinicId)
@@ -232,7 +234,7 @@ class StockAlertService
             ->where('notifiable_type', User::class)
             ->where('notifiable_id', $user->id)
             ->whereNull('read_at')
-            ->whereDate('created_at', now()->toDateString())
+            ->whereBetween('created_at', ClinicMonth::dayBounds(ClinicMonth::todayDate(), ClinicMonth::todayDate()))
             ->where('data->type', $type)
             ->where('data->product_id', $productId)
             ->exists();

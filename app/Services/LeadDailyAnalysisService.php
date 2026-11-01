@@ -7,6 +7,7 @@ use App\Models\LeadActivity;
 use App\Models\LeadDailyCheckin;
 use App\Models\LeadStatus;
 use App\Models\User;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +20,7 @@ use Illuminate\Support\Facades\DB;
  */
 class LeadDailyAnalysisService
 {
-    public const TZ = 'America/Sao_Paulo';
+    public const TZ = ClinicMonth::TZ;
 
     public const QUEUE_LIMIT = 50;
 

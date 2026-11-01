@@ -7,6 +7,7 @@ use App\Models\AppointmentConsumption;
 use App\Models\SaleItem;
 use App\Models\Treatment;
 use App\Models\User;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -28,8 +29,8 @@ class OperationsMetricsService
      */
     public function summarize(CarbonImmutable $from, CarbonImmutable $to): array
     {
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from/to são datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
 
         $sessionsByStatus = [
             Appointment::STATUS_SCHEDULED => 0,
@@ -90,8 +91,8 @@ class OperationsMetricsService
         })->values()->all();
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'date_field' => 'scheduled_at',
             'kpis' => [
                 'sessions_total' => $totalSessions,

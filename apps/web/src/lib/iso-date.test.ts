@@ -71,8 +71,8 @@ describe('iso-date', () => {
   })
 
   it('snaps nowDatetimeLocal to a 5-minute step', () => {
-    expect(nowDatetimeLocal(new Date(2026, 8, 8, 14, 32), 5)).toBe('2026-09-08T14:30')
-    expect(nowDatetimeLocal(new Date(2026, 8, 8, 14, 58), 5)).toBe('2026-09-08T15:00')
+    expect(nowDatetimeLocal(new Date('2026-09-08T14:32:00-03:00'), 5)).toBe('2026-09-08T14:30')
+    expect(nowDatetimeLocal(new Date('2026-09-08T14:58:00-03:00'), 5)).toBe('2026-09-08T15:00')
   })
 
   it('keeps an off-step minute in the picker list', () => {

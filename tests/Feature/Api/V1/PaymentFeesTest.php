@@ -197,10 +197,12 @@ class PaymentFeesTest extends TestCase
             ->assertJsonPath('data.0.effective_month', '2026-07');
 
         $resolver = new TaxRateResolver;
-        $this->assertSame(0.0, $resolver->ratePercentFor($this->clinic->id, CarbonImmutable::parse('2025-12-20')));
-        $this->assertSame(6.0, $resolver->ratePercentFor($this->clinic->id, CarbonImmutable::parse('2026-06-30')));
-        $this->assertSame(16.33, $resolver->ratePercentFor($this->clinic->id, CarbonImmutable::parse('2026-07-01')));
-        $this->assertSame(60.0, $resolver->taxFor($this->clinic->id, CarbonImmutable::parse('2026-03-10'), 1000));
+        $this->assertSame(0.0, $resolver->ratePercentFor($this->clinic->id, CarbonImmutable::parse('2025-12-20 12:00:00')));
+        $this->assertSame(6.0, $resolver->ratePercentFor($this->clinic->id, CarbonImmutable::parse('2026-06-30 12:00:00')));
+        $this->assertSame(16.33, $resolver->ratePercentFor($this->clinic->id, CarbonImmutable::parse('2026-07-01 03:00:00')));
+        // Instante da venda: 30/06 23:30 em São Paulo (01/07 02:30 UTC) ainda é junho.
+        $this->assertSame(6.0, $resolver->ratePercentFor($this->clinic->id, CarbonImmutable::parse('2026-07-01 02:30:00')));
+        $this->assertSame(60.0, $resolver->taxFor($this->clinic->id, CarbonImmutable::parse('2026-03-10 12:00:00'), 1000));
 
         $this->assertSame(2, TaxSetting::query()->count());
     }

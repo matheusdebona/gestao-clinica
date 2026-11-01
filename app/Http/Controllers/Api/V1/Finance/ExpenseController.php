@@ -10,6 +10,7 @@ use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\RecurringExpense;
 use App\Services\ExpenseGenerator;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Http\JsonResponse;
@@ -68,7 +69,7 @@ class ExpenseController extends Controller
     {
         $month = $this->month($request->validate(['month' => ['required', 'date_format:Y-m']])['month']);
 
-        if ($month->lte(CarbonImmutable::now()->startOfMonth())) {
+        if ($month->lte(ClinicMonth::currentMonth())) {
             $this->generator->generateMonth((int) CurrentClinic::id(), $month);
         }
 
@@ -181,7 +182,7 @@ class ExpenseController extends Controller
         if ($start === null) {
             return;
         }
-        $now = CarbonImmutable::now()->startOfMonth();
+        $now = ClinicMonth::currentMonth();
         // Gera os meses passados também, para o DRE histórico refletir o cadastro (limite de 5 anos).
         $from = CarbonImmutable::instance($start)->startOfMonth()->max($now->subYears(5));
         if ($from->lte($now)) {
@@ -191,7 +192,7 @@ class ExpenseController extends Controller
 
     private function month(string $value): CarbonImmutable
     {
-        return CarbonImmutable::createFromFormat('!Y-m', $value)->startOfMonth();
+        return ClinicMonth::parseMonth($value);
     }
 
     /**
@@ -377,7 +378,7 @@ class ExpenseController extends Controller
      */
     private function equipmentPayload(EquipmentAsset $a): array
     {
-        $now = CarbonImmutable::now();
+        $now = ClinicMonth::currentMonth();
         $elapsed = $a->monthsElapsed($now);
         $monthly = $a->monthlyDepreciation();
         $depreciable = max(0, (float) $a->purchase_value - (float) $a->residual_value);

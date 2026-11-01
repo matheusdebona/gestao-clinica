@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Lead;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,8 +20,8 @@ class LeadMetricsService
      */
     public function summarize(CarbonImmutable $from, CarbonImmutable $to): array
     {
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from/to são datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
 
         $totals = $this->cohort($fromStart, $toEnd)
             ->selectRaw('COUNT(*) as total')
@@ -36,8 +37,8 @@ class LeadMetricsService
         $avgSeconds = $totals->avg_seconds !== null ? (float) $totals->avg_seconds : null;
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'conversion_definition' => 'Converted / all leads created in the period (cancelled included). Converted = became a patient, even after the period.',
             'kpis' => [
                 'total' => $total,

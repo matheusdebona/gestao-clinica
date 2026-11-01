@@ -6,6 +6,7 @@ use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Notifications\AppointmentConfirmationDigestNotification;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
@@ -20,7 +21,7 @@ use Illuminate\Support\Facades\Notification;
  */
 class AppointmentConfirmationService
 {
-    public const TZ = 'America/Sao_Paulo';
+    public const TZ = ClinicMonth::TZ;
 
     /** Scheduled (not started, not cancelled) sessions of a clinic day, by time. */
     public function forDay(CarbonImmutable $day): EloquentCollection
@@ -140,7 +141,8 @@ class AppointmentConfirmationService
         return DB::table('notifications')
             ->where('notifiable_type', User::class)
             ->where('notifiable_id', $user->id)
-            ->whereDate('created_at', $now->toDateString())
+            // "Hoje" é o dia de São Paulo.
+            ->whereBetween('created_at', ClinicMonth::dayBounds(ClinicMonth::date($now), ClinicMonth::date($now)))
             ->where('data->type', AppointmentConfirmationDigestNotification::TYPE)
             ->exists();
     }

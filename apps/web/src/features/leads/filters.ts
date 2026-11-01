@@ -1,5 +1,6 @@
+import { clinicTodayIso } from '@/lib/clinic-time'
 import type { LocationQuery, LocationQueryRaw } from 'vue-router'
-import { lastDaysRange, currentMonthRange, toIsoDate } from '@/features/metrics/period'
+import { lastDaysRange, currentMonthRange } from '@/features/metrics/period'
 import type { LeadListParams } from '@/features/leads/api'
 
 export type LeadPeriod = 'all' | 'today' | '7d' | '30d' | 'month' | 'custom'
@@ -128,7 +129,7 @@ export function filtersToQuery(filters: LeadFilters): LocationQueryRaw {
 export function periodRange(filters: LeadFilters, now = new Date()): { from?: string; to?: string } {
   switch (filters.period) {
     case 'today': {
-      const today = toIsoDate(now)
+      const today = clinicTodayIso(now)
       return { from: today, to: today }
     }
     case '7d':

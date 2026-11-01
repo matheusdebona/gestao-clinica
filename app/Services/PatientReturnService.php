@@ -8,6 +8,7 @@ use App\Models\Protocol;
 use App\Models\Sale;
 use App\Models\Treatment;
 use App\Models\User;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -30,7 +31,7 @@ use Illuminate\Support\Collection;
  */
 class PatientReturnService
 {
-    public const TZ = 'America/Sao_Paulo';
+    public const TZ = ClinicMonth::TZ;
 
     /** "Vence em breve": due within this many days. */
     public const DUE_SOON_DAYS = 7;

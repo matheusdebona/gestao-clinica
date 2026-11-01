@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Client;
 use App\Models\Sale;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
@@ -40,16 +41,16 @@ class AcquisitionMetricsService
             $groupBy = self::GROUP_BY_ORIGIN;
         }
 
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from/to são datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
 
         $breakdown = $groupBy === self::GROUP_BY_CAMPAIGN
             ? $this->breakdownByCampaign($fromStart, $toEnd)
             : $this->breakdownByOrigin($fromStart, $toEnd);
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'group_by' => $groupBy,
             'conversion' => 'lifetime',
             'conversion_definition' => 'Client created in the period with at least one confirmed sale where sold_at >= client.created_at. The sale may occur after the period (e.g. budget in month N, payment in month N+1).',

@@ -6,6 +6,7 @@ use App\Models\Clinic;
 use App\Models\EquipmentAsset;
 use App\Models\Expense;
 use App\Models\RecurringExpense;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 
 /**
@@ -100,7 +101,7 @@ class ExpenseGenerator
     public function generateCurrentMonthForAll(): int
     {
         $count = 0;
-        $month = CarbonImmutable::now('America/Sao_Paulo')->startOfMonth();
+        $month = ClinicMonth::currentMonth();
         Clinic::query()->each(function (Clinic $clinic) use (&$count, $month) {
             $count += $this->generateMonth($clinic->id, $month);
         });

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\StockMovementType;
 use App\Models\Product;
 use App\Models\StockMovement;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 
@@ -21,9 +22,9 @@ class InventoryMetricsService
      */
     public function summarize(CarbonImmutable $from, CarbonImmutable $to): array
     {
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
-        $windowDays = max(1, $fromStart->diffInDays($to->startOfDay()) + 1);
+        // Dias de calendário de São Paulo (from/to são datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
+        $windowDays = max(1, (int) $from->startOfDay()->diffInDays($to->startOfDay()) + 1);
 
         $activeProducts = Product::query()->where('is_active', true);
 
@@ -80,8 +81,8 @@ class InventoryMetricsService
             ->all();
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'kpis' => [
                 'low_stock_count' => $lowStockCount,
                 'inventory_value' => $this->money($inventoryValue),

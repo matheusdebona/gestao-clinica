@@ -6,6 +6,7 @@ use App\Models\Budget;
 use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SalePayment;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
@@ -63,8 +64,8 @@ class CommercialMetricsService
      */
     public function summarize(CarbonImmutable $from, CarbonImmutable $to, ?string $granularity = null): array
     {
-        $fromStart = $from->startOfDay();
-        $toEnd = $to->endOfDay();
+        // Dias de calendário de São Paulo (from/to são datas).
+        [$fromStart, $toEnd] = ClinicMonth::dayBounds($from, $to);
         $resolvedGranularity = $this->resolveGranularity($fromStart, $toEnd, $granularity);
 
         $confirmedSales = Sale::query()
@@ -92,8 +93,8 @@ class CommercialMetricsService
             : null;
 
         return [
-            'from' => $fromStart->toDateString(),
-            'to' => $toEnd->toDateString(),
+            'from' => $from->toDateString(),
+            'to' => $to->toDateString(),
             'date_field' => 'sold_at',
             'granularity' => $resolvedGranularity,
             'kpis' => [
@@ -233,8 +234,9 @@ class CommercialMetricsService
         Collection $rows,
     ): array {
         $series = [];
-        $cursor = $this->bucketStart($fromStart, $granularity);
-        $last = $this->bucketStart($toEnd, $granularity);
+        // Limites em UTC → datas de São Paulo, como as chaves do SQL.
+        $cursor = $this->bucketStart($fromStart->setTimezone(ClinicMonth::TZ), $granularity);
+        $last = $this->bucketStart($toEnd->setTimezone(ClinicMonth::TZ), $granularity);
 
         while ($cursor->lte($last)) {
             $key = $this->bucketKey($cursor, $granularity);
@@ -253,6 +255,8 @@ class CommercialMetricsService
     private function periodExpression(string $column, string $granularity): string
     {
         $driver = DB::connection()->getDriverName();
+        // Agrupa pelo dia/semana/mês de São Paulo (o instante é gravado em UTC).
+        $column = ClinicMonth::localSql($column, $driver);
 
         return match ($granularity) {
             self::GRANULARITY_DAY => match ($driver) {

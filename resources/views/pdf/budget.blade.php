@@ -142,7 +142,7 @@
         @if (!empty($budget['valid_until']))
             <div>Válido até {{ \Illuminate\Support\Carbon::parse($budget['valid_until'])->format('d/m/Y') }}</div>
         @endif
-        <div>Gerado em {{ \Illuminate\Support\Carbon::parse($payload['generated_at'])->format('d/m/Y H:i') }}</div>
+        <div>Gerado em {{ \Illuminate\Support\Carbon::parse($payload['generated_at'])->timezone(\App\Support\ClinicMonth::TZ)->format('d/m/Y H:i') }}</div>
     </div>
 </div>
 

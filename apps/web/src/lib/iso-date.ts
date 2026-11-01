@@ -1,3 +1,5 @@
+import { clinicTodayIso, clinicWallClock } from '@/lib/clinic-time'
+
 export const ISO_DATE_RE = /^(\d{4})-(\d{2})-(\d{2})$/
 export const DATETIME_LOCAL_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::\d{2})?$/
 
@@ -41,8 +43,9 @@ export function parseIsoDate(value: string): Date | null {
   return date
 }
 
+/** Hoje no calendário de São Paulo. */
 export function todayIso(now = new Date()): string {
-  return toIsoDate(now)
+  return clinicTodayIso(now)
 }
 
 export function startOfMonth(date: Date): Date {
@@ -93,7 +96,9 @@ export function toDatetimeLocal(dateIso: string, hours: number, minutes: number)
   return `${dateIso}T${pad(hours)}:${pad(minutes)}`
 }
 
+/** Agora no relógio de Brasília, arredondado ao passo de minutos. */
 export function nowDatetimeLocal(now = new Date(), minuteStep = 5): string {
+  now = clinicWallClock(now)
   const step = minuteStep > 0 ? minuteStep : 1
   let hours = now.getHours()
   let minutes = Math.round(now.getMinutes() / step) * step

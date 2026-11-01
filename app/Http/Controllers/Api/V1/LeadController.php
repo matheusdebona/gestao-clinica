@@ -17,11 +17,11 @@ use App\Models\User;
 use App\Services\LeadService;
 use App\Services\LeadStaleService;
 use App\Support\CaseInsensitiveSearch;
+use App\Support\ClinicMonth;
 use App\Support\CurrentClinic;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
 
@@ -93,10 +93,10 @@ class LeadController extends Controller
         }
 
         if ($request->filled('from')) {
-            $query->where('created_at', '>=', Carbon::parse($request->input('from'))->startOfDay());
+            $query->where('created_at', '>=', ClinicMonth::boundary((string) $request->input('from'), true));
         }
         if ($request->filled('to')) {
-            $query->where('created_at', '<=', Carbon::parse($request->input('to'))->endOfDay());
+            $query->where('created_at', '<=', ClinicMonth::boundary((string) $request->input('to'), false));
         }
 
         $perPage = min(max($request->integer('per_page', 20), 1), 100);

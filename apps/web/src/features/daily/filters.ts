@@ -1,3 +1,4 @@
+import { clinicTodayIso } from '@/lib/clinic-time'
 import type { LocationQuery, LocationQueryRaw } from 'vue-router'
 import type { DailyParams, DailyTeamRow } from '@/features/daily/api'
 
@@ -17,11 +18,9 @@ export interface DailyFilters {
 }
 
 const ISO = /^\d{4}-\d{2}-\d{2}$/
-const TZ = 'America/Sao_Paulo'
-
 /** Today (or `now`) as a calendar day in São Paulo. */
 export function clinicToday(now = new Date()): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(now)
+  return clinicTodayIso(now)
 }
 
 export function shiftDay(day: string, delta: number): string {

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Client;
 use App\Models\PatientTier;
 use App\Models\Sale;
+use App\Support\ClinicMonth;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -31,7 +32,8 @@ class PatientTierService
 
     public function windowStart(): CarbonImmutable
     {
-        return CarbonImmutable::now()->subMonthsNoOverflow(self::WINDOW_MONTHS);
+        // Janela móvel no calendário de São Paulo: o mesmo instante, 12 meses atrás (ex.: 31/03 → 31/03).
+        return ClinicMonth::now()->subMonthsNoOverflow(self::WINDOW_MONTHS)->utc();
     }
 
     /** @return Collection<int, PatientTier> */

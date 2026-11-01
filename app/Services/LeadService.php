@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Lead;
 use App\Models\LeadActivity;
 use App\Models\User;
+use App\Support\ClinicMonth;
 use App\Support\EnsureDefaultLeadStatuses;
 use App\Support\LeadPhone;
 use Illuminate\Database\Eloquent\Collection;
@@ -335,7 +336,7 @@ class LeadService
 
         if ($lead !== null) {
             $by = $lead->createdBy?->name;
-            $when = $lead->created_at?->timezone('America/Sao_Paulo')->format('d/m/Y');
+            $when = $lead->created_at?->timezone(ClinicMonth::TZ)->format('d/m/Y');
 
             $leadClient = $lead->client;
 

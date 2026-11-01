@@ -6,6 +6,7 @@ use App\Models\Budget;
 use App\Models\Clinic;
 use App\Models\User;
 use App\Notifications\ForgottenBudgetsDigestNotification;
+use App\Support\ClinicMonth;
 use App\Support\ClinicSettings;
 use App\Support\CurrentClinic;
 use Carbon\CarbonImmutable;
@@ -25,7 +26,7 @@ use Illuminate\Support\Facades\Notification;
  */
 class BudgetFollowUpService
 {
-    public const TZ = 'America/Sao_Paulo';
+    public const TZ = ClinicMonth::TZ;
 
     /** Safety cap when evaluating tiers in PHP. */
     private const CANDIDATE_LIMIT = 500;
@@ -76,7 +77,8 @@ class BudgetFollowUpService
             ->where('budgets.sent_at', '<=', $cutoff)
             ->where(fn (Builder $q) => $q
                 ->whereNull('budgets.valid_until')
-                ->orWhere('budgets.valid_until', '>=', $today->utc()))
+                // "Válido até" é uma data de calendário: vale até o fim desse dia.
+                ->orWhereDate('budgets.valid_until', '>=', $today->toDateString()))
             ->when($userIds !== [], fn (Builder $q) => $q->whereIn('budgets.created_by_user_id', $userIds))
             ->orderBy('budgets.sent_at')
             ->orderBy('budgets.id');
@@ -91,7 +93,7 @@ class BudgetFollowUpService
             return null;
         }
         $today ??= self::today();
-        if ($budget->valid_until !== null && CarbonImmutable::parse($budget->valid_until)->lt($today->utc())) {
+        if ($budget->valid_until !== null && $budget->valid_until->toDateString() < $today->toDateString()) {
             return null;
         }
         $tiers = $this->tiers($budget->clinic_id);
