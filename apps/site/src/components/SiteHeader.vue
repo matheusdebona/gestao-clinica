@@ -15,6 +15,9 @@ const nav = [
 
 const open = ref(false)
 const condensed = ref(false)
+// Hidden at the very top so the hero gets the full first screen; slides in after a short scroll.
+const revealed = ref(false)
+const REVEAL_AT = 64
 const heroInView = ref(true)
 const sectionCtaInView = ref(true)
 const footerNear = ref(false)
@@ -48,6 +51,8 @@ function updateHeroLock() {
 
 function onScroll() {
   condensed.value = window.scrollY > 24
+  revealed.value = window.scrollY > REVEAL_AT
+  if (!revealed.value) open.value = false
   updateHeroLock()
 }
 
@@ -61,6 +66,8 @@ onMounted(() => {
   window.addEventListener('scroll', onScroll, { passive: true })
   window.addEventListener('resize', updateHeroLock, { passive: true })
   window.addEventListener('keydown', onKey)
+  window.addEventListener('hashchange', onScroll)
+  window.addEventListener('pageshow', onScroll)
 
   const visibleCtas = new Set<Element>()
   ctaIo = new IntersectionObserver(
@@ -88,16 +95,24 @@ onUnmounted(() => {
   window.removeEventListener('scroll', onScroll)
   window.removeEventListener('resize', updateHeroLock)
   window.removeEventListener('keydown', onKey)
+  window.removeEventListener('hashchange', onScroll)
+  window.removeEventListener('pageshow', onScroll)
   ctaIo?.disconnect()
   footerIo?.disconnect()
 })
 </script>
 
 <template>
-  <header class="pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4">
+  <header
+    class="site-header pointer-events-none fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-4 sm:pt-4"
+    :class="revealed ? 'is-revealed' : 'is-hidden'"
+    :inert="!revealed || undefined"
+    :aria-hidden="revealed ? undefined : 'true'"
+    data-site-header
+  >
     <div
-      class="pointer-events-auto mx-auto flex max-w-[1120px] items-center justify-between gap-3 rounded-chrome px-3 py-2 transition-[background-color,box-shadow,border-color,color] duration-200"
-      :class="condensed ? 'glass-regular text-title' : 'glass-dark text-inverse'"
+      :class="[condensed ? 'glass-regular text-title' : 'glass-dark text-inverse', revealed ? 'pointer-events-auto' : 'pointer-events-none']"
+      class="mx-auto flex max-w-[1120px] items-center justify-between gap-3 rounded-chrome px-3 py-2 transition-[background-color,box-shadow,border-color,color] duration-200"
     >
       <a href="#topo" class="inline-flex items-center px-1 py-0.5" :aria-label="APP_NAME">
         <BrandMark class="h-10 w-auto text-brand sm:h-11" />
