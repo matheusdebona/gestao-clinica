@@ -41,7 +41,11 @@ export const SHELL_PAYMENT_PERMISSIONS = [
   'card_operators.manage',
 ] as const
 
+/** Formato antigo (vários grupos abertos); migrado e apagado na primeira leitura. */
 export const SHELL_NAV_OPEN_STORAGE_KEY = 'gc_shell_nav_open'
+
+/** Grupo aberto do menu (um só); string vazia = todos fechados. */
+export const SHELL_NAV_OPEN_GROUP_STORAGE_KEY = 'gc_shell_nav_open_group'
 
 /** Max items in the mobile tab bar, including "Mais". */
 export const MOBILE_NAV_SLOTS = 5
@@ -398,56 +402,130 @@ export function groupContainingPath(nav: VisibleNav[], pathname: string): string
   return null
 }
 
-export function isOpenState(value: unknown): value is Record<string, boolean> {
+export type OpenGroups = Record<string, boolean>
+
+type ReadStorage = Pick<Storage, 'getItem'>
+type WriteStorage = Pick<Storage, 'setItem' | 'removeItem'>
+
+function defaultStorage(): Storage | null {
+  return typeof localStorage === 'undefined' ? null : localStorage
+}
+
+export function isOpenState(value: unknown): value is OpenGroups {
   if (!value || typeof value !== 'object' || Array.isArray(value)) {
     return false
   }
   return Object.values(value).every((entry) => typeof entry === 'boolean')
 }
 
-export function readStoredOpenGroups(
-  storage?: Pick<Storage, 'getItem'> | null,
-): Record<string, boolean> {
-  try {
-    const store = storage ?? (typeof localStorage === 'undefined' ? null : localStorage)
-    const raw = store?.getItem(SHELL_NAV_OPEN_STORAGE_KEY)
-    if (!raw) {
-      return {}
+/** Accordion exclusivo: no máximo um grupo aberto. */
+export function openOnly(groupId: string | null): OpenGroups {
+  return groupId ? { [groupId]: true } : {}
+}
+
+/** O grupo aberto (o primeiro na ordem do menu, se um estado antigo tiver vários). */
+export function openGroupId(open: OpenGroups, nav?: VisibleNav[]): string | null {
+  const ids = Object.keys(open).filter((id) => open[id])
+  if (ids.length === 0) {
+    return null
+  }
+  if (nav) {
+    const inMenu = nav.find((entry) => entry.kind === 'group' && ids.includes(entry.id))
+    if (inMenu) {
+      return inMenu.id
     }
-    const parsed: unknown = JSON.parse(raw)
-    return isOpenState(parsed) ? parsed : {}
+  }
+  return ids[0] ?? null
+}
+
+/**
+ * Grupo aberto salvo. Migra o formato antigo (`gc_shell_nav_open`, vários grupos
+ * `{ id: true }`) para um só grupo na chave nova e apaga a antiga.
+ */
+export function readStoredOpenGroup(
+  storage?: (ReadStorage & Partial<WriteStorage>) | null,
+  nav?: VisibleNav[],
+): string | null {
+  try {
+    const store = storage ?? defaultStorage()
+    if (!store) {
+      return null
+    }
+    const current = store.getItem(SHELL_NAV_OPEN_GROUP_STORAGE_KEY)
+    if (current !== null) {
+      return current === '' ? null : current
+    }
+    const legacy = store.getItem(SHELL_NAV_OPEN_STORAGE_KEY)
+    if (!legacy) {
+      return null
+    }
+    let parsed: unknown = null
+    try {
+      parsed = JSON.parse(legacy)
+    } catch {
+      parsed = null
+    }
+    const migrated = isOpenState(parsed) ? openGroupId(parsed, nav) : null
+    store.setItem?.(SHELL_NAV_OPEN_GROUP_STORAGE_KEY, migrated ?? '')
+    store.removeItem?.(SHELL_NAV_OPEN_STORAGE_KEY)
+    return migrated
   } catch {
-    return {}
+    return null
   }
 }
 
-export function persistOpenGroups(
-  state: Record<string, boolean>,
-  storage?: Pick<Storage, 'setItem'> | null,
-): void {
+export function persistOpenGroup(groupId: string | null, storage?: WriteStorage | null): void {
   try {
-    const store = storage ?? (typeof localStorage === 'undefined' ? null : localStorage)
-    store?.setItem(SHELL_NAV_OPEN_STORAGE_KEY, JSON.stringify(state))
+    const store = storage ?? defaultStorage()
+    store?.setItem(SHELL_NAV_OPEN_GROUP_STORAGE_KEY, groupId ?? '')
   } catch {
     // ignore quota / private mode
   }
 }
 
-export function withActiveGroupOpen(
-  open: Record<string, boolean>,
-  groupId: string | null,
-): Record<string, boolean> {
-  if (!groupId || open[groupId]) {
-    return open
-  }
-  return { ...open, [groupId]: true }
+/**
+ * Estado ao abrir a página: só o grupo da rota atual. Numa rota fora de grupo
+ * (ex.: Início), vale o último grupo que a pessoa deixou aberto.
+ */
+export function initialOpenGroups(
+  nav: VisibleNav[],
+  pathname: string,
+  stored: string | null,
+): OpenGroups {
+  return openOnly(groupContainingPath(nav, pathname) ?? stored)
 }
 
-export function toggleGroupOpen(
-  open: Record<string, boolean>,
-  groupId: string,
-): Record<string, boolean> {
-  return { ...open, [groupId]: !open[groupId] }
+/**
+ * Navegou para uma rota: se ela fica em outro grupo, abre esse e fecha os outros.
+ * Fora de grupo, ou dentro do mesmo grupo de antes (que a pessoa pode ter fechado),
+ * mantém o que estava, já reduzido a um grupo.
+ */
+export function openGroupsForRoute(
+  open: OpenGroups,
+  nav: VisibleNav[],
+  pathname: string,
+  previousPathname?: string,
+): OpenGroups {
+  const active = groupContainingPath(nav, pathname)
+  const sameGroupAsBefore =
+    previousPathname !== undefined && active === groupContainingPath(nav, previousPathname)
+  const keep = openGroupId(open, nav)
+  const next = openOnly(active && !sameGroupAsBefore ? active : keep)
+  return sameOpenGroups(open, next) ? open : next
+}
+
+/** Clique no cabeçalho: abre só este grupo; se ele já estava aberto, fecha. */
+export function toggleExclusiveGroup(open: OpenGroups, groupId: string): OpenGroups {
+  return open[groupId] ? {} : openOnly(groupId)
+}
+
+export function sameOpenGroups(a: OpenGroups, b: OpenGroups): boolean {
+  const ids = (state: OpenGroups) =>
+    Object.keys(state)
+      .filter((id) => state[id])
+      .sort()
+      .join('|')
+  return ids(a) === ids(b)
 }
 
 export function isAlertsItem(item: Pick<ShellNavItemDef, 'id'>): boolean {

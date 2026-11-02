@@ -17,14 +17,16 @@ import { APP_NAME } from '@/lib/brand'
 import {
   SHELL_ALERT_PERMISSIONS,
   buildVisibleNav,
-  groupContainingPath,
   isAlertsItem,
   isNavActive,
-  persistOpenGroups,
-  readStoredOpenGroups,
+  initialOpenGroups,
+  openGroupId,
+  openGroupsForRoute,
+  persistOpenGroup,
+  readStoredOpenGroup,
   splitMobileNav,
-  toggleGroupOpen,
-  withActiveGroupOpen,
+  toggleExclusiveGroup,
+  type OpenGroups,
   type ShellNavItemDef,
 } from '@/lib/shell-nav'
 import { useAuthStore } from '@/stores/auth'
@@ -48,34 +50,36 @@ const moreActive = computed(() =>
   }),
 )
 
-const openGroups = ref<Record<string, boolean>>(readStoredOpenGroups())
+// Accordion exclusivo: no máximo um grupo aberto (desktop e "Mais" no celular).
+const openGroups = ref<OpenGroups>(
+  initialOpenGroups(items.value, route.path, readStoredOpenGroup(undefined, items.value)),
+)
+
+function setOpenGroups(next: OpenGroups) {
+  if (next === openGroups.value) {
+    return
+  }
+  openGroups.value = next
+  persistOpenGroup(openGroupId(next))
+}
+
+persistOpenGroup(openGroupId(openGroups.value))
 
 watch(
   () => route.path,
-  (path) => {
+  (path, previous) => {
     moreOpen.value = false
-    const groupId = groupContainingPath(items.value, path)
-    const next = withActiveGroupOpen(openGroups.value, groupId)
-    if (next !== openGroups.value) {
-      openGroups.value = next
-      persistOpenGroups(next)
-    }
+    setOpenGroups(openGroupsForRoute(openGroups.value, items.value, path, previous))
   },
-  { immediate: true },
 )
 
+// Permissões carregadas depois: recalcula com o menu visível.
 watch(items, (nav) => {
-  const groupId = groupContainingPath(nav, route.path)
-  const next = withActiveGroupOpen(openGroups.value, groupId)
-  if (next !== openGroups.value) {
-    openGroups.value = next
-    persistOpenGroups(next)
-  }
+  setOpenGroups(openGroupsForRoute(openGroups.value, nav, route.path))
 })
 
 function onToggleGroup(groupId: string) {
-  openGroups.value = toggleGroupOpen(openGroups.value, groupId)
-  persistOpenGroups(openGroups.value)
+  setOpenGroups(toggleExclusiveGroup(openGroups.value, groupId))
 }
 
 function onNavigate(_item: ShellNavItemDef) {
