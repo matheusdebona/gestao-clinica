@@ -79,6 +79,7 @@ export const PERMISSION_LABELS: Record<string, string> = {
   'metrics.view': 'Ver métricas',
   'finance.view': 'Ver custos, margens e DRE',
   'finance.manage': 'Gerenciar despesas, impostos e comissões',
+  'integrations.manage': 'Gerenciar integrações (Claude)',
 }
 
 export function roleLabel(name: string): string {

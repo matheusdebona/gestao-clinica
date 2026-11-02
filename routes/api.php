@@ -20,6 +20,7 @@ use App\Http\Controllers\Api\V1\Finance\ExpenseController;
 use App\Http\Controllers\Api\V1\Finance\FinanceSettingsController;
 use App\Http\Controllers\Api\V1\Finance\GoalRemunerationController;
 use App\Http\Controllers\Api\V1\Finance\RevenueRemunerationController;
+use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LeadDailyAnalysisController;
 use App\Http\Controllers\Api\V1\LeadFollowUpTierController;
@@ -453,6 +454,14 @@ Route::prefix('v1')->group(function (): void {
             ->middleware(['permission:metrics.view', 'permission:leads.view']);
         Route::get('metrics/sales-funnel', [MetricsController::class, 'salesFunnel'])
             ->middleware(['permission:metrics.view', 'permission:leads.view']);
+
+        // Integrações (Claude/MCP só leitura): ver status, conexões e revogar.
+        Route::get('integrations', [IntegrationController::class, 'index'])
+            ->middleware('permission:integrations.manage');
+        Route::delete('integrations/claude/connections/{user}/{client}', [IntegrationController::class, 'revokeClaude'])
+            ->whereNumber('user')
+            ->whereUuid('client')
+            ->middleware('permission:integrations.manage');
 
         Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
         Route::get('notifications', [NotificationController::class, 'index']);

@@ -77,6 +77,12 @@ export const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/SettingsPage.vue'),
       },
       {
+        path: 'integracoes',
+        name: 'integrations',
+        meta: { title: 'Integrações', permission: 'integrations.manage' },
+        component: () => import('@/pages/IntegrationsPage.vue'),
+      },
+      {
         path: 'settings/whatsapp',
         name: 'settings-whatsapp',
         meta: { title: 'Mensagens do WhatsApp', permission: 'clinics.branding' },
