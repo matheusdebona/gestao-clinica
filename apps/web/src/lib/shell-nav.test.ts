@@ -6,11 +6,15 @@ import {
   flattenNavItems,
   groupContainingPath,
   isNavActive,
-  persistOpenGroups,
-  readStoredOpenGroups,
+  initialOpenGroups,
+  openGroupId,
+  openGroupsForRoute,
+  persistOpenGroup,
+  readStoredOpenGroup,
+  sameOpenGroups,
+  SHELL_NAV_OPEN_GROUP_STORAGE_KEY,
   splitMobileNav,
-  toggleGroupOpen,
-  withActiveGroupOpen,
+  toggleExclusiveGroup,
   type VisibleNav,
 } from './shell-nav'
 
@@ -227,36 +231,109 @@ describe('isNavActive', () => {
   })
 })
 
-describe('open group state', () => {
-  it('opens the group that owns the current path', () => {
-    const nav = buildVisibleNav(ADMIN, 'payment-methods')
+function memoryStorage(initial: Record<string, string> = {}) {
+  const memory = new Map<string, string>(Object.entries(initial))
+  return {
+    memory,
+    getItem: (key: string) => memory.get(key) ?? null,
+    setItem: (key: string, value: string) => {
+      memory.set(key, value)
+    },
+    removeItem: (key: string) => {
+      memory.delete(key)
+    },
+  }
+}
+
+describe('exclusive accordion state', () => {
+  const nav = buildVisibleNav(ADMIN, 'payment-methods')
+
+  it('finds the group that owns the current path', () => {
     expect(groupContainingPath(nav, '/clients/12')).toBe('atendimento')
     expect(groupContainingPath(nav, '/')).toBeNull()
-    expect(withActiveGroupOpen({ comercial: true }, 'atendimento')).toEqual({
-      comercial: true,
+  })
+
+  it('opens only the group of the current route on load', () => {
+    expect(initialOpenGroups(nav, '/clients/12', 'comercial')).toEqual({ atendimento: true })
+    expect(initialOpenGroups(nav, '/integracoes', null)).toEqual({ gestao: true })
+  })
+
+  it('falls back to the stored group on a route outside any group', () => {
+    expect(initialOpenGroups(nav, '/', 'comercial')).toEqual({ comercial: true })
+    expect(initialOpenGroups(nav, '/', null)).toEqual({})
+  })
+
+  it('opening a group closes every other group', () => {
+    let open = toggleExclusiveGroup({}, 'atendimento')
+    expect(open).toEqual({ atendimento: true })
+    open = toggleExclusiveGroup(open, 'comercial')
+    expect(open).toEqual({ comercial: true })
+    open = toggleExclusiveGroup({ atendimento: true, gestao: true }, 'financeiro')
+    expect(open).toEqual({ financeiro: true })
+  })
+
+  it('clicking the open group closes it', () => {
+    expect(toggleExclusiveGroup({ comercial: true }, 'comercial')).toEqual({})
+  })
+
+  it('navigating into another group opens it and closes the rest', () => {
+    expect(openGroupsForRoute({ comercial: true }, nav, '/clients', '/leads')).toEqual({
       atendimento: true,
     })
   })
 
-  it('remembers toggles in storage', () => {
-    const memory = new Map<string, string>()
-    const storage = {
-      getItem: (key: string) => memory.get(key) ?? null,
-      setItem: (key: string, value: string) => {
-        memory.set(key, value)
-      },
-    }
-    persistOpenGroups(toggleGroupOpen({}, 'comercial'), storage)
-    expect(memory.get(SHELL_NAV_OPEN_STORAGE_KEY)).toBe('{"comercial":true}')
-    expect(readStoredOpenGroups(storage)).toEqual({ comercial: true })
+  it('keeps a group the user closed while moving inside it', () => {
+    expect(openGroupsForRoute({}, nav, '/clients/12', '/clients')).toEqual({})
   })
 
-  it('ignores invalid stored JSON', () => {
-    expect(
-      readStoredOpenGroups({
-        getItem: () => 'nope',
-      }),
-    ).toEqual({})
+  it('keeps the current group on a route outside any group', () => {
+    const open = { comercial: true }
+    expect(openGroupsForRoute(open, nav, '/', '/leads')).toBe(open)
+  })
+
+  it('reduces a legacy multi-open state to one group', () => {
+    expect(openGroupsForRoute({ gestao: true, atendimento: true }, nav, '/')).toEqual({
+      atendimento: true,
+    })
+    expect(openGroupId({ gestao: true, atendimento: true }, nav)).toBe('atendimento')
+    expect(sameOpenGroups({ a: true, b: false }, { a: true })).toBe(true)
+  })
+
+  it('persists a single open group', () => {
+    const storage = memoryStorage()
+    persistOpenGroup('comercial', storage)
+    expect(storage.memory.get(SHELL_NAV_OPEN_GROUP_STORAGE_KEY)).toBe('comercial')
+    expect(readStoredOpenGroup(storage)).toBe('comercial')
+    persistOpenGroup(null, storage)
+    expect(readStoredOpenGroup(storage)).toBeNull()
+  })
+
+  it('migrates the old stored value to one group and drops the old key', () => {
+    const storage = memoryStorage({
+      [SHELL_NAV_OPEN_STORAGE_KEY]: '{"gestao":true,"comercial":true,"atendimento":false}',
+    })
+    expect(readStoredOpenGroup(storage, nav)).toBe('comercial')
+    expect(storage.memory.get(SHELL_NAV_OPEN_GROUP_STORAGE_KEY)).toBe('comercial')
+    expect(storage.memory.has(SHELL_NAV_OPEN_STORAGE_KEY)).toBe(false)
+  })
+
+  it('migrates an old value with nothing open, or invalid JSON, to closed', () => {
+    const closed = memoryStorage({ [SHELL_NAV_OPEN_STORAGE_KEY]: '{"comercial":false}' })
+    expect(readStoredOpenGroup(closed, nav)).toBeNull()
+    expect(closed.memory.get(SHELL_NAV_OPEN_GROUP_STORAGE_KEY)).toBe('')
+
+    const broken = memoryStorage({ [SHELL_NAV_OPEN_STORAGE_KEY]: 'nope' })
+    expect(readStoredOpenGroup(broken, nav)).toBeNull()
+    expect(broken.memory.has(SHELL_NAV_OPEN_STORAGE_KEY)).toBe(false)
+  })
+
+  it('survives a storage that throws', () => {
+    const storage = {
+      getItem: () => {
+        throw new Error('blocked')
+      },
+    }
+    expect(readStoredOpenGroup(storage)).toBeNull()
   })
 })
 
