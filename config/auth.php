@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\McpOAuthUser;
 use App\Models\User;
 
 return [
@@ -42,6 +43,12 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        // Conector MCP (Claude): tokens OAuth do Passport, só leitura. Ver routes/ai.php.
+        'api' => [
+            'driver' => 'passport',
+            'provider' => 'mcp_users',
+        ],
     ],
 
     /*
@@ -65,6 +72,12 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        // Mesma tabela users; modelo separado só para o Passport (o User usa Sanctum).
+        'mcp_users' => [
+            'driver' => 'eloquent',
+            'model' => McpOAuthUser::class,
         ],
 
         // 'users' => [

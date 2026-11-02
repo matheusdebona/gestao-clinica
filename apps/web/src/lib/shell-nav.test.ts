@@ -15,6 +15,7 @@ import {
 } from './shell-nav'
 
 const ADMIN = [
+  'integrations.manage',
   'users.view',
   'clinics.branding',
   'products.view',
@@ -132,6 +133,7 @@ describe('buildVisibleNav', () => {
       'team',
       'payments',
       'settings',
+      'integrations',
     ])
   })
 
@@ -143,7 +145,7 @@ describe('buildVisibleNav', () => {
       'Comercial[Leads, Orçamentos, Vendas, Protocolos]',
       'Clínica[Produtos, Alertas]',
       'Financeiro[Métricas, DRE, Pagamentos]',
-      'Gestão[Equipe, Configurações]',
+      'Gestão[Equipe, Configurações, Integrações]',
     ])
   })
 
@@ -198,7 +200,7 @@ describe('splitMobileNav', () => {
       'Comercial[Orçamentos, Vendas, Protocolos]',
       'Clínica[Produtos, Alertas]',
       'Financeiro[Métricas, DRE, Pagamentos]',
-      'Gestão[Equipe, Configurações]',
+      'Gestão[Equipe, Configurações, Integrações]',
     ])
   })
 
@@ -268,6 +270,7 @@ describe('catalog coverage', () => {
         '/budgets',
         '/clients',
         '/financeiro',
+        '/integracoes',
         '/leads',
         '/metrics',
         '/notifications',

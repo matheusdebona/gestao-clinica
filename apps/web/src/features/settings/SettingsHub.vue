@@ -79,6 +79,12 @@ const entries: SettingsEntry[] = [
     description: 'Regras de vendedores e profissionais, lançamentos do mês e pagamentos.',
     permissions: ['finance.view'],
   },
+  {
+    name: 'integrations',
+    title: 'Integrações',
+    description: 'Conectar o Claude (só leitura) e ver quem tem acesso.',
+    permissions: ['integrations.manage'],
+  },
 ]
 
 const visible = computed(() => entries.filter((entry) => entry.permissions.some((name) => auth.can(name))))
